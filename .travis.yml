@@ -1,0 +1,34 @@
+# https://docs.travis-ci.com/user/customizing-the-build
+matrix:
+  include:
+      # https://stackoverflow.com/questions/27644586/how-to-set-up-travis-ci-with-multiple-languages
+    - language: python
+      python: 3.7
+      install:
+        - pip install -r cc-library/requirements.txt
+      before_script:
+        cd cc-library/test
+      script:
+        - python -m unittest discover
+
+      # https://medium.com/faun/configuring-travis-ci-for-angular-application-34afee1715f
+    - language: node_js
+      install:
+        - npm uninstall typescript --no-save
+        - npm install
+      cache:
+        directories:
+          - node_modules
+          - front-end/node-modules
+      addons:
+        apt:
+          sources:
+            - google-chrome
+          packages:
+            - google-chrome-stable
+      script:
+        - npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
+
+    - language: go
+      script:
+        - go test back-end/test
