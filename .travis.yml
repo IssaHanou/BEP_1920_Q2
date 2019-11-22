@@ -25,7 +25,9 @@ matrix:
       jobs:
         include:
           - stage: test
-            script: npm runt lint:ci && run test:coverage:ci
+            script:
+              - npm run lint
+              - npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
       stages:
         - test
       addons:

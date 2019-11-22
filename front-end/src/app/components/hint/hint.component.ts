@@ -6,7 +6,7 @@ import {IMqttMessage, MqttService} from 'ngx-mqtt';
   templateUrl: './hint.component.html',
   styleUrls: ['./hint.component.css']
 })
-export class HintComponent implements OnInit, OnDestroy {
+export class HintComponent implements OnDestroy {
   hint: string;
 
   private subscription;
@@ -25,11 +25,6 @@ export class HintComponent implements OnInit, OnDestroy {
   public ngOnDestroy() {
     this.subscription.unsubscribe();
   }
-
-  ngOnInit() {
-
-  }
-
 
   onSubmit() {
     this.unsafePublish('test', this.hint);
