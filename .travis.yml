@@ -40,9 +40,10 @@ matrix:
       script:
         - ls
         - cd back-end
-        - .travis.gofmt.sh
+        - ls
+        - bash .travis.gofmt.sh
         - golint -set_exit_status ./..
         - ls
-        - go test
+        - go test -v ./...
         - ls
         - go build
