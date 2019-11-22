@@ -34,9 +34,9 @@ matrix:
 
     - language: go
       before_install:
-        - go run requirements.txt
+        - go get -t -v ./...
       script:
         - go build
         - ./back-end/.travis.gofmt.sh
         - test -z "`golint ./...`"
-        - go test back-end/src/racoon.games/test
+        - go test back-end/test

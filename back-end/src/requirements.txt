@@ -1,2 +1,0 @@
-go get -u golang.org/x/lint/golint
-go get -u github.com/stretchr/testify/assert
