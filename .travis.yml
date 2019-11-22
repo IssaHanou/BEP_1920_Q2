@@ -39,8 +39,10 @@ matrix:
         - go get -u golang.org/x/lint/golint
       script:
         - ls
-        - cd $CI_PROJECT_DIR/back-end
+        - cd back-end
         - .travis.gofmt.sh
         - golint -set_exit_status ./..
+        - ls
         - go test
-        - go build /back-end
+        - ls
+        - go build
