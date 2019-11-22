@@ -1,15 +1,15 @@
-package main
+package other
 
 import (
-	"../config"
+	bep "../config"
 	"fmt"
 )
 
-func main() {
+func test() {
 	fmt.Println("Starting server")
 	data := []byte(`{
             "name": "My Awesome Escape",
             "duration": "00:30:00"
     }`)
-	fmt.Println(config.GetFromJson(data))
+	fmt.Println(bep.GetFromJson(data))
 }

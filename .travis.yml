@@ -35,7 +35,7 @@ matrix:
     - language: go
       go_import_path: github.com/IssaHanou/BEP_1920_Q2
       before_install:
-        - go get -t -v ./...
+        - go get github.com/stretchr/testify/assert
       script:
         - go build
         - ./back-end/.travis.gofmt.sh
