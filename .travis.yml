@@ -33,9 +33,10 @@ matrix:
             - google-chrome-stable
 
     - language: go
+      go_import_path: github.com/IssaHanou/BEP_1920_Q2
       before_install:
+        - go get github.com/stretchr/testify/assert
         - go get -u golang.org/x/lint/golint
-        - go get -u github.com/stretchr/testify/assert
       script:
         - cd $CI_PROJECT_DIR/back-end
         - .travis.gofmt.sh
