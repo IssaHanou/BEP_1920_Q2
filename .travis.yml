@@ -46,4 +46,4 @@ matrix:
         - ls
         - go test -v ./...
         - ls
-        - go build
+        - go build main

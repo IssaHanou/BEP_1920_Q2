@@ -1,8 +1,8 @@
-package main
+package config
 
 import (
 	"fmt"
-	"github.com/IssaHanou/BEP_1920_Q2/back-end/src/config"
+	"github.com/IssaHanou/BEP_1920_Q2/back-end/src/config" // Todo: remove /src when merging to master
 )
 
 func main() {
