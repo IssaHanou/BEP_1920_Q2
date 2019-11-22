@@ -5,11 +5,11 @@ matrix:
     - language: python
       python: 3.7
       install:
-        - pip install -r cc-library/requirements.txt
+        - pip install -r cc_library/requirements.txt
       before_script:
-        cd cc-library/test
+        cd cc_library
       script:
-        - flake8 cc-library
+        - flake8 cc_library
         - python -m unittest discover
 
       # https://medium.com/faun/configuring-travis-ci-for-angular-application-34afee1715f
