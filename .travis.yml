@@ -18,6 +18,7 @@ matrix:
       before_script:
         - cd front-end/
         - npm install -g @angular/cli
+        - npm update
       cache:
         directories:
           - front-end/node_modules
