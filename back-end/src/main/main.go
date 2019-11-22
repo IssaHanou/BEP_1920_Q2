@@ -1,11 +1,11 @@
 package main
 
 import (
-	"../config"
+	"config"
 	"fmt"
 )
 
-func test() {
+func Main() {
 	fmt.Println("Starting server")
 	data := []byte(`{
             "name": "My Awesome Escape",
