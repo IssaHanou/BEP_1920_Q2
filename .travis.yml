@@ -16,6 +16,11 @@ matrix:
       node_js:
         - "12.13.1"
       sudo: true      
+      before_script:
+        - cd front-end/
+        - npm install -g @angular/cli
+      script:
+        - npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
       cache:
         directories:
           - node_modules
@@ -25,11 +30,6 @@ matrix:
             - google-chrome
           packages:
             - google-chrome-stable
-      before_script:
-        - cd front-end/
-        - npm install -g @angular/cli
-      script:
-        - npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
 
     - language: go
       before_install:
