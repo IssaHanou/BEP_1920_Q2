@@ -13,8 +13,6 @@ matrix:
 
       # https://medium.com/faun/configuring-travis-ci-for-angular-application-34afee1715f
     - language: node_js
-#      dist: trusty
-#      sudo: true
       node_js:
         - "12.13.1"
       services:
@@ -30,16 +28,10 @@ matrix:
           - node_modules
       script:
         - ng lint
-        - ng test # npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
+        - ng test
         - ng e2e
-#        - xvfb-run npm run e2e
       addons:
         chrome: stable
-#        apt:
-#          sources:
-#            - google-chrome
-#          packages:
-#            - google-chrome-stable
 
     - language: go
       before_install:

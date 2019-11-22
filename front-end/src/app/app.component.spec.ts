@@ -3,7 +3,7 @@ import { AppComponent } from './app.component';
 import {HintComponent} from './components/hint/hint.component';
 import {FormsModule} from '@angular/forms';
 import {MqttModule, MqttService} from 'ngx-mqtt';
-import {MQTT_SERVICE_OPTIONS} from "./app.module";
+import {MQTT_SERVICE_OPTIONS} from './app.module';
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
