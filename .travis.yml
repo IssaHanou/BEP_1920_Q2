@@ -14,14 +14,8 @@ matrix:
       # https://medium.com/faun/configuring-travis-ci-for-angular-application-34afee1715f
     - language: node_js
       node_js:
-        - "node"
-      before_script:
-        - ls
-        - cd front-end/
-        - ls
-        - npm install -g @angular/cli
-      script:
-        - npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
+        - "12.13.1"
+      sudo: true      
       cache:
         directories:
           - node_modules
@@ -31,6 +25,11 @@ matrix:
             - google-chrome
           packages:
             - google-chrome-stable
+      before_script:
+        - cd front-end/
+        - npm install -g @angular/cli
+      script:
+        - npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
 
     - language: go
       before_install:
