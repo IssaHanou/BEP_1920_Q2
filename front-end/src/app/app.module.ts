@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import {NgModule, OnDestroy} from '@angular/core';
+import {InjectionToken, NgModule, OnDestroy} from '@angular/core';
 
 import { AppComponent } from './app.component';
 import { HintComponent } from './components/hint/hint.component';
