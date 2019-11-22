@@ -1,8 +1,8 @@
 package other
 
 import (
-	bep "../config"
 	"fmt"
+	config "github.com/IssaHanou/BEP_1920_Q2/back-end/src/config"
 )
 
 func test() {
@@ -11,5 +11,5 @@ func test() {
             "name": "My Awesome Escape",
             "duration": "00:30:00"
     }`)
-	fmt.Println(bep.GetFromJson(data))
+	fmt.Println(config.GetFromJson(data))
 }

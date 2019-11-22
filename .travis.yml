@@ -41,5 +41,5 @@ matrix:
         - go build
         - ./back-end/.travis.gofmt.sh
         - test -z "`gofmt -l .`"
-#        - test -z "`golint ./...`"
-        - go test
+        - test -z "`golint ./...`"
+        - go test -v ./...
