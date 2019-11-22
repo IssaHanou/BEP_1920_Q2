@@ -1,8 +1,8 @@
-package other
+package main
 
 import (
+	"../config"
 	"fmt"
-	config "github.com/IssaHanou/BEP_1920_Q2/back-end/src/config"
 )
 
 func test() {

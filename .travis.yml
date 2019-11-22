@@ -38,8 +38,9 @@ matrix:
         - go get github.com/stretchr/testify/assert
         - go get -u golang.org/x/lint/golint
       script:
+        - ls
         - cd $CI_PROJECT_DIR/back-end
         - .travis.gofmt.sh
         - golint -set_exit_status ./..
-        - go test test
-        - go build
+        - go test
+        - go build /back-end
