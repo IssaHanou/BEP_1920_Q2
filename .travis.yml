@@ -13,7 +13,7 @@ matrix:
 
       # https://medium.com/faun/configuring-travis-ci-for-angular-application-34afee1715f
     - language: node_js
-      dist: trusty
+#      dist: trusty
 #      sudo: true
       node_js:
         - "12.13.1" 
