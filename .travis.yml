@@ -16,7 +16,7 @@ matrix:
       node_js:
         - "node"
       before_script:
-        - cd ./nodejs
+#        - cd ./nodejs
         - npm install -g @angular/cli
       script:
         - ng build --prod
