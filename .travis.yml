@@ -16,15 +16,15 @@ matrix:
       node_js:
         - "node"
       before_script:
-#        - cd ./nodejs
+        - ls
+        - cd front-end/
+        - ls
         - npm install -g @angular/cli
       script:
-        - ng build --prod
         - npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
       cache:
         directories:
           - node_modules
-          - front-end/node-modules
       addons:
         apt:
           sources:
