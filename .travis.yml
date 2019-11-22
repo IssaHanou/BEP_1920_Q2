@@ -19,6 +19,7 @@ matrix:
 #        - cd ./nodejs
         - npm install -g @angular/cli
       script:
+        - ls
         - ng build --prod
         - npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
       cache:
