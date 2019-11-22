@@ -9,6 +9,7 @@ matrix:
       before_script:
         cd cc-library/test
       script:
+        - flake8 cc-library
         - python -m unittest discover
 
       # https://medium.com/faun/configuring-travis-ci-for-angular-application-34afee1715f
