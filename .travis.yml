@@ -6,8 +6,6 @@ matrix:
       python: 3.7
       install:
         - pip install -r cc_library/requirements.txt
-      before_script:
-        cd cc_library
       script:
         - flake8 cc_library
         - python -m unittest discover
