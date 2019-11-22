@@ -6,17 +6,18 @@ import (
 	"strings"
 )
 
+// General is a struct that describes the configurations of an escape room
 type General struct {
 	Name     string `json:"name"`
 	Duration string `json:"duration"`
 }
 
-// Takes in json with general info of escape room.
-func GetFromJson(input []byte) string {
+// GetFromJSON takes in json with general info of escape room.
+func GetFromJSON(input []byte) string {
 	var data General
 	err := json.Unmarshal(input, &data)
 	if err != nil {
-		fmt.Errorf(err.Error())
+		_ = fmt.Errorf(err.Error())
 	}
 	return "Escape room " + data.Name + " should be solved within " +
 		formatDuration(data.Duration)

@@ -11,5 +11,5 @@ func main() {
             "name": "My Awesome Escape",
             "duration": "00:30:00"
     }`)
-	fmt.Println(config.GetFromJson(data))
+	fmt.Println(config.GetFromJSON(data))
 }
