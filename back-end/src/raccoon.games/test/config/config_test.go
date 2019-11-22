@@ -1,9 +1,9 @@
 package config
 
 import (
-	"../../src/config"
-	"testing"
+	"../../config"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestGetFromJson(t *testing.T) {
@@ -13,7 +13,5 @@ func TestGetFromJson(t *testing.T) {
 		}`)
 	result := config.GetFromJson(json)
 	expected := "Escape room My Awesome Escape should be solved within 30 minutes"
-	if result != expected {
-		t.Error("Excpected: "+expected+"; but was:", result)
-	}
+	assert.Equal(t, result, expected, "JSON should be properly converted to string")
 }
