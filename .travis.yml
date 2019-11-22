@@ -34,8 +34,7 @@ matrix:
 
     - language: go
       before_install:
-        - go get -u golang.org/x/lint/golint
-        - go get -u github.com/stretchr/testify/assert
+        - go run back-end/requirements.txt
       script:
         - go build
         - ./back-end/.travis.gofmt.sh
