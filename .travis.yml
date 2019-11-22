@@ -13,9 +13,11 @@ matrix:
 
       # https://medium.com/faun/configuring-travis-ci-for-angular-application-34afee1715f
     - language: node_js
-      install:
-        - npm uninstall typescript --no-save
-        - npm install
+      before_script:
+        - npm install -g @angular/cli
+      script:
+        - ng build --prod
+        - npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
       cache:
         directories:
           - node_modules
@@ -26,9 +28,13 @@ matrix:
             - google-chrome
           packages:
             - google-chrome-stable
-      script:
-        - npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
 
     - language: go
+      before_install:
+        - go get -u golang.org/x/lint/golint
+        - go get -u github.com/stretchr/testify/assert
       script:
+        - go build
+        - ./back-end/.travis.gofmt.sh
+        - test -z "`golint ./...`"
         - go test back-end/test

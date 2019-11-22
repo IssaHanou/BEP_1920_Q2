@@ -7,7 +7,7 @@ import (
 )
 
 type General struct {
-	Name string `json:"name"`
+	Name     string `json:"name"`
 	Duration string `json:"duration"`
 }
 

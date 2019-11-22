@@ -3,6 +3,7 @@ package config
 import (
 	"../../src/config"
 	"testing"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetFromJson(t *testing.T) {
