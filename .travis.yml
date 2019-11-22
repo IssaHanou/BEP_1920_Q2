@@ -23,7 +23,7 @@ matrix:
         - npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
       cache:
         directories:
-          - node_modules
+          - front-end/node_modules
       addons:
         apt:
           sources:
