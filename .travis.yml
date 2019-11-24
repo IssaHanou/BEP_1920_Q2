@@ -28,7 +28,7 @@ matrix:
           - node_modules
       script:
         - ng lint
-        - ng test
+        - ng test --watch=false
         - ng e2e
       addons:
         chrome: stable
