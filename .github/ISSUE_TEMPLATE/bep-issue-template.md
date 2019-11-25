@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-<b>Content</b>
+<b>Content</b><br>
 Describe issue here
 
 <b>Feature</b>
