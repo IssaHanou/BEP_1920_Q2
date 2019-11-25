@@ -1,20 +1,20 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HintComponent } from './hint.component';
-import {FormsModule} from '@angular/forms';
-import {MqttModule, MqttService} from 'ngx-mqtt';
-import {MQTT_SERVICE_OPTIONS} from '../../app.module';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { HintComponent } from "./hint.component";
+import { FormsModule } from "@angular/forms";
+import { MqttModule, MqttService } from "ngx-mqtt";
+import { MQTT_SERVICE_OPTIONS } from "../../app.module";
+import { TestComponent } from "../test/test.component";
 
-describe('HintComponent', () => {
+describe("HintComponent", () => {
   let component: HintComponent;
   let fixture: ComponentFixture<HintComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [ FormsModule, MqttModule.forRoot(MQTT_SERVICE_OPTIONS) ],
-      declarations: [ HintComponent ],
-      providers: [ MqttService ],
-    })
-    .compileComponents();
+      imports: [FormsModule, MqttModule.forRoot(MQTT_SERVICE_OPTIONS)],
+      declarations: [HintComponent],
+      providers: [MqttService]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -23,7 +23,7 @@ describe('HintComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

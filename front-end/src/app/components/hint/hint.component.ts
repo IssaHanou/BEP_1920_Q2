@@ -1,33 +1,22 @@
-import {Component, Injectable, OnDestroy, OnInit} from '@angular/core';
-import {IMqttMessage, MqttService} from 'ngx-mqtt';
+import { Component } from "@angular/core";
+import { MqttService } from "ngx-mqtt";
 
 @Component({
-  selector: 'app-hint',
-  templateUrl: './hint.component.html',
-  styleUrls: ['./hint.component.css']
+  selector: "app-hint",
+  templateUrl: "./hint.component.html",
+  styleUrls: ["./hint.component.css"]
 })
-export class HintComponent implements OnDestroy {
+export class HintComponent {
   hint: string;
 
-  private subscription;
-  public message: string;
-
-  constructor(private mqttService: MqttService) {
-    this.subscription = this.mqttService.observe('test').subscribe((message: IMqttMessage) => {
-      this.message = message.payload.toString();
-    });
-  }
+  constructor(private mqttService: MqttService) {}
 
   public unsafePublish(topic: string, message: string): void {
-      this.mqttService.unsafePublish(topic, message, {qos: 1, retain: true});
-    }
-
-  public ngOnDestroy() {
-    this.subscription.unsubscribe();
+    this.mqttService.unsafePublish(topic, message, { qos: 1, retain: true });
   }
 
   onSubmit() {
-    this.unsafePublish('test', this.hint);
-    this.hint = '';
+    this.unsafePublish("hint", this.hint);
+    this.hint = "";
   }
 }
