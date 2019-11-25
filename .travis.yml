@@ -13,29 +13,32 @@ matrix:
       # https://medium.com/faun/configuring-travis-ci-for-angular-application-34afee1715f
     - language: node_js
       node_js:
-        - "node"
+        - "12.13.1"
+      services:
+        - xvfb
+      dist: xenial
       before_script:
-        - ls
         - cd front-end/
-        - ls
         - npm install -g @angular/cli
-      script:
-        - npm run test -- --watch=false --no-progress --browsers=ChromeHeadlessNoSandbox
+        - npm update
+        - export DISPLAY=:99.0
       cache:
         directories:
           - node_modules
+      script:
+        - ng lint
+        - ng test --watch=false
+#        - ng e2e
       addons:
-        apt:
-          sources:
-            - google-chrome
-          packages:
-            - google-chrome-stable
+        chrome: stable
 
     - language: go
+      go_import_path: github.com/IssaHanou/BEP_1920_Q2
       before_install:
-        - go run requirements.txt
+        - go get github.com/stretchr/testify/assert
+        - go get -u golang.org/x/lint/golint
       script:
+        - cd back-end
+        - golint -set_exit_status ./..
+        - go test -v ./...
         - go build
-        - ./back-end/.travis.gofmt.sh
-        - test -z "`golint ./...`"
-        - go test back-end/src/racoon.games/test
