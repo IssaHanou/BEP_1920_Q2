@@ -4,3 +4,4 @@
 /cc_library/.idea
 __pycache__/
 **/.idea
+*/debug.log
