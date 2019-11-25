@@ -15,3 +15,6 @@ Describe issue here
 
 ### Action plan
 - [ ] First action to do
+
+### Related issues
+GH-
