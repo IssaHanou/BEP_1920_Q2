@@ -7,11 +7,11 @@ assignees: ''
 
 ---
 
-###Content
+### Content
 Describe issue here
 
-###Feature
+### Feature
 - Feature of this issue
 
-###Action plan
+### Action plan
 - [ ] First action to do
