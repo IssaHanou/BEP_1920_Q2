@@ -29,7 +29,7 @@ matrix:
       script:
         - ng lint
         - ng test --watch=false
-        - ng e2e
+#        - ng e2e
       addons:
         chrome: stable
 
