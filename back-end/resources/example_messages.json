@@ -1,0 +1,67 @@
+{
+  "messageStatusSequence": {
+    "device_id": "controlBoard",
+    "time_sent": "01-10-2019 13:59:02",
+    "type": "status",
+    "contents": [
+      0,
+      1,
+      2,
+      8,
+      3
+    ]
+  },
+  "messageStatusComponent": {
+    "device_id": "controlBoard",
+    "time_sent": "01-10-2019 13:59:02",
+    "type": "status",
+    "contents": {
+      "redSwitch": true,
+      "orangeSwitch": false,
+      "greenSwitch": false,
+      "slider1": 60,
+      "slider2": 30,
+      "slider3": 90,
+      "mainSwitch": false
+    }
+  },
+  "messageConfirmation": {
+    "device_id": "controlBoard",
+    "time_sent": "01-10-2019 13:59:02",
+    "type": "confirmation",
+    "contents": {
+      "completed": true
+    }
+  },
+  "messageInstructionTest": {
+    "device_id": "controlBoard",
+    "time_sent": "01-10-2019 13:59:02",
+    "type": "instruction",
+    "contents": {
+      "instruction": "test"
+    }
+  },
+  "messageInstructionStart": {
+    "device_id": "controlBoard",
+    "time_sent": "01-10-2019 13:59:02",
+    "type": "instruction",
+    "contents": {
+      "instruction": "start"
+    }
+  },
+  "device_id": "controlBoard",
+  "time_sent": "01-10-2019 13:59:02",
+  "type": "instruction",
+  "contents": {
+    "instruction": "update",
+    "new_status": {
+      "redSwitch": true,
+      "orangeSwitch": false,
+      "greenSwitch": false,
+      "slider1": 60,
+      "slider2": 30,
+      "slider3": 90,
+      "mainSwitch": false
+    }
+  }
+}

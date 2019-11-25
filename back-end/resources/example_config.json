@@ -1,0 +1,178 @@
+{
+  "general": {
+    "name": "Escape X",
+    "duration": "00:30:00"
+  },
+  "devices": [
+    {
+      "id": "controlBoard",
+      "description": "Control board with three switches, three slides with lights and one main switch.",
+      "input_units": [
+        "redSwitch",
+        "orangeSwitch",
+        "greenSwitch",
+        "slider1",
+        "slider2",
+        "slider3",
+        "mainSwitch"
+      ],
+      "output_units": [
+        "greenLight1",
+        "greenLight2",
+        "greenLight3",
+        "redLight1",
+        "redLight2",
+        "redLight3"
+      ],
+      "message": {
+        "input": {
+          "redSwitch": true,
+          "orangeSwitch": false,
+          "greenSwitch": false,
+          "slider1": 60,
+          "slider2": 30,
+          "slider3": 90,
+          "mainSwitch": false
+        },
+        "output": {
+          "greenLight1": false,
+          "greenLight2": false,
+          "greenLight3": false,
+          "redLight1": true,
+          "redLight2": true,
+          "redLight3": true
+        }
+      }
+    },
+    {
+      "id": "telephone",
+      "description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
+      "components": [],
+      "message": {
+        "input": [
+          0,
+          1,
+          2,
+          8,
+          3
+        ],
+        "output": "audio_1"
+      }
+    }
+  ],
+  "puzzles": [
+    {
+      "name": "Telefoon puzzels",
+      "rules": [
+        {
+          "id": "correctSequence",
+          "description": "De juiste volgorde van cijfers moet gedraaid worden.",
+          "conditions": [
+            {
+              "type": "device",
+              "id": "telphone",
+              "constraints": [
+                {
+                  "comparison": "eq",
+                  "value": [0, 1, 2, 7]
+                }
+              ],
+              "actions": [
+                {
+                  "type": "device",
+                  "id": "controlBoard",
+                  "message": {
+                    "output": {
+                      "greenLight1": {
+                        "instruction": "blink",
+                        "interval": 0.5
+                      },
+                      "greenLight2": false,
+                      "greenLight3": false,
+                      "redLight1": false,
+                      "redLight2": false,
+                      "redLight3": {
+                        "instruction": "blink",
+                        "interval": 0.5
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "hints": [
+        "De knop verzend jouw volgorde",
+        "Heb je al even gewacht?"
+      ]
+    },
+    {
+      "name": "Control puzzel",
+      "rules": [
+        {
+          "id": "controlSwitch",
+          "description": "Als de grote switch wordt geflipt, worden alle condities gecheckt (tweede schuif en groene of rode switch aan) en gaat het lichtje branden en de telefoono ringt.",
+          "conditions": [
+            {
+              "type": "device",
+              "device": "controlBoard",
+              "constraints": [
+                [
+                  {
+                    "component_id": "greenSwitch",
+                    "comparison": "eq",
+                    "value": true
+                  },
+                  {
+                    "component_id": "redSwitch",
+                    "comparison": "eq",
+                    "value": true
+                  }
+                ],
+                {
+                  "component_id": "slider2",
+                  "comparison": "lt",
+                  "value": 30
+                }
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "device",
+              "id": "telephone",
+              "message": {
+                "output": {
+                  "value": "audio_1"
+                }
+              }
+            },
+            {
+              "type": "device",
+              "id": "controlBoard",
+              "message": {
+                "status": {
+                  "redSwitch": true,
+                  "orangeSwitch": false,
+                  "greenSwitch": false,
+                  "slider1": 60,
+                  "slider2": 30,
+                  "slider3": 90,
+                  "mainSwitch": false,
+                  "greenLight1": false,
+                  "greenLight2": true,
+                  "greenLight3": false
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "hints": [
+        "Zet de schuiven nauwkeurig"
+      ]
+    }
+  ]
+}
