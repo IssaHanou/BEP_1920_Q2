@@ -17,9 +17,9 @@ export class TestComponent {
       type: "instruction",
       instruction: "test all",
       time_sent:
-        now.getDay() +
+        now.getDate() +
         "-" +
-        now.getMonth() +
+        (now.getMonth() + 1) +
         "-" +
         now.getFullYear() +
         " " +
