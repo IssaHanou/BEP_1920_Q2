@@ -44,14 +44,11 @@ matrix:
 #        - cd ../golang.org/x/
 #        - git clone https://github.com/golang/tools.git
         - go get -u golang.org/x/lint/golint
-        - ls 
-        - cd ../golang.org/x/
-        - ls
 
       script:
         - ls
-        - cd ../
+        - cd ../..
         - ls
-        - golint -set_exit_status sciler/..
+        - golint -set_exit_status sciler/...
         - go test -v sciler/...
         - go build sciler
