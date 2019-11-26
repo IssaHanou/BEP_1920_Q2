@@ -18,6 +18,7 @@ This is the general information of the escape room. It includes the following ta
 - `name`: this is the name of the escape room, this is a string, e.g. "Escape room X". This can be displayed in the front-end, so should be readable and in Dutch. 
 - `duration`: this is the duration of the escape room, which should be a string in the format "hh:mm:ss".
 - `host`: this is the IP address of the broker through which clients and back-end connect, formatted as a string.
+- `port`: this is the port on which the broker runs, formatted as integer. 
 
 ### Devices
 This will be a list of all devices in the room. Each device is defined as a JSON object with the following properties:

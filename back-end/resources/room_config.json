@@ -2,7 +2,8 @@
   "general": {
     "name": "Escape X",
     "duration": "00:30:00",
-    "host": "192.0.0.84"
+    "host": "192.0.0.84",
+    "port": 1883
   },
   "devices": [
     {
@@ -148,7 +149,7 @@
       "rules": [
         {
           "id": "controlSwitch",
-          "description": "Als de grote switch wordt geflipt, worden alle condities gecheckt (tweede schuif en groene of rode switch aan) en gaat het lichtje branden en de telefoono ringt.",
+          "description": "Als de grote switch wordt geflipt, worden alle condities gecheckt (tweede schuif en groene of rode switch aan) en gaat het lichtje branden en de telefoon ringt.",
           "limit": 1,
           "conditions": [
             {
