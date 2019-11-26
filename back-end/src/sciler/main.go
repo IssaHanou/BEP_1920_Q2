@@ -22,6 +22,8 @@ func main() {
 
 	communicator := communication.NewCommunicator(host, port, topics)
 	communicator.Start()
+
+	//loop for now preventing app to exit
 	for {
 		time.Sleep(time.Microsecond * time.Duration(250))
 	}
