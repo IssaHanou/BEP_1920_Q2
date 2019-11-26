@@ -16,13 +16,15 @@
     "time_sent": "01-10-2019 13:59:02",
     "type": "status",
     "contents": {
-      "redSwitch": true,
-      "orangeSwitch": false,
-      "greenSwitch": false,
-      "slider1": 60,
-      "slider2": 30,
-      "slider3": 90,
-      "mainSwitch": false
+      "input": {
+        "redSwitch": true,
+        "orangeSwitch": false,
+        "greenSwitch": false,
+        "slider1": 60,
+        "slider2": 30,
+        "slider3": 90,
+        "mainSwitch": false
+      }
     }
   },
   "messageConfirmation": {
@@ -53,15 +55,14 @@
   "time_sent": "01-10-2019 13:59:02",
   "type": "instruction",
   "contents": {
-    "instruction": "update",
-    "new_status": {
-      "redSwitch": true,
-      "orangeSwitch": false,
-      "greenSwitch": false,
-      "slider1": 60,
-      "slider2": 30,
-      "slider3": 90,
-      "mainSwitch": false
+    "instruction": "output",
+    "output": {
+      "greenLight1": false,
+      "greenLight2": false,
+      "greenLight3": false,
+      "redLight1": true,
+      "redLight2": true,
+      "redLight3": true
     }
   }
 }

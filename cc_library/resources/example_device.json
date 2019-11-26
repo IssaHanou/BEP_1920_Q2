@@ -1,0 +1,70 @@
+{
+  "id": "controlBoard",
+  "description": "Control board with three switches, three slides with lights and one main switch.",
+  "input_units": [
+    "redSwitch",
+    "orangeSwitch",
+    "greenSwitch",
+    "slider1",
+    "slider2",
+    "slider3",
+    "mainSwitch"
+  ],
+  "output_units": [
+    "greenLight1",
+    "greenLight2",
+    "greenLight3",
+    "redLight1",
+    "redLight2",
+    "redLight3"
+  ],
+  "message": {
+    "input": {
+      "redSwitch": true,
+      "orangeSwitch": false,
+      "greenSwitch": false,
+      "slider1": 60,
+      "slider2": 30,
+      "slider3": 90,
+      "mainSwitch": false
+    },
+    "output": {
+      "greenLight1": false,
+      "greenLight2": false,
+      "greenLight3": false,
+      "redLight1": true,
+      "redLight2": true,
+      "redLight3": true
+    }
+  },
+  "test": {
+    "output": {
+      "greenLight1": {
+        "instruction": "blink",
+        "interval": 0.5,
+        "delay": 0.3
+      },
+      "greenLight2": {
+        "instruction": "blink",
+        "interval": 0.5,
+        "delay": 0.7
+      },
+      "greenLight3": {
+        "instruction": "blink",
+        "interval": 0.5
+      },
+      "redLight1": {
+        "instruction": "blink",
+        "interval": 0.5
+      },
+      "redLight2": {
+        "instruction": "blink",
+        "interval": 0.5
+      },
+      "redLight3": {
+        "instruction": "blink",
+        "interval": 0.5
+      }
+    }
+  }
+}
