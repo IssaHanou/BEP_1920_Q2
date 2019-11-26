@@ -45,8 +45,8 @@ matrix:
         - ls
         - cd ../..
         - ls
-        - cd src
+        - cd src/sciler
         - golint -set_exit_status sciler/...
-        - cd ../
+        - cd ../..
         - go test -v sciler/...
         - go build sciler
