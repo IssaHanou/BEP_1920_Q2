@@ -45,6 +45,8 @@ matrix:
 #        - git clone https://github.com/golang/tools.git
         - go get -u golang.org/x/lint/golint
         - ls 
+        - cd ../
+        - ls
 
       script:
         - ls
