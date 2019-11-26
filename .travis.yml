@@ -35,6 +35,8 @@ matrix:
     - language: go
       go_import_path: github.com/IssaHanou/BEP_1920_Q2/back-end/src
       before_install:
+        - cd $TRAVIS_BUILD_DIR
+        - ls
         - cd back-end/src
         - ls
         - go get github.com/stretchr/testify/assert
