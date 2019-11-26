@@ -35,6 +35,7 @@ matrix:
     - language: go
       go_import_path: github.com/IssaHanou/BEP_1920_Q2/back-end/src
       before_install:
+        - go version
         - export GOPATH=$TRAVIS_BUILD_DIR/back-end/src
         - ls
         - cd back-end/src
