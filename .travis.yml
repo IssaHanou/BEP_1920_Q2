@@ -42,6 +42,18 @@ matrix:
         - ls
         - cd ../
         - ls
+        - cd ../
+        - ls
+        - cd ../
+        - ls
+        - cd ../
+        - ls
+        - cd ../
+        - ls
+        - cd ../
+        - ls
+        - cd ../
+        - ls
         - go get github.com/stretchr/testify/assert
         - go get -u golang.org/x/lint/golint
         - ls
