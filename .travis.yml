@@ -40,15 +40,13 @@ matrix:
         - cd back-end/src/sciler
         - ls
         - go get github.com/stretchr/testify/assert
-        - mkdir -p $GOPATH/src/golang.org/x/
-        - cd ../golang.org/x/
-        - git clone https://github.com/golang/tools.git
-#        - go get -u golang.org/x/lint/golint
-        - cd ../../sciler
+        - go get -u golang.org/x/lint/golint
       script:
         - ls
         - cd ../..
         - ls
+        - cd src
         - golint -set_exit_status sciler/...
+        - cd ../
         - go test -v sciler/...
         - go build sciler
