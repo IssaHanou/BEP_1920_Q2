@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"sciler/communication"
-	config2 "sciler/config"
+	"sciler/config"
 	"time"
 )
 
@@ -18,7 +18,7 @@ func main() {
             "name": "My Awesome Escape",
             "duration": "00:30:00"
     }`)
-	fmt.Println(config2.GetFromJSON(data))
+	fmt.Println(config.GetFromJSON(data))
 
 	communicator := communication.NewCommunicator(host, port, topics)
 	communicator.Start()

@@ -35,13 +35,13 @@ matrix:
     - language: go
       go_import_path: github.com/IssaHanou/BEP_1920_Q2/back-end/src
       before_install:
+        - cd back-end/src
         - ls
         - go get github.com/stretchr/testify/assert
         - go get -u golang.org/x/lint/golint
-        - ls
       script:
-        - ls
-        - cd back-end/src
+#        - ls
+#        - cd back-end/src
         - ls
         - golint -set_exit_status sciler/..
         - go test -v sciler/...
