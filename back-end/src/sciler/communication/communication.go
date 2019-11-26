@@ -7,21 +7,24 @@ import (
 	"time"
 )
 
-type communicator struct {
+// Communicator is a type that maintains communication with the front-end and the client computers.
+type Communicator struct {
 	clientOptions    mqtt.ClientOptions
 	topicsOfInterest []string
 }
 
-// NewCommunicator is a constructor for a communicator
-func NewCommunicator(host string, port string, topicsOfInterest []string) *communicator {
+// NewCommunicator is a constructor for a Communicator
+// It returns a Communicator
+func NewCommunicator(host string, port string, topicsOfInterest []string) *Communicator {
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("%s://%s:%s", "tcp", host, port))
 	opts.SetClientID("back-end")
 	opts.SetConnectionLostHandler(onConnectionLost)
-	return &communicator{*opts, topicsOfInterest}
+	return &Communicator{*opts, topicsOfInterest}
 }
 
-func (communicator *communicator) Start() {
+// Start is a function that will start the communication by connecting to the broker and subscribing to all topics of interest
+func (communicator *Communicator) Start() {
 	client := mqtt.NewClient(&communicator.clientOptions)
 	client.Connect()
 	topics := make(map[string]byte)
