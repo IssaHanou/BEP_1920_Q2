@@ -33,7 +33,7 @@ matrix:
         chrome: stable
 
     - language: go
-      go_import_path: github.com/IssaHanou/BEP_1920_Q2
+      go_import_path: github.com/IssaHanou/BEP_1920_Q2/back-end
       before_install:
         - ls
         - go get github.com/stretchr/testify/assert
