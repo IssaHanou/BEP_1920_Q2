@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/IssaHanou/BEP_1920_Q2/back-end/config"
-	"./communication"
+	"sciler/communication"
+	config2 "sciler/config"
 	"time"
 )
 
 const host string = "localhost"
 const port string = "1883"
-var topics = []string{"back-end", "status", "hint"}
+
+var topics = []string{"back-end", "status", "hint", "connect"}
 
 func main() {
 	fmt.Println("Starting server")
@@ -17,7 +18,7 @@ func main() {
             "name": "My Awesome Escape",
             "duration": "00:30:00"
     }`)
-	fmt.Println(config.GetFromJSON(data))
+	fmt.Println(config2.GetFromJSON(data))
 
 	communicator := communication.NewCommunicator(host, port, topics)
 	communicator.Start()
@@ -25,4 +26,3 @@ func main() {
 		time.Sleep(time.Microsecond * time.Duration(250))
 	}
 }
-

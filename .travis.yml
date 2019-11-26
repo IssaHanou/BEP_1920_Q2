@@ -38,7 +38,7 @@ matrix:
         - go get github.com/stretchr/testify/assert
         - go get -u golang.org/x/lint/golint
       script:
-        - cd back-end
-        - golint -set_exit_status ./..
-        - go test -v ./...
-        - go build
+        - cd back-end/src
+        - golint -set_exit_status sciler/..
+        - go test -v sciler/...
+        - go build sciler

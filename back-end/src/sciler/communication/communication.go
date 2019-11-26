@@ -12,6 +12,7 @@ type communicator struct {
 	topicsOfInterest []string
 }
 
+// NewCommunicator is a constructor for a communicator
 func NewCommunicator(host string, port string, topicsOfInterest []string) *communicator {
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("%s://%s:%s", "tcp", host, port))
