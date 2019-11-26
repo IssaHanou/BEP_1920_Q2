@@ -39,10 +39,9 @@ matrix:
         - ls
         - cd back-end/src/sciler
         - ls
-        - go get github.com/stretchr/testify/assert
+#        - go get github.com/stretchr/testify/assert
+        - mkdir -p $GOPATH/src/golang.org/x/
         - go get -u golang.org/x/lint/golint
-        - ls 
-        - cd sciler
       script:
         - ls
         - cd ../
