@@ -12,7 +12,7 @@ matrix:
 
       # https://medium.com/faun/configuring-travis-ci-for-angular-application-34afee1715f
     - language: node_js
-      node_js: 12.13.1"
+      node_js: 12.13.1
       services:
         - xvfb
       dist: xenial
@@ -33,11 +33,14 @@ matrix:
 
     - language: go
       go: 1.13.4
-      go_import_path: github.com/IssaHanou/BEP_1920_Q2/back-end/src
+      go_import_path: github.com/IssaHanou/BEP_1920_Q2/back-end
       before_install:
-        - export GOPATH=$HOME/travis/gopath/BEP_1920_Q2/back-end/
-        - export TRAVIS_BUILD_DIR=$HOME/travis/gopath/BEP_1920_Q2/back-end/src/
-        - cd $HOME/travis/gopath/BEP_1920_Q2/back-end/src
+        - ls
+        - cd ../
+        - ls
+        - cd ../
+        - ls
+        - cd ../
         - ls
         - go get github.com/stretchr/testify/assert
         - go get -u golang.org/x/lint/golint
