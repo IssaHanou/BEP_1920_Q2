@@ -9,6 +9,7 @@ There are three main components to the file:
 - `general`
 - `devices`
 - `puzzles` 
+- `general_events`
 - `rules` which are defined for puzzles
 
 ### General
@@ -16,27 +17,33 @@ This is the general information of the escape room. It includes the following ta
 
 - `name`: this is the name of the escape room, this is a string, e.g. "Escape room X". This can be displayed in the front-end, so should be readable and in Dutch. 
 - `duration`: this is the duration of the escape room, which should be a string in the format "hh:mm:ss".
+- `host`: this is the IP address of the broker through which clients and back-end connect, formatted as a string.
 
 ### Devices
 This will be a list of all devices in the room. Each device is defined as a JSON object with the following properties:
 
 - `id`: this is the id of a device. Write it in camelCase, e.g. "controlBoard".
 - `description`: this is optional and can contain more information about the device. This can be displayed in the front-end, so should be readable and in Dutch. 
-- `IP_address`: the IP address of the client computer for this device
-- `input_components`: this is a list of ids of different components of a device, which can generate input to the system. This can be empty. 
-- `output_components`: this is a list of ids of different components of a device, which can provide output of the system. This can be empty. 
-- `message`: this is an example message of the status update. It contains two status messages:
-    
-    - `input`: defines either default values for every input_component (in the form "componentId": "value") or if the input_components list is empty it will define the `value` tag, which can be a string, integer, boolean or array of single values.
-    - `output`: definer either values for every output_component (in the form "componentId": "value") or if the output_components list is empty it will define the `value` tag, which can be a string, integer, boolean or array of single values.
+- `input`: defines type of values to be expected as input as a map. There can be one key `value`, or the keys can be component ids. 
+    The value is a map with the `type` property. This is defined as a string and can "string", "boolean", "array", "integer" or a custom name. 
+- `output`: defines type of values to be expected as output as a map. There can be one key `value`, or the keys can be component ids. 
+    The value is a map with the `type` property. This is defined as a string and can "string", "boolean", "array", "integer" or a custom name.
+    It can also carry the `instruction` property which defines a map with custom instruction for the device. 
     
 ### Puzzles
 Puzzles is an array of puzzle objects, which have a 
 
 - `name`: name of puzzle. This can be displayed in the front-end, so should be readable and in Dutch. 
-- `rules`: array of rules objects (see below)
+- `rules`: array of rule objects (see below)
 - `hints`: array of hints (strings), specific to each puzzle. 
 These can be displayed in the front-end, so should be readable and in Dutch. 
+
+
+### General Events
+General events have the following properties:
+
+- `name`: name of event, for example "start"
+- `rules`: array of rule objects (see below)
 
 ### Rules
 Rules are defined by:

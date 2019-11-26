@@ -1,69 +1,89 @@
 {
   "general": {
     "name": "Escape X",
-    "duration": "00:30:00"
+    "duration": "00:30:00",
+    "host": "192.0.0.84"
   },
   "devices": [
     {
       "id": "controlBoard",
       "description": "Control board with three switches, three slides with lights and one main switch.",
-      "IP_address": "192.30.84.29",
-      "input_components": [
-        "redSwitch",
-        "orangeSwitch",
-        "greenSwitch",
-        "slider1",
-        "slider2",
-        "slider3",
-        "mainSwitch"
-      ],
-      "output_components": [
-        "greenLight1",
-        "greenLight2",
-        "greenLight3",
-        "redLight1",
-        "redLight2",
-        "redLight3"
-      ],
-      "message": {
-        "input": {
-          "redSwitch": true,
-          "orangeSwitch": false,
-          "greenSwitch": false,
-          "slider1": 60,
-          "slider2": 30,
-          "slider3": 90,
-          "mainSwitch": false
+      "input": {
+        "redSwitch": {
+          "type": "boolean"
         },
-        "output": {
-          "greenLight1": false,
-          "greenLight2": false,
-          "greenLight3": false,
-          "redLight1": true,
-          "redLight2": true,
-          "redLight3": true
+        "orangeSwitch": {
+          "type": "boolean"
+        },
+        "greenSwitch": {
+          "type": "boolean"
+        },
+        "slider1": {
+          "type": "integer"
+        },
+        "slider2": {
+          "type": "integer"
+        },
+        "slider3": {
+          "type": "integer"
+        },
+        "mainSwitch": {
+          "type": "boolean"
+        }
+      },
+      "output": {
+        "greenLight1": {
+          "type": "string",
+          "instruction": {
+            "interval": "integer",
+            "delay": "integer"
+          }
+        },
+        "greenLight2": {
+          "type": "string",
+          "instruction": {
+            "interval": "integer",
+            "delay": "integer"
+          }
+        },
+        "greenLight3": {
+          "type": "string",
+          "instruction": {
+            "interval": "integer",
+            "delay": "integer"
+          }
+        },
+        "redLight1": {
+          "type": "string",
+          "instruction": {
+            "interval": "integer",
+            "delay": "integer"
+          }
+        },
+        "redLight2":  {
+          "type": "string",
+          "instruction": {
+            "interval": "integer",
+            "delay": "integer"
+          }
+        },
+        "redLight3":  {
+          "type": "string",
+          "instruction": {
+            "interval": "integer",
+            "delay": "integer"
+          }
         }
       }
     },
     {
       "id": "telephone",
       "description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
-      "IP_address": "192.30.84.29",
-      "input_components": [],
-      "output_components": [],
-      "message": {
-        "input": {
-          "value": [
-            0,
-            1,
-            2,
-            8,
-            3
-          ]
-        },
-        "output": {
-          "value": "audio_1"
-        }
+      "input": {
+        "value": "array"
+      },
+      "output": {
+        "value": "string"
       }
     }
   ],
@@ -74,6 +94,7 @@
         {
           "id": "correctSequence",
           "description": "De juiste volgorde van cijfers moet gedraaid worden.",
+          "limit": 1,
           "conditions": [
             {
               "type": "device",
@@ -81,7 +102,12 @@
               "constraints": [
                 {
                   "comparison": "eq",
-                  "value": [0, 1, 2, 7]
+                  "value": [
+                    0,
+                    1,
+                    2,
+                    7
+                  ]
                 }
               ],
               "actions": [
@@ -92,7 +118,8 @@
                     "output": {
                       "greenLight1": {
                         "instruction": "blink",
-                        "interval": 0.5
+                        "interval": 0.5,
+                        "delay": 0
                       },
                       "greenLight2": false,
                       "greenLight3": false,
@@ -100,7 +127,8 @@
                       "redLight2": false,
                       "redLight3": {
                         "instruction": "blink",
-                        "interval": 0.5
+                        "interval": 0.5,
+                        "delay": 0
                       }
                     }
                   }
@@ -121,12 +149,11 @@
         {
           "id": "controlSwitch",
           "description": "Als de grote switch wordt geflipt, worden alle condities gecheckt (tweede schuif en groene of rode switch aan) en gaat het lichtje branden en de telefoono ringt.",
-          "triggered": 0,
           "limit": 1,
           "conditions": [
             {
               "type": "device",
-              "device": "controlBoard",
+              "id": "controlBoard",
               "constraints": [
                 {
                   "component_id": "mainSwitch",
@@ -182,6 +209,41 @@
       ],
       "hints": [
         "Zet de schuiven nauwkeurig"
+      ]
+    }
+  ],
+  "general_events": [
+    {
+      "name": "Start",
+      "rules": [
+        {
+          "id": "telephoneRings",
+          "description": "Als het spel start, moet de telefoon na 1 minuut ringen.",
+          "limit": 1,
+          "conditions": [
+            {
+              "type": "time",
+              "id": "telephone",
+              "constraints": [
+                {
+                  "comparison": "eq",
+                  "value": "00:01:00"
+                }
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "device",
+              "id": "telephone",
+              "message": {
+                "output": {
+                  "value": "audio_1"
+                }
+              }
+            }
+          ]
+        }
       ]
     }
   ]
