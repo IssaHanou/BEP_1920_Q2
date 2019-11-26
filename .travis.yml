@@ -41,8 +41,7 @@ matrix:
         - ls
         - go get github.com/stretchr/testify/assert
         - go get -u golang.org/x/lint/golint
-      install:
-        - go get -u golang.org/x/lint/golint
+        - go get -t -v ./...
       script:
         - ls
         - cd ../..
