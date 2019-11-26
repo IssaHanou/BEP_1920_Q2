@@ -55,7 +55,7 @@ This can be displayed in the front-end, so should be readable and in Dutch.
 - `limit`: this sets the number of times this rule can be triggered. 
 - `conditions`: this is an array of conditions. By putting several constraints in an array within the conditions array, they will be treated as OR conditions. 
 
-    - `type`: this can `rule`, `time` or `device`.
+    - `type`: this can `rule`, `timer` or `device`.
     - `id`: this will be the id of a timer, rule or device, depending on the type.
     - `constraints`: this is an array of constraints. By putting several constraints in an array within the constrains array, they will be treated as OR constraints. 
         

@@ -8,6 +8,5 @@ This will be a list of all devices in the room. Each device is defined as a JSON
 - `output`: defines type of values to be expected as output as a map. There can be one key `value`, or the keys can be component ids. 
     The value is a map with the `type` property. This is defined as a string and can "string", "boolean", "array", "integer" or a custom name.
     It can also carry the `instruction` property which defines a map with custom instruction for the device. 
-- `test`: defines test output sequence in the form of an `output` tag, defined similarly as described above. 
 - `label`: *To be added later*
 - `interval`: *To be added later*

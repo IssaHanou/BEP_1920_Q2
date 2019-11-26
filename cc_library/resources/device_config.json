@@ -68,36 +68,5 @@
         "delay": "integer"
       }
     }
-  },
-  "test": {
-    "output": {
-      "greenLight1": {
-        "instruction": "blink",
-        "interval": 0.5,
-        "delay": 0.3
-      },
-      "greenLight2": {
-        "instruction": "blink",
-        "interval": 0.5,
-        "delay": 0.7
-      },
-      "greenLight3": {
-        "instruction": "blink",
-        "interval": 0.5,
-        "delay": 0
-      },
-      "redLight1": {
-        "instruction": "blink",
-        "interval": 0.5
-      },
-      "redLight2": {
-        "instruction": "blink",
-        "interval": 0.5
-      },
-      "redLight3": {
-        "instruction": "blink",
-        "interval": 0.5
-      }
-    }
   }
 }
