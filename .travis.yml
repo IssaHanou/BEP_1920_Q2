@@ -42,9 +42,12 @@ matrix:
         - go get github.com/stretchr/testify/assert
         - go get -u golang.org/x/lint/golint
         - ls
+        - cd ../
+        - ls 
+        - cd sciler
       script:
         - ls
-        - cd ../../
+        - cd ../
         - ls
         - golint -set_exit_status sciler/..
         - go test -v sciler/...
