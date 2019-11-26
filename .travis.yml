@@ -37,14 +37,14 @@ matrix:
       before_install:
         - export GOPATH=$TRAVIS_BUILD_DIR/back-end
         - ls
-        - cd back-end/src
+        - cd back-end
         - ls
         - go get github.com/stretchr/testify/assert
         - go get -u golang.org/x/lint/golint
         - ls
       script:
-#        - ls
-#        - cd back-end/src
+        - ls
+        - cd src
         - ls
         - golint -set_exit_status sciler/..
         - go test -v sciler/...
