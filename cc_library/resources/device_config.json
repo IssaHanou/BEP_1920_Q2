@@ -2,6 +2,7 @@
   "id": "controlBoard",
   "description": "Control board with three switches, three slides with lights and one main switch.",
   "host": "192.0.0.84",
+  "handler": "board_handler",
   "input": {
     "redSwitch": {
       "type": "boolean"
