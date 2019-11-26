@@ -2,9 +2,9 @@ import {Component, Injectable, OnDestroy, OnInit} from '@angular/core';
 import {IMqttMessage, MqttService} from 'ngx-mqtt';
 
 @Component({
-  selector: 'app-hint',
+  selector: 'hint',
   templateUrl: './hint.component.html',
-  styleUrls: ['./hint.component.css']
+  styleUrls: ['./hint.component.css', '../../../assets/css/main.css']
 })
 export class HintComponent implements OnDestroy {
   hint: string;

@@ -1,0 +1,188 @@
+/*Global variables - don't work*/
+:root {
+  --blue-color: #3498DB;
+  --yellow-color: #fcf790;
+  --white-color: #EEEEEE;
+  --orange-color: #fcdd90;
+  --blue-color-light: #65bdf7;
+  --blue-color-dark: #0f88d9;
+}
+
+
+
+
+/*Fonts*/
+@font-face {
+  font-family: 'din-bold';
+  src: url('../fonts/din-bold-webfont.woff2') format('woff2'),
+  url('../fonts/din-bold-webfont.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'din-light';
+  src: url('../fonts/din-light-webfont.woff2') format('woff2'),
+  url('../fonts/din-light-webfont.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'din-med';
+  src: url('../fonts/din-medium-webfont.woff2') format('woff2'),
+  url('../fonts/din-medium-webfont.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'din';
+  src: url('../fonts/din-regular-webfont.woff2') format('woff2'),
+  url('../fonts/din-regular-webfont.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+/*TODO: menu and grid*/
+
+
+/*General styling*/
+.home {
+  background-color: #3498DB;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  height: 100%;
+}
+
+.menu {
+  background-color: #EEEEEE;
+}
+
+
+
+
+/*Boxes on home page*/
+.home-box {
+  font-family: 'din', sans-serif;
+  margin: 30px;
+  max-width: 100%;
+}
+.home-box .header {
+  font-family: 'din-med', sans-serif;
+  color: #65bdf7;
+  background-color: #EEEEEE;
+  margin-bottom: 5px;
+  padding: 5px;
+}
+.home-box .contents {
+  background-color: #EEEEEE;
+  padding: 5px;
+  text-align: center;
+  float: none;
+  justify-content: center;
+}
+@media only screen and (max-width: 400px) {
+  .home-box {
+    margin: 5px;
+  }
+}
+/*Define grid home page*/
+@media only screen and (min-width: 500px) {
+
+  /*Inline blocks*/
+  /*.timer-box {*/
+  /*  display: inline-block;*/
+  /*  vertical-align: top;*/
+  /*  horiz-align: left;*/
+  /*}*/
+  /*.manage-box {*/
+  /*  display: inline-block;*/
+  /*  vertical-align: center;*/
+  /*  horiz-align: left;*/
+  /*}*/
+  /*.hint-box {*/
+  /*  display: inline-block;*/
+  /*  vertical-align: bottom;*/
+  /*  horiz-align: left;*/
+  /*}*/
+  /*.device-box {*/
+  /*  display: inline-block;*/
+  /*  vertical-align: top;*/
+  /*  horiz-align: right;*/
+  /*}*/
+  /*.puzzle-box {*/
+  /*  display: inline-block;*/
+  /*  vertical-align: bottom;*/
+  /*  horiz-align: right;*/
+  /*}*/
+
+
+  /*grid layout*/
+  /*.home-content {*/
+  /*  display: grid;*/
+  /*  grid-template-columns: 40% 60%;*/
+  /*  !*grid-template-rows: ;*!*/
+  /*  height: 100%;*/
+  /*  max-width: 100%;*/
+  /*  grid-template-areas: "timer manage hint device puzzle";*/
+  /*      !*"timer device"*!*/
+  /*      !*'manage device'*!*/
+  /*      !*'manage puzzle'*!*/
+  /*      !*'hint puzzle'*!*/
+  /*      !*'hint puzzle';*!*/
+  /*}*/
+  /*.timer-box {grid-area: timer; row-span: 2}*/
+  /*.manage-box {grid-area: manage; row-span: 2}*/
+  /*.hint-box {grid-area: hint; row-span: 2}*/
+  /*.device-box {grid-area: device; row-span: 3}*/
+  /*.puzzle-box {grid-area: puzzle; row-span: 3}*/
+}
+
+
+
+
+/*Tables for devices and events*/
+.overview-table {
+  border-collapse: collapse;
+  border: 1px solid black;
+  border-radius: 4px;
+  width: 100%;
+}
+.overview-table thead {
+  font-family: 'din-bold', sans-serif;
+}
+.overview-table th {
+  border-bottom: 2px solid black;
+}
+.overview-table tbody {
+  font-family: 'din', sans-serif;
+}
+.overview-table td {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+.overview-table tbody tr:nth-child(odd) {
+  background-color: #fcf790;
+}
+.overview-table tbody tr:nth-child(even) {
+  background-color: #fcdd90;
+}
+.device-table tbody td:nth-child(1) {
+  text-align: left;
+}
+.device-table tbody td:nth-child(2) {
+  text-align: center;
+}
+.device-table tbody td:nth-child(3) {
+  text-align: left;
+}
+.puzzle-table tbody td {
+  text-align: left;
+}
+
+
+
+
