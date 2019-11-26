@@ -2,6 +2,7 @@ This will be a list of all devices in the room. Each device is defined as a JSON
 
 - `id`: this is the id of a device. Write it in camelCase, e.g. "controlBoard".
 - `description`: this is optional and can contain more information about the device. This can be displayed in the front-end, so should be readable and in Dutch. 
+- `IP_address`: the IP address of the client computer for this device
 - `input_components`: this is a list of ids of different components of a device, which can generate input to the system. This can be empty. 
 - `output_components`: this is a list of ids of different components of a device, which can provide output of the system. This can be empty. 
 - `message`: this is an example message of the status update. It contains two status messages:

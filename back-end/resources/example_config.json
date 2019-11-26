@@ -7,7 +7,8 @@
     {
       "id": "controlBoard",
       "description": "Control board with three switches, three slides with lights and one main switch.",
-      "input_units": [
+      "IP_address": "192.30.84.29",
+      "input_components": [
         "redSwitch",
         "orangeSwitch",
         "greenSwitch",
@@ -16,7 +17,7 @@
         "slider3",
         "mainSwitch"
       ],
-      "output_units": [
+      "output_components": [
         "greenLight1",
         "greenLight2",
         "greenLight3",
@@ -47,16 +48,22 @@
     {
       "id": "telephone",
       "description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
-      "components": [],
+      "IP_address": "192.30.84.29",
+      "input_components": [],
+      "output_components": [],
       "message": {
-        "input": [
-          0,
-          1,
-          2,
-          8,
-          3
-        ],
-        "output": "audio_1"
+        "input": {
+          "value": [
+            0,
+            1,
+            2,
+            8,
+            3
+          ]
+        },
+        "output": {
+          "value": "audio_1"
+        }
       }
     }
   ],

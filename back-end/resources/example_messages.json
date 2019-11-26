@@ -51,18 +51,28 @@
       "instruction": "start"
     }
   },
-  "device_id": "controlBoard",
-  "time_sent": "01-10-2019 13:59:02",
-  "type": "instruction",
-  "contents": {
-    "instruction": "output",
-    "output": {
-      "greenLight1": false,
-      "greenLight2": false,
-      "greenLight3": false,
-      "redLight1": true,
-      "redLight2": true,
-      "redLight3": true
+  "messageInstructionOutput": {
+    "device_id": "controlBoard",
+    "time_sent": "01-10-2019 13:59:02",
+    "type": "instruction",
+    "contents": {
+      "instruction": "output",
+      "output": {
+        "greenLight1": false,
+        "greenLight2": false,
+        "greenLight3": false,
+        "redLight1": true,
+        "redLight2": true,
+        "redLight3": true
+      }
+    }
+  },
+  "messageConnectionConfirmation": {
+    "device_id": "telephone",
+    "time_sent": "01-10-2019 13:59:02",
+    "type": "connection",
+    "message": {
+      "connection": true
     }
   }
 }

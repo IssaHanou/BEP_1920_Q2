@@ -13,7 +13,7 @@
         - If type is "confirmation", then the message contents is:
             - `completed`: "true" or "false" depending on success
         - If type is `connection`, then the message contents is:
-            - `device_id`: 
+            - `connection`: "true" or "false" depending on connection status 
         - If type is "instruction", then the message contents is:
             - `instruction`: this is the type of instruction, which can be one of the following:
                 `output`, `test`, `start`, `reset`, `stop`. With output, the next property will be:

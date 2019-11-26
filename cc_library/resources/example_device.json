@@ -1,7 +1,8 @@
 {
   "id": "controlBoard",
   "description": "Control board with three switches, three slides with lights and one main switch.",
-  "input_units": [
+  "IP_address": "192.30.84.29",
+  "input_components": [
     "redSwitch",
     "orangeSwitch",
     "greenSwitch",
@@ -10,7 +11,7 @@
     "slider3",
     "mainSwitch"
   ],
-  "output_units": [
+  "output_component": [
     "greenLight1",
     "greenLight2",
     "greenLight3",
