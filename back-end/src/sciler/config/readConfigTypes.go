@@ -1,18 +1,14 @@
 package config
 
-/**
-Config specifies all configuration elements of an escape room.
-*/
-type Config struct {
+// ReadConfig specifies all configuration elements of an escape room.
+type ReadConfig struct {
 	General       General        `json:"general"`
 	Devices       []Device       `json:"devices"`
 	Puzzles       []Puzzle       `json:"puzzles"`
 	GeneralEvents []GeneralEvent `json:"general_events"`
 }
 
-/**
-General is a struct that describes the configurations of an escape room.
-*/
+// General is a struct that describes the configurations of an escape room.
 type General struct {
 	Name     string `json:"name"`
 	Duration string `json:"duration"`
@@ -20,9 +16,7 @@ type General struct {
 	Port     int    `json:"port"`
 }
 
-/**
-Device is a struct that describes the configurations of a device in the room.
-*/
+// Device is a struct that describes the configurations of a device in the room.
 type Device struct {
 	ID          string   `json:"id"`
 	Description string   `json:"description"`
@@ -30,26 +24,20 @@ type Device struct {
 	Output      IOObject `json:"output"`
 }
 
-/**
-Puzzle is a struct that describes contents of a puzzle.
-*/
+// Puzzle is a struct that describes contents of a puzzle.
 type Puzzle struct {
 	Name  string   `json:"name"`
 	Rules []Rule   `json:"rules"`
 	Hints []string `json:"hints"`
 }
 
-/**
-GeneralEvent defines a general event, like start.
-*/
+// GeneralEvent defines a general event, like start.
 type GeneralEvent struct {
 	Name  string `json:"name"`
 	Rules []Rule `json:"rules"`
 }
 
-/**
-Rule is a struct that describes how action flow is handled in the escape room.
-*/
+// Rule is a struct that describes how action flow is handled in the escape room.
 type Rule struct {
 	ID          string      `json:"id"`
 	Description string      `json:"description"`
@@ -58,38 +46,53 @@ type Rule struct {
 	Actions     []Action    `json:"actions"`
 }
 
-/**
-Condition is a struct that determines when rules are fired.
-*/
+// Condition is a struct that determines when rules are fired.
 type Condition struct {
 	Type        string       `json:"type"`
-	ID          string       `json:"id"`
-	constraints []Constraint `json:"constraints"`
+	TypeID      string       `json:"id"`
+	Constraints []Constraint `json:"constraints"`
+	Value       Valuer
 }
 
-/**
-Action is a struct that determines what happens when a rule is fired.
-*/
+type Valuer interface {
+	ValueOf() int
+}
+
+func LessThan(i, j Valuer) bool {
+	return i.ValueOf() < j.ValueOf()
+}
+
+func EqualTo(i, j Valuer) bool {
+	return i.ValueOf() == j.ValueOf()
+}
+
+func (i Condition) ValueOf() int {
+	return
+}
+
+type Element struct {
+	next, prev *Element
+	Value      Valuer
+}
+
+// Action is a struct that determines what happens when a rule is fired.
 type Action struct {
 	Type    string        `json:"type"`
 	ID      string        `json:"id"`
 	Message ActionMessage `json:"message"`
 }
 
-/**
-Constraint specifies a conditions.
-*/
+// Constraint specifies a conditions.
 type Constraint struct {
 	Comparison  string `json:"comparison"`
 	Value       string `json:"value"`
-	ComponentId string `json:"component_id"`
+	ComponentID string `json:"component_id"`
 }
 
-/**
-Messsage can be sent across clients of the brokers.
-*/
+// ActionMessage can be sent across clients of the brokers.
 type ActionMessage struct {
 	Output IOObject `json:"output"`
 }
 
+// IOObject contains a map defining either input or output.
 type IOObject map[string]interface{}
