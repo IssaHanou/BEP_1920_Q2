@@ -44,7 +44,6 @@
   font-style: normal;
 }
 
-/*TODO: menu and grid*/
 
 
 /*General styling*/
@@ -56,10 +55,16 @@
   justify-content: center;
   height: 100%;
 }
-
 .menu {
   background-color: #EEEEEE;
 }
+.home-header {
+  max-width: 100%;
+  font-family: 'din-bold', sans-serif;
+  text-align: center;
+}
+
+
 
 
 
@@ -84,61 +89,27 @@
   float: none;
   justify-content: center;
 }
+
+/*Small screens should have small margin*/
 @media only screen and (max-width: 400px) {
   .home-box {
     margin: 5px;
   }
 }
-/*Define grid home page*/
-@media only screen and (min-width: 500px) {
+/*Define grid home page for large screens*/
+@media only screen and (min-width: 600px) {
 
-  /*Inline blocks*/
-  /*.timer-box {*/
-  /*  display: inline-block;*/
-  /*  vertical-align: top;*/
-  /*  horiz-align: left;*/
-  /*}*/
-  /*.manage-box {*/
-  /*  display: inline-block;*/
-  /*  vertical-align: center;*/
-  /*  horiz-align: left;*/
-  /*}*/
-  /*.hint-box {*/
-  /*  display: inline-block;*/
-  /*  vertical-align: bottom;*/
-  /*  horiz-align: left;*/
-  /*}*/
-  /*.device-box {*/
-  /*  display: inline-block;*/
-  /*  vertical-align: top;*/
-  /*  horiz-align: right;*/
-  /*}*/
-  /*.puzzle-box {*/
-  /*  display: inline-block;*/
-  /*  vertical-align: bottom;*/
-  /*  horiz-align: right;*/
-  /*}*/
+  .timer-box {grid-area: timer; row-span: 2}
+  .manage-box {grid-area: manage; row-span: 2}
+  .hint-box {grid-area: hint; row-span: 2}
+  .device-box {grid-area: device; row-span: 3}
+  .puzzle-box {grid-area: puzzle; row-span: 3}
 
-
-  /*grid layout*/
-  /*.home-content {*/
-  /*  display: grid;*/
-  /*  grid-template-columns: 40% 60%;*/
-  /*  !*grid-template-rows: ;*!*/
-  /*  height: 100%;*/
-  /*  max-width: 100%;*/
-  /*  grid-template-areas: "timer manage hint device puzzle";*/
-  /*      !*"timer device"*!*/
-  /*      !*'manage device'*!*/
-  /*      !*'manage puzzle'*!*/
-  /*      !*'hint puzzle'*!*/
-  /*      !*'hint puzzle';*!*/
-  /*}*/
-  /*.timer-box {grid-area: timer; row-span: 2}*/
-  /*.manage-box {grid-area: manage; row-span: 2}*/
-  /*.hint-box {grid-area: hint; row-span: 2}*/
-  /*.device-box {grid-area: device; row-span: 3}*/
-  /*.puzzle-box {grid-area: puzzle; row-span: 3}*/
+  .home-content {
+    display: grid;
+    grid-template-columns: 40% 60%;
+    grid-template-rows: 15% 15% 15% 15% 15% 15%;
+  }
 }
 
 
