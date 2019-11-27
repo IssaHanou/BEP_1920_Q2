@@ -5,11 +5,11 @@ from datetime import datetime
 
 def on_connect(self, userdata, flags, rc):
     if rc == 0:
-        self.client.connected_flag = True  # set flag
+        self.connected_flag = True  # set flag
         print("connected OK")
     else:
         print("Bad connection Returned code=", rc)
-        self.client.bad_connection_flag = True
+        self.bad_connection_flag = True
 
 
 def on_disconnect(client, userdata, rc):
@@ -23,6 +23,10 @@ def on_log(client, userdata, level, buf):
 
 
 class Connection:
+    """
+    Class Connection keeps track of the broker.
+    """
+
     def __init__(self, config, app):
         self.config = config
         self.app = app
@@ -51,7 +55,8 @@ class Connection:
                 msg_dict = {
                     "messageConnectionConfirmation": {
                         "device_id": self.name,
-                        "time_sent": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
+                        "time_sent":
+                            datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
                         "type": "connection",
                         "message": {"connection": True},
                     }
@@ -61,5 +66,5 @@ class Connection:
                 self.app.subscribe_topic("test")
                 self.client.loop_forever()
                 break
-            except (ConnectionRefusedError, ConnectionError):
+            except (ConnectionError):
                 print("alles is kapot")
