@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/sirupsen/logrus"
 	"sciler/communication"
 	"sciler/config"
 	"time"
@@ -21,7 +23,10 @@ func main() {
 	fmt.Println(config.GetFromJSON(data))
 
 	communicator := communication.NewCommunicator(host, port, topics)
-	communicator.Start()
+	communicator.Start(func(client mqtt.Client, message mqtt.Message) {
+		// Todo: Make advanced message handler which acts according to the events / configuration
+		logrus.Info(string(message.Payload()))
+	})
 
 	//loop for now preventing app to exit
 	for {
