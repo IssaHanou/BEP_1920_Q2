@@ -7,6 +7,6 @@ button {
   border-radius: 4px;
 }
 
-button .orange {
+button .stop {
   background-color: var(--orange-color, #fcdd90);
 }
