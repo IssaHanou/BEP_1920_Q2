@@ -47,13 +47,15 @@
 
 
 /*General styling*/
-.home {
+body {
   background-color: #3498DB;
+  height: 100%;
+}
+.home{
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
   justify-content: center;
-  height: 100%;
 }
 .menu {
   background-color: #EEEEEE;
