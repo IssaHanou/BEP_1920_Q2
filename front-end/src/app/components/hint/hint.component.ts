@@ -2,7 +2,7 @@ import {Component, Injectable, OnDestroy, OnInit} from '@angular/core';
 import {IMqttMessage, MqttService} from 'ngx-mqtt';
 
 @Component({
-  selector: 'hint',
+  selector: 'app-hint',
   templateUrl: './hint.component.html',
   styleUrls: ['./hint.component.css', '../../../assets/css/main.css']
 })
