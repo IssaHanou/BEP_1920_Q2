@@ -3,13 +3,21 @@
     "device_id": "controlBoard",
     "time_sent": "01-10-2019 13:59:02",
     "type": "status",
-    "contents": [
-      0,
-      1,
-      2,
-      8,
-      3
-    ]
+    "contents": {
+      "input": {
+        "turningWheel": [
+          0,
+          1,
+          2,
+          8,
+          3
+        ]
+      },
+      "output": {
+        "audio": "",
+        "ringTone": ""
+      }
+    }
   },
   "messageStatusComponent": {
     "device_id": "controlBoard",
@@ -24,6 +32,14 @@
         "slider2": 30,
         "slider3": 90,
         "mainSwitch": false
+      },
+      "output": {
+        "greenLight1": false,
+        "greenLight2": false,
+        "greenLight3": false,
+        "redLight1": true,
+        "redLight2": true,
+        "redLight3": true
       }
     }
   },
@@ -58,12 +74,16 @@
     "contents": {
       "instruction": "output",
       "output": {
-        "greenLight1": false,
-        "greenLight2": false,
-        "greenLight3": false,
-        "redLight1": true,
-        "redLight2": true,
-        "redLight3": true
+        "greenLight1": {
+          "instruction": "blink",
+          "interval": 0.5,
+          "delay": 0
+        },
+        "greenLight2": true,
+        "greenLight3": true,
+        "redLight1": false,
+        "redLight2": false,
+        "redLight3": false
       }
     }
   },

@@ -25,11 +25,10 @@ This will be a list of all devices in the room. Each device is defined as a JSON
 
 - `id`: this is the id of a device. Write it in camelCase, e.g. "controlBoard".
 - `description`: this is optional and can contain more information about the device. This can be displayed in the front-end, so should be readable and in Dutch. 
-- `input`: defines type of values to be expected as input as a map. There can be one key `value`, or the keys can be component ids. 
-    The value is a map with the `type` property. This is defined as a string and can "string", "boolean", "array", "integer" or a custom name. 
-- `output`: defines type of values to be expected as output as a map. There can be one key `value`, or the keys can be component ids. 
-    The value is a map with the `type` property. This is defined as a string and can "string", "boolean", "array", "integer" or a custom name.
-    It can also carry the `instruction` property which defines a map with custom instruction for the device. 
+- `input`: defines type of values to be expected as input. The keys are component ids and values are types of input (in string format).  
+    Examples are: "string", "boolean", "array", "integer" or a custom name. 
+- `output`: defines type of values to be expected as output. The keys are component ids and the value is a map with a `type` property 
+    and an optional `instruction`, which defines a map with custom instruction for the device. 
     
 ### Puzzles
 Puzzles is an array of puzzle objects, which have a 
@@ -59,12 +58,14 @@ This can be displayed in the front-end, so should be readable and in Dutch.
     - `id`: this will be the id of a timer, rule or device, depending on the type.
     - `constraints`: this is an array of constraints. By putting several constraints in an array within the constrains array, they will be treated as OR constraints. 
         
-        - `comparison`: this can be "eq", "lt", "gt", "cont", "lte", "gte" 
+        - `comparison`: this can be "eq", "lt", "gt", "cont" (contains), "lte", "gte" 
         - `value`: this is the value on which the comparison is made. 
-        - `component_id`: in the case of "device" type, where the device has a non-empty input_components list, this is the id of the component it triggers.
+        - `component_id`: in the case of "device" type, this is the id of the component it triggers.
 - `actions`: this is an array of actions:
         
     - `type`: this can be `device` or `timer`
     - `id`: the id of device or timer, depending on type respectively
-    - `message`: this defines the output message sent. In case of device this can either contain a componentIds with their updated values or a general value (array) to the device. 
-     In the case of timer, the message should have `instruction` specified as `stop` or `subtract`, in the latter case, a `value` should also be passed. 
+    - `message`: this defines the output message sent. In case of device type, the message contains parameter `output`.
+        The output defines the type of values to be expected as output. The keys are component ids 
+        and the value is a map with a `type` property and an optional `instruction`, which defines a map with custom instruction for the device.
+        In the case of timer, the message should have `instruction` specified as `stop` or `subtract`, in the latter case, a `value` should also be passed. 

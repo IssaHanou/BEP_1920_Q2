@@ -10,27 +10,13 @@
       "id": "controlBoard",
       "description": "Control board with three switches, three slides with lights and one main switch.",
       "input": {
-        "redSwitch": {
-          "type": "boolean"
-        },
-        "orangeSwitch": {
-          "type": "boolean"
-        },
-        "greenSwitch": {
-          "type": "boolean"
-        },
-        "slider1": {
-          "type": "integer"
-        },
-        "slider2": {
-          "type": "integer"
-        },
-        "slider3": {
-          "type": "integer"
-        },
-        "mainSwitch": {
-          "type": "boolean"
-        }
+        "redSwitch": "boolean",
+        "orangeSwitch": "boolean",
+        "greenSwitch": "boolean",
+        "slider1": "integer",
+        "slider2": "integer",
+        "slider3": "integer",
+        "mainSwitch": "boolean"
       },
       "output": {
         "greenLight1": {
@@ -81,10 +67,11 @@
       "id": "telephone",
       "description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
       "input": {
-        "value": "array"
+        "turningWheel": "array"
       },
       "output": {
-        "value": "string"
+        "audio": "string",
+        "ringTone": "string"
       }
     }
   ],
@@ -103,7 +90,7 @@
               "constraints": [
                 {
                   "comparison": "eq",
-                  "value": [
+                  "turningWheel": [
                     0,
                     1,
                     2,
@@ -187,7 +174,7 @@
               "id": "telephone",
               "message": {
                 "output": {
-                  "value": "audio_1"
+                  "audio": "audio_1"
                 }
               }
             },
@@ -239,7 +226,7 @@
               "id": "telephone",
               "message": {
                 "output": {
-                  "value": "audio_1"
+                  "audio": "audio_1"
                 }
               }
             }
