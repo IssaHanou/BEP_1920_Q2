@@ -2,25 +2,17 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"strings"
 )
 
-// General is a struct that describes the configurations of an escape room
-type General struct {
-	Name     string `json:"name"`
-	Duration string `json:"duration"`
-}
-
-// GetFromJSON takes in json with general info of escape room.
-func GetFromJSON(input []byte) string {
-	var data General
+// Transforms json file into config object.
+func ReadJSON(input []byte) Config {
+	var data Config
 	err := json.Unmarshal(input, &data)
 	if err != nil {
-		_ = fmt.Errorf(err.Error())
+		panic(err.Error())
 	}
-	return "Escape room " + data.Name + " should be solved within " +
-		formatDuration(data.Duration)
+	return data
 }
 
 //Takes in duration string in format hh:mm:ss

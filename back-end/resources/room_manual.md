@@ -58,7 +58,7 @@ This can be displayed in the front-end, so should be readable and in Dutch.
     - `id`: this will be the id of a timer, rule or device, depending on the type.
     - `constraints`: this is an array of constraints. By putting several constraints in an array within the constrains array, they will be treated as OR constraints. 
         
-        - `comparison`: this can be "eq", "lt", "gt", "cont" (contains), "lte", "gte" 
+        - `comp`: this is the type of comparison and can be "eq", "lt", "gt", "cont" (contains), "lte", "gte" 
         - `value`: this is the value on which the comparison is made. 
         - `component_id`: in the case of "device" type, this is the id of the component it triggers.
 - `actions`: this is an array of actions:

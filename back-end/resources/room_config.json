@@ -89,7 +89,7 @@
               "id": "telphone",
               "constraints": [
                 {
-                  "comparison": "eq",
+                  "comp": "eq",
                   "turningWheel": [
                     0,
                     1,
@@ -145,24 +145,24 @@
               "constraints": [
                 {
                   "component_id": "mainSwitch",
-                  "comparison": "eq",
+                  "comp": "eq",
                   "value": true
                 },
                 [
                   {
                     "component_id": "greenSwitch",
-                    "comparison": "eq",
+                    "comp": "eq",
                     "value": true
                   },
                   {
                     "component_id": "redSwitch",
-                    "comparison": "eq",
+                    "comp": "eq",
                     "value": true
                   }
                 ],
                 {
                   "component_id": "slider2",
-                  "comparison": "lt",
+                  "comp": "lt",
                   "value": 30
                 }
               ]
