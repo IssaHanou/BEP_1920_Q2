@@ -3,8 +3,8 @@ package communication
 import (
 	"fmt"
 	"github.com/eclipse/paho.mqtt.golang"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"gotest.tools/assert"
 	"testing"
 	"time"
 )
@@ -56,7 +56,7 @@ func TestNewCommunicator(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := NewCommunicator(tt.args.host, tt.args.port, tt.args.topicsOfInterest)
-			assert.DeepEqual(t, got.topicsOfInterest, tt.want.topicsOfInterest)
+			assert.Equal(t, got.topicsOfInterest, tt.want.topicsOfInterest)
 		})
 	}
 }
