@@ -4,7 +4,7 @@ import { MqttService } from "ngx-mqtt";
 @Component({
   selector: "app-hint",
   templateUrl: "./hint.component.html",
-  styleUrls: ["./hint.component.css"]
+  styleUrls: ["./hint.component.css", "../../../assets/css/main.css"]
 })
 export class HintComponent {
   hint: string;

@@ -1,0 +1,12 @@
+button {
+  background-color: var(--yellow-color, #fcf790);
+  border-color: #fcbc26;
+  font-family: 'din-bold', sans-serif;
+  margin: 5px;
+  font-size: 16px;
+  border-radius: 4px;
+}
+
+button .stop {
+  background-color: var(--orange-color, #fcdd90);
+}

@@ -3,7 +3,6 @@ import { HintComponent } from "./hint.component";
 import { FormsModule } from "@angular/forms";
 import { MqttModule, MqttService } from "ngx-mqtt";
 import { MQTT_SERVICE_OPTIONS } from "../../app.module";
-import { TestComponent } from "../test/test.component";
 
 describe("HintComponent", () => {
   let component: HintComponent;
@@ -25,5 +24,10 @@ describe("HintComponent", () => {
 
   it("should create", () => {
     expect(component).toBeTruthy();
+  });
+
+  it("should render header", () => {
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector("h3").textContent).toContain("Hints");
   });
 });

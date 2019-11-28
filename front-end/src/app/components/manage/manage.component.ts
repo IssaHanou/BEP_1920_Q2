@@ -2,14 +2,16 @@ import { Component, OnInit } from "@angular/core";
 import { MqttService } from "ngx-mqtt";
 
 @Component({
-  selector: "app-test",
-  templateUrl: "./test.component.html",
-  styleUrls: ["./test.component.css"]
+  selector: "app-manage",
+  templateUrl: "./manage.component.html",
+  styleUrls: ["./manage.component.css", "../../../assets/css/main.css"]
 })
-export class TestComponent {
+export class ManageComponent implements OnInit {
   constructor(private mqttService: MqttService) {}
 
-  onClick() {
+  ngOnInit() {}
+
+  onClickTest() {
     let message;
     let now;
     now = new Date();
