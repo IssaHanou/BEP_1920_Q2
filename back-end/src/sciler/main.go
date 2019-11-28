@@ -15,10 +15,11 @@ const port string = "1883"
 
 var topics = []string{"back-end", "status", "hint", "connect"}
 
+// Message is a type that follows the structure all messages have, described in resources/message_manual.md
 type Message struct {
-	DeviceId string      `json:"device_id"`
-	TimeSent string      `json:"time_sent"`
-	Type     string      `json:"type"`
+	DeviceID string                 `json:"device_id"`
+	TimeSent string                 `json:"time_sent"`
+	Type     string                 `json:"type"`
 	Contents map[string]interface{} `json:"contents"`
 }
 
@@ -43,7 +44,7 @@ func main() {
 				if raw.Contents["instruction"] == "test all" { // todo maybe switch again
 					logrus.Info("instruction -> test all")
 					message := Message{
-						DeviceId: "back-end",
+						DeviceID: "back-end",
 						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 						Type:     "instruction",
 						Contents: map[string]interface{}{
