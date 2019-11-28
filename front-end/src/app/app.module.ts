@@ -11,7 +11,7 @@ import { FormsModule } from "@angular/forms";
 import { MqttModule, MqttService, IMqttServiceOptions } from "ngx-mqtt";
 
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
-  hostname: "192.168.178.82",
+  hostname: "localhost",
   port: 8083,
   clientId: "front-end"
 };
