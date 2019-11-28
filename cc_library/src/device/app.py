@@ -4,22 +4,42 @@ import json
 import paho.mqtt.client as mqtt
 
 
-def on_connect(self, userdata, flags, rc):
+def on_connect(client, userdata, flags, rc):
+    """
+    When trying to connect to the broker,
+    on_connect will return the result of this action.
+    """
     if rc == 0:
-        self.connected_flag = True  # set flag
+        client.connected_flag = True  # set flag
         print("connected OK")
     else:
         print("Bad connection Returned code=", rc)
-        self.bad_connection_flag = True
+        client.bad_connection_flag = True
 
 
 def on_disconnect(client, userdata, rc):
+    """
+    When disconnecting from the broker, on_disconnect prints the reason.
+    """
+    msg_dict = {
+        "messageConnectionConfirmation": {
+            "device_id": client.id,
+            "time_sent": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
+            "type": "connection",
+            "message": {"connection": False},
+        }
+    }
+    msg = json.dumps(msg_dict)
+    client.publish("connection", msg)
     print("disconnecting reason  " + str(rc))
     client.connected_flag = False
     client.disconnect_flag = True
 
 
 def on_log(client, userdata, level, buf):
+    """
+    Very annoying logger that logs everything happening with the mqtt client.
+    """
     print("log: ", buf)
 
 
@@ -41,13 +61,25 @@ class App:
         self.client.on_disconnect = on_disconnect
 
     def start(self):
+        """
+        Starting method to call from the starting script.
+        """
         self.connect()
 
     def subscribe_topic(self, topic):
+        """
+        Method to call to subscribe to a topic the
+        device wants to recieve from the broker.
+        """
         print("subscribed to topic", topic)
         self.client.subscribe(topic=topic)
 
     def send_status_message(self, msg):
+        """
+        Method to send status messages to the topic status.
+        msg should be a dictionary/json with components
+         as keys and its status as value
+        """
         jsonmsg = {
             "messageStatusComponent": {
                 "device_id": self.name,
@@ -60,11 +92,23 @@ class App:
         self.client.publish("status", str(jsonmsg))
 
     def on_message(self, client, userdata, message):
+        """
+        This method is called when the client receives
+         a message from the broken for a subscribed topic.
+        The message is printed and send through to the handler.
+        """
         print("message received ", str(message.payload.decode("utf-8")))
         print("message topic=", message.topic)
-        self.handle(self, message)
+        self.handle(message)
 
     def connect(self):
+        """
+        Connect method to set up the connection to the broker.
+        When connected:
+        sends message to topic connection to say its connected,
+        subscribes to topic "test"
+        starts loop_forever
+        """
         while True:
             try:
                 self.client.connect(self.host, 1883, keepalive=60)
@@ -72,8 +116,7 @@ class App:
                 msg_dict = {
                     "messageConnectionConfirmation": {
                         "device_id": self.name,
-                        "time_sent":
-                            datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
+                        "time_sent": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
                         "type": "connection",
                         "message": {"connection": True},
                     }
@@ -83,17 +126,26 @@ class App:
                 self.subscribe_topic("test")
                 self.client.loop_forever()
                 break
-            except (ConnectionError):
+            except:
                 print("alles is kapot")
 
     def handle(self, message):
+        """
+        Interpreter of incoming messages.
+        Correct device mapper is called with the content of the message.
+        """
         message = message.payload.decode("utf-8")
         message = json.loads(message)
-        message_type = message.get("messageInstructionTest").get("type")
-        if message_type == "instruction":
+        message_type = list(message.keys())[0]
+        print(message_type)
+        if message_type == "messageInstructionTest":
             self.device.incoming_instruction(
                 message.get("messageInstructionTest").get("contents")
             )
-        elif message_type == "status":
-            status = self.device.incoming_status()
-            self.send_status_message(status)
+        elif message_type == "messageInstruction":
+            self.device.incoming_instruction(
+                message.get("messageInstruction").get("contents")
+            )
+        elif message_type == "messageInstructionOutput":
+            # status = self.device.incoming_status()
+            self.send_status_message({"error": "status read to implement"})

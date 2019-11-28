@@ -127,7 +127,7 @@ if __name__ == "__main__":
     def get_status_switch(device, name, switch):
         """
         get status calls send_message to send the status of
-        a switch to the MQTT broker
+        a switch to the MQTT broker.
         """
         print("get status", name, switch)
         app.send_status_message(device.get_switch(name, switch))
@@ -135,29 +135,25 @@ if __name__ == "__main__":
     GPIO.add_event_detect(
         device1.switch0,
         GPIO.BOTH,
-        callback=lambda *a: get_status_switch(device1,
-                                              "switch0", device1.switch0),
+        callback=lambda *a: get_status_switch(device1, "switch0", device1.switch0),
         bouncetime=100,
     )
     GPIO.add_event_detect(
         device1.switch1,
         GPIO.BOTH,
-        callback=lambda *a: get_status_switch(device1,
-                                              "switch1", device1.switch1),
+        callback=lambda *a: get_status_switch(device1, "switch1", device1.switch1),
         bouncetime=100,
     )
     GPIO.add_event_detect(
         device1.switch2,
         GPIO.BOTH,
-        callback=lambda *a: get_status_switch(device1,
-                                              "switch2", device1.switch2),
+        callback=lambda *a: get_status_switch(device1, "switch2", device1.switch2),
         bouncetime=100,
     )
     GPIO.add_event_detect(
         device1.switch3,
         GPIO.BOTH,
-        callback=lambda *a: get_status_switch(device1,
-                                              "switch3", device1.switch3),
+        callback=lambda *a: get_status_switch(device1, "switch3", device1.switch3),
         bouncetime=100,
     )
 
