@@ -12,12 +12,9 @@ export class ManageComponent implements OnInit {
   ngOnInit() {}
 
   onClickTest() {
-    let message;
-    let now;
-    now = new Date();
-    message = {
-      type: "instruction",
-      instruction: "test all",
+    const now = new Date();
+    const message = {
+      device_id: "front-end",
       time_sent:
         now.getDate() +
         "-" +
@@ -29,7 +26,11 @@ export class ManageComponent implements OnInit {
         ":" +
         now.getMinutes() +
         ":" +
-        now.getSeconds()
+        now.getSeconds(),
+      type: "instruction",
+      contents: {
+        instruction: "test all"
+      }
     };
     this.mqttService.unsafePublish("back-end", JSON.stringify(message));
   }

@@ -42,8 +42,6 @@ func onConnectionLost(client mqtt.Client, e error) {
 	if client.IsConnected() {
 		client.Disconnect(500)
 	}
-
-	// Todo try to reconnect
 }
 
 // Publish is a method that will send a message to a specific topic
