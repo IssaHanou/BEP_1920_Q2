@@ -22,13 +22,12 @@ def on_disconnect(client, userdata, rc):
     When disconnecting from the broker, on_disconnect prints the reason.
     """
     msg_dict = {
-        "messageConnectionConfirmation": {
-            "device_id": client.id,
-            "time_sent": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
-            "type": "connection",
-            "message": {"connection": False},
-        }
+        "device_id": "library",
+        "time_sent": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
+        "type": "connection",
+        "message": {"connection": False},
     }
+
     msg = json.dumps(msg_dict)
     client.publish("connection", msg)
     print("disconnecting reason  " + str(rc))
@@ -81,13 +80,12 @@ class App:
          as keys and its status as value
         """
         jsonmsg = {
-            "messageStatusComponent": {
-                "device_id": self.name,
-                "time_sent": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
-                "type": "status",
-                "contents": eval(msg),
-            }
+            "device_id": self.name,
+            "time_sent": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
+            "type": "status",
+            "contents": eval(msg),
         }
+
         print(jsonmsg)
         self.client.publish("status", str(jsonmsg))
 
@@ -114,13 +112,12 @@ class App:
                 self.client.connect(self.host, 1883, keepalive=60)
                 print("we zijn connected")
                 msg_dict = {
-                    "messageConnectionConfirmation": {
-                        "device_id": self.name,
-                        "time_sent": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
-                        "type": "connection",
-                        "message": {"connection": True},
-                    }
+                    "device_id": self.name,
+                    "time_sent": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
+                    "type": "connection",
+                    "message": {"connection": True},
                 }
+
                 msg = json.dumps(msg_dict)
                 self.client.publish("connection", msg)
                 self.subscribe_topic("test")
@@ -136,16 +133,6 @@ class App:
         """
         message = message.payload.decode("utf-8")
         message = json.loads(message)
-        message_type = list(message.keys())[0]
-        print(message_type)
-        if message_type == "messageInstructionTest":
-            self.device.incoming_instruction(
-                message.get("messageInstructionTest").get("contents")
-            )
-        elif message_type == "messageInstruction":
-            self.device.incoming_instruction(
-                message.get("messageInstruction").get("contents")
-            )
-        elif message_type == "messageInstructionOutput":
-            # status = self.device.incoming_status()
-            self.send_status_message({"error": "status read to implement"})
+        self.device.incoming_instruction(
+            message.get("contents")
+        )
