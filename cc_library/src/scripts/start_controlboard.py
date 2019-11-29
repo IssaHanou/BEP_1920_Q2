@@ -62,7 +62,6 @@ class ControlBoard:
         """
         Set here the mapping from messages to methods.
         """
-        print(data)
         instruction = data.get("instruction")
         if instruction == "test":
             self.test()
@@ -79,7 +78,6 @@ class ControlBoard:
     def blink(self, data):
         led = getattr(self, data.get("led"))
         interval = data.get("interval")
-        print("blinking: ", led, interval)
         GPIO.output(led, GPIO.HIGH)
         time.sleep(interval)
         GPIO.output(led, GPIO.LOW)
@@ -88,15 +86,12 @@ class ControlBoard:
     def turn_off(self, data):
         led = getattr(self, data.get("led"))
         GPIO.output(led, GPIO.LOW)
-        print(led, "is LOW")
 
     def turn_on(self, data):
         led = getattr(self, data.get("led"))
         GPIO.output(led, GPIO.HIGH)
-        print(led, "is HIGH")
 
     def get_switch(self, name, switch):
-        print({name: str(GPIO.input(switch))})
         return str({name: str(GPIO.input(switch))})
 
     def test(self):
@@ -109,7 +104,6 @@ class ControlBoard:
                 GPIO.output(self.redled[i], GPIO.LOW)
                 GPIO.output(self.greenled[i], GPIO.LOW)
                 time.sleep(0.2)
-            print("knipper knipper")
 
 
 if __name__ == "__main__":
@@ -130,7 +124,6 @@ if __name__ == "__main__":
         get status calls send_message to send the status of
         a switch to the MQTT broker.
         """
-        print("get status", name, switch)
         app.send_status_message(device.get_switch(name, switch))
 
     GPIO.add_event_detect(

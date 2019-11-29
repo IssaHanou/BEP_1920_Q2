@@ -11,9 +11,9 @@ def on_connect(client, userdata, flags, rc):
     """
     if rc == 0:
         client.connected_flag = True  # set flag
-        print("connected OK")
+        on_python_log("connected OK")
     else:
-        print("Bad connection Returned code=", rc)
+        on_python_log(("Bad connection Returned code=", rc))
         client.bad_connection_flag = True
 
 
@@ -22,7 +22,7 @@ def on_disconnect(client, userdata, rc):
     When disconnecting from the broker, on_disconnect prints the reason.
     """
     msg_dict = {
-        "device_id": "library",
+        "device_id": id(client),
         "time_sent": datetime.now().strftime("%d-%m-%YT%H:%M:%S"),
         "type": "connection",
         "message": {"connection": False},
@@ -30,7 +30,7 @@ def on_disconnect(client, userdata, rc):
 
     msg = json.dumps(msg_dict)
     client.publish("connection", msg)
-    print("disconnecting reason  " + str(rc))
+    on_python_log(("disconnecting reason  " + str(rc)))
     client.connected_flag = False
     client.disconnect_flag = True
 
@@ -39,7 +39,14 @@ def on_log(client, userdata, level, buf):
     """
     Very annoying logger that logs everything happening with the mqtt client.
     """
-    print("log: ", buf)
+    print("broker log: ", buf)
+
+
+def on_python_log(text):
+    """
+    Manual logger for the developers.
+    """
+    print("python log: ", text)
 
 
 class App:
@@ -51,7 +58,7 @@ class App:
         self.device = device
         self.config = json.load(config)
         self.name = self.config.get("id")
-        self.info = self.config.get("info")
+        self.info = self.config.get("description")
         self.host = self.config.get("host")
         self.client = mqtt.Client(self.name)
         self.client.on_message = self.on_message
@@ -70,7 +77,8 @@ class App:
         Method to call to subscribe to a topic the
         device wants to recieve from the broker.
         """
-        print("subscribed to topic", topic)
+
+        on_python_log(("subscribed to topic", topic))
         self.client.subscribe(topic=topic)
 
     def send_status_message(self, msg):
@@ -86,7 +94,7 @@ class App:
             "contents": eval(msg),
         }
         msg = json.dumps(jsonmsg)
-        print(str(msg))
+        on_python_log(str(msg))
         self.client.publish("status", msg)
 
     def on_message(self, client, userdata, message):
@@ -95,8 +103,8 @@ class App:
          a message from the broken for a subscribed topic.
         The message is printed and send through to the handler.
         """
-        print("message received ", str(message.payload.decode("utf-8")))
-        print("message topic=", message.topic)
+        on_python_log(("message received ", str(message.payload.decode("utf-8"))))
+        on_python_log(("message topic=", message.topic))
         self.handle(message)
 
     def connect(self):
@@ -110,7 +118,7 @@ class App:
         while True:
             try:
                 self.client.connect(self.host, 1883, keepalive=60)
-                print("we zijn connected")
+                on_python_log("we zijn connected")
                 msg_dict = {
                     "device_id": self.name,
                     "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
@@ -123,8 +131,8 @@ class App:
                 self.subscribe_topic("test")
                 self.client.loop_forever()
                 break
-            except:
-                print("alles is kapot")
+            except (ConnectionRefusedError):
+                on_python_log("alles is kapot")
 
     def handle(self, message):
         """

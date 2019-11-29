@@ -1,70 +1,72 @@
 {
-  "id": "controlBoard1",
+  "id": "controlBoard",
   "description": "Control board with three switches, three slides with lights and one main switch.",
   "host": "192.168.178.82",
-  "input_components": [
-    "redSwitch",
-    "orangeSwitch",
-    "greenSwitch",
-    "slider1",
-    "slider2",
-    "slider3",
-    "mainSwitch"
-  ],
-  "output_component": [
-    "greenLight1",
-    "greenLight2",
-    "greenLight3",
-    "redLight1",
-    "redLight2",
-    "redLight3"
-  ],
-  "message": {
-    "input": {
-      "redSwitch": true,
-      "orangeSwitch": false,
-      "greenSwitch": false,
-      "slider1": 60,
-      "slider2": 30,
-      "slider3": 90,
-      "mainSwitch": false
+  "handler": "board_handler",
+  "input": {
+    "redSwitch": {
+      "type": "boolean"
     },
-    "output": {
-      "greenLight1": false,
-      "greenLight2": false,
-      "greenLight3": false,
-      "redLight1": true,
-      "redLight2": true,
-      "redLight3": true
+    "orangeSwitch": {
+      "type": "boolean"
+    },
+    "greenSwitch": {
+      "type": "boolean"
+    },
+    "slider1": {
+      "type": "integer"
+    },
+    "slider2": {
+      "type": "integer"
+    },
+    "slider3": {
+      "type": "integer"
+    },
+    "mainSwitch": {
+      "type": "boolean"
     }
   },
-  "test": {
-    "output": {
-      "greenLight1": {
-        "instruction": "blink",
-        "interval": 0.5,
-        "delay": 0.3
-      },
-      "greenLight2": {
-        "instruction": "blink",
-        "interval": 0.5,
-        "delay": 0.7
-      },
-      "greenLight3": {
-        "instruction": "blink",
-        "interval": 0.5
-      },
-      "redLight1": {
-        "instruction": "blink",
-        "interval": 0.5
-      },
-      "redLight2": {
-        "instruction": "blink",
-        "interval": 0.5
-      },
-      "redLight3": {
-        "instruction": "blink",
-        "interval": 0.5
+  "output": {
+    "greenLight1": {
+      "type": "string",
+      "instruction": {
+        "interval": "integer",
+        "delay": "integer"
+      }
+    },
+    "greenLight2": {
+      "type": "string",
+      "instruction": {
+        "interval": "integer",
+        "delay": "integer"
+      }
+    },
+    "greenLight3": {
+      "type": "string",
+      "instruction": {
+        "interval": "integer",
+        "delay": "integer"
+      }
+    },
+    "redLight1": {
+      "type": "string",
+      "instruction": {
+        "interval": "integer",
+        "delay": "integer"
+      }
+    },
+    "redLight2":  {
+      "type": "string",
+      "instruction": {
+        "interval": "integer",
+        "delay": "integer"
+      }
+    },
+    "redLight3":  {
+      "type": "string",
+      "instruction": {
+        "interval": "integer",
+        "delay": "integer"
       }
     }
   }

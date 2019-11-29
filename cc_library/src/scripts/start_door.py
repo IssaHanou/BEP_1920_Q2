@@ -18,7 +18,6 @@ class Door:
         """
         Set here the mapping from messages to methods.
         """
-        print(data)
         instruction = data.get("instruction")
         if instruction == "test":
             self.test()
