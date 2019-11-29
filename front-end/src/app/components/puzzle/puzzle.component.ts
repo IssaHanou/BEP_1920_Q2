@@ -1,15 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from "@angular/core";
 
 @Component({
-  selector: 'app-puzzle',
-  templateUrl: './puzzle.component.html',
-  styleUrls: ['./puzzle.component.css', '../../../assets/css/main.css']
+  selector: "app-puzzle",
+  templateUrl: "./puzzle.component.html",
+  styleUrls: ["./puzzle.component.css", "../../../assets/css/main.css"]
 })
 export class PuzzleComponent implements OnInit {
+  constructor() {}
 
-  constructor() { }
-
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }

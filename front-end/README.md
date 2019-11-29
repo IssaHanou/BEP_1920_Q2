@@ -1,4 +1,4 @@
-# MyApp
+# Front-end
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.3.19.
 
 # Installation
@@ -6,6 +6,16 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 ````
     npm install ngx-mqtt --save
 ````
+
+# setup prettier
+```
+    npm install --save-dev --save-exact prettier
+    npm install --save-dev tslint-config-prettier
+```
+- natigate to Settings > Tools > File Watchers 
+- press `+` and select `Prettier`
+- enable auto saved files to trigger the watcher in advanced settings
+- press `ok`
 
 ### Development server
 

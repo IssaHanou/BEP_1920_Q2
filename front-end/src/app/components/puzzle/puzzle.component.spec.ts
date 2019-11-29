@@ -1,16 +1,15 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { PuzzleComponent } from './puzzle.component';
+import { PuzzleComponent } from "./puzzle.component";
 
-describe('PuzzleComponent', () => {
+describe("PuzzleComponent", () => {
   let component: PuzzleComponent;
   let fixture: ComponentFixture<PuzzleComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PuzzleComponent ]
-    })
-    .compileComponents();
+      declarations: [PuzzleComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -19,19 +18,19 @@ describe('PuzzleComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render header', () => {
+  it("should render header", () => {
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('h3').textContent).toContain('Puzzels');
+    expect(compiled.querySelector("h3").textContent).toContain("Puzzels");
   });
 
-  it('table should have correct headers', () => {
+  it("table should have correct headers", () => {
     const compiled = fixture.debugElement.nativeElement;
-    const tableHeaders = compiled.querySelectorAll('th');
-    expect(tableHeaders.item(0).textContent).toContain('Puzzel');
-    expect(tableHeaders.item(1).textContent).toContain('Status');
+    const tableHeaders = compiled.querySelectorAll("th");
+    expect(tableHeaders.item(0).textContent).toContain("Puzzel");
+    expect(tableHeaders.item(1).textContent).toContain("Status");
   });
 });
