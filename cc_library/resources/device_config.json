@@ -1,0 +1,73 @@
+{
+  "id": "controlBoard",
+  "description": "Control board with three switches, three slides with lights and one main switch.",
+  "host": "192.0.0.84",
+  "handler": "board_handler",
+  "input": {
+    "redSwitch": {
+      "type": "boolean"
+    },
+    "orangeSwitch": {
+      "type": "boolean"
+    },
+    "greenSwitch": {
+      "type": "boolean"
+    },
+    "slider1": {
+      "type": "integer"
+    },
+    "slider2": {
+      "type": "integer"
+    },
+    "slider3": {
+      "type": "integer"
+    },
+    "mainSwitch": {
+      "type": "boolean"
+    }
+  },
+  "output": {
+    "greenLight1": {
+      "type": "string",
+      "instruction": {
+        "interval": "integer",
+        "delay": "integer"
+      }
+    },
+    "greenLight2": {
+      "type": "string",
+      "instruction": {
+        "interval": "integer",
+        "delay": "integer"
+      }
+    },
+    "greenLight3": {
+      "type": "string",
+      "instruction": {
+        "interval": "integer",
+        "delay": "integer"
+      }
+    },
+    "redLight1": {
+      "type": "string",
+      "instruction": {
+        "interval": "integer",
+        "delay": "integer"
+      }
+    },
+    "redLight2":  {
+      "type": "string",
+      "instruction": {
+        "interval": "integer",
+        "delay": "integer"
+      }
+    },
+    "redLight3":  {
+      "type": "string",
+      "instruction": {
+        "interval": "integer",
+        "delay": "integer"
+      }
+    }
+  }
+}
