@@ -1,5 +1,4 @@
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
-
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { ManageComponent } from "./manage.component";
 import { MqttModule, MqttService } from "ngx-mqtt";
 import { MQTT_SERVICE_OPTIONS } from "../../app.module";
@@ -8,13 +7,13 @@ describe("ManageComponent", () => {
   let component: ManageComponent;
   let fixture: ComponentFixture<ManageComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [MqttModule.forRoot(MQTT_SERVICE_OPTIONS)],
       declarations: [ManageComponent],
       providers: [MqttService]
     }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ManageComponent);
@@ -45,5 +44,16 @@ describe("ManageComponent", () => {
     expect(
       compiled.getElementsByClassName("reset").item(0).textContent
     ).toContain("Reset");
+  });
+
+  it("should send test message on test button click", () => {
+    spyOn(component, "onClickTestButton");
+    const testButton = fixture.debugElement.nativeElement
+      .getElementsByClassName("test")
+      .item(0);
+    testButton.click();
+    fixture.detectChanges();
+
+    expect(component.onClickTestButton).toHaveBeenCalled();
   });
 });
