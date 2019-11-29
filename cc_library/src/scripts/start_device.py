@@ -88,17 +88,18 @@ class ControlBoard:
     def turn_off(self, data):
         led = getattr(self, data.get("led"))
         GPIO.output(led, GPIO.LOW)
+        print(led, "is LOW")
 
     def turn_on(self, data):
         led = getattr(self, data.get("led"))
         GPIO.output(led, GPIO.HIGH)
+        print(led, "is HIGH")
 
     def get_switch(self, name, switch):
         print({name: str(GPIO.input(switch))})
         return str({name: str(GPIO.input(switch))})
 
     def test(self):
-        print("debug2")
         for j in range(0, 3):
             for i in range(0, 3):
                 GPIO.output(self.redled[i], GPIO.HIGH)

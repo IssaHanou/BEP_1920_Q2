@@ -23,7 +23,7 @@ def on_disconnect(client, userdata, rc):
     """
     msg_dict = {
         "device_id": "library",
-        "time_sent": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
+        "time_sent": datetime.now().strftime("%d-%m-%YT%H:%M:%S"),
         "type": "connection",
         "message": {"connection": False},
     }
@@ -81,13 +81,13 @@ class App:
         """
         jsonmsg = {
             "device_id": self.name,
-            "time_sent": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
+            "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
             "type": "status",
             "contents": eval(msg),
         }
-
-        print(jsonmsg)
-        self.client.publish("status", str(jsonmsg))
+        msg = json.dumps(jsonmsg)
+        print(str(msg))
+        self.client.publish("status", msg)
 
     def on_message(self, client, userdata, message):
         """
@@ -113,7 +113,7 @@ class App:
                 print("we zijn connected")
                 msg_dict = {
                     "device_id": self.name,
-                    "time_sent": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z"),
+                    "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
                     "type": "connection",
                     "message": {"connection": True},
                 }
@@ -133,6 +133,4 @@ class App:
         """
         message = message.payload.decode("utf-8")
         message = json.loads(message)
-        self.device.incoming_instruction(
-            message.get("contents")
-        )
+        self.device.incoming_instruction(message.get("contents"))

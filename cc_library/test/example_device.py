@@ -71,7 +71,7 @@ def test():
             time.sleep(0.2)
 
 
-config = open('controlboard_config.json')
+config = open("controlboard_config.json")
 app = App(config)
 
 app.start()

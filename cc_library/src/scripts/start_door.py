@@ -10,7 +10,6 @@ except (RuntimeError, ModuleNotFoundError):
 
 
 class Door:
-
     def __init__(self):
         self.door = 17
         GPIO.setup(self.door, GPIO.OUT)
@@ -29,20 +28,21 @@ class Door:
             self.turn_on(data),
 
     def turn_off(self, data):
-        #door = getattr(self, data.get("door"))
+        # door = getattr(self, data.get("door"))
         GPIO.output(self.door, GPIO.HIGH)
 
     def turn_on(self, data):
-        #door = getattr(self, data.get("door"))
+        # door = getattr(self, data.get("door"))
         GPIO.output(self.door, GPIO.LOW)
 
     def test(self):
         for i in range(0, 2):
-            GPIO.output(self.door, GPIO.HIGH)
-            time.sleep(5)
             GPIO.output(self.door, GPIO.LOW)
             time.sleep(5)
+            GPIO.output(self.door, GPIO.HIGH)
+            time.sleep(5)
         GPIO.output(self.door, GPIO.HIGH)
+
 
 if __name__ == "__main__":
     # This is the main script of the Raspberry Pi
@@ -58,4 +58,3 @@ if __name__ == "__main__":
     app = App(config=config, device=device1)
 
     app.start()
-
