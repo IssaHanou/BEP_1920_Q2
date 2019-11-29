@@ -28,11 +28,11 @@
           "conditions": [
             {
               "type": "device",
-              "type_id": "telephone",
+              "type_id": "ledLights",
               "constraints": [
                 {
                   "comp": "eq",
-                  "component_id": "color",
+                  "component_id": "light",
                   "value": true
                 }
               ]

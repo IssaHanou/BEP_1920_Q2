@@ -56,9 +56,9 @@ This can be displayed in the front-end, so should be readable and in Dutch.
 
     - `type`: this can `rule`, `timer` or `device`.
     - `type_id`: this will be the id of a timer, rule or device, depending on the type.
-    - `constraints`: this is an array of constraints. By putting several constraints in an array within the constrains array, they will be treated as OR constraints. 
+    - `constraints`: this is an array of constraints. 
         
-        - `comp`: this is the type of comparison and can be "eq", "lt", "gt", "cont" (contains), "lte", "gte" 
+        - `comp`: this is the type of comparison and can be "eq", "lt", "gt", "contains" (contains), "lte", "gte" 
         - `value`: this is the value on which the comparison is made. This should be in the same type as specified in the input of the device. 
             If it has custom input, then enter value in preferred type and deal with it on the client.
             In case of "timer" type, it should be in the format "hh:mm:ss"
@@ -68,7 +68,6 @@ This can be displayed in the front-end, so should be readable and in Dutch.
         
     - `type`: this can be `device` or `timer`
     - `type_id`: the id of device or timer, depending on type respectively
-    - `message`: this defines the output message sent. In case of device type, the message contains parameter `output`.
-        The output defines the type of values to be expected as output. The keys are component ids 
-        and the value is a map with a `type` property and an optional `instruction`, which defines a map with custom instruction for the device.
+    - `message`: this defines the `output` message sent. The output defines the type of values to be expected as output. 
+        In case of device type, the keys are component ids and the value is a type. An additional "instruction" property may be defined.
         In the case of timer, the message should have `instruction` specified as `stop` or `subtract`, in the latter case, a `value` should also be passed. 

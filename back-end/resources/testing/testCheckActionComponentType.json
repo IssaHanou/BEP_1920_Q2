@@ -17,7 +17,7 @@
       }
     }
   ],
-  "puzzles": [
+  "general_events": [
     {
       "name": "Telefoon puzzels",
       "rules": [
@@ -26,17 +26,6 @@
           "description": "De juiste volgorde van cijfers moet gedraaid worden.",
           "limit": 1,
           "conditions": [
-            {
-              "type": "device",
-              "type_id": "telephone",
-              "constraints": [
-                {
-                  "comp": "eq",
-                  "component_id": "color",
-                  "value": true
-                }
-              ]
-            }
           ],
           "actions": [
             {
@@ -44,10 +33,9 @@
               "type_id": "ledLights",
               "message": {
                 "output": {
-                  "color": "green"
+                  "color": 0
                 }
               }
-
             }
           ]
         }

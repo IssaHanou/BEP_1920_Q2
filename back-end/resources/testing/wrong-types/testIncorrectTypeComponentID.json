@@ -28,28 +28,17 @@
           "conditions": [
             {
               "type": "device",
-              "type_id": "telephone",
+              "type_id": "ledLights",
               "constraints": [
                 {
                   "comp": "eq",
-                  "component_id": "color",
-                  "value": true
+                  "value": "30:00",
+                  "component_id": 30
                 }
               ]
             }
           ],
-          "actions": [
-            {
-              "type": "device",
-              "type_id": "ledLights",
-              "message": {
-                "output": {
-                  "color": "green"
-                }
-              }
-
-            }
-          ]
+          "actions": []
         }
       ]
     }

@@ -27,29 +27,17 @@
           "limit": 1,
           "conditions": [
             {
-              "type": "device",
-              "type_id": "telephone",
+              "type": "timer",
+              "type_id": "timer1",
               "constraints": [
                 {
-                  "comp": "eq",
-                  "component_id": "color",
-                  "value": true
+                  "comp": "test",
+                  "value": "30:00"
                 }
               ]
             }
           ],
-          "actions": [
-            {
-              "type": "device",
-              "type_id": "ledLights",
-              "message": {
-                "output": {
-                  "color": "green"
-                }
-              }
-
-            }
-          ]
+          "actions": []
         }
       ]
     }

@@ -26,28 +26,16 @@
           "description": "De juiste volgorde van cijfers moet gedraaid worden.",
           "limit": 1,
           "conditions": [
-            {
-              "type": "device",
-              "type_id": "telephone",
-              "constraints": [
-                {
-                  "comp": "eq",
-                  "component_id": "color",
-                  "value": true
-                }
-              ]
-            }
           ],
           "actions": [
             {
-              "type": "device",
-              "type_id": "ledLights",
+              "type": "my-type",
+              "type_id": "color",
               "message": {
                 "output": {
                   "color": "green"
                 }
               }
-
             }
           ]
         }

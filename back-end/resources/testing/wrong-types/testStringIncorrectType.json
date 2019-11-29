@@ -10,7 +10,7 @@
       "id": "ledLights",
       "description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
       "input": {
-        "light": "boolean"
+        "light": "string"
       },
       "output": {
         "color": "string"
@@ -28,28 +28,17 @@
           "conditions": [
             {
               "type": "device",
-              "type_id": "telephone",
+              "type_id": "ledLights",
               "constraints": [
                 {
                   "comp": "eq",
-                  "component_id": "color",
-                  "value": true
+                  "value": 30,
+                  "component_id": "light"
                 }
               ]
             }
           ],
-          "actions": [
-            {
-              "type": "device",
-              "type_id": "ledLights",
-              "message": {
-                "output": {
-                  "color": "green"
-                }
-              }
-
-            }
-          ]
+          "actions": []
         }
       ]
     }
