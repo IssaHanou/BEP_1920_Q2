@@ -8,6 +8,9 @@ def on_connect(client, userdata, flags, rc):
     """
     When trying to connect to the broker,
     on_connect will return the result of this action.
+    userdata:   the private user data as set in Client() or userdata_set()
+    flags:      response flags sent by the broker
+    rc:         the connection result
     """
     if rc == 0:
         client.connected_flag = True  # set flag
@@ -118,7 +121,7 @@ class App:
         while True:
             try:
                 self.client.connect(self.host, 1883, keepalive=60)
-                on_python_log("we zijn connected")
+                on_python_log("Connected to broker")
                 msg_dict = {
                     "device_id": self.name,
                     "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),

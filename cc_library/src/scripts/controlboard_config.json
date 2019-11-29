@@ -1,5 +1,5 @@
 {
-  "id": "controlBoard",
+  "id": "controlBoard1",
   "description": "Control board with three switches, three slides with lights and one main switch.",
   "host": "192.168.178.82",
   "handler": "board_handler",
