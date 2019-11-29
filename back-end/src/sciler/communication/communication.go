@@ -10,7 +10,6 @@ import (
 
 // Communicator is a type that maintains communication with the front-end and the client computers.
 type Communicator struct {
-	clientOptions    mqtt.ClientOptions
 	client           mqtt.Client
 	topicsOfInterest []string
 }
@@ -22,7 +21,7 @@ func NewCommunicator(host string, port string, topicsOfInterest []string) *Commu
 	opts.SetClientID("back-end")
 	opts.SetConnectionLostHandler(onConnectionLost)
 	client := mqtt.NewClient(opts)
-	return &Communicator{*opts, client, topicsOfInterest}
+	return &Communicator{client, topicsOfInterest}
 }
 
 // Start is a function that will start the communication by connecting to the broker and subscribing to all topics of interest
@@ -45,12 +44,12 @@ func onConnectionLost(client mqtt.Client, e error) {
 }
 
 // Publish is a method that will send a message to a specific topic
-func (communicator *Communicator) Publish(topic string, message string) {
+func (communicator *Communicator) Publish(topic string, message string, retrials int) {
 	err := action(func() mqtt.Token {
 		return communicator.client.Publish(topic, byte(0), false, message)
-	}, "publish", 3)
+	}, "publish", retrials)
 	if err == errors.New("action failed") {
-
+		// todo reconnect?
 	}
 }
 
@@ -65,7 +64,7 @@ func action(action func() mqtt.Token, actionType string, retrials int) error {
 			logger.Warnf("Fail to %s, %v", actionType, token.Error())
 			time.Sleep(1 * time.Second)
 
-			logger.Infof("Retry %d to %s", i +1, actionType)
+			logger.Infof("Retry %d to %s", i+1, actionType)
 			err = errors.New("action eventually successful")
 			continue
 		} else {

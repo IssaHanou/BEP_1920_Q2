@@ -40,9 +40,9 @@ func main() {
 		}
 		switch raw.Type {
 		case "instruction":
+			logrus.Info("instruction  message received")
 			{
-				if raw.Contents["instruction"] == "test all" { // todo maybe switch again
-					logrus.Info("instruction -> test all")
+				if raw.Contents["instruction"] == "test all" && raw.DeviceID == "front-end" { // todo maybe switch again
 					message := Message{
 						DeviceID: "back-end",
 						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
@@ -55,21 +55,46 @@ func main() {
 					if err != nil {
 						logrus.Errorf("Error occurred while constructing message to publish: %v", err)
 					} else {
-						communicator.Publish("test", string(jsonMessage))
+						communicator.Publish("test", string(jsonMessage), 3)
 					}
 				}
 			}
 		case "status":
 			{
-				logrus.Info("status")
+				logrus.Info("status message received")
+				if raw.DeviceID == "controlBoard1" {
+					var instruction string
+					if raw.Contents["switch1"] == "1" {
+						instruction = "turn off"
+					} else if raw.Contents["switch1"] == "0" {
+						instruction = "turn on"
+					}
+					if instruction != "" {
+						message := Message{
+							DeviceID: "back-end",
+							TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+							Type:     "instruction",
+							Contents: map[string]interface{}{
+								"instruction": instruction,
+							},
+						}
+						jsonMessage, err := json.Marshal(&message)
+						if err != nil {
+							logrus.Errorf("Error occurred while constructing message to publish: %v", err)
+						} else {
+							communicator.Publish("test", string(jsonMessage), 3)
+						}
+					}
+				}
+
 			}
 		case "confirmation":
 			{
-				logrus.Info("confirmation")
+				logrus.Info("confirmation message received")
 			}
 		case "connection":
 			{
-				logrus.Info("connection")
+				logrus.Info("connection message received")
 			}
 		}
 	})

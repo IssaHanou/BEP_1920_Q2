@@ -1,6 +1,7 @@
 package communication
 
 import (
+	"errors"
 	"fmt"
 	"github.com/eclipse/paho.mqtt.golang"
 	"github.com/stretchr/testify/assert"
@@ -34,7 +35,6 @@ func TestNewCommunicator(t *testing.T) {
 				topicsOfInterest: []string{"test", "back-end"},
 			},
 			want: &Communicator{
-				clientOptions:    *optionsLocal,
 				client:           mqtt.NewClient(optionsLocal),
 				topicsOfInterest: []string{"test", "back-end"},
 			},
@@ -47,7 +47,6 @@ func TestNewCommunicator(t *testing.T) {
 				topicsOfInterest: nil,
 			},
 			want: &Communicator{
-				clientOptions:    *optionsLocal,
 				client:           mqtt.NewClient(optionsLocal),
 				topicsOfInterest: nil,
 			},
@@ -61,20 +60,36 @@ func TestNewCommunicator(t *testing.T) {
 	}
 }
 
-type TokenMock struct {
+type TokenMockSuccess struct {
 	mock.Mock
 }
 
-func (t TokenMock) Wait() bool {
+func (t TokenMockSuccess) Wait() bool {
 	return false
 }
 
-func (t TokenMock) WaitTimeout(time.Duration) bool {
+func (t TokenMockSuccess) WaitTimeout(time.Duration) bool {
 	return true
 }
 
-func (t TokenMock) Error() error {
+func (t TokenMockSuccess) Error() error {
 	return nil
+}
+
+type TokenMockFailure struct {
+	mock.Mock
+}
+
+func (t TokenMockFailure) Wait() bool {
+	return true
+}
+
+func (t TokenMockFailure) WaitTimeout(time.Duration) bool {
+	return true
+}
+
+func (t TokenMockFailure) Error() error {
+	return errors.New("testing error of TokenMockFailure")
 }
 
 type ClientMock struct {
@@ -90,7 +105,8 @@ func (c ClientMock) IsConnectionOpen() bool {
 }
 
 func (c ClientMock) Connect() mqtt.Token {
-	return new(TokenMock)
+	args := c.Called()
+	return args.Get(0).(mqtt.Token)
 }
 
 func (c ClientMock) Disconnect(quiesce uint) {
@@ -98,19 +114,20 @@ func (c ClientMock) Disconnect(quiesce uint) {
 }
 
 func (c ClientMock) Publish(topic string, qos byte, retained bool, payload interface{}) mqtt.Token {
-	return new(TokenMock)
+	args := c.Called(topic, qos, retained, payload)
+	return args.Get(0).(mqtt.Token)
 }
 
 func (c ClientMock) Subscribe(topic string, qos byte, callback mqtt.MessageHandler) mqtt.Token {
-	return new(TokenMock)
+	return new(TokenMockSuccess)
 }
 
 func (c ClientMock) SubscribeMultiple(filters map[string]byte, callback mqtt.MessageHandler) mqtt.Token {
-	return new(TokenMock)
+	return new(TokenMockSuccess)
 }
 
 func (c ClientMock) Unsubscribe(topics ...string) mqtt.Token {
-	return new(TokenMock)
+	return new(TokenMockSuccess)
 }
 
 func (c ClientMock) AddRoute(topic string, callback mqtt.MessageHandler) {
@@ -122,9 +139,36 @@ func (c ClientMock) OptionsReader() mqtt.ClientOptionsReader {
 }
 
 func TestCommunicator_Start(t *testing.T) {
-// Todo: Add test
+	client := new(ClientMock)
+	communicator := Communicator{
+		client:           client,
+		topicsOfInterest: []string{"back-end", "test"},
+	}
+
+	client.On("Connect").Return(new(TokenMockSuccess)).Once()
+	//client.On("SubscribeMultiple", communicator.topicsOfInterest, mock.Anything).Return(new(TokenMockSuccess)).Once()
+	communicator.Start(func(client mqtt.Client, message mqtt.Message) {})
+	client.AssertExpectations(t)
 }
 
 func TestCommunicator_Publish(t *testing.T) {
-// Todo: Add test
+	client := new(ClientMock)
+	communicator := Communicator{
+		client:           client,
+		topicsOfInterest: []string{"back-end", "test"},
+	}
+	client.On("Publish", "test", byte(0), false, "json").Return(new(TokenMockSuccess)).Once()
+	communicator.Publish("test", "json", 3)
+	client.AssertExpectations(t)
+}
+
+func TestCommunicator_PublishFailure(t *testing.T) {
+	client := new(ClientMock)
+	communicator := Communicator{
+		client:           client,
+		topicsOfInterest: []string{"back-end", "test"},
+	}
+	client.On("Publish", "test", byte(0), false, "json").Return(new(TokenMockFailure)).Times(3)
+	communicator.Publish("test", "json", 3)
+	client.AssertExpectations(t)
 }
