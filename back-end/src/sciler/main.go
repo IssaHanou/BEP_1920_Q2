@@ -33,7 +33,7 @@ func main() {
 
 	communicator := communication.NewCommunicator(host, port, topics)
 	go communicator.Start(func(client mqtt.Client, message mqtt.Message) {
-		// Todo: Make advanced message handler which acts according to the events / configuration
+		// TODO: Make advanced message handler which acts according to the events / configuration
 		var raw Message
 		if err := json.Unmarshal(message.Payload(), &raw); err != nil {
 			logrus.Errorf("Invalid JSON received: %v", err)
@@ -42,7 +42,7 @@ func main() {
 		case "instruction":
 			logrus.Info("instruction  message received")
 			{
-				if raw.Contents["instruction"] == "test all" && raw.DeviceID == "front-end" { // todo maybe switch again
+				if raw.Contents["instruction"] == "test all" && raw.DeviceID == "front-end" { // TODO maybe switch again
 					message := Message{
 						DeviceID: "back-end",
 						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
@@ -99,7 +99,7 @@ func main() {
 		}
 	})
 
-	//loop for now preventing app to exit
+	// loop for now preventing app to exit
 	for {
 		time.Sleep(time.Microsecond * time.Duration(250))
 	}
