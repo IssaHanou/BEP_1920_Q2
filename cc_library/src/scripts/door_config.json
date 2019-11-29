@@ -2,9 +2,9 @@
   "id": "Door1",
   "description": "Door can open and close",
   "host": "192.168.178.82",
-  "input_components": [
+  "input": [
   ],
-  "output_component": [
+  "output": [
     "door"
   ],
   "message": {

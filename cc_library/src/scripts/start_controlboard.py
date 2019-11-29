@@ -130,25 +130,25 @@ if __name__ == "__main__":
         device1.switch0,
         GPIO.BOTH,
         callback=lambda *a: get_status_switch(device1, "switch0", device1.switch0),
-        bouncetime=100,
+        bouncetime=250,
     )
     GPIO.add_event_detect(
         device1.switch1,
         GPIO.BOTH,
         callback=lambda *a: get_status_switch(device1, "switch1", device1.switch1),
-        bouncetime=100,
+        bouncetime=250,
     )
     GPIO.add_event_detect(
         device1.switch2,
         GPIO.BOTH,
         callback=lambda *a: get_status_switch(device1, "switch2", device1.switch2),
-        bouncetime=100,
+        bouncetime=250,
     )
     GPIO.add_event_detect(
         device1.switch3,
         GPIO.BOTH,
         callback=lambda *a: get_status_switch(device1, "switch3", device1.switch3),
-        bouncetime=100,
+        bouncetime=250,
     )
 
     # Start connection

@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const host string = "localhost"
+const host string = "192.168.178.82"
 const port string = "1883"
 
 var topics = []string{"back-end", "status", "hint", "connect"}
