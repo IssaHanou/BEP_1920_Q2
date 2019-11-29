@@ -1,0 +1,21 @@
+{
+  "general": {
+    "name": "Escape X",
+    "duration": "00:30:00",
+    "host": "192.0.0.84",
+    "port": 1883
+  },
+  "devices": [
+    {
+      "id": "telephone",
+      "description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
+      "input": {
+        "turningWheel": 0
+      },
+      "output": {
+        "audio": "audio1",
+        "ringTone": "string"
+      }
+    }
+  ]
+}

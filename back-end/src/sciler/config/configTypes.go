@@ -1,5 +1,11 @@
 package config
 
+import (
+	"crypto/sha512"
+	"encoding/base64"
+	"fmt"
+)
+
 // ReadConfig specifies all configuration elements of an escape room.
 type ReadConfig struct {
 	General       General        `json:"general"`
@@ -18,10 +24,10 @@ type General struct {
 
 // Device is a struct that describes the configurations of a device in the room.
 type Device struct {
-	ID          string   `json:"id"`
-	Description string   `json:"description"`
-	Input       IOObject `json:"input"`
-	Output      IOObject `json:"output"`
+	ID          string            `json:"id"`
+	Description string            `json:"description"`
+	Input       map[string]string `json:"input"`
+	Output      OutputObject      `json:"output"`
 }
 
 // Puzzle is a struct that describes contents of a puzzle.
@@ -48,51 +54,35 @@ type Rule struct {
 
 // Condition is a struct that determines when rules are fired.
 type Condition struct {
-	Type        string       `json:"type"`
-	TypeID      string       `json:"id"`
-	Constraints []Constraint `json:"constraints"`
-	Value       Valuer
+	Type        string           `json:"type"`
+	TypeID      string           `json:"type_id"`
+	Constraints []ConstraintInfo `json:"constraints"`
+	RuleID      string
 }
 
-type Valuer interface {
-	ValueOf() int
-}
+// ConstraintInfo is a general map allowing to read input constraints, which are later parsed to real constraint objects.
+type ConstraintInfo map[string]interface{}
 
-func LessThan(i, j Valuer) bool {
-	return i.ValueOf() < j.ValueOf()
-}
-
-func EqualTo(i, j Valuer) bool {
-	return i.ValueOf() == j.ValueOf()
-}
-
-func (i Condition) ValueOf() int {
-	return
-}
-
-type Element struct {
-	next, prev *Element
-	Value      Valuer
+// GetID returns hash of condition, limited to the first 24 characters
+func (condition *Condition) GetID() string {
+	hasher := sha512.New()
+	var toHash string = condition.RuleID + condition.TypeID + fmt.Sprint(condition.Constraints)
+	hasher.Write([]byte(toHash))
+	hash := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+	return hash[0:24]
 }
 
 // Action is a struct that determines what happens when a rule is fired.
 type Action struct {
 	Type    string        `json:"type"`
-	ID      string        `json:"id"`
+	TypeID  string        `json:"type_id"`
 	Message ActionMessage `json:"message"`
-}
-
-// Constraint specifies a conditions.
-type Constraint struct {
-	Comparison  string `json:"comparison"`
-	Value       string `json:"value"`
-	ComponentID string `json:"component_id"`
 }
 
 // ActionMessage can be sent across clients of the brokers.
 type ActionMessage struct {
-	Output IOObject `json:"output"`
+	Output OutputObject `json:"output"`
 }
 
-// IOObject contains a map defining either input or output.
-type IOObject map[string]interface{}
+// OutputObject contains a map defining either input or output.
+type OutputObject map[string]interface{}
