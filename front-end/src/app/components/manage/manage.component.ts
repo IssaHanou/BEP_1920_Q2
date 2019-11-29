@@ -11,7 +11,7 @@ export class ManageComponent implements OnInit {
 
   ngOnInit() {}
 
-  onClickTest() {
+  onClickTestButton() {
     const now = new Date();
     const message = {
       device_id: "front-end",
