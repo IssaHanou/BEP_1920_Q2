@@ -4,4 +4,8 @@
 /cc_library/.idea
 __pycache__/
 **/.idea
+**/pkg
+**/bin
+**/src/*
+!**/src/sciler
 */debug.log
