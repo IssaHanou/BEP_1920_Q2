@@ -2,16 +2,13 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/sirupsen/logrus"
+	"os"
 	"sciler/communication"
 	"sciler/config"
 	"time"
 )
-
-const host string = "192.168.178.82"
-const port string = "1883"
 
 var topics = []string{"back-end", "status", "hint", "connect"}
 
@@ -24,12 +21,15 @@ type Message struct {
 }
 
 func main() {
-	fmt.Println("Starting server")
-	data := []byte(`{
-            "name": "My Awesome Escape",
-            "duration": "00:30:00"
-    }`)
-	fmt.Println(config.GetFromJSON(data))
+	dir, err := os.Getwd()
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	filename := dir + "/back-end/resources/room_config.json"
+	configurations := config.ReadFile(filename)
+	logrus.Info("configurations read from: " + filename)
+	host := configurations.General.Host
+	port := configurations.General.Port
 
 	communicator := communication.NewCommunicator(host, port, topics)
 	go communicator.Start(func(client mqtt.Client, message mqtt.Message) {

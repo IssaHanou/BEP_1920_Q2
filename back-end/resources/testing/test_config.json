@@ -75,12 +75,17 @@
       }
     },
     {
-      "id": "door1",
-      "description": "De deur kan open en dicht zijn en neemt geen input.",
+      "id": "testDevice",
+      "description": "Device with all types of input for testing",
       "input": {
-      },
-      "output": {
-        "open": "boolean"
+        "string": "string",
+        "bool": "bool",
+        "numeric": "numeric",
+        "num-array": "num-array",
+        "bool-array": "bool-array",
+        "string-array": "string-array",
+        "custom": "custom",
+        "timer": "timer"
       }
     }
   ],
@@ -206,6 +211,71 @@
       "hints": [
         "Zet de schuiven nauwkeurig"
       ]
+    },
+    {
+      "name": "Test puzzel",
+      "rules": [
+        {
+          "id": "testCondition",
+          "description": "Condition with all component type constraints for testing",
+          "limit": 1,
+          "conditions": [
+            {
+              "type": "device",
+              "type_id": "testDevice",
+              "constraints": [
+                {
+                  "comp": "contains",
+                  "value": "mystring",
+                  "component_id": "string"
+                },
+                {
+                  "comp": "eq",
+                  "value": [
+                    "mystring1",
+                    "mystring2"
+                  ],
+                  "component_id": "string-array"
+                },
+                {
+                  "comp": "lte",
+                  "value": 2.5,
+                  "component_id": "numeric"
+                },
+                {
+                  "comp": "contains",
+                  "value": [
+                    0,
+                    -1,
+                    0.5,
+                    25,
+                    9.12
+                  ],
+                  "component_id": "num-array"
+                },
+                {
+                  "comp": "contains",
+                  "value": [
+                    true,
+                    false,
+                    true
+                  ],
+                  "component_id": "bool-array"
+                },
+                {
+                  "comp": "gt",
+                  "value": {
+                    "instruction": "test"
+                  },
+                  "component_id": "custom"
+                }
+              ]
+            }
+          ],
+          "actions": [],
+          "hints": []
+        }
+      ]
     }
   ],
   "general_events": [
@@ -234,7 +304,6 @@
               "type_id": "telephone",
               "message": {
                 "output": {
-                  "ringTone": "standard",
                   "audio": "audio_1"
                 }
               }
@@ -248,7 +317,7 @@
       "rules": [
         {
           "id": "flipSwitch",
-          "description": "Als de knop omgaat, stopt het spel: tijd stopt en deur gaat open.",
+          "description": "Als de knop omgaat, stopt het spel.",
           "limit": 1,
           "conditions": [
             {
@@ -256,9 +325,9 @@
               "type_id": "controlBoard",
               "constraints": [
                 {
-                  "component_id": "mainSwitch",
                   "comp": "eq",
-                  "value": true
+                  "value": true,
+                  "component_id": "mainSwitch"
                 }
               ]
             }
@@ -270,15 +339,6 @@
               "message": {
                 "output": {
                   "instruction": "stop"
-                }
-              }
-            },
-            {
-              "type": "device",
-              "type_id": "door1",
-              "message": {
-                "output": {
-                  "open": true
                 }
               }
             }

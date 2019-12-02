@@ -1,5 +1,7 @@
 # BEP_1920_Q2 - broker
 
+
+### Set-up
 When using Mosquitto as a broker, mosquitto.conf should be used to setup a broker with an extra listener for websockets.
  
 The bind-address should be changed to local-ip when communication outside a one machine develepment setup is required. 
@@ -14,3 +16,9 @@ mosquitto -c <mosquitto.conf>
 ```
 
 When there is a mosquitto broker already running, this will not work. Then, first run `net stop mosquitto`.
+
+### Running
+```
+mosquitto -t <topic>
+mosquitto -h <ip.ad.dr.ess>
+```

@@ -1,0 +1,8 @@
+{
+  "general": {
+    "name": "Escape X",
+    "duration": 30,
+    "host": "192.0.0.84",
+    "port": 1883
+  }
+}
