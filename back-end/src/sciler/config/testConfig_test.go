@@ -47,7 +47,7 @@ func TestActionOutput(t *testing.T) {
 		"redLight2":   false,
 		"redLight3":   false,
 	}
-	assert.Equal(t, output, config.Puzzles[1].Rules[0].Actions[1].Message.Output,
+	assert.Equal(t, output, config.Puzzles[1].Event.Rules[0].Actions[1].Message.Output,
 		"Message from action should be of OutputObject type, retrieved through puzzles in config")
 }
 
@@ -69,7 +69,7 @@ func TestGeneralEvents(t *testing.T) {
 func TestComponentIDForDeviceConstraintNum(t *testing.T) {
 	filename := "../../../resources/testing/test_config.json"
 	config := ReadFile(filename)
-	list := GetConstraintNumeric(config, config.Puzzles[1].Rules[0].Conditions[0].GetID())
+	list := GetConstraintNumeric(config, config.Puzzles[1].Event.Rules[0].Conditions[0].GetID())
 	assert.Equal(t, 1, len(list), "There should be one numeric constraint for this condition")
 	assert.Equal(t, "slider2", list[0].ComponentID,
 		"ComponentID should be retrieved correctly through puzzle, rule, condition, constraint")
@@ -78,7 +78,7 @@ func TestComponentIDForDeviceConstraintNum(t *testing.T) {
 func TestComponentIDForDeviceConstraintBool(t *testing.T) {
 	filename := "../../../resources/testing/test_config.json"
 	config := ReadFile(filename)
-	list := GetConstraintBool(config, config.Puzzles[1].Rules[0].Conditions[0].GetID())
+	list := GetConstraintBool(config, config.Puzzles[1].Event.Rules[0].Conditions[0].GetID())
 	assert.Equal(t, 3, len(list), "There should be three boolean constraints for this condition")
 	assert.Equal(t, "greenSwitch", list[1].ComponentID,
 		"ComponentID should be retrieved correctly through puzzle, rule, condition, constraint")
@@ -87,7 +87,7 @@ func TestComponentIDForDeviceConstraintBool(t *testing.T) {
 func TestComponentIDForDeviceConstraintDouble(t *testing.T) {
 	filename := "../../../resources/testing/test_config.json"
 	config := ReadFile(filename)
-	list := GetConstraintNumeric(config, config.Puzzles[2].Rules[0].Conditions[0].GetID())
+	list := GetConstraintNumeric(config, config.Puzzles[2].Event.Rules[0].Conditions[0].GetID())
 	assert.Equal(t, 1, len(list), "There should be one numeric constraint for this condition")
 	assert.Equal(t, "numeric", list[0].ComponentID,
 		"ComponentID should be retrieved correctly through puzzle, rule, condition, constraint")
@@ -98,7 +98,7 @@ func TestComponentIDForDeviceConstraintDouble(t *testing.T) {
 func TestComponentIDForDeviceConstraintString(t *testing.T) {
 	filename := "../../../resources/testing/test_config.json"
 	config := ReadFile(filename)
-	list := GetConstraintString(config, config.Puzzles[2].Rules[0].Conditions[0].GetID())
+	list := GetConstraintString(config, config.Puzzles[2].Event.Rules[0].Conditions[0].GetID())
 	assert.Equal(t, 1, len(list), "There should be one string constraint for this condition")
 	assert.Equal(t, "string", list[0].ComponentID,
 		"ComponentID should be retrieved correctly through puzzle, rule, condition, constraint")
@@ -109,7 +109,7 @@ func TestComponentIDForDeviceConstraintString(t *testing.T) {
 func TestComponentIDForDeviceConstraintNumArray(t *testing.T) {
 	filename := "../../../resources/testing/test_config.json"
 	config := ReadFile(filename)
-	list := GetConstraintNumArray(config, config.Puzzles[2].Rules[0].Conditions[0].GetID())
+	list := GetConstraintNumArray(config, config.Puzzles[2].Event.Rules[0].Conditions[0].GetID())
 	assert.Equal(t, 1, len(list), "There should be one num-array constraint for this condition")
 	assert.Equal(t, "num-array", list[0].ComponentID,
 		"ComponentID should be retrieved correctly through puzzle, rule, condition, constraint")
@@ -120,7 +120,7 @@ func TestComponentIDForDeviceConstraintNumArray(t *testing.T) {
 func TestComponentIDForDeviceConstraintStringArray(t *testing.T) {
 	filename := "../../../resources/testing/test_config.json"
 	config := ReadFile(filename)
-	list := GetConstraintStringArray(config, config.Puzzles[2].Rules[0].Conditions[0].GetID())
+	list := GetConstraintStringArray(config, config.Puzzles[2].Event.Rules[0].Conditions[0].GetID())
 	assert.Equal(t, 1, len(list), "There should be one num-array constraint for this condition")
 	assert.Equal(t, "string-array", list[0].ComponentID,
 		"ComponentID should be retrieved correctly through puzzle, rule, condition, constraint")
@@ -131,7 +131,7 @@ func TestComponentIDForDeviceConstraintStringArray(t *testing.T) {
 func TestComponentIDForDeviceConstraintBoolArray(t *testing.T) {
 	filename := "../../../resources/testing/test_config.json"
 	config := ReadFile(filename)
-	list := GetConstraintBoolArray(config, config.Puzzles[2].Rules[0].Conditions[0].GetID())
+	list := GetConstraintBoolArray(config, config.Puzzles[2].Event.Rules[0].Conditions[0].GetID())
 	assert.Equal(t, 1, len(list), "There should be one bool-array constraint for this condition")
 	assert.Equal(t, "bool-array", list[0].ComponentID,
 		"ComponentID should be retrieved correctly through puzzle, rule, condition, constraint")
@@ -142,7 +142,7 @@ func TestComponentIDForDeviceConstraintBoolArray(t *testing.T) {
 func TestComponentIDForDeviceConstraintCustom(t *testing.T) {
 	filename := "../../../resources/testing/test_config.json"
 	config := ReadFile(filename)
-	list := GetConstraintCustomType(config, config.Puzzles[2].Rules[0].Conditions[0].GetID())
+	list := GetConstraintCustomType(config, config.Puzzles[2].Event.Rules[0].Conditions[0].GetID())
 	assert.Equal(t, 1, len(list), "There should be one custom type constraint for this condition")
 	assert.Equal(t, "custom", list[0].ComponentID,
 		"ComponentID should be retrieved correctly through puzzle, rule, condition, constraint")

@@ -4,7 +4,7 @@ package config
 type WorkingConfig struct {
 	General       General
 	Puzzles       []Puzzle
-	GeneralEvents []GeneralEvent
+	GeneralEvents []Event
 	//TODO maps and concurrency
 	Devices   map[string]Device
 	Rules     map[string]Rule
@@ -13,6 +13,18 @@ type WorkingConfig struct {
 	// string, bool, numeric, string-array, bool-array, num-array, custom, timer
 	// ex: ConstraintMap[conditionID][boolean] = []ConstraintBool
 	ConstraintMap map[string]map[string][]interface{}
+}
+
+// Event is general struct with name and rule set.
+type Event struct {
+	Name  string
+	Rules []Rule
+}
+
+// Puzzle is struct which inherits event and extra hints set.
+type Puzzle struct {
+	Event Event
+	Hints []string
 }
 
 // Constraint is main constraint type with comparison and componentID (latter only for device condition).

@@ -10,7 +10,7 @@ import (
 type ReadConfig struct {
 	General       General        `json:"general"`
 	Devices       []Device       `json:"devices"`
-	Puzzles       []Puzzle       `json:"puzzles"`
+	Puzzles       []ReadPuzzle   `json:"puzzles"`
 	GeneralEvents []GeneralEvent `json:"general_events"`
 }
 
@@ -30,8 +30,8 @@ type Device struct {
 	Output      OutputObject      `json:"output"`
 }
 
-// Puzzle is a struct that describes contents of a puzzle.
-type Puzzle struct {
+// ReadPuzzle is a struct that describes contents of a puzzle.
+type ReadPuzzle struct {
 	Name  string   `json:"name"`
 	Rules []Rule   `json:"rules"`
 	Hints []string `json:"hints"`

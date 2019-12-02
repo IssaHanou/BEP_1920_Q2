@@ -39,19 +39,32 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, error) {
 	var config WorkingConfig
 	// Copy information from read config to working config.
 	config.General = readConfig.General
-	config.Puzzles = readConfig.Puzzles
-	config.GeneralEvents = readConfig.GeneralEvents
 	config.Devices = make(map[string]Device)
 	for _, d := range readConfig.Devices {
 		config.Devices[d.ID] = d
 	}
 
 	// Create additional data structures.
+	config.Puzzles = []Puzzle{}
+	config.GeneralEvents = []Event{}
 	config.Rules = make(map[string]Rule)
 	config.ActionMap = make(map[string][]Action)
 	config.ConstraintMap = make(map[string]map[string][]interface{})
-	for i, p := range config.Puzzles {
-		for j, r := range p.Rules {
+
+	var eventList []*Event
+	for _, p := range readConfig.Puzzles {
+		newEvent := Event{p.Name, p.Rules}
+		newPuzzle := Puzzle{newEvent, p.Hints}
+		config.Puzzles = append(config.Puzzles, newPuzzle)
+		eventList = append(eventList, &newEvent)
+	}
+	for _, e := range readConfig.GeneralEvents {
+		newEvent := Event{e.Name, e.Rules}
+		config.GeneralEvents = append(config.GeneralEvents, newEvent)
+		eventList = append(eventList, &newEvent)
+	}
+	for _, e := range eventList {
+		for j, r := range (*e).Rules {
 			config.Rules[r.ID] = r
 			actions, err := checkActions(config.Devices, r.Actions)
 			if err != nil {
@@ -59,7 +72,8 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, error) {
 			}
 			for k, c := range r.Conditions {
 				// Set both original pointer's and current pointer's conditions
-				config.Puzzles[i].Rules[j].Conditions[k].RuleID = r.ID
+				(*e).Rules[j].Conditions[k].RuleID = r.ID
+				//config.Puzzles[i].Rules[j].Conditions[k].RuleID = r.ID
 				c.RuleID = r.ID
 				config.ActionMap[c.GetID()] = actions
 				constraints, err := makeConstraints(config.Devices, c)
