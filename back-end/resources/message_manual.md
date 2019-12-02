@@ -12,6 +12,7 @@
             - `output`: specifies current values for every output_component (in the form "componentId": "value") or an empty string if there is no output 
         - If type is "confirmation", then the message contents is:
             - `completed`: "true" or "false" depending on success
+            - `instructed`: the instruction message that the client computer acted on regarding this confirmation
         - If type is `connection`, then the message contents is:
             - `connection`: "true" or "false" depending on connection status 
         - If type is "instruction", then the message contents is:

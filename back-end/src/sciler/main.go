@@ -5,6 +5,7 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/sirupsen/logrus"
 	"os"
+	"reflect"
 	"sciler/communication"
 	"sciler/config"
 	"time"
@@ -91,10 +92,35 @@ func main() {
 		case "confirmation":
 			{
 				logrus.Info("confirmation message received")
+				value, ok := raw.Contents["completed"]
+				if !ok || reflect.TypeOf(value).Kind() != reflect.Bool {
+					logrus.Error("Received improperly structured confirmation message from device " + raw.DeviceID)
+				} else if !value.(bool) {
+					value2, ok2 := raw.Contents["instructed"]
+					if !ok2 {
+						logrus.Error("Device " + raw.DeviceID + " did not complete instruction at " +
+							raw.TimeSent)
+					} else {
+						logrus.Error("Device " + raw.DeviceID + " did not complete instruction with type " +
+							value2.(string) + " at " + raw.TimeSent)
+					}
+				} else {
+					value2, ok2 := raw.Contents["instructed"]
+					if !ok2 {
+						logrus.Info("Device " + raw.DeviceID + " completed instruction at " + raw.TimeSent)
+					} else {
+						logrus.Info("Device " + raw.DeviceID + " completed instruction with type " +
+							value2.(string) + " at " + raw.TimeSent)
+					}
+				}
 			}
 		case "connection":
 			{
 				logrus.Info("connection message received")
+			}
+		default:
+			{
+				logrus.Info("received unsupported message of type " + raw.Type)
 			}
 		}
 	})
