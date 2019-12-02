@@ -32,6 +32,7 @@ func main() {
 	port := configurations.General.Port
 
 	communicator := communication.NewCommunicator(host, port, topics)
+
 	go communicator.Start(func(client mqtt.Client, message mqtt.Message) {
 		// TODO: Make advanced message handler which acts according to the events / configuration
 		var raw Message
@@ -40,7 +41,7 @@ func main() {
 		}
 		switch raw.Type {
 		case "instruction":
-			logrus.Info("instruction  message received")
+
 			{
 				if raw.Contents["instruction"] == "test all" && raw.DeviceID == "front-end" { // TODO maybe switch again
 					message := Message{
@@ -61,31 +62,37 @@ func main() {
 			}
 		case "status":
 			{
-				logrus.Info("status message received")
-				if raw.DeviceID == "controlBoard1" {
-					var instruction string
-					if raw.Contents["switch1"] == "1" {
-						instruction = "turn off"
-					} else if raw.Contents["switch1"] == "0" {
-						instruction = "turn on"
-					}
-					if instruction != "" {
-						message := Message{
-							DeviceID: "back-end",
-							TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-							Type:     "instruction",
-							Contents: map[string]interface{}{
-								"instruction": instruction,
-							},
-						}
-						jsonMessage, err := json.Marshal(&message)
-						if err != nil {
-							logrus.Errorf("Error occurred while constructing message to publish: %v", err)
-						} else {
-							communicator.Publish("test", string(jsonMessage), 3)
-						}
-					}
+				logrus.Info("status  message received from: ", raw.DeviceID)
+				for k, v := range raw.Contents {
+					configurations.Devices[raw.DeviceID].Status[k] = v
 				}
+
+				//logrus.Print(configurations.Devices[raw.DeviceID])
+				//logrus.Info("status message received")
+				//if raw.DeviceID == "controlBoard1" {
+				//	var instruction string
+				//	if raw.Contents["switch1"] == "1" {
+				//		instruction = "turn off"
+				//	} else if raw.Contents["switch1"] == "0" {
+				//		instruction = "turn on"
+				//	}
+				//	if instruction != "" {
+				//		message := Message{
+				//			DeviceID: "back-end",
+				//			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+				//			Type:     "instruction",
+				//			Contents: map[string]interface{}{
+				//				"instruction": instruction,
+				//			},
+				//		}
+				//		jsonMessage, err := json.Marshal(&message)
+				//		if err != nil {
+				//			logrus.Errorf("Error occurred while constructing message to publish: %v", err)
+				//		} else {
+				//			communicator.Publish("test", string(jsonMessage), 3)
+				//		}
+				//	}
+				// }
 
 			}
 		case "confirmation":
@@ -95,8 +102,12 @@ func main() {
 		case "connection":
 			{
 				logrus.Info("connection message received")
+				con := configurations.Devices[raw.DeviceID]
+				con.Connection = true
+				configurations.Devices[raw.DeviceID] = con
 			}
 		}
+
 	})
 
 	// loop for now preventing app to exit

@@ -26,7 +26,7 @@ func TestFileError(t *testing.T) {
 func TestDeviceInputWrongTypeError(t *testing.T) {
 	filename := "../../../resources/testing/wrong-types/testDeviceInputWrongTypeError.json"
 	assert.PanicsWithValue(t,
-		"json: cannot unmarshal number into Go struct field Device.devices.input of type string",
+		"json: cannot unmarshal number into Go struct field ReadDevice.devices.input of type string",
 		func() { ReadFile(filename) },
 		"Incorrect json (no input type in string format) should panic")
 }
@@ -35,7 +35,7 @@ func TestDeviceInputWrongTypeError(t *testing.T) {
 //func TestDeviceOutputWrongTypeError(t *testing.T) {
 //	filename := "../../../resources/testing/wrong-types/testDeviceOutputWrongTypeError.json"
 //	assert.PanicsWithValue(t,
-//		"json: cannot unmarshal number into Go struct field Device.devices.output of type string",
+//		"json: cannot unmarshal number into Go struct field ReadDevice.devices.output of type string",
 //		func() { ReadFile(filename) },
 //		"Incorrect json (no output type in string format) should panic")
 //}
@@ -45,7 +45,7 @@ func TestDeviceActionNotPresent(t *testing.T) {
 	assert.PanicsWithValue(t,
 		"device with id telephone not found in map",
 		func() { ReadFile(filename) },
-		"Device used in action should be present in device list")
+		"ReadDevice used in action should be present in device list")
 }
 
 func TestComponentActionNotPresent(t *testing.T) {
@@ -61,7 +61,7 @@ func TestDeviceConstraintNotPresent(t *testing.T) {
 	assert.PanicsWithValue(t,
 		"device with id telephone not found in map",
 		func() { ReadFile(filename) },
-		"Device used in constraint should be present in device list")
+		"ReadDevice used in constraint should be present in device list")
 }
 
 func TestComponentConstraintNotPresent(t *testing.T) {
