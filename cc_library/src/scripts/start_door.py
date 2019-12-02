@@ -1,7 +1,7 @@
 import os
 import time
 
-from src.device.app import App
+from src.device.app import *
 
 try:
     import RPi.GPIO as GPIO

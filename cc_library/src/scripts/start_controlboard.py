@@ -1,6 +1,6 @@
 import os
 import time
-from src.device.app import App
+from src.scclib.scclib import SccLib
 
 try:
     import RPi.GPIO as GPIO
@@ -117,14 +117,14 @@ if __name__ == "__main__":
     abs_file_path = os.path.join(two_up, rel_path)
     abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
     config = open(file=abs_file_path)
-    app = App(config=config, device=device1)
+    app = SccLib(config=config, device=device1)
 
     def get_status_switch(device, name, switch):
         """
         get status calls send_message to send the status of
         a switch to the MQTT broker.
         """
-        app.send_status_message(device.get_switch(name, switch))
+        app.__send_status_message(device.get_switch(name, switch))
 
     GPIO.add_event_detect(
         device1.switch0,

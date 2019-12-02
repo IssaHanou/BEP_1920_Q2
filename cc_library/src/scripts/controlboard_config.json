@@ -1,30 +1,16 @@
 {
-  "id": "controlBoard1",
+  "id": "controlBoard",
   "description": "Control board with three switches, three slides with lights and one main switch.",
   "host": "192.168.178.82",
-  "handler": "board_handler",
+  "port": 1883,
   "input": {
-    "redSwitch": {
-      "type": "boolean"
-    },
-    "orangeSwitch": {
-      "type": "boolean"
-    },
-    "greenSwitch": {
-      "type": "boolean"
-    },
-    "slider1": {
-      "type": "integer"
-    },
-    "slider2": {
-      "type": "integer"
-    },
-    "slider3": {
-      "type": "integer"
-    },
-    "mainSwitch": {
-      "type": "boolean"
-    }
+    "redSwitch": "boolean",
+    "orangeSwitch":  "boolean",
+    "greenSwitch": "boolean",
+    "slider1": "numeric",
+    "slider2": "numeric",
+    "slider3": "numeric",
+    "mainSwitch": "numeric"
   },
   "output": {
     "greenLight1": {
