@@ -17,7 +17,7 @@ func TestGeneralInformation(t *testing.T) {
 func TestPuzzleSize(t *testing.T) {
 	filename := "../../../resources/testing/test_config.json"
 	config := ReadFile(filename)
-	assert.Equal(t, 3, len(config.Puzzles), "Should have read two puzzles")
+	assert.Equal(t, 3, len(config.Puzzles), "Should have read three puzzles")
 }
 
 func TestDeviceInput(t *testing.T) {
@@ -181,6 +181,6 @@ func TestDeviceOutputCustomType(t *testing.T) {
 		assert.Equal(t, "audio", key,
 			"Id of component should be key in input map")
 		assert.Equal(t, "string", value,
-			"Custom type of component should be value in input map")
+			"Custom type of component should be value in output map")
 	}
 }

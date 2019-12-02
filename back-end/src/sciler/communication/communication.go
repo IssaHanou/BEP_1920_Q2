@@ -15,9 +15,9 @@ type Communicator struct {
 }
 
 // NewCommunicator is a constructor for a Communicator
-func NewCommunicator(host string, port string, topicsOfInterest []string) *Communicator {
+func NewCommunicator(host string, port int, topicsOfInterest []string) *Communicator {
 	opts := mqtt.NewClientOptions()
-	opts.AddBroker(fmt.Sprintf("%s://%s:%s", "tcp", host, port))
+	opts.AddBroker(fmt.Sprintf("%s://%s:%d", "tcp", host, port))
 	opts.SetClientID("back-end")
 	opts.SetConnectionLostHandler(onConnectionLost)
 	client := mqtt.NewClient(opts)

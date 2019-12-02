@@ -66,7 +66,7 @@ type ConstraintInfo map[string]interface{}
 // GetID returns hash of condition, limited to the first 24 characters
 func (condition *Condition) GetID() string {
 	hasher := sha512.New()
-	var toHash string = condition.RuleID + condition.TypeID + fmt.Sprint(condition.Constraints)
+	toHash := condition.RuleID + condition.TypeID + fmt.Sprint(condition.Constraints)
 	hasher.Write([]byte(toHash))
 	hash := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
 	return hash[0:24]
