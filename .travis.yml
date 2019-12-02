@@ -12,8 +12,7 @@ matrix:
 
       # https://medium.com/faun/configuring-travis-ci-for-angular-application-34afee1715f
     - language: node_js
-      node_js:
-        - "12.13.1"
+      node_js: 12.13.1
       services:
         - xvfb
       dist: xenial
@@ -33,12 +32,15 @@ matrix:
         chrome: stable
 
     - language: go
-      go_import_path: github.com/IssaHanou/BEP_1920_Q2
+      go: 1.13.4
+      go_import_path: github.com/IssaHanou/BEP_1920_Q2/back-end
       before_install:
-        - go get github.com/stretchr/testify/assert
         - go get -u golang.org/x/lint/golint
+        - export GOPATH=$TRAVIS_BUILD_DIR/back-end
+        - cd back-end/src/sciler
+        - go get github.com/stretchr/testify/assert
       script:
-        - cd back-end
-        - golint -set_exit_status ./..
-        - go test -v ./...
-        - go build
+        - cd ../..
+        - golint -set_exit_status sciler/...
+        - go test -v sciler/...
+        - go build sciler

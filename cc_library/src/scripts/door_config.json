@@ -1,0 +1,26 @@
+{
+  "id": "Door1",
+  "description": "Door can open and close",
+  "host": "192.168.178.82",
+  "input": [
+  ],
+  "output": [
+    "door"
+  ],
+  "message": {
+    "input": {
+    },
+    "output": {
+      "door": false
+    }
+  },
+  "test": {
+    "output": {
+      "door": {
+        "instruction": "test",
+        "interval": 0.5,
+        "delay": 0.3
+      }
+    }
+  }
+}

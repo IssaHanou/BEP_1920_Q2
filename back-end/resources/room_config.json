@@ -13,52 +13,52 @@
         "redSwitch": "boolean",
         "orangeSwitch": "boolean",
         "greenSwitch": "boolean",
-        "slider1": "integer",
-        "slider2": "integer",
-        "slider3": "integer",
+        "slider1": "numeric",
+        "slider2": "numeric",
+        "slider3": "numeric",
         "mainSwitch": "boolean"
       },
       "output": {
         "greenLight1": {
           "type": "string",
           "instruction": {
-            "interval": "integer",
-            "delay": "integer"
+            "interval": "numeric",
+            "delay": "numeric"
           }
         },
         "greenLight2": {
           "type": "string",
           "instruction": {
-            "interval": "integer",
-            "delay": "integer"
+            "interval": "numeric",
+            "delay": "numeric"
           }
         },
         "greenLight3": {
           "type": "string",
           "instruction": {
-            "interval": "integer",
-            "delay": "integer"
+            "interval": "numeric",
+            "delay": "numeric"
           }
         },
         "redLight1": {
           "type": "string",
           "instruction": {
-            "interval": "integer",
-            "delay": "integer"
+            "interval": "numeric",
+            "delay": "numeric"
           }
         },
-        "redLight2":  {
+        "redLight2": {
           "type": "string",
           "instruction": {
-            "interval": "integer",
-            "delay": "integer"
+            "interval": "numeric",
+            "delay": "numeric"
           }
         },
-        "redLight3":  {
+        "redLight3": {
           "type": "string",
           "instruction": {
-            "interval": "integer",
-            "delay": "integer"
+            "interval": "numeric",
+            "delay": "numeric"
           }
         }
       }
@@ -67,11 +67,20 @@
       "id": "telephone",
       "description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
       "input": {
-        "turningWheel": "array"
+        "turningWheel": "num-array"
       },
       "output": {
         "audio": "string",
         "ringTone": "string"
+      }
+    },
+    {
+      "id": "door1",
+      "description": "De deur kan open en dicht zijn en neemt geen input.",
+      "input": {
+      },
+      "output": {
+        "open": "boolean"
       }
     }
   ],
@@ -86,11 +95,12 @@
           "conditions": [
             {
               "type": "device",
-              "id": "telphone",
+              "type_id": "telephone",
               "constraints": [
                 {
-                  "comparison": "eq",
-                  "turningWheel": [
+                  "comp": "eq",
+                  "component_id": "turningWheel",
+                  "value": [
                     0,
                     1,
                     2,
@@ -101,7 +111,7 @@
               "actions": [
                 {
                   "type": "device",
-                  "id": "controlBoard",
+                  "type_id": "controlBoard",
                   "message": {
                     "output": {
                       "greenLight1": {
@@ -141,28 +151,26 @@
           "conditions": [
             {
               "type": "device",
-              "id": "controlBoard",
+              "type_id": "controlBoard",
               "constraints": [
                 {
                   "component_id": "mainSwitch",
-                  "comparison": "eq",
+                  "comp": "eq",
                   "value": true
                 },
-                [
-                  {
-                    "component_id": "greenSwitch",
-                    "comparison": "eq",
-                    "value": true
-                  },
-                  {
-                    "component_id": "redSwitch",
-                    "comparison": "eq",
-                    "value": true
-                  }
-                ],
+                {
+                  "component_id": "greenSwitch",
+                  "comp": "eq",
+                  "value": true
+                },
+                {
+                  "component_id": "redSwitch",
+                  "comp": "eq",
+                  "value": true
+                },
                 {
                   "component_id": "slider2",
-                  "comparison": "lt",
+                  "comp": "lt",
                   "value": 30
                 }
               ]
@@ -171,7 +179,7 @@
           "actions": [
             {
               "type": "device",
-              "id": "telephone",
+              "type_id": "telephone",
               "message": {
                 "output": {
                   "audio": "audio_1"
@@ -180,7 +188,7 @@
             },
             {
               "type": "device",
-              "id": "controlBoard",
+              "type_id": "controlBoard",
               "message": {
                 "output": {
                   "greenLight1": false,
@@ -211,10 +219,10 @@
           "conditions": [
             {
               "type": "timer",
-              "id": "telephone",
+              "type_id": "timer1",
               "constraints": [
                 {
-                  "comparison": "eq",
+                  "comp": "eq",
                   "value": "00:01:00"
                 }
               ]
@@ -223,10 +231,54 @@
           "actions": [
             {
               "type": "device",
-              "id": "telephone",
+              "type_id": "telephone",
               "message": {
                 "output": {
+                  "ringTone": "standard",
                   "audio": "audio_1"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stop",
+      "rules": [
+        {
+          "id": "flipSwitch",
+          "description": "Als de knop omgaat, stopt het spel: tijd stopt en deur gaat open.",
+          "limit": 1,
+          "conditions": [
+            {
+              "type": "device",
+              "type_id": "controlBoard",
+              "constraints": [
+                {
+                  "component_id": "mainSwitch",
+                  "comp": "eq",
+                  "value": true
+                }
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "timer",
+              "type_id": "timer1",
+              "message": {
+                "output": {
+                  "instruction": "stop"
+                }
+              }
+            },
+            {
+              "type": "device",
+              "type_id": "door1",
+              "message": {
+                "output": {
+                  "open": true
                 }
               }
             }
