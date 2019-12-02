@@ -58,7 +58,7 @@ This can be displayed in the front-end, so should be readable and in Dutch.
     - `type_id`: this will be the id of a timer, rule or device, depending on the type.
     - `constraints`: this is an array of constraints. 
         
-        - `comp`: this is the type of comparison and can be "eq", "lt", "gt", "contains" (contains), "lte", "gte" 
+        - `comparison`: this is the type of comparison and can be "eq", "lt", "gt", "contains" (contains), "lte", "gte" 
         - `value`: this is the value on which the comparison is made. This should be in the same type as specified in the input of the device. 
             If it has custom input, then enter value in preferred type and deal with it on the client.
             In case of "timer" type, it should be in the format "hh:mm:ss"

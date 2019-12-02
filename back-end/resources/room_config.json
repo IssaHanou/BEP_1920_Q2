@@ -98,7 +98,7 @@
               "type_id": "telephone",
               "constraints": [
                 {
-                  "comp": "eq",
+                  "comparison": "eq",
                   "component_id": "turningWheel",
                   "value": [
                     0,
@@ -155,22 +155,22 @@
               "constraints": [
                 {
                   "component_id": "mainSwitch",
-                  "comp": "eq",
+                  "comparison": "eq",
                   "value": true
                 },
                 {
                   "component_id": "greenSwitch",
-                  "comp": "eq",
+                  "comparison": "eq",
                   "value": true
                 },
                 {
                   "component_id": "redSwitch",
-                  "comp": "eq",
+                  "comparison": "eq",
                   "value": true
                 },
                 {
                   "component_id": "slider2",
-                  "comp": "lt",
+                  "comparison": "lt",
                   "value": 30
                 }
               ]
@@ -222,7 +222,7 @@
               "type_id": "timer1",
               "constraints": [
                 {
-                  "comp": "eq",
+                  "comparison": "eq",
                   "value": "00:01:00"
                 }
               ]
@@ -257,7 +257,7 @@
               "constraints": [
                 {
                   "component_id": "mainSwitch",
-                  "comp": "eq",
+                  "comparison": "eq",
                   "value": true
                 }
               ]

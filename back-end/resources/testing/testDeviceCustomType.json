@@ -31,7 +31,7 @@
               "type_id": "telephone",
               "constraints": [
                 {
-                  "comp": "eq",
+                  "comparison": "eq",
                   "component_id": "turningWheel",
                   "value": {
                     "my_key": "my_value"

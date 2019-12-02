@@ -31,7 +31,7 @@
               "type_id": "ledLights",
               "constraints": [
                 {
-                  "comp": "eq",
+                  "comparison": "eq",
                   "value": [true],
                   "component_id": "light"
                 }

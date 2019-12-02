@@ -103,7 +103,7 @@
               "type_id": "telephone",
               "constraints": [
                 {
-                  "comp": "eq",
+                  "comparison": "eq",
                   "component_id": "turningWheel",
                   "value": [
                     0,
@@ -160,22 +160,22 @@
               "constraints": [
                 {
                   "component_id": "mainSwitch",
-                  "comp": "eq",
+                  "comparison": "eq",
                   "value": true
                 },
                 {
                   "component_id": "greenSwitch",
-                  "comp": "eq",
+                  "comparison": "eq",
                   "value": true
                 },
                 {
                   "component_id": "redSwitch",
-                  "comp": "eq",
+                  "comparison": "eq",
                   "value": true
                 },
                 {
                   "component_id": "slider2",
-                  "comp": "lt",
+                  "comparison": "lt",
                   "value": 30
                 }
               ]
@@ -225,12 +225,12 @@
               "type_id": "testDevice",
               "constraints": [
                 {
-                  "comp": "contains",
+                  "comparison": "contains",
                   "value": "mystring",
                   "component_id": "string"
                 },
                 {
-                  "comp": "eq",
+                  "comparison": "eq",
                   "value": [
                     "mystring1",
                     "mystring2"
@@ -238,12 +238,12 @@
                   "component_id": "string-array"
                 },
                 {
-                  "comp": "lte",
+                  "comparison": "lte",
                   "value": 2.5,
                   "component_id": "numeric"
                 },
                 {
-                  "comp": "contains",
+                  "comparison": "contains",
                   "value": [
                     0,
                     -1,
@@ -254,7 +254,7 @@
                   "component_id": "num-array"
                 },
                 {
-                  "comp": "contains",
+                  "comparison": "contains",
                   "value": [
                     true,
                     false,
@@ -263,7 +263,7 @@
                   "component_id": "bool-array"
                 },
                 {
-                  "comp": "gt",
+                  "comparison": "gt",
                   "value": {
                     "instruction": "test"
                   },
@@ -292,7 +292,7 @@
               "type_id": "timer1",
               "constraints": [
                 {
-                  "comp": "eq",
+                  "comparison": "eq",
                   "value": "00:01:00"
                 }
               ]
@@ -325,7 +325,7 @@
               "type_id": "controlBoard",
               "constraints": [
                 {
-                  "comp": "eq",
+                  "comparison": "eq",
                   "value": true,
                   "component_id": "mainSwitch"
                 }

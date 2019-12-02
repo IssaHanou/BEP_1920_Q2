@@ -97,19 +97,19 @@ func checkDeviceType(constraint ConstraintInfo, generalConstraint Constraint, de
 // includeCompo specifies whether to include the component id in the constraint, which is not the case for timer type.
 func createConstraint(constraint ConstraintInfo, includeComponentID bool) (Constraint, error) {
 	var err error
-	if reflect.TypeOf(constraint["comp"]).Kind() != reflect.String {
-		return Constraint{}, errors.New("comparison '" + fmt.Sprint(constraint["comp"]) + "' cannot be cast to string")
+	if reflect.TypeOf(constraint["comparison"]).Kind() != reflect.String {
+		return Constraint{}, errors.New("comparison '" + fmt.Sprint(constraint["comparison"]) + "' cannot be cast to string")
 	}
-	if !checkComparison(constraint["comp"].(string)) {
+	if !checkComparison(constraint["comparison"].(string)) {
 		return Constraint{}, errors.New("comparison should be 'eq', 'lt', 'lte', 'gt', 'gte' or 'contains'")
 	}
 	if includeComponentID {
 		if reflect.TypeOf(constraint["component_id"]).Kind() != reflect.String {
 			return Constraint{}, errors.New("component_id " + fmt.Sprint(constraint["component_id"]) + " cannot be cast to string")
 		}
-		return Constraint{constraint["comp"].(string), constraint["component_id"].(string)}, err
+		return Constraint{constraint["comparison"].(string), constraint["component_id"].(string)}, err
 	}
-	return Constraint{constraint["comp"].(string), ""}, err
+	return Constraint{constraint["comparison"].(string), ""}, err
 }
 
 // Check if comparison is valid
@@ -129,7 +129,7 @@ func GetConstraintTimer(config WorkingConfig, conditionID string) []ConstraintTi
 	if config.ConstraintMap[conditionID] == nil {
 		panic(errors.New("Condition ID: " + conditionID + " not in constraint map").Error())
 	}
-	var resultArray []interface{} = config.ConstraintMap[conditionID]["timer"]
+	resultArray := config.ConstraintMap[conditionID]["timer"]
 	for i := range resultArray {
 		constraintArray = append(constraintArray, resultArray[i].(ConstraintTimer))
 	}
@@ -142,7 +142,7 @@ func GetConstraintBool(config WorkingConfig, conditionID string) []ConstraintBoo
 	if config.ConstraintMap[conditionID] == nil {
 		panic(errors.New("Condition ID: " + conditionID + " not in constraint map").Error())
 	}
-	var resultArray []interface{} = config.ConstraintMap[conditionID]["boolean"]
+	resultArray := config.ConstraintMap[conditionID]["boolean"]
 	for i := range resultArray {
 		constraintArray = append(constraintArray, resultArray[i].(ConstraintBool))
 	}
@@ -155,7 +155,7 @@ func GetConstraintString(config WorkingConfig, conditionID string) []ConstraintS
 	if config.ConstraintMap[conditionID] == nil {
 		panic(errors.New("Condition ID: " + conditionID + " not in constraint map").Error())
 	}
-	var resultArray []interface{} = config.ConstraintMap[conditionID]["string"]
+	resultArray := config.ConstraintMap[conditionID]["string"]
 	for i := range resultArray {
 		constraintArray = append(constraintArray, resultArray[i].(ConstraintString))
 	}
@@ -168,7 +168,7 @@ func GetConstraintNumeric(config WorkingConfig, conditionID string) []Constraint
 	if config.ConstraintMap[conditionID] == nil {
 		panic(errors.New("Condition ID: " + conditionID + " not in constraint map").Error())
 	}
-	var resultArray []interface{} = config.ConstraintMap[conditionID]["numeric"]
+	resultArray := config.ConstraintMap[conditionID]["numeric"]
 	for i := range resultArray {
 		constraintArray = append(constraintArray, resultArray[i].(ConstraintNumeric))
 	}
@@ -181,7 +181,7 @@ func GetConstraintStringArray(config WorkingConfig, conditionID string) []Constr
 	if config.ConstraintMap[conditionID] == nil {
 		panic(errors.New("Condition ID: " + conditionID + " not in constraint map").Error())
 	}
-	var resultArray []interface{} = config.ConstraintMap[conditionID]["string-array"]
+	resultArray := config.ConstraintMap[conditionID]["string-array"]
 	for i := range resultArray {
 		constraintArray = append(constraintArray, resultArray[i].(ConstraintStringArray))
 	}
@@ -194,7 +194,7 @@ func GetConstraintBoolArray(config WorkingConfig, conditionID string) []Constrai
 	if config.ConstraintMap[conditionID] == nil {
 		panic(errors.New("Condition ID: " + conditionID + " not in constraint map").Error())
 	}
-	var resultArray []interface{} = config.ConstraintMap[conditionID]["bool-array"]
+	resultArray := config.ConstraintMap[conditionID]["bool-array"]
 	for i := range resultArray {
 		constraintArray = append(constraintArray, resultArray[i].(ConstraintBoolArray))
 	}
@@ -207,7 +207,7 @@ func GetConstraintNumArray(config WorkingConfig, conditionID string) []Constrain
 	if config.ConstraintMap[conditionID] == nil {
 		panic(errors.New("Condition ID: " + conditionID + " not in constraint map").Error())
 	}
-	var resultArray []interface{} = config.ConstraintMap[conditionID]["num-array"]
+	resultArray := config.ConstraintMap[conditionID]["num-array"]
 	for i := range resultArray {
 		constraintArray = append(constraintArray, resultArray[i].(ConstraintNumericArray))
 	}
@@ -220,7 +220,7 @@ func GetConstraintCustomType(config WorkingConfig, conditionID string) []Constra
 	if config.ConstraintMap[conditionID] == nil {
 		panic(errors.New("Condition ID: " + conditionID + " not in constraint map").Error())
 	}
-	var resultArray []interface{} = config.ConstraintMap[conditionID]["custom"]
+	resultArray := config.ConstraintMap[conditionID]["custom"]
 	for i := range resultArray {
 		constraintArray = append(constraintArray, resultArray[i].(ConstraintCustomType))
 	}

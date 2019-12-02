@@ -31,7 +31,7 @@
               "type_id": "ledLights",
               "constraints": [
                 {
-                  "comp": 30,
+                  "comparison": 30,
                   "value": "30:00",
                   "component_id": "light"
                 }
