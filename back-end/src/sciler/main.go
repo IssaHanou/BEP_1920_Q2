@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/sirupsen/logrus"
+	"io"
 	"os"
 	"sciler/communication"
 	"sciler/config"
@@ -21,11 +23,20 @@ type Message struct {
 }
 
 func main() {
-	dir, err := os.Getwd()
-	if err != nil {
-		logrus.Fatal(err)
+	dir, dirErr := os.Getwd()
+	if dirErr != nil {
+		logrus.Fatal(dirErr)
 	}
-	filename := dir + "/back-end/resources/room_config.json"
+	// Write to both cmd and file
+	writeFile := dir + "\\back-end\\output\\" + fmt.Sprint(time.Now().Format("02-01-2006")+".txt")
+	file, fileErr := os.Create(writeFile)
+	if fileErr != nil {
+		logrus.Fatal(fileErr)
+	}
+	multi := io.MultiWriter(os.Stdout, file)
+	logrus.SetOutput(multi)
+
+	filename := dir + "\\back-end\\resources\\room_config.json"
 	configurations := config.ReadFile(filename)
 	logrus.Info("configurations read from: " + filename)
 	host := configurations.General.Host
