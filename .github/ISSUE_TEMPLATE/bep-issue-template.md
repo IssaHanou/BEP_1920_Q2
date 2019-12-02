@@ -1,20 +1,18 @@
 ---
-name: BEP Issue Template
+name: BEP Pull Request Template
 about: Describe this issue template's purpose here.
 title: ''
 labels: ''
 assignees: ''
 
 ---
+#### Issue
+Closes GH-??
 
 ### Content
-Describe issue here
+Describe pull request here
 
-### Feature
-- Feature of this issue
+### TODO
+- [ ] if anything is left to do - otherwise delete this section
 
-### Action plan
-- [ ] First action to do
 
-### Related issues
-GH-
