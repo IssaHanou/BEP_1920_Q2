@@ -18,12 +18,14 @@ class ControlBoard:
     mainSwitch = 23
     switches = [redSwitch, orangeSwitch, greenSwitch, mainSwitch]
 
-    redled0 = 9
-    redled1 = 15
-    redled2 = 17
-    greenled0 = 10
-    greenled1 = 14
-    greenled2 = 4
+    redLED0 = 9
+    redLED1 = 15
+    redLED2 = 17
+    redLEDs = [redLED0, redLED1, redLED2]
+    greenLED0 = 10
+    greenLED1 = 14
+    greenLED2 = 4
+    greenLEDs = [greenLED0, greenLED1, greenLED2]
 
     a_pin0 = 24
     a_pin1 = 25
@@ -37,12 +39,12 @@ class ControlBoard:
     GPIO.setup(greenSwitch, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.setup(mainSwitch, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-    GPIO.setup(redled0, GPIO.OUT)
-    GPIO.setup(redled1, GPIO.OUT)
-    GPIO.setup(redled2, GPIO.OUT)
-    GPIO.setup(greenled0, GPIO.OUT)
-    GPIO.setup(greenled1, GPIO.OUT)
-    GPIO.setup(greenled2, GPIO.OUT)
+    GPIO.setup(redLED0, GPIO.OUT)
+    GPIO.setup(redLED1, GPIO.OUT)
+    GPIO.setup(redLED2, GPIO.OUT)
+    GPIO.setup(greenLED0, GPIO.OUT)
+    GPIO.setup(greenLED1, GPIO.OUT)
+    GPIO.setup(greenLED2, GPIO.OUT)
 
     def get_status(self):
         status = "{"
@@ -86,12 +88,12 @@ class ControlBoard:
     def test(self):
         for j in range(0, 3):
             for i in range(0, 3):
-                GPIO.output(self.redled[i], GPIO.HIGH)
-                GPIO.output(self.greenled[i], GPIO.HIGH)
+                GPIO.output(self.redLEDs[i], GPIO.HIGH)
+                GPIO.output(self.greenLEDs[i], GPIO.HIGH)
                 time.sleep(0.2)
             for i in range(0, 3):
-                GPIO.output(self.redled[i], GPIO.LOW)
-                GPIO.output(self.greenled[i], GPIO.LOW)
+                GPIO.output(self.redLEDs[i], GPIO.LOW)
+                GPIO.output(self.greenLEDs[i], GPIO.LOW)
                 time.sleep(0.2)
 
 

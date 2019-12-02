@@ -13,42 +13,42 @@
     "mainSwitch": "numeric"
   },
   "output": {
-    "greenLight1": {
+    "greenLED0": {
       "type": "string",
       "instruction": {
         "interval": "integer",
         "delay": "integer"
       }
     },
-    "greenLight2": {
+    "greenLED1": {
       "type": "string",
       "instruction": {
         "interval": "integer",
         "delay": "integer"
       }
     },
-    "greenLight3": {
+    "greenLED2": {
       "type": "string",
       "instruction": {
         "interval": "integer",
         "delay": "integer"
       }
     },
-    "redLight1": {
+    "redLED0": {
       "type": "string",
       "instruction": {
         "interval": "integer",
         "delay": "integer"
       }
     },
-    "redLight2":  {
+    "redLED1":  {
       "type": "string",
       "instruction": {
         "interval": "integer",
         "delay": "integer"
       }
     },
-    "redLight3":  {
+    "redLED2":  {
       "type": "string",
       "instruction": {
         "interval": "integer",
