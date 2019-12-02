@@ -1,6 +1,6 @@
 ## Output
-Log files for the back-end will appear here. These are named <date>.txt. 
+Log files for the back-end will appear here. These are named with the format `dd-mm-yyyy--hh-mm-ss.txt`. 
 
-A new one is created for each day, or the current one is overwritten. 
+If the file of this moment (to the second) already exists, the current one is overwritten. 
 
 These logs will not be committed. 

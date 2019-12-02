@@ -28,11 +28,12 @@ func main() {
 		logrus.Fatal(dirErr)
 	}
 	// Write to both cmd and file
-	writeFile := dir + "\\back-end\\output\\" + fmt.Sprint(time.Now().Format("02-01-2006")+".txt")
+	writeFile := dir + "\\back-end\\output\\" + fmt.Sprint(time.Now().Format("02-01-2006--15-04-26")+".txt")
 	file, fileErr := os.Create(writeFile)
 	if fileErr != nil {
 		logrus.Fatal(fileErr)
 	}
+	logrus.Info("writing logs to both console and " + writeFile)
 	multi := io.MultiWriter(os.Stdout, file)
 	logrus.SetOutput(multi)
 
