@@ -13,12 +13,12 @@ import (
 func TestNewCommunicator(t *testing.T) {
 	type args struct {
 		host             string
-		port             string
+		port             int
 		topicsOfInterest []string
 	}
 
 	optionsLocal := mqtt.NewClientOptions()
-	optionsLocal.AddBroker(fmt.Sprintf("%s://%s:%s", "tcp", "localhost", "1883"))
+	optionsLocal.AddBroker(fmt.Sprintf("%s://%s:%d", "tcp", "localhost", 1883))
 	optionsLocal.SetClientID("back-end")
 	optionsLocal.SetConnectionLostHandler(onConnectionLost)
 
@@ -31,7 +31,7 @@ func TestNewCommunicator(t *testing.T) {
 			name: "two topics",
 			args: args{
 				host:             "localhost",
-				port:             "1883",
+				port:             1883,
 				topicsOfInterest: []string{"test", "back-end"},
 			},
 			want: &Communicator{
@@ -43,7 +43,7 @@ func TestNewCommunicator(t *testing.T) {
 			name: "no topics",
 			args: args{
 				host:             "localhost",
-				port:             "1883",
+				port:             1883,
 				topicsOfInterest: nil,
 			},
 			want: &Communicator{
