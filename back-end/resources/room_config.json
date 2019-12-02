@@ -2,7 +2,7 @@
   "general": {
     "name": "Escape X",
     "duration": "00:30:00",
-    "host": "192.0.0.84",
+    "host": "localhost",
     "port": 1883
   },
   "devices": [

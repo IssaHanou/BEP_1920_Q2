@@ -150,6 +150,18 @@ func TestCommunicator_Start(t *testing.T) {
 	client.AssertExpectations(t)
 }
 
+func TestCommunicator_Start_handler(t *testing.T) {
+	client := new(ClientMock)
+	communicator := Communicator{
+		client:           client,
+		topicsOfInterest: []string{"back-end", "test"},
+	}
+
+	client.On("Connect").Return(new(TokenMockSuccess)).Once()
+	communicator.Start(handler)
+	client.AssertExpectations(t)
+}
+
 func TestCommunicator_Publish(t *testing.T) {
 	client := new(ClientMock)
 	communicator := Communicator{
