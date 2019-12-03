@@ -40,7 +40,7 @@ func main() {
 		}
 		switch raw.Type {
 		case "instruction":
-			logrus.Info("instruction  message received")
+			logrus.Info("instruction message received")
 			{
 				if raw.Contents["instruction"] == "test all" && raw.DeviceID == "front-end" { // TODO maybe switch again
 					message := Message{
@@ -62,11 +62,11 @@ func main() {
 		case "status":
 			{
 				logrus.Info("status message received")
-				if raw.DeviceID == "controlBoard1" {
+				if raw.DeviceID == "controlBoard" {
 					var instruction string
-					if raw.Contents["switch1"] == "1" {
+					if raw.Contents["mainSwitch"] == "1" {
 						instruction = "turn off"
-					} else if raw.Contents["switch1"] == "0" {
+					} else if raw.Contents["mainSwitch"] == "0" {
 						instruction = "turn on"
 					}
 					if instruction != "" {
