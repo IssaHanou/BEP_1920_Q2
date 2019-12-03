@@ -35,6 +35,10 @@ func (handler *Handler) NewHandler(client mqtt.Client, message mqtt.Message) {
 	if err := json.Unmarshal(message.Payload(), &raw); err != nil {
 		logrus.Errorf("Invalid JSON received: %v", err)
 	}
+	handler.msgMapper(raw)
+}
+
+func (handler *Handler) msgMapper(raw Message) {
 	switch raw.Type {
 	case "instruction":
 		{

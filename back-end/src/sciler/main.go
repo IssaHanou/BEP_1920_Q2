@@ -35,8 +35,8 @@ func main() {
 	port := configurations.General.Port
 
 	communicator := communication.NewCommunicator(host, port, topics)
-	handler1 := handler.GetHandler(configurations, *communicator)
-	go communicator.Start(handler1.NewHandler)
+	handler := handler.GetHandler(configurations, *communicator)
+	go communicator.Start(handler.NewHandler)
 
 	// loop for now preventing app to exit
 	for {
