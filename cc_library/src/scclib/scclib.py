@@ -64,7 +64,7 @@ class SccLib:
     # device should be an object with the following functions:
     # - perform_instruction(contents) -> void, which should perform each instruction (including the test instruction)
     #   given the contents of the instruction message
-    # - get_status() ->
+    # - get_status() -> returns the status (string of json), which contains the input and output
     def __init__(self, config, device):
         self.device = device
         self.config = json.load(config)
