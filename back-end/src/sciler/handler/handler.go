@@ -85,11 +85,11 @@ func (handler *Handler) onStatusMsg(raw Message) {
 //openDoorBeun is the test function for developers to test the door and switch combo
 func (handler *Handler) openDoorBeun(raw Message) {
 	logrus.Info("status message received, checking if door needs to open.")
-	if raw.DeviceID == "controlBoard1" {
+	if raw.DeviceID == "controlBoard" {
 		var instruction string
-		if raw.Contents["switch1"] == "1" {
+		if raw.Contents["mainSwitch"] == "1" {
 			instruction = "turn off"
-		} else if raw.Contents["switch1"] == "0" {
+		} else if raw.Contents["mainSwitch"] == "0" {
 			instruction = "turn on"
 		}
 		if instruction != "" {

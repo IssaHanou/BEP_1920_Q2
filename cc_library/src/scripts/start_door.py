@@ -1,7 +1,7 @@
 import os
 import time
 
-from src.device.app import App
+from cc_library.src.scclib.scclib import SccLib
 
 try:
     import RPi.GPIO as GPIO
@@ -54,6 +54,6 @@ if __name__ == "__main__":
     abs_file_path = os.path.join(two_up, rel_path)
     abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
     config = open(file=abs_file_path)
-    app = App(config=config, device=device1)
+    app = SccLib(config=config, device=device1)
 
     app.start()
