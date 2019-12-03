@@ -1,7 +1,8 @@
 import os
 import time
 
-from src.scclib.scclib import SccLib
+from cc_library.src.sciler.scclib.app import SccLib, on_python_log
+from cc_library.src.sciler.scclib.device import Device
 
 try:
     import RPi.GPIO as GPIO
@@ -9,12 +10,12 @@ except (RuntimeError, ModuleNotFoundError):
     from fake_rpi.RPi import GPIO
 
 
-class ControlBoard:
-    GPIO.setmode(GPIO.BCM)
-
+class ControlBoard(Device):
     """
     Define pin numbers to which units are connected on Pi.
     """
+    GPIO.setmode(GPIO.BCM)
+
     redSwitch = 27
     orangeSwitch = 22
     greenSwitch = 18
@@ -51,7 +52,7 @@ class ControlBoard:
 
     def get_status(self):
         """
-        Return status of different components of device.
+        Return status of the four switches of the control board.
         """
         status = "{"
         status += "'redSwitch': " + str(GPIO.input(self.redSwitch)) + ","
@@ -75,6 +76,17 @@ class ControlBoard:
         elif instruction == "turnOn":
             self.turn_on(contents)
 
+    def test(self):
+        for j in range(0, 3):
+            for i in range(0, 3):
+                GPIO.output(self.redLEDs[i], GPIO.HIGH)
+                GPIO.output(self.greenLEDs[i], GPIO.HIGH)
+                time.sleep(0.2)
+            for i in range(0, 3):
+                GPIO.output(self.redLEDs[i], GPIO.LOW)
+                GPIO.output(self.greenLEDs[i], GPIO.LOW)
+                time.sleep(0.2)
+
     def blink(self, data):
         led = getattr(self, data.get("led"))
         interval = data.get("interval")
@@ -91,16 +103,6 @@ class ControlBoard:
         led = getattr(self, data.get("led"))
         GPIO.output(led, GPIO.HIGH)
 
-    def test(self):
-        for j in range(0, 3):
-            for i in range(0, 3):
-                GPIO.output(self.redLEDs[i], GPIO.HIGH)
-                GPIO.output(self.greenLEDs[i], GPIO.HIGH)
-                time.sleep(0.2)
-            for i in range(0, 3):
-                GPIO.output(self.redLEDs[i], GPIO.LOW)
-                GPIO.output(self.greenLEDs[i], GPIO.LOW)
-                time.sleep(0.2)
 
 
 try:
@@ -120,8 +122,8 @@ try:
 
     scclib.start()
 except KeyboardInterrupt:
-    print("Interrupted!")
+    on_python_log("Interrupted by keyboard")
 
 finally:
     GPIO.cleanup()  # This ensures a clean exit
-    print("Clean exit ensured!")
+    on_python_log("Cleanly exited Control board program")

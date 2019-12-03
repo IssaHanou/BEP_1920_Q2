@@ -91,7 +91,7 @@ class SccLib:
     def __subscribe_topic(self, topic):
         """
         Method to call to subscribe to a topic which the
-        scclib wants to receive from the broker.
+        sciler wants to receive from the broker.
         """
 
         on_python_log(("subscribed to topic", topic))
@@ -156,7 +156,7 @@ class SccLib:
     def __handle(self, message):
         """
         Interpreter of incoming messages.
-        Correct scclib mapper is called with the content of the message.
+        Correct sciler mapper is called with the content of the message.
         """
         message = message.payload.decode("utf-8")
         message = json.loads(message)
