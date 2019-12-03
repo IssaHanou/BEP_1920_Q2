@@ -38,6 +38,7 @@ func (handler *Handler) NewHandler(client mqtt.Client, message mqtt.Message) {
 	handler.msgMapper(raw)
 }
 
+// msgMapper sends the right message through to the right function
 func (handler *Handler) msgMapper(raw Message) {
 	switch raw.Type {
 	case "instruction":
@@ -48,7 +49,6 @@ func (handler *Handler) msgMapper(raw Message) {
 		{
 			handler.onStatusMsg(raw)
 			handler.openDoorBeun(raw)
-
 		}
 	case "confirmation":
 		{
@@ -57,6 +57,10 @@ func (handler *Handler) msgMapper(raw Message) {
 	case "connection":
 		{
 			handler.onConnectionMsg(raw)
+		}
+	default:
+		{
+			logrus.Error("message received from ", raw.DeviceID, ", but no message type could be found: ", raw.Type)
 		}
 	}
 

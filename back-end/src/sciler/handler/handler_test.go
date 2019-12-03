@@ -161,3 +161,21 @@ func TestOnInstructionMsg(t *testing.T) {
 	assert.Equal(t, true, true,
 		"TODO: TestOnInstructionMsg")
 }
+
+func TestMsgMapper(t *testing.T) {
+	handler := getTestHandler()
+	msg := Message{
+		DeviceID: "TestDevice",
+		TimeSent: "",
+		Type:     "test",
+		Contents: map[string]interface{}{
+			"testComponent0": false,
+			"testComponent1": true,
+			"testComponent2": false},
+	}
+
+	before := handler.Config
+	handler.onStatusMsg(msg)
+	assert.Equal(t, before, handler.Config,
+		"Nothing should have bee changed after an incorrect message type")
+}
