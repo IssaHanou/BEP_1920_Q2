@@ -90,13 +90,17 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 	value, ok := raw.Contents["completed"]
 	if !ok || reflect.TypeOf(value).Kind() != reflect.Bool {
 		logrus.Error("Received improperly structured confirmation message from device " + raw.DeviceID)
-	} else if !value.(bool) {
-		logrus.Error("Device " + raw.DeviceID + " did not complete instruction with type " +
-			raw.Contents["instructed"].(string) + " at " + raw.TimeSent)
 	} else {
-		logrus.Info("Device " + raw.DeviceID + " completed instruction with type " +
-			raw.Contents["instructed"].(string) + " at " + raw.TimeSent)
+		msg := raw.Contents["instructed"].(map[string]interface{})
+		if !value.(bool) {
+			logrus.Error("Device " + raw.DeviceID + " did not complete instruction with type " +
+				msg["instruction"].(string) + " at " + raw.TimeSent)
+		} else {
+			logrus.Info("Device " + raw.DeviceID + " completed instruction with type " +
+				msg["instruction"].(string) + " at " + raw.TimeSent)
+		}
 	}
+	//TODO pass to front-end if he sent message
 }
 
 //openDoorBeun is the test function for developers to test the door and switch combo

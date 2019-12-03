@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"sciler/communication"
 	"sciler/config"
@@ -8,7 +10,7 @@ import (
 )
 
 func getTestHandler() *Handler {
-	config := config.WorkingConfig{
+	workingConfig := config.WorkingConfig{
 		General: config.General{
 			Name:     "Test",
 			Duration: "1",
@@ -39,13 +41,13 @@ func getTestHandler() *Handler {
 		ActionMap:     nil,
 		ConstraintMap: nil,
 	}
-	communicator := communication.NewCommunicator(config.General.Host,
-		config.General.Port, []string{"back-end", "test"})
-	return GetHandler(config, *communicator)
+	communicator := communication.NewCommunicator(workingConfig.General.Host,
+		workingConfig.General.Port, []string{"back-end", "test"})
+	return GetHandler(workingConfig, *communicator)
 }
 
 func Test_GetHandler(t *testing.T) {
-	config := config.WorkingConfig{
+	workingConfig := config.WorkingConfig{
 		General: config.General{
 			Name:     "Test",
 			Duration: "1",
@@ -59,8 +61,8 @@ func Test_GetHandler(t *testing.T) {
 		ActionMap:     nil,
 		ConstraintMap: nil,
 	}
-	communicator := communication.NewCommunicator(config.General.Host,
-		config.General.Port, []string{"back-end", "test"})
+	communicator := communication.NewCommunicator(workingConfig.General.Host,
+		workingConfig.General.Port, []string{"back-end", "test"})
 
 	tests := []struct {
 		name string
@@ -69,14 +71,14 @@ func Test_GetHandler(t *testing.T) {
 		{
 			name: "test",
 			want: &Handler{
-				Config:       config,
+				Config:       workingConfig,
 				Communicator: *communicator,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := GetHandler(config, *communicator)
+			got := GetHandler(workingConfig, *communicator)
 			assert.Equal(t, got.Config, tt.want.Config)
 			assert.Equal(t, got.Communicator, tt.want.Communicator)
 		})
@@ -153,8 +155,27 @@ func TestOnStatusMsg(t *testing.T) {
 }
 
 func TestOnConfirmationMsg(t *testing.T) {
-	assert.Equal(t, true, true,
-		"TODO: TestOnConfirmationMsg")
+	handler := getTestHandler()
+	text := []byte(`{
+		"completed": true,
+		"instructed": {
+			"instruction": "test"
+		}
+	}`)
+	var data map[string]interface{}
+	if err := json.Unmarshal(text, &data); err != nil {
+		assert.Fail(t, "Should be valid json message")
+	}
+	fmt.Println(data)
+
+	msg := Message{
+		DeviceID: "TestDevice",
+		TimeSent: "",
+		Type:     "confirmation",
+		Contents: data,
+	}
+	assert.NotPanics(t, func() { handler.onConfirmationMsg(msg) },
+		"Device should return valid confirmation message")
 }
 
 func TestOnInstructionMsg(t *testing.T) {
