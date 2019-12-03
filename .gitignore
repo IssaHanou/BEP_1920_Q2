@@ -1,11 +1,10 @@
 /node_modules
 /venv
 /env
-/cc_library/.idea
 __pycache__/
 **/.idea
-**/pkg
-**/bin
-**/src/*
-!**/src/sciler
+back-end/pkg
+back-end/bin
+back-end/src/*
+!back-end/src/sciler
 */debug.log
