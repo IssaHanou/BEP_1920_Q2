@@ -9,7 +9,7 @@ import (
 // ReadConfig specifies all configuration elements of an escape room.
 type ReadConfig struct {
 	General       General        `json:"general"`
-	Devices       []Device       `json:"devices"`
+	Devices       []ReadDevice   `json:"devices"`
 	Puzzles       []Puzzle       `json:"puzzles"`
 	GeneralEvents []GeneralEvent `json:"general_events"`
 }
@@ -22,8 +22,8 @@ type General struct {
 	Port     int    `json:"port"`
 }
 
-// Device is a struct that describes the configurations of a device in the room.
-type Device struct {
+// ReadDevice is a struct that describes the configurations of a device in the room.
+type ReadDevice struct {
 	ID          string            `json:"id"`
 	Description string            `json:"description"`
 	Input       map[string]string `json:"input"`
