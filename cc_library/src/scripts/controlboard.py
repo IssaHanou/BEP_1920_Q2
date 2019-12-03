@@ -54,10 +54,10 @@ class ControlBoard:
         Return status of different components of device.
         """
         status = "{"
-        status += ("'redSwitch': " + str(GPIO.input(self.redSwitch)) + ",")
-        status += ("'orangeSwitch': " + str(GPIO.input(self.orangeSwitch)) + ",")
-        status += ("'greenSwitch': " + str(GPIO.input(self.greenSwitch)) + ",")
-        status += ("'mainSwitch': " + str(GPIO.input(self.mainSwitch)))
+        status += "'redSwitch': " + str(GPIO.input(self.redSwitch)) + ","
+        status += "'orangeSwitch': " + str(GPIO.input(self.orangeSwitch)) + ","
+        status += "'greenSwitch': " + str(GPIO.input(self.greenSwitch)) + ","
+        status += "'mainSwitch': " + str(GPIO.input(self.mainSwitch))
         status += "}"
         return status
 

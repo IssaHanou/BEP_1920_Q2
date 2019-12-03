@@ -62,8 +62,8 @@ class SccLib:
     # TODO: write this in a client-computer manual
     # config should be a file containing JSON in the format specified in the device_manual
     # device should be an object with the following functions:
-    # - perform_instruction(contents) -> void, which should perform each instruction (including the test instruction)
-    #   given the contents of the instruction message
+    # - perform_instruction(contents) -> void, which should perform each instruction
+    #   (including the test instruction) given the contents of the instruction message
     # - get_status() -> returns the status (string of json), which contains the input and output
     def __init__(self, config, device):
         self.device = device
@@ -107,7 +107,7 @@ class SccLib:
             "contents": eval(msg),
         }
         msg = json.dumps(json_msg)
-        mqtt_message_info = self.client.publish("status", msg)
+        self.client.publish("status", msg)
         # mqtt_message_info.wait_for_publish()  # publishing not always successful?
         on_python_log(str("published: " + msg))
 
