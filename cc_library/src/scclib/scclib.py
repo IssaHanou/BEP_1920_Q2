@@ -13,7 +13,7 @@ def on_python_log(text):
 
 class SccLib:
     """
-    Class App sets up the connection and the right handler
+    Class SccLib sets up the connection and the right handler
     """
 
     def __on_connect(client, userdata, flags, rc):
@@ -49,6 +49,9 @@ class SccLib:
         client.disconnect_flag = True
 
     def status_changed(self, channel):
+        """
+        This is called from the client computer to message a status update.
+        """
         log = "status changed of pin " + str(channel)
         on_python_log(log)
         self.__send_status_message(self.device.get_status())
@@ -87,8 +90,8 @@ class SccLib:
 
     def __subscribe_topic(self, topic):
         """
-        Method to call to subscribe to a topic the
-        scclib wants to recieve from the broker.
+        Method to call to subscribe to a topic which the
+        scclib wants to receive from the broker.
         """
 
         on_python_log(("subscribed to topic", topic))
@@ -107,8 +110,8 @@ class SccLib:
             "contents": eval(msg),
         }
         msg = json.dumps(json_msg)
+        #TODO what to do when publish fails
         self.client.publish("status", msg)
-        # mqtt_message_info.wait_for_publish()  # publishing not always successful?
         on_python_log(str("published: " + msg))
 
     def __on_message(self, client, userdata, message):
