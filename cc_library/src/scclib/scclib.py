@@ -110,7 +110,7 @@ class SccLib:
             "contents": eval(msg),
         }
         msg = json.dumps(json_msg)
-        #TODO what to do when publish fails
+        # TODO what to do when publish fails
         self.client.publish("status", msg)
         on_python_log(str("published: " + msg))
 
