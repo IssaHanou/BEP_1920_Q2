@@ -14,6 +14,7 @@ class Door(Device):
     """
     Define pin numbers to which units are connected on Pi.
     """
+
     GPIO.setmode(GPIO.BCM)
     door = 17
     GPIO.setup(door, GPIO.OUT)

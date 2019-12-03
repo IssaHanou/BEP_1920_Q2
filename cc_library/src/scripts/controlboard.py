@@ -14,6 +14,7 @@ class ControlBoard(Device):
     """
     Define pin numbers to which units are connected on Pi.
     """
+
     GPIO.setmode(GPIO.BCM)
 
     redSwitch = 27
@@ -102,7 +103,6 @@ class ControlBoard(Device):
     def turn_on(self, data):
         led = getattr(self, data.get("led"))
         GPIO.output(led, GPIO.HIGH)
-
 
 
 try:
