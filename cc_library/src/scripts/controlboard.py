@@ -65,15 +65,24 @@ class ControlBoard(Device):
             positions[channel] = round(100 - (self.adc.read_adc(channel) / 266))
         return positions
 
+    def get_leds_status(self):
+        reds = [0,0,0]
+        greens = [0,0,0]
+        for i in range(0,3):
+            reds[i] = GPIO.input(self.redLEDs[i])
+            greens[i] = GPIO.input(self.greenLEDs[i])
+        return "'redLEDs': " + str(reds) + ",'greenLEDs': " + str(greens)
+
     def get_status(self):
         """
-        Return status of switches and sliders of device.
+        Return status of switches, LEDs and sliders of device.
         """
         status = "{"
         status += "'redSwitch': " + str(GPIO.input(self.redSwitch)) + ","
         status += "'orangeSwitch': " + str(GPIO.input(self.orangeSwitch)) + ","
         status += "'greenSwitch': " + str(GPIO.input(self.greenSwitch)) + ","
         status += "'mainSwitch': " + str(GPIO.input(self.mainSwitch)) + ","
+        status += self.get_leds_status() + ","
         status += "'sliders': " + str(self.get_sliders_analog_reading())
         status += "}"
         return status
