@@ -1,7 +1,9 @@
 import os
 import time
 
-from src.scclib.scclib import SccLib
+from cc_library.src.sciler.scclib.app import SccLib
+from cc_library.src.sciler.scclib.device import Device
+import Adafruit_ADS1x15
 
 try:
     import RPi.GPIO as GPIO
@@ -9,9 +11,8 @@ except (RuntimeError, ModuleNotFoundError):
     from fake_rpi.RPi import GPIO
 
 
-class ControlBoard:
+class ControlBoard(Device):
     GPIO.setmode(GPIO.BCM)
-
     """
     Define pin numbers to which units are connected on Pi.
     """
@@ -49,15 +50,40 @@ class ControlBoard:
     GPIO.setup(greenLED1, GPIO.OUT)
     GPIO.setup(greenLED2, GPIO.OUT)
 
+    adc = Adafruit_ADS1x15.ADS1115()
+
+    GPIO.setup(a_pin0, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(a_pin1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(a_pin2, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(b_pin0, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(b_pin1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(b_pin2, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+    def get_sliders_analog_reading(self):
+        positions = [0, 0, 0]
+        for channel in range(0, 3):
+            positions[channel] = round(100 - (self.adc.read_adc(channel) / 266))
+        return positions
+
+    def get_leds_status(self):
+        reds = [0, 0, 0]
+        greens = [0, 0, 0]
+        for i in range(0, 3):
+            reds[i] = GPIO.input(self.redLEDs[i])
+            greens[i] = GPIO.input(self.greenLEDs[i])
+        return "'redLEDs': " + str(reds) + ",'greenLEDs': " + str(greens)
+
     def get_status(self):
         """
-        Return status of different components of device.
+        Return status of switches, LEDs and sliders of device.
         """
         status = "{"
         status += "'redSwitch': " + str(GPIO.input(self.redSwitch)) + ","
         status += "'orangeSwitch': " + str(GPIO.input(self.orangeSwitch)) + ","
         status += "'greenSwitch': " + str(GPIO.input(self.greenSwitch)) + ","
-        status += "'mainSwitch': " + str(GPIO.input(self.mainSwitch))
+        status += "'mainSwitch': " + str(GPIO.input(self.mainSwitch)) + ","
+        status += self.get_leds_status() + ","
+        status += "'sliders': " + str(self.get_sliders_analog_reading())
         status += "}"
         return status
 
@@ -113,10 +139,24 @@ try:
     config = open(file=abs_file_path)
     scclib = SccLib(config, device)
 
-    GPIO.add_event_detect(device.redSwitch, GPIO.BOTH, callback=scclib.statusChanged)
-    GPIO.add_event_detect(device.orangeSwitch, GPIO.BOTH, callback=scclib.statusChanged)
-    GPIO.add_event_detect(device.greenSwitch, GPIO.BOTH, callback=scclib.statusChanged)
-    GPIO.add_event_detect(device.mainSwitch, GPIO.BOTH, callback=scclib.statusChanged)
+    GPIO.add_event_detect(
+        device.redSwitch, GPIO.BOTH, callback=scclib.statusChanged, bouncetime=200
+    )
+    GPIO.add_event_detect(
+        device.orangeSwitch, GPIO.BOTH, callback=scclib.statusChanged, bouncetime=200
+    )
+    GPIO.add_event_detect(
+        device.greenSwitch, GPIO.BOTH, callback=scclib.statusChanged, bouncetime=200
+    )
+    GPIO.add_event_detect(
+        device.mainSwitch, GPIO.BOTH, callback=scclib.statusChanged, bouncetime=200
+    )
+    GPIO.add_event_detect(device.a_pin0, GPIO.BOTH, callback=scclib.status_changed)
+    GPIO.add_event_detect(device.a_pin1, GPIO.BOTH, callback=scclib.status_changed)
+    GPIO.add_event_detect(device.a_pin2, GPIO.BOTH, callback=scclib.status_changed)
+    GPIO.add_event_detect(device.b_pin0, GPIO.BOTH, callback=scclib.status_changed)
+    GPIO.add_event_detect(device.b_pin1, GPIO.BOTH, callback=scclib.status_changed)
+    GPIO.add_event_detect(device.b_pin2, GPIO.BOTH, callback=scclib.status_changed)
 
     scclib.start()
 except KeyboardInterrupt:
