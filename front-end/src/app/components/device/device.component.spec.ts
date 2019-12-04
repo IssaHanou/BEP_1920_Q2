@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { DeviceComponent } from "./device.component";
 
-describe("TimerComponent", () => {
+describe("DeviceComponent", () => {
   let component: DeviceComponent;
   let fixture: ComponentFixture<DeviceComponent>;
 
