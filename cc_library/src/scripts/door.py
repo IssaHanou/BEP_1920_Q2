@@ -57,6 +57,7 @@ class Door(Device):
         GPIO.output(door, GPIO.LOW)
 
 
+scclib = None
 try:
     device = Door()
 
@@ -68,7 +69,8 @@ try:
     scclib = SccLib(config=config, device=device)
     scclib.start()
 except KeyboardInterrupt:
-    print("program was terminated from keyboard input")
+    scclib.logger.log("program was terminated from keyboard input")
 finally:
-    GPIO.cleanup()  # This ensures clean exit
-    print("Cleanly exited Door program")
+    GPIO.cleanup()
+    scclib.logger.log("Cleanly exited Door program")
+    scclib.logger.close()
