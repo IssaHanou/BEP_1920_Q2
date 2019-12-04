@@ -1,8 +1,9 @@
 import os
 import time
 
-from cc_library.src.sciler.scclib.app import SccLib, on_python_log
+from cc_library.src.sciler.scclib.app import SccLib
 from cc_library.src.sciler.scclib.device import Device
+import Adafruit_ADS1x15
 
 try:
     import RPi.GPIO as GPIO
@@ -11,10 +12,6 @@ except (RuntimeError, ModuleNotFoundError):
 
 
 class ControlBoard(Device):
-    """
-    Define pin numbers to which units are connected on Pi.
-    """
-
     GPIO.setmode(GPIO.BCM)
 
     redSwitch = 27
@@ -51,15 +48,24 @@ class ControlBoard(Device):
     GPIO.setup(greenLED1, GPIO.OUT)
     GPIO.setup(greenLED2, GPIO.OUT)
 
+    GPIO.setup(a_pin0, GPIO.IN)
+    GPIO.setup(b_pin0, GPIO.IN)
+
+    adc = Adafruit_ADS1x15.ADS1115()
+
+    def get_sliders_analog_reading(self):
+        positions = [0,0,0]
+        for channel in range(0, 3):
+            positions[channel] = round(100-(self.adc.read_adc(channel)/266))
+        return positions
+
     def get_status(self):
-        """
-        Return status of the four switches of the control board.
-        """
         status = "{"
-        status += "'redSwitch': " + str(GPIO.input(self.redSwitch)) + ","
-        status += "'orangeSwitch': " + str(GPIO.input(self.orangeSwitch)) + ","
-        status += "'greenSwitch': " + str(GPIO.input(self.greenSwitch)) + ","
-        status += "'mainSwitch': " + str(GPIO.input(self.mainSwitch))
+        status += ("'redSwitch': " + str(GPIO.input(self.redSwitch)) + ",")
+        status += ("'orangeSwitch': " + str(GPIO.input(self.orangeSwitch)) + ",")
+        status += ("'greenSwitch': " + str(GPIO.input(self.greenSwitch)) + ",")
+        status += ("'mainSwitch': " + str(GPIO.input(self.mainSwitch)) + ",")
+        status += ("'sliders': " + str(self.get_sliders_analog_reading()))
         status += "}"
         return status
 
@@ -77,17 +83,6 @@ class ControlBoard(Device):
         elif instruction == "turnOn":
             self.turn_on(contents)
 
-    def test(self):
-        for j in range(0, 3):
-            for i in range(0, 3):
-                GPIO.output(self.redLEDs[i], GPIO.HIGH)
-                GPIO.output(self.greenLEDs[i], GPIO.HIGH)
-                time.sleep(0.2)
-            for i in range(0, 3):
-                GPIO.output(self.redLEDs[i], GPIO.LOW)
-                GPIO.output(self.greenLEDs[i], GPIO.LOW)
-                time.sleep(0.2)
-
     def blink(self, data):
         led = getattr(self, data.get("led"))
         interval = data.get("interval")
@@ -104,6 +99,17 @@ class ControlBoard(Device):
         led = getattr(self, data.get("led"))
         GPIO.output(led, GPIO.HIGH)
 
+    def test(self):
+        for j in range(0, 3):
+            for i in range(0, 3):
+                GPIO.output(self.redLEDs[i], GPIO.HIGH)
+                GPIO.output(self.greenLEDs[i], GPIO.HIGH)
+                time.sleep(0.2)
+            for i in range(0, 3):
+                GPIO.output(self.redLEDs[i], GPIO.LOW)
+                GPIO.output(self.greenLEDs[i], GPIO.LOW)
+                time.sleep(0.2)
+
 
 try:
     device = ControlBoard()
@@ -119,11 +125,18 @@ try:
     GPIO.add_event_detect(device.orangeSwitch, GPIO.BOTH, callback=scclib.statusChanged)
     GPIO.add_event_detect(device.greenSwitch, GPIO.BOTH, callback=scclib.statusChanged)
     GPIO.add_event_detect(device.mainSwitch, GPIO.BOTH, callback=scclib.statusChanged)
+    GPIO.add_event_detect(device.a_pin0, GPIO.BOTH, callback=scclib.status_changed)
+    GPIO.add_event_detect(device.a_pin1, GPIO.BOTH, callback=scclib.status_changed)
+    GPIO.add_event_detect(device.a_pin2, GPIO.BOTH, callback=scclib.status_changed)
+    GPIO.add_event_detect(device.b_pin0, GPIO.BOTH, callback=scclib.status_changed)
+    GPIO.add_event_detect(device.b_pin1, GPIO.BOTH, callback=scclib.status_changed)
+    GPIO.add_event_detect(device.b_pin2, GPIO.BOTH, callback=scclib.status_changed)
+
 
     scclib.start()
 except KeyboardInterrupt:
-    on_python_log("Interrupted by keyboard")
+    print("Interrupted!")
 
 finally:
     GPIO.cleanup()  # This ensures a clean exit
-    on_python_log("Cleanly exited Control board program")
+    print("Clean exit ensured!")

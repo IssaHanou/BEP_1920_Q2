@@ -43,6 +43,7 @@ class SccLib:
         }
 
         msg = json.dumps(msg_dict)
+        # TODO what to do when publish fails
         client.publish("connection", msg)
         on_python_log(("disconnecting reason  " + str(rc)))
         client.connected_flag = False
@@ -62,13 +63,10 @@ class SccLib:
         """
         print(self.name, ", broker log: ", buf)
 
-    # TODO: write this in a client-computer manual
-    # config should be a file containing JSON in the format specified in the device_manual
-    # device should be an object with the following functions:
-    # - perform_instruction(contents) -> void, which should perform each instruction
-    #   (including the test instruction) given the contents of the instruction message
-    # - get_status() -> returns the status (string of json), which contains the input and output
     def __init__(self, config, device):
+        """
+        Initialize device with its configruation json file and python script.
+        """
         self.device = device
         self.config = json.load(config)
         self.name = self.config.get("id")
@@ -91,7 +89,7 @@ class SccLib:
     def __subscribe_topic(self, topic):
         """
         Method to call to subscribe to a topic which the
-        sciler wants to receive from the broker.
+        sciler system wants to receive from the broker.
         """
 
         on_python_log(("subscribed to topic", topic))

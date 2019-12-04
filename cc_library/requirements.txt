@@ -1,3 +1,5 @@
 flake8
 black
 paho.mqtt
+fake_rpi
+Adafruit_ADS1x15
