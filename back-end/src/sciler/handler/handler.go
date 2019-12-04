@@ -97,10 +97,15 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 				msg["instruction"].(string) + " at " + raw.TimeSent)
 		} else {
 			logrus.Info("Device " + raw.DeviceID + " completed instruction with type " +
-				msg["instruction"].(string) + " at " + raw.TimeSent)
+				msg["contents"].(map[string]interface{})["instruction"].(string) + " at " + raw.TimeSent)
+		}
+		// If original message to which device responded with confirmation was sent by front-end,
+		// pass confirmation through
+		if msg["device_id"] == "front-end" {
+			jsonMessage, _ := json.Marshal(raw)
+			handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 		}
 	}
-	//TODO pass to front-end if he sent message
 }
 
 //openDoorBeun is the test function for developers to test the door and switch combo

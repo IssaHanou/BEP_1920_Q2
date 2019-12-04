@@ -22,7 +22,7 @@ class Logger:
         Manual logger for the developers.
         """
         print("python log: ", text)
-        self.file.write(text + "\n")
+        self.file.write(str(text) + "\n")
 
     def close(self):
         """

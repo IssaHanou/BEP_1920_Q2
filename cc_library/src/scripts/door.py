@@ -31,6 +31,8 @@ class Door(Device):
     def perform_instruction(self, contents):
         """
         Set here the mapping from messages to methods.
+        Should return warning when illegal instruction was sent
+        or instruction could not be performed.
         """
         instruction = contents.get("instruction")
         if instruction == "test":
@@ -38,7 +40,10 @@ class Door(Device):
         elif instruction == "turn off":
             self.turn_off(contents)
         elif instruction == "turn on":
-            self.turn_on(contents),
+            self.turn_on(contents)
+        else:
+            return True
+        return False
 
     def test(self):
         for i in range(0, 2):

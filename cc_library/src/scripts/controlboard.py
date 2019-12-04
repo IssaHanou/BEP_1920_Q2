@@ -90,6 +90,8 @@ class ControlBoard(Device):
     def perform_instruction(self, contents):
         """
         Set here the mapping from messages to methods.
+        Should return warning when illegal instruction was sent
+        or instruction could not be performed.
         """
         instruction = contents.get("instruction")
         if instruction == "test":
@@ -100,6 +102,9 @@ class ControlBoard(Device):
             self.turn_off(contents)
         elif instruction == "turnOn":
             self.turn_on(contents)
+        else:
+            return True
+        return None
 
     def blink(self, data):
         led = getattr(self, data.get("led"))
