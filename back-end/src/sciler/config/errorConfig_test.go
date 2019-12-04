@@ -45,7 +45,7 @@ func TestDeviceActionNotPresent(t *testing.T) {
 	assert.PanicsWithValue(t,
 		"device with id telephone not found in map",
 		func() { ReadFile(filename) },
-		"ReadDevice used in action should be present in device list")
+		"ReadDevice used in action should be present in device logics")
 }
 
 func TestComponentActionNotPresent(t *testing.T) {
@@ -53,7 +53,7 @@ func TestComponentActionNotPresent(t *testing.T) {
 	assert.PanicsWithValue(t,
 		"component id: light not found in device input",
 		func() { ReadFile(filename) },
-		"Component used in action should be present in device list")
+		"Component used in action should be present in device logics")
 }
 
 func TestDeviceConstraintNotPresent(t *testing.T) {
@@ -61,7 +61,7 @@ func TestDeviceConstraintNotPresent(t *testing.T) {
 	assert.PanicsWithValue(t,
 		"device with id telephone not found in map",
 		func() { ReadFile(filename) },
-		"ReadDevice used in constraint should be present in device list")
+		"ReadDevice used in constraint should be present in device logics")
 }
 
 func TestComponentConstraintNotPresent(t *testing.T) {
@@ -69,7 +69,7 @@ func TestComponentConstraintNotPresent(t *testing.T) {
 	assert.PanicsWithValue(t,
 		"component id: color not found in device input",
 		func() { ReadFile(filename) },
-		"Component used in constraint should be present in device list")
+		"Component used in constraint should be present in device logics")
 }
 
 func TestIncorrectTypeCondition(t *testing.T) {
@@ -77,7 +77,7 @@ func TestIncorrectTypeCondition(t *testing.T) {
 	assert.PanicsWithValue(t,
 		"invalid type of condition: mytype",
 		func() { ReadFile(filename) },
-		"Condition type should be 'device' or 'timer'")
+		"ReadCondition type should be 'device' or 'timer'")
 }
 
 func TestIncorrectTypeAction(t *testing.T) {
@@ -85,7 +85,7 @@ func TestIncorrectTypeAction(t *testing.T) {
 	assert.PanicsWithValue(t,
 		"invalid type of action: my-type",
 		func() { ReadFile(filename) },
-		"Condition type should be 'device' or 'timer'")
+		"ReadCondition type should be 'device' or 'timer'")
 }
 
 func TestCheckActionComponentType(t *testing.T) {
@@ -93,7 +93,7 @@ func TestCheckActionComponentType(t *testing.T) {
 	assert.PanicsWithValue(t,
 		"Value was not of type string: 0",
 		func() { ReadFile(filename) },
-		"Condition type should be 'device' or 'timer'")
+		"ReadCondition type should be 'device' or 'timer'")
 }
 
 /////////////////////////////////// Test timer actions
@@ -255,35 +255,35 @@ func TestNoComponentIDForDeviceConstraintBool(t *testing.T) {
 	filename := "../../../resources/testing/test_config.json"
 	config := ReadFile(filename)
 	assert.PanicsWithValue(t,
-		"Condition ID: ID not in constraint map",
+		"ReadCondition ID: ID not in constraint map",
 		func() { GetConstraintBool(config, "ID") },
 		"Panic thrown when ID not found for bool")
 	assert.PanicsWithValue(t,
-		"Condition ID: ID not in constraint map",
+		"ReadCondition ID: ID not in constraint map",
 		func() { GetConstraintString(config, "ID") },
 		"Panic thrown when ID not found for string")
 	assert.PanicsWithValue(t,
-		"Condition ID: ID not in constraint map",
+		"ReadCondition ID: ID not in constraint map",
 		func() { GetConstraintNumeric(config, "ID") },
 		"Panic thrown when ID not found for numeric")
 	assert.PanicsWithValue(t,
-		"Condition ID: ID not in constraint map",
+		"ReadCondition ID: ID not in constraint map",
 		func() { GetConstraintStringArray(config, "ID") },
 		"Panic thrown when ID not found for string array")
 	assert.PanicsWithValue(t,
-		"Condition ID: ID not in constraint map",
+		"ReadCondition ID: ID not in constraint map",
 		func() { GetConstraintNumArray(config, "ID") },
 		"Panic thrown when ID not found for num array")
 	assert.PanicsWithValue(t,
-		"Condition ID: ID not in constraint map",
+		"ReadCondition ID: ID not in constraint map",
 		func() { GetConstraintBoolArray(config, "ID") },
 		"Panic thrown when ID not found for bool array")
 	assert.PanicsWithValue(t,
-		"Condition ID: ID not in constraint map",
+		"ReadCondition ID: ID not in constraint map",
 		func() { GetConstraintCustomType(config, "ID") },
 		"Panic thrown when ID not found for custom type")
 	assert.PanicsWithValue(t,
-		"Condition ID: ID not in constraint map",
+		"ReadCondition ID: ID not in constraint map",
 		func() { GetConstraintTimer(config, "ID") },
 		"Panic thrown when ID not found for timer")
 }

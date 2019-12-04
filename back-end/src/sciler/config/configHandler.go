@@ -39,59 +39,124 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, error) {
 	var config WorkingConfig
 	// Copy information from read config to working config.
 	config.General = readConfig.General
-	config.Puzzles = readConfig.Puzzles
-	config.GeneralEvents = readConfig.GeneralEvents
+	config.Puzzles = generatePuzzles(readConfig.Puzzles)
+	//config.GeneralEvents = // todo
 	config.Devices = make(map[string]Device)
 	for _, d := range readConfig.Devices {
 		config.Devices[d.ID] = Device{d.ID, d.Description, d.Input,
 			d.Output, make(map[string]interface{}), false}
 	}
 
-	// Create additional data structures.
-	config.Rules = make(map[string]Rule)
-	config.ActionMap = make(map[string][]Action)
-	config.ConstraintMap = make(map[string]map[string][]interface{})
-	for i, p := range config.Puzzles {
-		for j, r := range p.Rules {
-			config.Rules[r.ID] = r
-			actions, err := checkActions(config.Devices, r.Actions)
+	return config, checkConfig(config)
+}
+
+// checkConfig is a method that will return an error if the constraints value type is not equal to the device input type specified, the actions type is not equal to the device output type, or some other not allowed json configuration
+func checkConfig(config WorkingConfig) error {
+	for _, puzzle := range config.Puzzles {
+		for _, rule := range puzzle.Event.Rules {
+			err := rule.Conditions.CheckConstraints(config)
 			if err != nil {
-				return config, err
-			}
-			for k, c := range r.Conditions {
-				// Set both original pointer's and current pointer's conditions
-				config.Puzzles[i].Rules[j].Conditions[k].RuleID = r.ID
-				c.RuleID = r.ID
-				config.ActionMap[c.GetID()] = actions
-				constraints, err := makeConstraints(config.Devices, c)
-				if err != nil {
-					return config, err
-				}
-				config.ConstraintMap[c.GetID()] = constraints
+				return err
 			}
 		}
 	}
-	for i, e := range config.GeneralEvents {
-		for j, r := range e.Rules {
-			config.Rules[r.ID] = r
-			actions, err := checkActions(config.Devices, r.Actions)
+
+	for _, generalEvent := range config.GeneralEvents {
+		for _, rule := range generalEvent.Rules {
+			err := rule.Conditions.CheckConstraints(config)
 			if err != nil {
-				return config, err
-			}
-			for k, c := range r.Conditions {
-				// Set both original pointer's and current pointer's conditions
-				config.GeneralEvents[i].Rules[j].Conditions[k].RuleID = r.ID
-				c.RuleID = r.ID
-				config.ActionMap[c.GetID()] = actions
-				constraints, err := makeConstraints(config.Devices, c)
-				if err != nil {
-					return config, err
-				}
-				config.ConstraintMap[c.GetID()] = constraints
+				return err
 			}
 		}
 	}
-	return config, nil
+
+	// todo add check for actions
+	return nil
+}
+
+func generatePuzzles(puzzles []ReadPuzzle) []Puzzle {
+	result := make([]Puzzle, len(puzzles))
+	for i, readPuzzle := range puzzles {
+		puzzle := Puzzle{
+			Event: Event{
+				Name:  readPuzzle.Name,
+				Rules: make([]Rule, len(readPuzzle.Rules)),
+			},
+			Hints: readPuzzle.Hints,
+		}
+
+		for _, readRule := range readPuzzle.Rules {
+			rule := Rule{
+				ID:          readRule.ID,
+				Description: readRule.Description,
+				Limit:       readRule.Limit,
+				Conditions:  nil,
+				Actions:     readRule.Actions,
+			}
+			rule.Conditions = generateLogicalCondition(readRule.Conditions)
+			puzzle.Event.Rules[i] = rule
+		}
+		result[i] = puzzle
+	}
+	return result
+}
+
+func generateLogicalCondition(conditions interface{}) LogicalCondition { // todo check types
+	logic := conditions.(map[string]interface{})
+	if logic["operator"] != nil { // operator
+		if logic["operator"] == "AND" {
+			and := AndCondition{}
+			for _, condition := range logic["list"].([]interface{}) {
+				and.logics = append(and.logics, generateLogicalCondition(condition))
+			}
+			return and
+		} else if logic["operator"] == "OR" {
+			or := OrCondition{}
+			for _, condition := range logic["list"].([]interface{}) {
+				or.logics = append(or.logics, generateLogicalCondition(condition))
+			}
+			return or
+		} else {
+			panic(fmt.Sprintf("JSON config in wrong format, operator: %v, could not be processed", logic["operator"]))
+		}
+	} else if logic["type"] != nil && reflect.TypeOf(logic["type"]).Kind() == reflect.String && logic["type_id"] != nil && reflect.TypeOf(logic["type_id"]).Kind() == reflect.String {
+		condition := Condition{
+			Type:        logic["type"].(string),
+			TypeID:      logic["type_id"].(string),
+			Constraints: generateLogicalConstraint(logic["constraints"]),
+		}
+		return condition
+	}
+	panic(fmt.Sprintf("JSON config in wrong format, conditions: %v, could not be processed", conditions))
+}
+
+func generateLogicalConstraint(constraints interface{}) LogicalConstraint {
+	logic := constraints.(map[string]interface{})
+	if logic["operator"] != nil { // operator
+		if logic["operator"] == "AND" {
+			and := AndConstraint{}
+			for _, constraint := range logic["list"].([]interface{}) {
+				and.logics = append(and.logics, generateLogicalConstraint(constraint))
+			}
+			return and
+		} else if logic["operator"] == "OR" {
+			or := OrConstraint{}
+			for _, constraint := range logic["list"].([]interface{}) {
+				or.logics = append(or.logics, generateLogicalConstraint(constraint))
+			}
+			return or
+		} else {
+			panic(fmt.Sprintf("JSON config in wrong format, operator: %v, could not be processed", logic["operator"]))
+		}
+	} else if logic["comp"] != nil && reflect.TypeOf(logic["comp"]).Kind() == reflect.String && logic["component_id"] != nil && reflect.TypeOf(logic["component_id"]).Kind() == reflect.String {
+		constraint := Constraint{
+			Comparison:  logic["comp"].(string),
+			ComponentID: logic["component_id"].(string),
+			Value:       logic["value"],
+		}
+		return constraint
+	}
+	panic(fmt.Sprintf("JSON config in wrong format, conditions: %v, could not be processed", constraints))
 }
 
 func checkActions(devices map[string]Device, actions []Action) ([]Action, error) {
