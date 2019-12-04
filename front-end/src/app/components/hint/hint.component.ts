@@ -9,7 +9,8 @@ import { MqttService } from "ngx-mqtt";
 export class HintComponent {
   hint: string;
 
-  constructor(private mqttService: MqttService) {}
+  constructor(private mqttService: MqttService) {
+  }
 
   public unsafePublish(topic: string, message: string): void {
     this.mqttService.unsafePublish(topic, message, { qos: 1, retain: true });

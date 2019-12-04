@@ -1,5 +1,6 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
-import {Observable} from 'rxjs/internal/Observable';
+import {Component, OnDestroy, OnInit} from "@angular/core";
+import {Subscription} from "rxjs";
+import {IMqttMessage, MqttService} from "ngx-mqtt";
 
 @Component({
   selector: "app-device",
@@ -9,30 +10,63 @@ import {Observable} from 'rxjs/internal/Observable';
 
 
 export class DeviceComponent implements OnInit {
-  constructor() {
+  jsonData: JSON
+  jsonMsg: JSON
+  msg: IMqttMessage
+  private subscription: Subscription;
+  topicname: "status";
+
+  onMessageArrived(message) {
+    if (message.destinationName.indexOf("status") !== -1) {
+      this.jsonMsg = JSON.parse(message.payloadString);
+    }
+
+
   }
 
-  data
-  columns
+  subscribeNewTopic(): void {
+    console.log("inside subscribe new topic")
+    this.subscription = this.mqttService.observe(this.topicname).subscribe((message: IMqttMessage) => {
+      this.msg = message;
+      console.log("Message: " + message.payload.toString() + "<br> for topic: " + message.topic)
+      this.onMessageArrived(message)
+    });
+    console.log("subscribed to topic: " + this.topicname)
+  }
+
+
+  constructor(private mqttService: MqttService) {
+  }
 
   ngOnInit() {
-    this.columns = ["Apparaat", "Connectie", "Status"]
-    this.data = [
-      {
-        Apparaat: "Weegschaal",
-        Connectie: "true",
-        Status: "40",
-      },
-      {
-        Apparaat: "telefoon",
-        Connectie: "true",
-        Status: "0612254049",
-      },
-      {
-        Apparaat: "Controlbord",
-        Connectie: "false",
-        Status: "false" ,
-      },
-    ]
+    const column = ["apparaat", "connectie", "status"]
+    const data = `[
+        {
+          "id": "Door",
+          "status": [
+                       {
+                        "id": "door",
+                        "status": true
+                       }
+                    ],
+           "connection":"true"
+        },
+        {
+          "id": "Buttons",
+          "status": [
+                    {
+                      "id": "knop3",
+                       "status": true
+                    },
+                    {
+                      "id": "knop5",
+                      "status": false
+                    }
+                    ],
+          "connection": "true"
+        }
+    ]`;
+
+    this.jsonData = JSON.parse(data)
   }
 }
