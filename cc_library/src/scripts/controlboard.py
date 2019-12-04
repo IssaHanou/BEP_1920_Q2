@@ -48,10 +48,15 @@ class ControlBoard(Device):
     GPIO.setup(greenLED1, GPIO.OUT)
     GPIO.setup(greenLED2, GPIO.OUT)
 
-    GPIO.setup(a_pin0, GPIO.IN)
-    GPIO.setup(b_pin0, GPIO.IN)
-
     adc = Adafruit_ADS1x15.ADS1115()
+
+    GPIO.setup(a_pin0, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(a_pin1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(a_pin2, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(b_pin0, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(b_pin1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(b_pin2, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
 
     def get_sliders_analog_reading(self):
         positions = [0,0,0]
@@ -121,17 +126,16 @@ try:
     config = open(file=abs_file_path)
     scclib = SccLib(config, device)
 
-    GPIO.add_event_detect(device.redSwitch, GPIO.BOTH, callback=scclib.statusChanged)
-    GPIO.add_event_detect(device.orangeSwitch, GPIO.BOTH, callback=scclib.statusChanged)
-    GPIO.add_event_detect(device.greenSwitch, GPIO.BOTH, callback=scclib.statusChanged)
-    GPIO.add_event_detect(device.mainSwitch, GPIO.BOTH, callback=scclib.statusChanged)
+    GPIO.add_event_detect(device.redSwitch, GPIO.BOTH, callback=scclib.statusChanged, bouncetime=200)
+    GPIO.add_event_detect(device.orangeSwitch, GPIO.BOTH, callback=scclib.statusChanged, bouncetime=200)
+    GPIO.add_event_detect(device.greenSwitch, GPIO.BOTH, callback=scclib.statusChanged, bouncetime=200)
+    GPIO.add_event_detect(device.mainSwitch, GPIO.BOTH, callback=scclib.statusChanged, bouncetime=200)
     GPIO.add_event_detect(device.a_pin0, GPIO.BOTH, callback=scclib.status_changed)
     GPIO.add_event_detect(device.a_pin1, GPIO.BOTH, callback=scclib.status_changed)
     GPIO.add_event_detect(device.a_pin2, GPIO.BOTH, callback=scclib.status_changed)
     GPIO.add_event_detect(device.b_pin0, GPIO.BOTH, callback=scclib.status_changed)
     GPIO.add_event_detect(device.b_pin1, GPIO.BOTH, callback=scclib.status_changed)
     GPIO.add_event_detect(device.b_pin2, GPIO.BOTH, callback=scclib.status_changed)
-
 
     scclib.start()
 except KeyboardInterrupt:
