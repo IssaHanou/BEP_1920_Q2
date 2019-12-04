@@ -13,7 +13,9 @@ except (RuntimeError, ModuleNotFoundError):
 
 class ControlBoard(Device):
     GPIO.setmode(GPIO.BCM)
-
+    """
+    Define pin numbers to which units are connected on Pi.
+    """
     redSwitch = 27
     orangeSwitch = 22
     greenSwitch = 18
@@ -64,6 +66,9 @@ class ControlBoard(Device):
         return positions
 
     def get_status(self):
+        """
+        Return status of switches and sliders of device.
+        """
         status = "{"
         status += "'redSwitch': " + str(GPIO.input(self.redSwitch)) + ","
         status += "'orangeSwitch': " + str(GPIO.input(self.orangeSwitch)) + ","
