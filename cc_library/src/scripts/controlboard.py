@@ -128,6 +128,7 @@ class ControlBoard(Device):
                 GPIO.output(self.greenLEDs[i], GPIO.LOW)
                 time.sleep(0.2)
 
+
 scclib = None
 try:
     device = ControlBoard()
