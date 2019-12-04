@@ -129,6 +129,7 @@ class ControlBoard(Device):
                 time.sleep(0.2)
 
 
+scclib = None
 try:
     device = ControlBoard()
 
@@ -160,8 +161,8 @@ try:
 
     scclib.start()
 except KeyboardInterrupt:
-    print("Interrupted!")
-
+    scclib.logger.log("program was terminated from keyboard input")
 finally:
-    GPIO.cleanup()  # This ensures a clean exit
-    print("Clean exit ensured!")
+    GPIO.cleanup()
+    scclib.logger.log("Cleanly exited ControlBoard program")
+    scclib.logger.close()
