@@ -66,9 +66,9 @@ class ControlBoard(Device):
         return positions
 
     def get_leds_status(self):
-        reds = [0,0,0]
-        greens = [0,0,0]
-        for i in range(0,3):
+        reds = [0, 0, 0]
+        greens = [0, 0, 0]
+        for i in range(0, 3):
             reds[i] = GPIO.input(self.redLEDs[i])
             greens[i] = GPIO.input(self.greenLEDs[i])
         return "'redLEDs': " + str(reds) + ",'greenLEDs': " + str(greens)
