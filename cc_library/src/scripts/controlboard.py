@@ -160,8 +160,7 @@ try:
 
     scclib.start()
 except KeyboardInterrupt:
-    print("Interrupted!")
-
+    print("program was terminated from keyboard input")
 finally:
-    GPIO.cleanup()  # This ensures a clean exit
-    print("Clean exit ensured!")
+    GPIO.cleanup()
+    print("Cleanly exited ControlBoard program")

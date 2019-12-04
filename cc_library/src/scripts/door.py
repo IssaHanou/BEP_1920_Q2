@@ -1,7 +1,7 @@
 import os
 import time
 
-from cc_library.src.sciler.scclib.app import SccLib, on_python_log
+from cc_library.src.sciler.scclib.app import SccLib
 from cc_library.src.sciler.scclib.device import Device
 
 try:
@@ -67,9 +67,8 @@ try:
     config = open(file=abs_file_path)
     scclib = SccLib(config=config, device=device)
     scclib.start()
-
 except KeyboardInterrupt:
-    on_python_log("Interrupted by keyboard")
+    print("program was terminated from keyboard input")
 finally:
     GPIO.cleanup()  # This ensures clean exit
-    on_python_log("Cleanly exited Door program")
+    print("Cleanly exited Door program")
