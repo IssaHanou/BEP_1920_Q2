@@ -8,10 +8,10 @@ import (
 
 // ReadConfig specifies all configuration elements of an escape room.
 type ReadConfig struct {
-	General       General      `json:"general"`
-	Devices       []ReadDevice `json:"devices"`
-	Puzzles       []ReadPuzzle `json:"puzzles"`
-	GeneralEvents []ReadEvent  `json:"general_events"`
+	General       General            `json:"general"`
+	Devices       []ReadDevice       `json:"devices"`
+	Puzzles       []ReadPuzzle       `json:"puzzles"`
+	GeneralEvents []ReadGeneralEvent `json:"general_events"`
 }
 
 // General is a struct that describes the configurations of an escape room.
@@ -37,10 +37,36 @@ type ReadPuzzle struct {
 	Hints []string   `json:"hints"`
 }
 
-// ReadEvent defines a general event, like start.
-type ReadEvent struct {
+// GetName returns the name of a ReadPuzzle
+func (r ReadPuzzle) GetName() string {
+	return r.Name
+}
+
+// GetRules returns the readRules of a ReadPuzzle
+func (r ReadPuzzle) GetRules() []ReadRule {
+	return r.Rules
+}
+
+// ReadGeneralEvent defines a general event, like start.
+type ReadGeneralEvent struct {
 	Name  string     `json:"name"`
 	Rules []ReadRule `json:"rules"`
+}
+
+// GetName returns the name of a ReadGeneralEvent
+func (r ReadGeneralEvent) GetName() string {
+	return r.Name
+}
+
+// GetRules returns the readRules of a ReadGeneralEvent
+func (r ReadGeneralEvent) GetRules() []ReadRule {
+	return r.Rules
+}
+
+// ReadEvent is an interface that both ReadPuzzle and ReadGeneralEvent implement
+type ReadEvent interface {
+	GetName() string
+	GetRules() []ReadRule
 }
 
 // ReadOperator defines a object that takes an operator and combines a logics of other operators or conditions

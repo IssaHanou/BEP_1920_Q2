@@ -10,7 +10,7 @@ import (
 type WorkingConfig struct {
 	General       General
 	Puzzles       []Puzzle
-	GeneralEvents []Event
+	GeneralEvents []GeneralEvent
 	Devices       map[string]Device
 }
 
@@ -25,14 +25,40 @@ type Rule struct {
 
 // Puzzle is a struct that describes contents of a puzzle.
 type Puzzle struct {
-	Event Event
+	Event GeneralEvent
 	Hints []string
 }
 
-// Event defines a general event, like start.
-type Event struct {
+// GetName returns the name of a Puzzle
+func (p Puzzle) GetName() string {
+	return p.Event.Name
+}
+
+// GetRules returns the rules of a Puzzle
+func (p Puzzle) GetRules() []Rule {
+	return p.Event.Rules
+}
+
+// GeneralEvent defines a general event, like start.
+type GeneralEvent struct {
 	Name  string `json:"name"`
 	Rules []Rule `json:"rules"`
+}
+
+// GetName returns the name of a GeneralEvent
+func (g GeneralEvent) GetName() string {
+	return g.Name
+}
+
+// GetRules returns the rules of a GeneralEvent
+func (g GeneralEvent) GetRules() []Rule {
+	return g.Rules
+}
+
+// Event is an interface that both Puzzle and GeneralEvent implement
+type Event interface { // todo remove if not used
+	GetName() string
+	GetRules() []Rule
 }
 
 func compare(param1 interface{}, param2 interface{}, comparision string) bool { // todo check types
@@ -103,48 +129,52 @@ func (constraint Constraint) CheckConstraints(condition Condition, config Workin
 	switch condition.Type {
 	case "device":
 		{
-			device := config.Devices[condition.TypeID]
-			valueType := reflect.TypeOf(constraint.Value).Kind()
-			comparision := constraint.Comparison
-			switch device.Input[constraint.ComponentID] {
-			case "string":
-				{
-					if valueType != reflect.String {
-						return fmt.Errorf("input type string expected but %s found as type of %v", valueType.String(), constraint.Value)
+			if device, ok := config.Devices[condition.TypeID]; ok {
+
+				valueType := reflect.TypeOf(constraint.Value).Kind()
+				comparision := constraint.Comparison
+				switch device.Input[constraint.ComponentID] {
+				case "string":
+					{
+						if valueType != reflect.String {
+							return fmt.Errorf("input type string expected but %s found as type of %v", valueType.String(), constraint.Value)
+						}
+						if comparision != "eq" {
+							return fmt.Errorf("comparision %s not allowed on a string", comparision)
+						}
 					}
-					if comparision != "eq" {
-						return fmt.Errorf("comparision %s not allowed on a string", comparision)
+				case "boolean":
+					{
+						if valueType != reflect.Bool {
+							return fmt.Errorf("input type boolean expected but %s found as type of %v", valueType.String(), constraint.Value)
+						}
+						if comparision != "eq" {
+							return fmt.Errorf("comparision %s not allowed on a bool", comparision)
+						}
 					}
+				case "numeric":
+					{
+						if valueType != reflect.Int && valueType != reflect.Float64 {
+							return fmt.Errorf("input type numeric expected but %s found as type of %v", valueType.String(), constraint.Value)
+						}
+						if comparision == "contains" {
+							return fmt.Errorf("comparision %s not allowed on a numeric", comparision)
+						}
+					}
+				case "array":
+					{
+						if valueType != reflect.Slice {
+							return fmt.Errorf("input type array expected but %s found as type of %v", valueType.String(), constraint.Value)
+						}
+						if comparision != "contains" && comparision != "eq" {
+							return fmt.Errorf("comparision %s not allowed on an array", comparision)
+						}
+					}
+				default:
+					// todo custom types
 				}
-			case "boolean":
-				{
-					if valueType != reflect.Bool {
-						return fmt.Errorf("input type boolean expected but %s found as type of %v", valueType.String(), constraint.Value)
-					}
-					if comparision != "eq" {
-						return fmt.Errorf("comparision %s not allowed on a bool", comparision)
-					}
-				}
-			case "numeric":
-				{
-					if valueType != reflect.Int && valueType != reflect.Float64 {
-						return fmt.Errorf("input type numeric expected but %s found as type of %v", valueType.String(), constraint.Value)
-					}
-					if comparision == "contains" {
-						return fmt.Errorf("comparision %s not allowed on a numeric", comparision)
-					}
-				}
-			case "array":
-				{
-					if valueType != reflect.Array {
-						return fmt.Errorf("input type array expected but %s found as type of %v", valueType.String(), constraint.Value)
-					}
-					if comparision != "contains" {
-						return fmt.Errorf("comparision %s not allowed on an array", comparision)
-					}
-				}
-			default:
-				// todo custom types
+			} else {
+				return fmt.Errorf("device with id %s not found in map", condition.TypeID)
 			}
 		}
 	case "timer":
