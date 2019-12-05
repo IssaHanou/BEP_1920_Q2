@@ -88,7 +88,7 @@ func (handler *Handler) onStatusMsg(raw Message) {
 	handler.SendStatus(raw.DeviceID)
 }
 
-// SendStatus sends all status and connecton data of a device to the front-end
+// SendStatus sends all status and connection data of a device to the front-end.
 func (handler *Handler) SendStatus(deviceID string) {
 	message := Message{
 		DeviceID: "back-end",
@@ -96,21 +96,9 @@ func (handler *Handler) SendStatus(deviceID string) {
 		Type:     "status",
 		Contents: map[string]interface{}{
 			"id":         handler.Config.Devices[deviceID].ID,
-			"status":     nil,
+			"status":     handler.Config.Devices[deviceID].Status,
 			"connection": handler.Config.Devices[deviceID].Connection,
 		},
-	}
-	if handler.Config.Devices[deviceID].Status != nil {
-		message = Message{
-			DeviceID: "back-end",
-			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-			Type:     "status",
-			Contents: map[string]interface{}{
-				"id":         handler.Config.Devices[deviceID].ID,
-				"status":     handler.Config.Devices[deviceID].Status,
-				"connection": handler.Config.Devices[deviceID].Connection,
-			},
-		}
 	}
 
 	jsonMessage, err := json.Marshal(&message)
@@ -123,7 +111,7 @@ func (handler *Handler) SendStatus(deviceID string) {
 
 }
 
-//openDoorBeun is the test function for developers to test the door and switch combo
+//openDoorBeun is the test function for developers to test the door and switch combo.
 func (handler *Handler) openDoorBeun(raw Message) {
 	logrus.Info("status message received, checking if door needs to open.")
 	if raw.DeviceID == "controlBoard" {

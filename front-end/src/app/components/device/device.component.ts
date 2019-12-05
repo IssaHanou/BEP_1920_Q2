@@ -63,6 +63,9 @@ export class DeviceComponent implements OnInit {
   }
 }
 
+/**
+ * Devices has a Map all containing all devices with a key that is the same as the id.
+ */
 export class Devices {
   all: Map<string, Device>;
 
@@ -70,6 +73,10 @@ export class Devices {
     this.all = new Map<string,Device>()
   }
 
+  /**
+   * setDevice either updates an existing Device with the update methods or creates a new one.
+   * @param jsonData json object with keys id, status and connection. 
+   */
   setDevice(jsonData){
     if (this.all.has(jsonData.id)) {
       this.all.get(jsonData.id).updateStatus(jsonData.status);
@@ -81,6 +88,9 @@ export class Devices {
   }
 }
 
+/**
+ * Device has all the information the front-end needs to show of each device
+ */
 export class Device {
   id: string;
   status: Map<string, any>;
@@ -93,10 +103,18 @@ export class Device {
     this.updateStatus(jsonData.status)
   }
 
+  /**
+   * updateConnection is called on every status update to update the connections status.
+   * @param connection boolean
+   */
   updateConnection(connection){
     this.connection = connection;
   }
 
+  /**
+   * updateStatus is called on every status update to update the component status.
+   * @param jsonStatus json object containing components as key with status as value.
+   */
   updateStatus(jsonStatus) {
     const keys = Object.keys(jsonStatus);
     for (const key of keys) {
