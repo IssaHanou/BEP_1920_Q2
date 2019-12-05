@@ -15,7 +15,6 @@ export class DeviceComponent implements OnInit {
   private subscription: Subscription;
   topicname= "front-end";
   deviceList: Devices;
-  private data: string;
 
   onMessageArrived(message) {
     let jsonData  = JSON.parse(message);
