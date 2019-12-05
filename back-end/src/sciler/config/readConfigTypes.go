@@ -1,11 +1,5 @@
 package config
 
-import (
-	"crypto/sha512"
-	"encoding/base64"
-	"fmt"
-)
-
 // ReadConfig specifies all configuration elements of an escape room.
 type ReadConfig struct {
 	General       General            `json:"general"`
@@ -94,15 +88,6 @@ type ReadCondition struct {
 
 // ConstraintInfo is a general map allowing to read input constraints, which are later parsed to real constraint objects.
 type ConstraintInfo map[string]interface{}
-
-// GetID returns hash of condition, limited to the first 24 characters
-func (condition *ReadCondition) GetID() string {
-	hasher := sha512.New()
-	toHash := condition.RuleID + condition.TypeID + fmt.Sprint(condition.Constraints)
-	hasher.Write([]byte(toHash))
-	hash := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
-	return hash[0:24]
-}
 
 // Action is a struct that determines what happens when a rule is fired.
 type Action struct {

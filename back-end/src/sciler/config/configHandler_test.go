@@ -45,7 +45,7 @@ func TestDeviceConstraintNotPresent(t *testing.T) {
 func TestComponentConstraintNotPresent(t *testing.T) {
 	filename := "../../../resources/testing/testComponentConstraintNotPresent.json"
 	assert.PanicsWithValue(t,
-		"component id: color not found in device input",
+		"device with id non existing not found in map",
 		func() { ReadFile(filename) },
 		"Component used in constraint should be present in device logics")
 }
@@ -53,39 +53,47 @@ func TestComponentConstraintNotPresent(t *testing.T) {
 func TestIncorrectTypeCondition(t *testing.T) {
 	filename := "../../../resources/testing/testIncorrectTypeCondition.json"
 	assert.PanicsWithValue(t,
-		"invalid type of condition: mytype",
+		"invalid type of condition: not device or timer",
 		func() { ReadFile(filename) },
 		"ReadCondition type should be 'device' or 'timer'")
 }
 
-func Test_checkConfig(t *testing.T) {
-
+func TestIncorrectConstraintOperation(t *testing.T) {
+	filename := "../../../resources/testing/testIncorrectConstraintOperator.json"
+	assert.PanicsWithValue(t,
+		"JSON config in wrong format, operator: non existing operator, could not be processed",
+		func() { ReadFile(filename) },
+		"operator should be 'AND' or 'OR'")
 }
 
-func Test_generateDataStructures(t *testing.T) {
-
+func TestIncorrectConditionOperation(t *testing.T) {
+	filename := "../../../resources/testing/testIncorrectConditionOperator.json"
+	assert.PanicsWithValue(t,
+		"JSON config in wrong format, operator: non existing operator, could not be processed",
+		func() { ReadFile(filename) },
+		"operator should be 'AND' or 'OR'")
 }
 
-func Test_generateGeneralEvent(t *testing.T) {
-
+func TestWrongConditionStructure(t *testing.T) {
+	filename := "../../../resources/testing/testWrongConditionStructure.json"
+	assert.PanicsWithValue(t,
+		"JSON config in wrong condition format, conditions: map[non existing:non existing], could not be processed",
+		func() { ReadFile(filename) },
+		"condition should follow the condition or operator format")
 }
 
-func Test_generateGeneralEvents(t *testing.T) {
-
+func TestWrongConstraintStructure(t *testing.T) {
+	filename := "../../../resources/testing/testWrongConstraintStructure.json"
+	assert.PanicsWithValue(t,
+		"JSON config in wrong constraint format, conditions: map[non existing:non existing], could not be processed",
+		func() { ReadFile(filename) },
+		"condition should follow the condition or operator format")
 }
 
-func Test_generateLogicalCondition(t *testing.T) {
-
-}
-
-func Test_generateLogicalConstraint(t *testing.T) {
-
-}
-
-func Test_generatePuzzles(t *testing.T) {
-
-}
-
-func Test_generateRules(t *testing.T) {
-
+func TestWrongComponentIDType(t *testing.T) {
+	filename := "../../../resources/testing/testWrongComponentIDType.json"
+	assert.PanicsWithValue(t,
+		"JSON config in wrong format, component_id should be of type string, 6 is of type float64",
+		func() { ReadFile(filename) },
+		"constraint should have a component_id of type string (if the condition is of type device)")
 }

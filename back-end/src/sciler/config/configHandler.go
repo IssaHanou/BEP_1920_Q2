@@ -143,7 +143,7 @@ func generateLogicalCondition(conditions interface{}) LogicalCondition { // todo
 
 		return condition
 	}
-	panic(fmt.Sprintf("JSON config in wrong format, conditions: %v, could not be processed", conditions))
+	panic(fmt.Sprintf("JSON config in wrong condition format, conditions: %v, could not be processed", conditions))
 }
 
 func generateLogicalConstraint(constraints interface{}) LogicalConstraint {
@@ -184,7 +184,7 @@ func generateLogicalConstraint(constraints interface{}) LogicalConstraint {
 
 		return constraint
 	}
-	panic(fmt.Sprintf("JSON config in wrong format, conditions: %v, could not be processed", constraints))
+	panic(fmt.Sprintf("JSON config in wrong constraint format, conditions: %v, could not be processed", constraints))
 }
 
 //func checkActions(devices map[string]Device, actions []Action) ([]Action, error) {
