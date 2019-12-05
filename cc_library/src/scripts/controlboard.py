@@ -99,9 +99,9 @@ class ControlBoard(Device):
         elif instruction == "blink":
             self.blink(contents)
         elif instruction == "turnOff":
-            self.turn_off(contents)
+            self.turn_off()
         elif instruction == "turnOn":
-            self.turn_on(contents)
+            self.turn_on()
         else:
             return True
         return None
@@ -114,13 +114,13 @@ class ControlBoard(Device):
         GPIO.output(led, GPIO.LOW)
         time.sleep(interval)
 
-    def turn_off(self, data):
-        led = getattr(self, data.get("led"))
-        GPIO.output(led, GPIO.LOW)
+    def turn_off(self):
+        GPIO.output(self.redLEDs, GPIO.LOW)
+        GPIO.output(self.greenLEDs, GPIO.LOW)
 
-    def turn_on(self, data):
-        led = getattr(self, data.get("led"))
-        GPIO.output(led, GPIO.HIGH)
+    def turn_on(self):
+        GPIO.output(self.redLEDs, GPIO.HIGH)
+        GPIO.output(self.greenLEDs, GPIO.HIGH)
 
     def test(self):
         for j in range(0, 3):

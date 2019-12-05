@@ -37,7 +37,7 @@ func (communicator *Communicator) Start(handler mqtt.MessageHandler) {
 }
 
 func onConnectionLost(client mqtt.Client, e error) {
-	logger.Warn(fmt.Sprintf("connection lost : %v", e))
+	logger.Warn(fmt.Sprintf("connection lost: %v", e))
 	if client.IsConnected() {
 		client.Disconnect(500)
 	}

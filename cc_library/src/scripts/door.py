@@ -38,9 +38,9 @@ class Door(Device):
         if instruction == "test":
             self.test()
         elif instruction == "turn off":
-            self.turn_off(contents)
+            self.turn_off()
         elif instruction == "turn on":
-            self.turn_on(contents)
+            self.turn_on()
         else:
             return True
         return False
@@ -53,13 +53,11 @@ class Door(Device):
             time.sleep(2)
         GPIO.output(self.door, GPIO.LOW)
 
-    def turn_off(self, data):
-        door = getattr(self, data.get("door"))
-        GPIO.output(door, GPIO.HIGH)
+    def turn_off(self):
+        GPIO.output(self.door, GPIO.HIGH)
 
-    def turn_on(self, data):
-        door = getattr(self, data.get("door"))
-        GPIO.output(door, GPIO.LOW)
+    def turn_on(self):
+        GPIO.output(self.door, GPIO.LOW)
 
 
 scclib = None

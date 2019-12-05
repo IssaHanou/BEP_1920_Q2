@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/sirupsen/logrus"
 	"reflect"
@@ -110,10 +111,12 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 			msg := original.(map[string]interface{})
 			if !value.(bool) {
 				logrus.Error("device " + raw.DeviceID + " did not complete instruction with type " +
-					msg["contents"].(map[string]string)["instruction"] + " at " + raw.TimeSent)
+					fmt.Sprint(msg["contents"].(map[string]interface{})["instruction"]) +
+					" at " + raw.TimeSent)
 			} else {
 				logrus.Info("device " + raw.DeviceID + " completed instruction with type " +
-					msg["contents"].(map[string]string)["instruction"] + " at " + raw.TimeSent)
+					fmt.Sprint(msg["contents"].(map[string]interface{})["instruction"]) +
+					" at " + raw.TimeSent)
 			}
 			// If original message to which device responded with confirmation was sent by front-end,
 			// pass confirmation through
@@ -131,9 +134,9 @@ func (handler *Handler) openDoorBeun(raw Message) {
 	logrus.Info("checking if door needs to open based on received status message")
 	if raw.DeviceID == "controlBoard" {
 		var instruction string
-		if raw.Contents["mainSwitch"] == 1 {
+		if raw.Contents["mainSwitch"] == float64(1) {
 			instruction = "turn off"
-		} else if raw.Contents["mainSwitch"] == 0 {
+		} else if raw.Contents["mainSwitch"] == float64(0) {
 			instruction = "turn on"
 		}
 		if instruction != "" {
@@ -149,7 +152,7 @@ func (handler *Handler) openDoorBeun(raw Message) {
 			if err != nil {
 				logrus.Errorf("error occurred while constructing message to publish: %v", err)
 			} else {
-				handler.Communicator.Publish("test", string(jsonMessage), 3)
+				handler.Communicator.Publish("door", string(jsonMessage), 3)
 			}
 		}
 	}
