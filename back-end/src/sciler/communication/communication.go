@@ -37,7 +37,7 @@ func (communicator *Communicator) Start(handler mqtt.MessageHandler) {
 }
 
 func onConnectionLost(client mqtt.Client, e error) {
-	logger.Warn(fmt.Sprintf("Connection lost : %v", e))
+	logger.Warn(fmt.Sprintf("connection lost : %v", e))
 	if client.IsConnected() {
 		client.Disconnect(500)
 	}
@@ -62,17 +62,17 @@ func action(action func() mqtt.Token, actionType string, retrials int) error {
 		token := action()
 		var err error = nil
 		if token.Wait() && token.Error() != nil {
-			logger.Warnf("Fail to %s, %v", actionType, token.Error())
+			logger.Warnf("fail to %s, %v", actionType, token.Error())
 			time.Sleep(1 * time.Second)
 
-			logger.Infof("Retry %d to %s", i+1, actionType)
+			logger.Infof("retry %d to %s", i+1, actionType)
 			err = errors.New("action eventually successful")
 			continue
 		} else {
-			logger.Infof("%s successful!", actionType)
+			logger.Infof("back-end: %s successful!", actionType)
 			return err
 		}
 	}
-	logger.Errorf("All retries to %s failed, giving up :(", actionType)
+	logger.Errorf("all retries to %s failed, giving up", actionType)
 	return errors.New("action failed")
 }

@@ -66,7 +66,7 @@ class SccLib:
                     "device_id": self.name,
                     "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
                     "type": "connection",
-                    "contents": eval({"connection": True}),
+                    "contents": {"connection": True},
                 }
 
                 msg = json.dumps(msg_dict)
@@ -104,7 +104,7 @@ class SccLib:
             "device_id": id(client),
             "time_sent": datetime.now().strftime("%d-%m-%YT%H:%M:%S"),
             "type": "connection",
-            "contents": eval({"connection": False}),
+            "contents": {"connection": False},
         }
 
         msg = json.dumps(msg_dict)
@@ -154,19 +154,19 @@ class SccLib:
         """
         message = message.payload.decode("utf-8")
         message = json.loads(message)
-        result = self.device.perform_instruction(message.get("contents"))
+        failed_result = self.device.perform_instruction(message.get("contents"))
         msg_dict = {
             "device_id": self.name,
             "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
             "type": "confirmation",
-            "contents": eval({"completed": not result, "instructed": message}),
+            "contents": {"completed": not failed_result, "instructed": message},
         }
         msg = json.dumps(msg_dict)
         self.__send_message("confirmation", msg)
-        if result:
-            self.logger.log(("instruction performed", message))
-        else:
+        if failed_result:
             self.logger.log(("instruction could not be performed", message))
+        else:
+            self.logger.log(("instruction performed", message))
 
     def __subscribe_topic(self, topic):
         """

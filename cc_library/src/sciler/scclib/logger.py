@@ -13,8 +13,8 @@ class Logger:
         if not os.path.exists("logs"):
             os.mkdir("logs")
 
-        self.filename = "logs/log-" + datetime.datetime.now().strftime("%d-%m-%YT--%H-%M-%S") \
-                        + ".txt"
+        self.filename = ("logs/log-" + datetime.datetime.now().strftime("%d-%m-%YT--%H-%M-%S")
+                         + ".txt")
         self.file = open(self.filename, "w+")
 
     def log(self, text):
