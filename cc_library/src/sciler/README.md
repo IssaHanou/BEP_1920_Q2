@@ -8,7 +8,14 @@ This mainly consists of:
 - `device_manual.md` the manual for writing configuration files for devices
 - `LICENSE.md` the license with which this library complies
 
-## Set-up
+## Set-up testing device
+- create custom device script, which should inherit from `Device`, add it to `cc_library/src/scripts`
+- write configuration for the the device, according to `device_manual.md`, in the same file as the script
+- `ssh pi@<ip-address>`
+- `python3 cc_library/src/scripts/<custom-device>.py` to start device
+- start broker for device to connect with. run `mosquitto -c <conf>`
+
+## Set-up library
 To run this library on a client computer:
 
 - `pip install sciler`
@@ -16,7 +23,7 @@ To run this library on a client computer:
 - write configuration for the the device, according to `device_manual.md`
 - `ssh pi@<ip-address>`
 - `python3 sclier/scclib/<custom-device>.py` to start device
-- start broker for device to connect with `mosquitto -c <conf>`
+- start broker for device to connect with. run `mosquitto -c <conf>`
 
 ## License
 This library is licensed with GNU GPL v3, see `LICENSE.md`.

@@ -74,5 +74,6 @@ func action(action func() mqtt.Token, actionType string, retrials int) error {
 		}
 	}
 	logger.Errorf("all retries to %s failed, giving up", actionType)
+	//TODO reconnect
 	return errors.New("action failed")
 }

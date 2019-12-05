@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
-import { MqttService } from "ngx-mqtt";
+import { Message } from "../../message";
+import { AppComponent } from "../../app.component";
 
 @Component({
   selector: "app-manage",
@@ -7,31 +8,25 @@ import { MqttService } from "ngx-mqtt";
   styleUrls: ["./manage.component.css", "../../../assets/css/main.css"]
 })
 export class ManageComponent implements OnInit {
-  constructor(private mqttService: MqttService) {}
+  constructor(private app: AppComponent) {}
 
   ngOnInit() {}
 
   onClickTestButton() {
-    const now = new Date();
-    const message = {
-      device_id: "front-end",
-      time_sent:
-        now.getDate() +
-        "-" +
-        (now.getMonth() + 1) +
-        "-" +
-        now.getFullYear() +
-        " " +
-        now.getHours() +
-        ":" +
-        now.getMinutes() +
-        ":" +
-        now.getSeconds(),
-      type: "instruction",
-      contents: {
-        instruction: "test all"
-      }
-    };
-    this.mqttService.unsafePublish("back-end", JSON.stringify(message));
+    this.app.sendInstruction("test all")
+  }
+
+  /**
+   * Test for the processing of messages.
+   * TODO delete this
+   */
+  onClickStartButton() {
+    let msg = new Message("front-end",
+      "instruction",
+      new Date(),
+      {"instruction": "test"}
+    );
+    let res = this.app.jsonConvert.serialize(msg);
+    this.app.processMessage(JSON.stringify(res));
   }
 }
