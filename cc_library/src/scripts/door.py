@@ -19,12 +19,18 @@ class Door(Device):
     door = 17
     GPIO.setup(door, GPIO.OUT)
 
+    status = False
+
     def get_status(self):
         """
         Return status of the door.
         """
         status = "{"
-        status += "'door': " + str(GPIO.input(self.door))
+        status += "'door': "
+        if self.status:
+            status += "'open'"
+        else:
+            status += "'closed'"
         status += "}"
         return status
 
@@ -48,16 +54,21 @@ class Door(Device):
     def test(self):
         for i in range(0, 2):
             GPIO.output(self.door, GPIO.LOW)
+            self.status = True
             time.sleep(2)
             GPIO.output(self.door, GPIO.HIGH)
+            self.status = False
             time.sleep(2)
         GPIO.output(self.door, GPIO.LOW)
+        self.status = True
 
     def turn_off(self):
         GPIO.output(self.door, GPIO.HIGH)
+        self.status = False
 
     def turn_on(self):
         GPIO.output(self.door, GPIO.LOW)
+        self.status = True
 
 
 scclib = None

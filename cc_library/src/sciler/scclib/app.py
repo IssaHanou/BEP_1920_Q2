@@ -163,6 +163,7 @@ class SccLib:
         }
         msg = json.dumps(msg_dict)
         self.__send_message("confirmation", msg)
+        self.__send_status_message(self.device.get_status())
         if failed_result:
             self.logger.log(("instruction could not be performed", message))
         else:
