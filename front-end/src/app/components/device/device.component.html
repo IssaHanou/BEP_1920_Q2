@@ -5,43 +5,22 @@
       <thead>
       <tr>
         <th>Apparaat</th>
-        <th>Connectie</th>
-        <th>Component</th>
+        <th>Connectie status</th>
+        <th>Component status</th>
       </tr>
-<!--      <tr class="table-header">-->
-<!--        <th  >Student Name</th>-->
-<!--        <th >Subject</th>-->
-<!--        <th >Marks</th>-->
-<!--      </tr>-->
       </thead>
       <tbody>
-              <tr mdbTableCol  *ngFor="let key of jsonData">
-              <td>{{ key["apparaat"] }}</td>
-              <td>{{ key["connectie"] }}</td>
+              <tr *ngFor="let dev of deviceList.all.values() ">
+              <td>{{ dev.id }}</td>
+              <td>{{ dev.connection }}</td>
                 <td>
                 <ul>
-                  <li *ngFor="let comp of key.status">
-                {{comp["id"]}} - {{comp["status"]}}
+                  <li *ngFor="let comp of dev.status | keyvalue">
+                    {{comp.key}} : {{comp.value}}
                   </li>
                 </ul>
                 </td>
             </tr>
-<!--            <tr    *ngFor="let key of jsonData" >-->
-        <!--              <div *ngFor="let components of device.status;">-->
-<!--        <td >{{ key["apparaat"] }}</td>-->
-<!--                  <td >{{components.id}}</td>-->
-<!--                  <td >{{components.value}}</td>-->
-<!--                </div>-->
-<!--            </tr>-->
-<!--      <tr mdbTableCol *ngFor="let student of jsonData; index as j">-->
-<!--        <div *ngFor="let subject of student.subjects; index as k">-->
-<!--          <div  *ngFor="let exam of subject.exams; index as i">-->
-<!--            <td>{{student.name}}</td>-->
-<!--            <td>{{subject.name}}</td>-->
-<!--            <td>{{exam.score}}</td>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </tr>-->
       </tbody>
     </table>
   </div>

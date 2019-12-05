@@ -36,8 +36,11 @@ func main() {
 
 	communicator := communication.NewCommunicator(host, port, topics)
 	handler := handler.GetHandler(configurations, *communicator)
-	go communicator.Start(handler.NewHandler)
 
+	go communicator.Start(handler.NewHandler)
+	for _, value := range handler.Config.Devices {
+		handler.SendStatus(value.ID)
+	}
 	// loop for now preventing app to exit
 	for {
 		time.Sleep(time.Microsecond * time.Duration(250))

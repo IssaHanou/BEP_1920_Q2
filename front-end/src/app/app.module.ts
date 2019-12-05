@@ -13,7 +13,7 @@ import { MqttModule, MqttService, IMqttServiceOptions } from "ngx-mqtt";
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   hostname: "192.168.178.82",
   port: 8083,
-  clientId: "front-end"
+  clientId: "front-end1"
 };
 
 @NgModule({
