@@ -11,7 +11,8 @@ import (
 	"time"
 )
 
-var topics = []string{"back-end", "hint", "connect", "status", "connection", "confirmation", "instruction"}
+//var topics = []string{"back-end", "hint", "connect", "status", "connection", "confirmation", "instruction"}
+var topics = []string{"back-end", "status", "hint", "connect"}
 
 func main() {
 	dir, dirErr := os.Getwd()

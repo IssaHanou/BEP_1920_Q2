@@ -151,6 +151,7 @@ class SccLib:
         """
         Interpreter of incoming messages.
         Correct sciler mapper is called with the content of the message.
+        Send confirmation message
         """
         message = message.payload.decode("utf-8")
         message = json.loads(message)
