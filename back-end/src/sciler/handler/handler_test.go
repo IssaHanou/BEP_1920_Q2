@@ -235,7 +235,7 @@ func TestOnConfirmationMsgTrue(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]string{"instruction": "test"},
+				"contents":  map[string]interface{}{"instruction": "test"},
 				"type":      "instruction",
 			},
 		},
@@ -255,7 +255,7 @@ func TestOnConfirmationMsgFalse(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]string{"instruction": "test"},
+				"contents":  map[string]interface{}{"instruction": "test"},
 				"type":      "instruction",
 			},
 		},
@@ -275,7 +275,7 @@ func TestOnConfirmationMsgIncorrect1(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]string{"instruction": "test"},
+				"contents":  map[string]interface{}{"instruction": "test"},
 				"type":      "instruction",
 			},
 		},
@@ -295,7 +295,7 @@ func TestOnConfirmationMsgIncorrect2(t *testing.T) {
 			"instruction": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]string{"instruction": "test"},
+				"contents":  map[string]interface{}{"instruction": "test"},
 				"type":      "instruction",
 			},
 		},
@@ -315,7 +315,7 @@ func TestOnConfirmationMsgIncorrect3(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]string{"instruction": "test"},
+				"contents":  map[string]interface{}{"instruction": "test"},
 				"type":      "instruction",
 			},
 		},
@@ -335,7 +335,7 @@ func TestMsgMapperConfirmation(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]string{"instruction": "test"},
+				"contents":  map[string]interface{}{"instruction": "test"},
 				"type":      "instruction",
 			},
 		},

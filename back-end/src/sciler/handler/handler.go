@@ -112,11 +112,11 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 			msg := original.(map[string]interface{})
 			if !value.(bool) {
 				logrus.Error("device " + raw.DeviceID + " did not complete instruction " +
-					fmt.Sprint(msg["contents"].(map[string]string)["instruction"]) +
+					fmt.Sprint(msg["contents"].(map[string]interface{})["instruction"]) +
 					" at " + raw.TimeSent)
 			} else {
 				logrus.Info("device " + raw.DeviceID + " completed instruction " +
-					fmt.Sprint(msg["contents"].(map[string]string)["instruction"]) +
+					fmt.Sprint(msg["contents"].(map[string]interface{})["instruction"]) +
 					" at " + raw.TimeSent)
 			}
 			// If original message to which device responded with confirmation was sent by front-end,
@@ -149,9 +149,9 @@ func (handler *Handler) SendStatus(deviceID string) {
 
 	jsonMessage, err := json.Marshal(&message)
 	if err != nil {
-		logrus.Errorf("Error occurred while constructing message to publish: %v", err)
+		logrus.Errorf("error occurred while constructing message to publish: %v", err)
 	} else {
-		logrus.Info("Sending status data to front-end")
+		logrus.Info("sending status data to front-end")
 		handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 	}
 
