@@ -22,8 +22,8 @@ type General struct {
 	Port     int    `json:"port"`
 }
 
-// Device is a struct that describes the configurations of a device in the room.
-type Device struct {
+// ReadDevice is a struct that describes the configurations of a device in the room.
+type ReadDevice struct {
 	ID          string            `json:"id"`
 	Description string            `json:"description"`
 	Input       map[string]string `json:"input"`

@@ -80,3 +80,13 @@ type ConstraintCustomType struct {
 	Constraint
 	Value interface{}
 }
+
+// Device is a struct for all the devices
+type Device struct {
+	ID          string
+	Description string
+	Input       map[string]string
+	Output      OutputObject
+	Status      map[string]interface{}
+	Connection  bool
+}

@@ -75,7 +75,7 @@
       }
     },
     {
-      "id": "door1",
+      "id": "door",
       "description": "De deur kan open en dicht zijn en neemt geen input.",
       "input": {
       },
@@ -275,7 +275,7 @@
             },
             {
               "type": "device",
-              "type_id": "door1",
+              "type_id": "door",
               "message": {
                 "output": {
                   "open": true

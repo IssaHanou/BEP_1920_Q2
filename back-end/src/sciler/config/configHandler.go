@@ -41,7 +41,8 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, error) {
 	config.General = readConfig.General
 	config.Devices = make(map[string]Device)
 	for _, d := range readConfig.Devices {
-		config.Devices[d.ID] = d
+		config.Devices[d.ID] = Device{d.ID, d.Description, d.Input,
+			d.Output, make(map[string]interface{}), false}
 	}
 
 	// Create additional data structures.
