@@ -130,7 +130,7 @@ func TestOnConnectionMsgFalse(t *testing.T) {
 	handler.onConnectionMsg(msg)
 
 	assert.Equal(t, false, handler.Config.Devices["TestDevice"].Connection,
-		"Device should set connection to true on connection message")
+		"Device should set connection to false on connection message")
 }
 
 func TestMsgMapperConnection(t *testing.T) {
