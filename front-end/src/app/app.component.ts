@@ -18,7 +18,8 @@ export class AppComponent implements OnInit, OnDestroy {
   nameOfRoom = "Super awesome escape";
   jsonConvert: JsonConvert;
 
-  constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
+  constructor(private mqttService: MqttService,
+              private snackBar: MatSnackBar) {
     this.jsonConvert = new JsonConvert()
   }
 

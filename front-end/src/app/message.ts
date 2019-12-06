@@ -1,4 +1,5 @@
 import {JsonObject, JsonProperty} from "json2typescript";
+import * as moment from "moment";
 
 /**
  * Message class with same variables as message json object that is sent by broker.
@@ -26,8 +27,8 @@ export class Message {
    * @param date Date object
    */
   private static formatDate(date: Date): string {
-    return date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate() +
-      " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+    date.setMonth(date.getMonth() - 1);
+    return moment(date).format("DD-MM-YYYY HH:mm:ss");
   }
 
   /**
@@ -36,12 +37,13 @@ export class Message {
    */
   public static deserialize(jsonMessage: string): Message {
     let msg = JSON.parse(jsonMessage);
+    console.log(msg);
     let deviceId = msg["device_id"];
     let timeSent = msg["time_sent"];
     let dateTime = timeSent.split(" ");
     let date = dateTime[0].split("-");
     let time = dateTime[1].split(":");
-    let newDate = new Date(date[0], date[1], date[2], time[0], time[1], time[2]);
+    let newDate = new Date(date[2], date[1], date[0], time[0], time[1], time[2]);
     let type = msg["type"];
     let contents = msg["contents"];
     return new Message(deviceId, type, newDate, contents);
