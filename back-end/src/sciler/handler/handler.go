@@ -70,8 +70,9 @@ func (handler *Handler) msgMapper(raw Message) {
 func (handler *Handler) onConnectionMsg(raw Message) {
 	logrus.Info("connection message received from:", raw.DeviceID)
 	con := handler.Config.Devices[raw.DeviceID]
-	con.Connection = true
+	con.Connection = raw.Contents["connection"].(bool)
 	handler.Config.Devices[raw.DeviceID] = con
+	handler.SendStatus(raw.DeviceID)
 }
 
 //onStatusMsg is the function to process status messages.
@@ -80,9 +81,36 @@ func (handler *Handler) onStatusMsg(raw Message) {
 	for k, v := range raw.Contents {
 		handler.Config.Devices[raw.DeviceID].Status[k] = v
 	}
+	con := handler.Config.Devices[raw.DeviceID]
+	con.Connection = true
+	handler.Config.Devices[raw.DeviceID] = con
+	handler.SendStatus(raw.DeviceID)
 }
 
-//openDoorBeun is the test function for developers to test the door and switch combo
+// SendStatus sends all status and connection data of a device to the front-end.
+func (handler *Handler) SendStatus(deviceID string) {
+	message := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "status",
+		Contents: map[string]interface{}{
+			"id":         handler.Config.Devices[deviceID].ID,
+			"status":     handler.Config.Devices[deviceID].Status,
+			"connection": handler.Config.Devices[deviceID].Connection,
+		},
+	}
+
+	jsonMessage, err := json.Marshal(&message)
+	if err != nil {
+		logrus.Errorf("Error occurred while constructing message to publish: %v", err)
+	} else {
+		logrus.Info("Sending status data to front-end")
+		handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+	}
+
+}
+
+// openDoorBeun is the test function for developers to test the door and switch combo.
 func (handler *Handler) openDoorBeun(raw Message) {
 	logrus.Info("status message received, checking if door needs to open.")
 	if raw.DeviceID == "controlBoard" {
@@ -128,6 +156,11 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 			logrus.Errorf("Error occurred while constructing message to publish: %v", err)
 		} else {
 			handler.Communicator.Publish("test", string(jsonMessage), 3)
+		}
+	}
+	if raw.Contents["instruction"] == "send status" && raw.DeviceID == "front-end" {
+		for _, value := range handler.Config.Devices {
+			handler.SendStatus(value.ID)
 		}
 	}
 }
