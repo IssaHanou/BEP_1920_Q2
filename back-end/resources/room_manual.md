@@ -52,18 +52,26 @@ Rules are defined by:
 - `description`: this is optional and can contain more information about the rule. 
 This can be displayed in the front-end, so should be readable and in Dutch.
 - `limit`: this sets the number of times this rule can be triggered. 
-- `conditions`: this is an array of conditions. By putting several constraints in an array within the conditions array, they will be treated as OR conditions. Rule/combination pairs must be unique. 
-
-    - `type`: this can `rule`, `timer` or `device`.
-    - `type_id`: this will be the id of a timer, rule or device, depending on the type.
-    - `constraints`: this is an array of constraints. 
+- `conditions`: this is an logical operator (1) defined by `operator` (either `AND` or `OR`) and `list` which is a list of conditions or other logical operators **or** this is a condition (2) defined by `type`, `type_id` and `constraint`
+    
+    1. Logical operator
+        - `operator`: this can `AND` or `OR`
+        - `list`: this is an array of conditions / logical operators
+    2. Condition
+        - `type`: this can `rule`, `timer` or `device`.
+        - `type_id`: this will be the id of a timer, rule or device, depending on the type.
+        - `constraints`: this is an logical operator (1) defined by `operator` (either `AND` or `OR`) and `list` which is a list of conditions or other logical operators **or** this is a constraint (2) defined by `comp`, `value` and `component_id`      
         
-        - `comp`: this is the type of comparison and can be "eq", "lt", "gt", "contains" (contains), "lte", "gte" 
-        - `value`: this is the value on which the comparison is made. This should be in the same type as specified in the input of the device. 
-            If it has custom input, then enter value in preferred type and deal with it on the client.
-            In case of "timer" type, it should be in the format "hh:mm:ss"
-        - `component_id`: in the case of "device" type, this is the id of the component it triggers.
-            In case of "timer" type, this is non-existent. 
+            1. Logical operator
+                - `operator`: this can `AND` or `OR`
+                - `list`: this is an array of conditions / logical operators
+            2.
+                - `comp`: this is the type of comparison and can be "eq", "lt", "gt", "contains" (contains), "lte", "gte" 
+                - `value`: this is the value on which the comparison is made. This should be in the same type as specified in the input of the device. 
+                If it has custom input, then enter value in preferred type and deal with it on the client.
+                In case of "timer" type, it should be in the format "hh:mm:ss"
+                - `component_id`: in the case of "device" type, this is the id of the component it triggers.
+                In case of "timer" type, this is non-existent. 
 - `actions`: this is an array of actions:
         
     - `type`: this can be `device` or `timer`
