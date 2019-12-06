@@ -70,4 +70,4 @@ This can be displayed in the front-end, so should be readable and in Dutch.
     - `type_id`: the id of device or timer, depending on type respectively
     - `message`: this defines the `output` message sent. The output defines the type of values to be expected as output. 
         In case of device type, the keys are component ids and the value is a type. An additional "instruction" property may be defined.
-        In the case of timer, the message should have `instruction` specified as `stop` or `subtract`, in the latter case, a `value` should also be passed. 
+        In the case of timer, the message should have `instruction` specified as `stop`, `start`, `add`, `subtract` or `set`, in all cases (except `stop` and `start`), a `value` should also be passed. 
