@@ -116,7 +116,7 @@ func generateRules(readRules []ReadRule) []Rule {
 	return rules
 }
 
-func generateLogicalCondition(conditions interface{}) LogicalCondition { // todo check types
+func generateLogicalCondition(conditions interface{}) LogicalCondition {
 	logic := conditions.(map[string]interface{})
 	if logic["operator"] != nil { // operator
 		if logic["operator"] == "AND" {
@@ -187,6 +187,7 @@ func generateLogicalConstraint(constraints interface{}) LogicalConstraint {
 	panic(fmt.Sprintf("JSON config in wrong constraint format, conditions: %v, could not be processed", constraints))
 }
 
+// TODO: rewrite this code in GH-73
 //func checkActions(devices map[string]Device, actions []Action) ([]Action, error) {
 //	for _, a := range actions {
 //		output := a.Message.Output
@@ -234,60 +235,6 @@ func generateLogicalConstraint(constraints interface{}) LogicalConstraint {
 //	return actions, nil
 //}
 
-//// CheckComponentType checks if value is of componentType and returns error if not.
-//func CheckComponentType(componentType interface{}, value interface{}) error {
-//	switch componentType {
-//	case "string":
-//		if reflect.TypeOf(value).Kind() != reflect.String {
-//			return errors.New("Value was not of type string: " + fmt.Sprint(value))
-//		}
-//	case "numeric":
-//		if reflect.TypeOf(value).Kind() != reflect.Float64 {
-//			return errors.New("Value was not of type numeric: " + fmt.Sprint(value))
-//		}
-//	case "boolean":
-//		if reflect.TypeOf(value).Kind() != reflect.Bool {
-//			return errors.New("Value was not of type boolean: " + fmt.Sprint(value))
-//		}
-//	case "num-array":
-//		if reflect.TypeOf(value).Kind() != reflect.Slice {
-//			return errors.New("Value was not of type array: " + fmt.Sprint(value))
-//		}
-//		array := value.([]interface{})
-//		for i := range array {
-//			if reflect.TypeOf(array[i]).Kind() != reflect.Float64 {
-//				return errors.New("Value was not of type num-array: " + fmt.Sprint(value))
-//			}
-//		}
-//	case "string-array":
-//		if reflect.TypeOf(value).Kind() != reflect.Slice {
-//			return errors.New("Value was not of type array: " + fmt.Sprint(value))
-//		}
-//		array := value.([]interface{})
-//		for i := range array {
-//			if reflect.TypeOf(array[i]).Kind() != reflect.String {
-//				return errors.New("Value was not of type string-array: " + fmt.Sprint(value))
-//			}
-//		}
-//	case "bool-array":
-//		if reflect.TypeOf(value).Kind() != reflect.Slice {
-//			return errors.New("Value was not of type array: " + fmt.Sprint(value))
-//		}
-//		array := value.([]interface{})
-//		for i := range array {
-//			if reflect.TypeOf(array[i]).Kind() != reflect.Bool {
-//				return errors.New("Value was not of type bool-array: " + fmt.Sprint(value))
-//			}
-//		}
-//	default:
-//		// Value is of custom type, must be checked at client computer level
-//		return nil
-//	}
-//	return nil
-//}
-
-//TODO handling multiple OR/AND - new issue
-//TODO front-end - new issue
 //TODO multiple errors?
 //TODO check device present
 //TODO check component present

@@ -40,8 +40,8 @@ func (p Puzzle) GetRules() []Rule {
 
 // GeneralEvent defines a general event, like start.
 type GeneralEvent struct {
-	Name  string `json:"name"`
-	Rules []Rule `json:"rules"`
+	Name  string
+	Rules []Rule
 }
 
 // GetName returns the name of a GeneralEvent
@@ -75,7 +75,7 @@ func compare(param1 interface{}, param2 interface{}, comparision string) bool {
 	case "contains":
 		return contains(param1, param2)
 	default:
-		panic(fmt.Sprintf("Cannot compare on: %s", comparision))
+		panic(fmt.Sprintf("cannot compare on: %s", comparision))
 	}
 }
 
@@ -101,9 +101,9 @@ type Device struct {
 
 // Condition is a struct that determines when rules are fired.
 type Condition struct {
-	Type        string            `json:"type"`
-	TypeID      string            `json:"type_id"`
-	Constraints LogicalConstraint `json:"constraints"`
+	Type        string
+	TypeID      string
+	Constraints LogicalConstraint
 }
 
 // CheckConstraints is a method that checks types and comparator operators
@@ -316,5 +316,3 @@ func (or OrConstraint) Resolve(condition Condition, config WorkingConfig) bool {
 	}
 	return result
 }
-
-//todo resolve on constraint

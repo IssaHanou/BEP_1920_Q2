@@ -75,17 +75,16 @@
       }
     },
     {
-      "id": "testDevice",
-      "description": "Device with all types of input for testing",
-      "input": {
-        "string": "string",
-        "bool": "bool",
-        "numeric": "numeric",
-        "num-array": "num-array",
-        "bool-array": "bool-array",
-        "string-array": "string-array",
-        "custom": "custom",
-        "timer": "timer"
+      "id": "door",
+      "description": "device that controls a door magnet through a relay",
+      "input": {},
+      "output": {
+        "door":  {
+          "type": "string",
+          "instruction": {
+            "instruction": "string"
+          }
+        }
       }
     }
   ],

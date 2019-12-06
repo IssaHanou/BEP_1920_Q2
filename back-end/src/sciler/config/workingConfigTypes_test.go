@@ -48,7 +48,7 @@ func TestPuzzle_GetRules(t *testing.T) {
 
 func Test_CompareWrongComparison(t *testing.T) {
 	assert.PanicsWithValue(t,
-		"Cannot compare on: unknown",
+		"cannot compare on: unknown",
 		func() { compare("a", "a", "unknown") },
 		"comparisons should be done on existing options like eq and gte")
 }
