@@ -290,7 +290,37 @@ func Test_CheckResolve(t *testing.T) {
 	}
 	filename := "../../../resources/testing/test_config.json"
 	assert.PanicsWithValue(t,
-		fmt.Sprintf("cannot resolve constraint %v because condition.type is an unknown type", constraint),
+		fmt.Sprintf("cannot resolve constraint %v because condition.type is an unknown type, this should already be checked when reading in the JSON", constraint),
 		func() { constraint.Resolve(condition, ReadFile(filename)) },
 		"Custom condition types are not supported!")
+}
+
+func Test_ResolveDeviceFalse(t *testing.T) {
+	filename := "../../../resources/testing/test_resolveFalse.json"
+	config := ReadFile(filename)
+	config.Devices["controlBoard"].Status["mainSwitch"] = false
+	config.Devices["controlBoard"].Status["greenSwitch"] = true
+	config.Devices["controlBoard"].Status["redSwitch"] = true
+	config.Devices["controlBoard"].Status["slider2"] = 30
+	assert.False(t, config.Puzzles[1].GetRules()[0].Conditions.Resolve(config))
+}
+
+func Test_ResolveDeviceTrue(t *testing.T) {
+	filename := "../../../resources/testing/test_resolveTrue.json"
+	config := ReadFile(filename)
+	config.Devices["controlBoard"].Status["mainSwitch"] = true
+	config.Devices["controlBoard"].Status["greenSwitch"] = true
+	config.Devices["controlBoard"].Status["redSwitch"] = true
+	config.Devices["controlBoard"].Status["slider2"] = 30
+	assert.True(t, config.Puzzles[1].GetRules()[0].Conditions.Resolve(config))
+}
+
+func Test_ResolveTimer(t *testing.T) {
+	filename := "../../../resources/testing/test_config.json"
+	config := ReadFile(filename)
+	assert.PanicsWithValue(t,
+		"cannot resolve constraint {eq  00:01:01} because condition.type is an timer type, which is not implemented yet",
+		func() { config.GeneralEvents[0].GetRules()[0].Conditions.Resolve(config) },
+		"Timers are not supported yet")
+
 }

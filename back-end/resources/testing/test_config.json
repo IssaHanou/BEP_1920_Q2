@@ -178,7 +178,7 @@
                     {
                       "component_id": "slider2",
                       "comp": "lt",
-                      "value": 30
+                      "value": 20
                     }
                   ]
                 }

@@ -198,10 +198,10 @@ func (constraint Constraint) Resolve(condition Condition, config WorkingConfig) 
 			status := device.Status[constraint.ComponentID]
 			return compare(status, constraint.Value, constraint.Comparison)
 		}
-	case "timer": //todo
-		return false
+	case "timer": //todo timer
+		panic(fmt.Sprintf("cannot resolve constraint %v because condition.type is an timer type, which is not implemented yet", constraint))
 	default:
-		panic(fmt.Sprintf("cannot resolve constraint %v because condition.type is an unknown type", constraint))
+		panic(fmt.Sprintf("cannot resolve constraint %v because condition.type is an unknown type, this should already be checked when reading in the JSON", constraint))
 	}
 }
 
