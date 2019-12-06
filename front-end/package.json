@@ -3,6 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
+    "node": "node --max-old-space-size=8192 ./node_modules/@angular/cli/bin/ng lint",
+    "fix-memory-limit": "cross-env LIMIT=16000 increase-memory-limit",
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
