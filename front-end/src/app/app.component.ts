@@ -25,17 +25,15 @@ export class AppComponent implements OnInit, OnDestroy {
   topics = ["front-end"];
   deviceList: Devices;
 
-  constructor(
-    private mqttService: MqttService,
-    private snackBar: MatSnackBar
-  ) {}
+  constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
+    this.jsonConvert = new JsonConvert();
+    this.deviceList = new Devices();
+  }
 
   ngOnInit(): void {
     for (let i = 0; i < this.topics.length; i++) {
       this.subscribeNewTopic(this.topics[i]);
     }
-    this.jsonConvert = new JsonConvert();
-    this.deviceList = new Devices();
     this.sendInstruction("send status");
   }
 
