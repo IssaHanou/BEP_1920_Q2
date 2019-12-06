@@ -51,6 +51,7 @@ func (handler *Handler) msgMapper(raw Message) {
 		{
 			handler.onStatusMsg(raw)
 			handler.openDoorBeun(raw)
+			handler.SendStatus(raw.DeviceID)
 		}
 	case "confirmation":
 		{

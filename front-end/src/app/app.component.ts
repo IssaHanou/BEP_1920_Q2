@@ -1,9 +1,11 @@
 import {Component, OnDestroy, OnInit, ViewEncapsulation} from "@angular/core";
-import {MqttService} from "ngx-mqtt";
+import {IMqttMessage, MqttService} from "ngx-mqtt";
 import {Message} from "./message";
 import {JsonConvert} from "json2typescript";
 import {MatSnackBar, MatSnackBarConfig} from '@angular/material';
 import '@angular/material/prebuilt-themes/deeppurple-amber.css'
+import {Subscription} from "rxjs";
+import {Devices} from "./components/device/devices";
 
 
 @Component({
@@ -17,13 +19,21 @@ export class AppComponent implements OnInit, OnDestroy {
   title = "S.C.I.L.E.R";
   nameOfRoom = "Super awesome escape";
   jsonConvert: JsonConvert;
+  subscription: Subscription;
+  topics = ["front-end"];
+  deviceList: Devices;
 
   constructor(private mqttService: MqttService,
-              private snackBar: MatSnackBar) {
-    this.jsonConvert = new JsonConvert()
-  }
+              private snackBar: MatSnackBar) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    for (let i = 0; i < this.topics.length; i++) {
+      this.subscribeNewTopic(this.topics[i]);
+    }
+    this.jsonConvert = new JsonConvert();
+    this.deviceList = new Devices();
+    this.sendInstruction("send status");
+  }
 
   /**
    * The purpose of this is, when the user leave the app we should cleanup our subscriptions
@@ -31,6 +41,20 @@ export class AppComponent implements OnInit, OnDestroy {
    */
   ngOnDestroy(): void {
     this.mqttService.disconnect();
+  }
+
+  /**
+   * Subscribe to topics.
+   */
+  public subscribeNewTopic(topic: string): void {
+    this.subscription = this.mqttService
+      .observe(topic)
+      .subscribe((message: IMqttMessage) => {
+        console.log("log: received on topic " + message.topic + ", message: " +
+          message.payload.toString());
+        this.processMessage(message.payload.toString());
+      });
+    console.log("log: subscribed to topic: " + topic);
   }
 
   /**
@@ -56,20 +80,24 @@ export class AppComponent implements OnInit, OnDestroy {
     let msg: Message = Message.deserialize(jsonMessage);
     switch (msg.type) {
       case "confirmation": {
-        // When the front-end receives confirmation message from client computer
-        // that instruction was completed, show the message to the user.
+        /** When the front-end receives confirmation message from client computer
+         * that instruction was completed, show the message to the user.
+         **/
         let display = "received confirmation from " + msg.deviceId
           + " for instruction: " + msg.contents["instructed"]["contents"]["instruction"];
         this.openSnackbar(display, '');
-        console.log(display);
         break;
       }
       case "instruction": {
         //TODO instructions to front-end? e.g. ask for hint
         break;
       }
+      case "status": {
+        this.deviceList.setDevice(msg.contents);
+        break;
+      }
       default:
-        console.log("invalid message type " + msg.type);
+        console.log("log: received invalid message type " + msg.type);
         break;
     }
   }
@@ -83,6 +111,6 @@ export class AppComponent implements OnInit, OnDestroy {
     let config = new MatSnackBarConfig();
     config.duration = 2000;
     config.panelClass = ["custom-snack-bar"];
-    this.snackBar.open(message, action,  config);
+    this.snackBar.open(message, action, config);
   }
 }

@@ -1,9 +1,5 @@
 @import "../assets/css/main.css";
 
 .custom-snack-bar {
-  font-family: 'din-med', sans-serif;
-}
-
-.mat-snack-bar-container {
-  min-width: 500px;
+  /*font-family: 'din-med', sans-serif;*/
 }

@@ -36,6 +36,6 @@ describe("DeviceComponent", () => {
     const tableHeaders = compiled.querySelectorAll("th");
     expect(tableHeaders.item(0).textContent).toContain("Apparaat");
     expect(tableHeaders.item(1).textContent).toContain("Connectie status");
-    expect(tableHeaders.item(2).textContent).toContain("Component status");
+    expect(tableHeaders.item(2).textContent).toContain("Onderdeel status");
   });
 });
