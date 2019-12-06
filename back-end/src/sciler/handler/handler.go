@@ -34,7 +34,6 @@ func (handler *Handler) NewHandler(client mqtt.Client, message mqtt.Message) {
 	var raw Message
 	if err := json.Unmarshal(message.Payload(), &raw); err != nil {
 		logrus.Errorf("Invalid JSON received: %v", err)
-		logrus.Error(raw)
 	}
 	handler.msgMapper(raw)
 }
@@ -49,7 +48,7 @@ func (handler *Handler) msgMapper(raw Message) {
 	case "status":
 		{
 			handler.onStatusMsg(raw)
-			//handler.openDoorBeun(raw)
+			handler.openDoorBeun(raw)
 		}
 	case "confirmation":
 		{
