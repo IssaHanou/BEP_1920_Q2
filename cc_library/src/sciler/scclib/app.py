@@ -143,7 +143,14 @@ class SccLib:
          a message from the broken for a subscribed topic.
         The message is printed and send through to the handler.
         """
-        self.logger.log(("message received: topic", message.topic, "message", str(message.payload.decode("utf-8"))))
+        self.logger.log(
+            (
+                "message received: topic",
+                message.topic,
+                "message",
+                str(message.payload.decode("utf-8")),
+            )
+        )
         self.__handle(message)
 
     def __handle(self, message):
