@@ -30,9 +30,9 @@ export class Device {
     for (const key of keys) {
       if (this.status.has(key)) {
         this.status.delete(key);
-        this.status.set(key, jsonStatus[key])
+        this.status.set(key, jsonStatus[key]);
       } else {
-        this.status.set(key, jsonStatus[key])
+        this.status.set(key, jsonStatus[key]);
       }
     }
   }

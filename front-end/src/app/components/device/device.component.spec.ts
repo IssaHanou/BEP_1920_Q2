@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { DeviceComponent } from "./device.component";
 import { MqttModule, MqttService } from "ngx-mqtt";
 import { MQTT_SERVICE_OPTIONS } from "../../app.module";
-import {FormsModule} from "@angular/forms";
+import { FormsModule } from "@angular/forms";
 
 describe("DeviceComponent", () => {
   let component: DeviceComponent;

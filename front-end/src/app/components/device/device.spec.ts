@@ -1,6 +1,5 @@
-import {Device} from "./device";
-import {DeviceComponent} from "./device.component";
-
+import { Device } from "./device";
+import { DeviceComponent } from "./device.component";
 
 describe("DeviceComponent", () => {
   let device: Device;
@@ -23,16 +22,13 @@ describe("DeviceComponent", () => {
     expect(device.connection).toBe(false);
     device.updateConnection(true);
     expect(device.connection).toBe(true);
-    }
-  );
+  });
 
   it("should set status", () => {
-    console.log(device)
-      expect(device.getValue("door")).toBe(true);
+    console.log(device);
+    expect(device.getValue("door")).toBe(true);
     const jsonData = JSON.parse(`{ "door" : false }`);
-      device.updateStatus(jsonData);
-      expect(device.connection).toBe(false);
-    }
-  );
-
+    device.updateStatus(jsonData);
+    expect(device.connection).toBe(false);
+  });
 });

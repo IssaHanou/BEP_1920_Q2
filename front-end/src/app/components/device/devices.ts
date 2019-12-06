@@ -1,4 +1,4 @@
-import {Device} from "./device";
+import { Device } from "./device";
 
 /**
  * Devices has a Map all containing all devices with a key that is the same as the id.
@@ -7,7 +7,7 @@ export class Devices {
   all: Map<string, Device>;
 
   constructor() {
-    this.all = new Map<string, Device>()
+    this.all = new Map<string, Device>();
   }
 
   /**
@@ -17,9 +17,9 @@ export class Devices {
   setDevice(jsonData) {
     if (this.all.has(jsonData.id)) {
       this.all.get(jsonData.id).updateStatus(jsonData.status);
-      this.all.get(jsonData.id).updateConnection(jsonData.connection)
+      this.all.get(jsonData.id).updateConnection(jsonData.connection);
     } else {
-      this.all.set(jsonData.id, new Device(jsonData))
+      this.all.set(jsonData.id, new Device(jsonData));
     }
   }
 
