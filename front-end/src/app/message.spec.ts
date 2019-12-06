@@ -37,7 +37,6 @@ describe("AppComponent",() => {
       "{'device_id': 'door', 'type': 'instruction', 'time_sent': '10-05-2019 15:09:14', " +
       "'contents': {'instruction': 'start'}}}}";
     jsonMsg = replaceAll(jsonMsg,"'", "\"");
-    console.log(jsonMsg);
     expect(Message.deserialize(jsonMsg)).toEqual(message);
   });
 

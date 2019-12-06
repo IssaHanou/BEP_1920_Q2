@@ -141,6 +141,22 @@ func TestMsgMapperConnectionOtherDeviceInvalid2(t *testing.T) {
 		"Device should not set connection to true on incorrect connection message")
 }
 
+func TestOnConnectionMsgFalse(t *testing.T) {
+	handler := getTestHandler()
+	msg := Message{
+		DeviceID: "TestDevice",
+		TimeSent: "",
+		Type:     "connection",
+		Contents: map[string]interface{}{
+			"connection": false,
+		},
+	}
+	handler.onConnectionMsg(msg)
+
+	assert.Equal(t, false, handler.Config.Devices["TestDevice"].Connection,
+		"Device should set connection to false on connection message")
+}
+
 func TestMsgMapperConnection(t *testing.T) {
 	handler := getTestHandler()
 	msg := Message{

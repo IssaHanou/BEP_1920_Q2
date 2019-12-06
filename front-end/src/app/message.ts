@@ -37,7 +37,6 @@ export class Message {
    */
   public static deserialize(jsonMessage: string): Message {
     let msg = JSON.parse(jsonMessage);
-    console.log(msg);
     let deviceId = msg["device_id"];
     let timeSent = msg["time_sent"];
     let dateTime = timeSent.split(" ");
