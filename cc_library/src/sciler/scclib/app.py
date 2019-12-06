@@ -3,12 +3,7 @@ import json
 
 import paho.mqtt.client as mqtt
 
-
-def on_python_log(text):
-    """
-    Manual logger for the developers.
-    """
-    print("python log: ", text)
+from cc_library.src.sciler.scclib.logger import Logger
 
 
 class SccLib:
@@ -16,7 +11,27 @@ class SccLib:
     Class SccLib sets up the connection and the right handler
     """
 
-    def __on_connect(client, userdata, flags, rc):
+    def __init__(self, config, device):
+        """
+        Initialize device with its configuration json file and python script.
+        """
+        self.device = device
+        self.config = json.load(config)
+        self.name = self.config.get("id")
+        self.info = self.config.get("description")
+        self.host = self.config.get("host")
+        self.port = self.config.get("port")
+        self.logger = Logger()
+        self.logger.log("Start of log for device: " + self.name)
+
+        self.statusChanged = self.status_changed
+        self.client = mqtt.Client(self.name)
+        self.client.on_message = self.__on_message
+        self.client.on_log = self.__on_log
+        self.client.on_connect = self.__on_connect
+        self.client.on_disconnect = self.__on_disconnect
+
+    def __on_connect(self, client, userdata, flags, rc):
         """
         When trying to connect to the broker,
         on_connect will return the result of this action.
@@ -26,12 +41,12 @@ class SccLib:
         """
         if rc == 0:
             client.connected_flag = True  # set flag
-            on_python_log("connected OK")
+            self.logger.log("connected OK")
         else:
-            on_python_log(("Bad connection Returned code=", rc))
+            self.logger.log(("bad connection, returned code=", rc))
             client.bad_connection_flag = True
 
-    def __on_disconnect(client, userdata, rc):
+    def __on_disconnect(self, client, userdata, rc):
         """
         When disconnecting from the broker, on_disconnect prints the reason.
         """
@@ -43,44 +58,26 @@ class SccLib:
         }
 
         msg = json.dumps(msg_dict)
+        # TODO what to do when publish fails
         client.publish("connection", msg)
-        on_python_log(("disconnecting reason  " + str(rc)))
+        self.logger.log(("disconnecting, reason  " + str(rc)))
         client.connected_flag = False
         client.disconnect_flag = True
+        self.logger.close()
 
     def status_changed(self, channel):
         """
         This is called from the client computer to message a status update.
         """
         log = "status changed of pin " + str(channel)
-        on_python_log(log)
+        self.logger.log(log)
         self.__send_status_message(self.device.get_status())
 
     def __on_log(self, level, buf):
         """
-        Very annoying logger that logs everything happening with the mqtt client.
+        Broker logger that logs everything happening with the mqtt client.
         """
         print(self.name, ", broker log: ", buf)
-
-    # TODO: write this in a client-computer manual
-    # config should be a file containing JSON in the format specified in the device_manual
-    # device should be an object with the following functions:
-    # - perform_instruction(contents) -> void, which should perform each instruction
-    #   (including the test instruction) given the contents of the instruction message
-    # - get_status() -> returns the status (string of json), which contains the input and output
-    def __init__(self, config, device):
-        self.device = device
-        self.config = json.load(config)
-        self.name = self.config.get("id")
-        self.info = self.config.get("description")
-        self.host = self.config.get("host")
-        self.port = self.config.get("port")
-        self.statusChanged = self.status_changed
-        self.client = mqtt.Client(self.name)
-        self.client.on_message = self.__on_message
-        self.client.on_log = self.__on_log
-        self.client.on_connect = self.__on_connect
-        self.client.on_disconnect = self.__on_disconnect
 
     def start(self):
         """
@@ -91,10 +88,10 @@ class SccLib:
     def __subscribe_topic(self, topic):
         """
         Method to call to subscribe to a topic which the
-        scclib wants to receive from the broker.
+        sciler system wants to receive from the broker.
         """
 
-        on_python_log(("subscribed to topic", topic))
+        self.logger.log(("subscribed to topic", topic))
         self.client.subscribe(topic=topic)
 
     def __send_status_message(self, msg):
@@ -112,7 +109,7 @@ class SccLib:
         msg = json.dumps(json_msg)
         # TODO what to do when publish fails
         self.client.publish("status", msg)
-        on_python_log(str("published: " + msg))
+        self.logger.log(str("published: " + msg))
 
     def __on_message(self, client, userdata, message):
         """
@@ -120,8 +117,8 @@ class SccLib:
          a message from the broken for a subscribed topic.
         The message is printed and send through to the handler.
         """
-        on_python_log(("message received ", str(message.payload.decode("utf-8"))))
-        on_python_log(("message topic=", message.topic))
+        self.logger.log(("message received ", str(message.payload.decode("utf-8"))))
+        self.logger.log(("message topic=", message.topic))
         self.__handle(message)
 
     def __connect(self):
@@ -135,7 +132,7 @@ class SccLib:
         while True:
             try:
                 self.client.connect(self.host, self.port, keepalive=60)
-                on_python_log("Connected to broker")
+                self.logger.log("connected to broker")
                 msg_dict = {
                     "device_id": self.name,
                     "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
@@ -151,12 +148,12 @@ class SccLib:
                 self.client.loop_forever()
                 break
             except ConnectionRefusedError:
-                on_python_log("alles is kapot")
+                self.logger.log("ERROR: connection was refused")
 
     def __handle(self, message):
         """
         Interpreter of incoming messages.
-        Correct scclib mapper is called with the content of the message.
+        Correct sciler mapper is called with the content of the message.
         """
         message = message.payload.decode("utf-8")
         message = json.loads(message)

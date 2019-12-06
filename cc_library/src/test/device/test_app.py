@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
 # import unittest
 
-# from cc_library.src.scclib import base_handler
+# from cc_library.src.sciler import base_handler
 
 
 # class BaseHandlerTestCase(unittest.TestCase):
