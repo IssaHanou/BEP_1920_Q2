@@ -172,7 +172,7 @@
                     },
                     {
                       "component_id": "redSwitch",
-                      "comp": "eq",
+                      "comp": "lte",
                       "value": true
                     },
                     {
@@ -266,7 +266,7 @@
           "limit": 1,
           "conditions": {
             "type": "device",
-            "type_id": "non existing",
+            "type_id": "controlBoard",
             "constraints": {
               "comp": "eq",
               "value": true,

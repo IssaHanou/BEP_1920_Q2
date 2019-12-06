@@ -152,7 +152,7 @@
           "description": "Als de grote switch wordt geflipt, worden alle condities gecheckt (tweede schuif en groene of rode switch aan) en gaat het lichtje branden en de telefoon ringt.",
           "limit": 1,
           "conditions": {
-            "operator": "AND",
+            "operator": "non existing operator",
             "list": [
               {
                 "type": "device",
@@ -266,7 +266,7 @@
           "limit": 1,
           "conditions": {
             "type": "device",
-            "type_id": "non existing",
+            "type_id": "controlBoard",
             "constraints": {
               "comp": "eq",
               "value": true,

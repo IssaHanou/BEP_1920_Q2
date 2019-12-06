@@ -176,7 +176,7 @@
                       "value": true
                     },
                     {
-                      "component_id": "slider2",
+                      "component_id": 6,
                       "comp": "lt",
                       "value": 30
                     }
@@ -266,7 +266,7 @@
           "limit": 1,
           "conditions": {
             "type": "device",
-            "type_id": "non existing",
+            "type_id": "controlBoard",
             "constraints": {
               "comp": "eq",
               "value": true,

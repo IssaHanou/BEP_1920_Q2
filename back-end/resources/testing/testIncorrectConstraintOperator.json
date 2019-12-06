@@ -158,7 +158,7 @@
                 "type": "device",
                 "type_id": "controlBoard",
                 "constraints": {
-                  "operator": "OR",
+                  "operator": "non existing operator",
                   "list": [
                     {
                       "component_id": "mainSwitch",
@@ -266,7 +266,7 @@
           "limit": 1,
           "conditions": {
             "type": "device",
-            "type_id": "non existing",
+            "type_id": "controlBoard",
             "constraints": {
               "comp": "eq",
               "value": true,

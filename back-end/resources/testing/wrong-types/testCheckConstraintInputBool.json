@@ -158,7 +158,7 @@
                 "type": "device",
                 "type_id": "controlBoard",
                 "constraints": {
-                  "operator": "OR",
+                  "operator": "AND",
                   "list": [
                     {
                       "component_id": "mainSwitch",
@@ -173,7 +173,7 @@
                     {
                       "component_id": "redSwitch",
                       "comp": "eq",
-                      "value": true
+                      "value": 1
                     },
                     {
                       "component_id": "slider2",
@@ -266,7 +266,7 @@
           "limit": 1,
           "conditions": {
             "type": "device",
-            "type_id": "non existing",
+            "type_id": "controlBoard",
             "constraints": {
               "comp": "eq",
               "value": true,

@@ -10,7 +10,7 @@
       "id": "controlBoard",
       "description": "Control board with three switches, three slides with lights and one main switch.",
       "input": {
-        "redSwitch": "boolean",
+        "redSwitch": "numeric",
         "orangeSwitch": "boolean",
         "greenSwitch": "boolean",
         "slider1": "numeric",
@@ -172,8 +172,8 @@
                     },
                     {
                       "component_id": "redSwitch",
-                      "comp": "eq",
-                      "value": true
+                      "comp": "contains",
+                      "value": 1
                     },
                     {
                       "component_id": "slider2",
@@ -266,7 +266,7 @@
           "limit": 1,
           "conditions": {
             "type": "device",
-            "type_id": "non existing",
+            "type_id": "controlBoard",
             "constraints": {
               "comp": "eq",
               "value": true,

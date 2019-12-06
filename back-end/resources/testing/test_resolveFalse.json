@@ -163,12 +163,12 @@
                     {
                       "component_id": "mainSwitch",
                       "comp": "eq",
-                      "value": true
+                      "value": false
                     },
                     {
                       "component_id": "greenSwitch",
                       "comp": "eq",
-                      "value": true
+                      "value": false
                     },
                     {
                       "component_id": "redSwitch",
@@ -182,7 +182,21 @@
                     }
                   ]
                 }
+              },               {
+                "type": "device",
+                "type_id": "controlBoard",
+                "constraints": {
+                  "operator": "OR",
+                  "list": [
+                    {
+                      "component_id": "mainSwitch",
+                      "comp": "eq",
+                      "value": true
+                    }
+                  ]
+                }
               }
+
             ]
           },
           "actions": [
@@ -266,7 +280,7 @@
           "limit": 1,
           "conditions": {
             "type": "device",
-            "type_id": "non existing",
+            "type_id": "controlBoard",
             "constraints": {
               "comp": "eq",
               "value": true,
