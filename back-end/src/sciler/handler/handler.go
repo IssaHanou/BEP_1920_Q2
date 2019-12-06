@@ -93,7 +93,7 @@ func (handler *Handler) onStatusMsg(raw Message) {
 	if !ok {
 		logrus.Warn("status message received from device " + raw.DeviceID + ", which is not in the config")
 	} else {
-		logrus.Info("status message received from: ", raw.DeviceID)
+		logrus.Info("status message received from: " + raw.DeviceID + ", status: " + fmt.Sprint(raw.Contents))
 		for k, v := range raw.Contents {
 			handler.Config.Devices[raw.DeviceID].Status[k] = v
 		}
@@ -136,6 +136,7 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 }
 
 // SendStatus sends all status and connection data of a device to the front-end.
+// Information retrieved from config.
 func (handler *Handler) SendStatus(deviceID string) {
 	message := Message{
 		DeviceID: "back-end",
@@ -152,7 +153,7 @@ func (handler *Handler) SendStatus(deviceID string) {
 	if err != nil {
 		logrus.Errorf("error occurred while constructing message to publish: %v", err)
 	} else {
-		logrus.Info("sending status data to front-end")
+		logrus.Info("sending status data to front-end: " + fmt.Sprint(message.Contents))
 		handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 	}
 
@@ -192,7 +193,7 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 	logrus.Info("instruction message received from: ", raw.DeviceID)
 	if raw.Contents["instruction"] == "test all" && raw.DeviceID == "front-end" { // TODO maybe switch again
 		message := Message{
-			DeviceID: "back-end",
+			DeviceID: raw.DeviceID,
 			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 			Type:     "instruction",
 			Contents: map[string]interface{}{

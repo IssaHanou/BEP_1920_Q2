@@ -52,8 +52,8 @@ export class AppComponent implements OnInit, OnDestroy {
       .observe(topic)
       .subscribe((message: IMqttMessage) => {
         console.log("log: received on topic " + message.topic + ", message: " +
-          message.payload.toString());
-        this.processMessage(message.payload.toString());
+          message.payload);
+        this.processMessage(message.payload.toLocaleString());
       });
     console.log("log: subscribed to topic: " + topic);
   }
@@ -110,7 +110,7 @@ export class AppComponent implements OnInit, OnDestroy {
    */
   public openSnackbar(message: string, action: string) {
     let config = new MatSnackBarConfig();
-    config.duration = 2000;
+    config.duration = 3000;
     config.panelClass = ["custom-snack-bar"];
     this.snackBar.open(message, action, config);
   }
