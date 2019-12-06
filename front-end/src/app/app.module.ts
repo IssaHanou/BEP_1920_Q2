@@ -9,6 +9,9 @@ import { PuzzleComponent } from "./components/puzzle/puzzle.component";
 import { FormsModule } from "@angular/forms";
 
 import { MqttModule, MqttService, IMqttServiceOptions } from "ngx-mqtt";
+import {MatSnackBar, MatSnackBarContainer, MatSnackBarModule} from "@angular/material/snack-bar";
+import {Overlay} from "@angular/cdk/overlay";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   hostname: "192.168.178.82",
@@ -23,7 +26,7 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     DeviceComponent,
     TimerComponent,
     ManageComponent,
-    PuzzleComponent
+    PuzzleComponent,
   ],
   exports: [
     AppComponent,
@@ -36,9 +39,12 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   imports: [
     BrowserModule,
     FormsModule,
-    MqttModule.forRoot(MQTT_SERVICE_OPTIONS)
+    MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
+    BrowserAnimationsModule,
+    MatSnackBarModule
   ],
-  providers: [MqttService],
-  bootstrap: [AppComponent]
+  providers: [MqttService, MatSnackBar, Overlay],
+  bootstrap: [AppComponent],
+  entryComponents: [MatSnackBarContainer]
 })
 export class AppModule {}

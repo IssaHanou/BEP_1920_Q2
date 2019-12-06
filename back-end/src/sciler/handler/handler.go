@@ -110,12 +110,12 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 		} else {
 			msg := original.(map[string]interface{})
 			if !value.(bool) {
-				logrus.Error("device " + raw.DeviceID + " did not complete instruction with type " +
-					fmt.Sprint(msg["contents"].(map[string]interface{})["instruction"]) +
+				logrus.Error("device " + raw.DeviceID + " did not complete instruction " +
+					fmt.Sprint(msg["contents"].(map[string]string)["instruction"]) +
 					" at " + raw.TimeSent)
 			} else {
-				logrus.Info("device " + raw.DeviceID + " completed instruction with type " +
-					fmt.Sprint(msg["contents"].(map[string]interface{})["instruction"]) +
+				logrus.Info("device " + raw.DeviceID + " completed instruction " +
+					fmt.Sprint(msg["contents"].(map[string]string)["instruction"]) +
 					" at " + raw.TimeSent)
 			}
 			// If original message to which device responded with confirmation was sent by front-end,

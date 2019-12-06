@@ -8,11 +8,14 @@ import { DeviceComponent } from "./components/device/device.component";
 import { ManageComponent } from "./components/manage/manage.component";
 import { PuzzleComponent } from "./components/puzzle/puzzle.component";
 import { TimerComponent } from "./components/timer/timer.component";
+import {MatSnackBarModule} from "@angular/material/snack-bar";
 
 describe("AppComponent", () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [FormsModule, MqttModule.forRoot(MQTT_SERVICE_OPTIONS)],
+      imports: [FormsModule,
+        MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
+        MatSnackBarModule],
       declarations: [
         AppComponent,
         HintComponent,
