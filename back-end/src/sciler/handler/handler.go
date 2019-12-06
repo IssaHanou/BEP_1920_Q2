@@ -110,7 +110,7 @@ func (handler *Handler) SendStatus(deviceID string) {
 
 }
 
-//openDoorBeun is the test function for developers to test the door and switch combo.
+// openDoorBeun is the test function for developers to test the door and switch combo.
 func (handler *Handler) openDoorBeun(raw Message) {
 	logrus.Info("status message received, checking if door needs to open.")
 	if raw.DeviceID == "controlBoard" {
