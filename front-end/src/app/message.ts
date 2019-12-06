@@ -1,4 +1,4 @@
-import {JsonObject, JsonProperty} from "json2typescript";
+import { JsonObject, JsonProperty } from "json2typescript";
 import * as moment from "moment";
 
 /**
@@ -6,13 +6,13 @@ import * as moment from "moment";
  */
 @JsonObject
 export class Message {
-  @JsonProperty('device_id')
+  @JsonProperty("device_id")
   deviceId: string;
-  @JsonProperty('type')
+  @JsonProperty("type")
   type: string;
-  @JsonProperty('time_sent')
+  @JsonProperty("time_sent")
   timeSent: string;
-  @JsonProperty('contents')
+  @JsonProperty("contents")
   contents: any;
 
   constructor(deviceId: string, type: string, date: Date, contents: any) {
@@ -42,7 +42,14 @@ export class Message {
     let dateTime = timeSent.split(" ");
     let date = dateTime[0].split("-");
     let time = dateTime[1].split(":");
-    let newDate = new Date(date[2], date[1], date[0], time[0], time[1], time[2]);
+    let newDate = new Date(
+      date[2],
+      date[1],
+      date[0],
+      time[0],
+      time[1],
+      time[2]
+    );
     let type = msg["type"];
     let contents = msg["contents"];
     return new Message(deviceId, type, newDate, contents);

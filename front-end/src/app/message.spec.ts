@@ -1,24 +1,24 @@
 import { Component, OnInit } from "@angular/core";
 import { Message } from "./message";
 
-
-describe("AppComponent",() => {
-
+describe("AppComponent", () => {
   let message: Message;
 
   beforeEach(() => {
-    message = new Message("front-end",
+    message = new Message(
+      "front-end",
       "confirmation",
       new Date(2019, 1, 5, 14, 16, 1),
       {
-        "completed": true,
-        "instructed": {
-          "device_id": "door",
-          "time_sent": "10-05-2019 15:09:14",
-          "type": "instruction",
-          "contents": {"instruction": "start"}
+        completed: true,
+        instructed: {
+          device_id: "door",
+          time_sent: "10-05-2019 15:09:14",
+          type: "instruction",
+          contents: { instruction: "start" }
         }
-      })
+      }
+    );
   });
 
   it("should create", () => {
@@ -30,17 +30,18 @@ describe("AppComponent",() => {
   });
 
   it("should deserialize json correctly", () => {
-    let jsonMsg = "{'device_id': 'front-end', " +
+    let jsonMsg =
+      "{'device_id': 'front-end', " +
       "'type': 'confirmation', " +
       "'time_sent': '05-01-2019 14:16:01', " +
       "'contents': {'completed': true, 'instructed': " +
       "{'device_id': 'door', 'type': 'instruction', 'time_sent': '10-05-2019 15:09:14', " +
       "'contents': {'instruction': 'start'}}}}";
-    jsonMsg = replaceAll(jsonMsg,"'", "\"");
+    jsonMsg = replaceAll(jsonMsg, "'", '"');
     expect(Message.deserialize(jsonMsg)).toEqual(message);
   });
 
   function replaceAll(str, find, replace) {
-    return str.replace(new RegExp(find, 'g'), replace);
+    return str.replace(new RegExp(find, "g"), replace);
   }
 });

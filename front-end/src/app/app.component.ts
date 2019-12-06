@@ -1,18 +1,20 @@
-import {Component, OnDestroy, OnInit, ViewEncapsulation} from "@angular/core";
-import {IMqttMessage, MqttService} from "ngx-mqtt";
-import {Message} from "./message";
-import {JsonConvert} from "json2typescript";
-import {MatSnackBar, MatSnackBarConfig} from '@angular/material';
-import '@angular/material/prebuilt-themes/deeppurple-amber.css'
-import {Subscription} from "rxjs";
-import {Devices} from "./components/device/devices";
-
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from "@angular/core";
+import { IMqttMessage, MqttService } from "ngx-mqtt";
+import { Message } from "./message";
+import { JsonConvert } from "json2typescript";
+import { MatSnackBar, MatSnackBarConfig } from "@angular/material";
+import "@angular/material/prebuilt-themes/deeppurple-amber.css";
+import { Subscription } from "rxjs";
+import { Devices } from "./components/device/devices";
 
 @Component({
   selector: "app-root",
   templateUrl: "./app.component.html",
-  styleUrls: ["./app.component.css", "../assets/css/main.css",
-    "../../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css"],
+  styleUrls: [
+    "./app.component.css",
+    "../assets/css/main.css",
+    "../../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css"
+  ],
   encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit, OnDestroy {
@@ -23,8 +25,10 @@ export class AppComponent implements OnInit, OnDestroy {
   topics = ["front-end"];
   deviceList: Devices;
 
-  constructor(private mqttService: MqttService,
-              private snackBar: MatSnackBar) {}
+  constructor(
+    private mqttService: MqttService,
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
     for (let i = 0; i < this.topics.length; i++) {
@@ -50,8 +54,12 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subscription = this.mqttService
       .observe(topic)
       .subscribe((message: IMqttMessage) => {
-        console.log("log: received on topic " + message.topic + ", message: " +
-          message.payload.toString());
+        console.log(
+          "log: received on topic " +
+            message.topic +
+            ", message: " +
+            message.payload.toString()
+        );
         this.processMessage(message.payload.toString());
       });
     console.log("log: subscribed to topic: " + topic);
@@ -62,14 +70,14 @@ export class AppComponent implements OnInit, OnDestroy {
    * @param instruction instruction to be sent.
    */
   public sendInstruction(instruction: string) {
-    let msg = new Message("front-end",
-      "instruction",
-      new Date(),
-      {"instruction": instruction}
-    );
-    let jsonMessage: string = this.jsonConvert.serialize(msg)
+    let msg = new Message("front-end", "instruction", new Date(), {
+      instruction: instruction
+    });
+    let jsonMessage: string = this.jsonConvert.serialize(msg);
     this.mqttService.unsafePublish("instruction", JSON.stringify(jsonMessage));
-    console.log("log: sent instruction message: " + JSON.stringify(jsonMessage))
+    console.log(
+      "log: sent instruction message: " + JSON.stringify(jsonMessage)
+    );
   }
 
   /**
@@ -83,9 +91,12 @@ export class AppComponent implements OnInit, OnDestroy {
         /** When the front-end receives confirmation message from client computer
          * that instruction was completed, show the message to the user.
          **/
-        let display = "received confirmation from " + msg.deviceId
-          + " for instruction: " + msg.contents["instructed"]["contents"]["instruction"];
-        this.openSnackbar(display, '');
+        let display =
+          "received confirmation from " +
+          msg.deviceId +
+          " for instruction: " +
+          msg.contents["instructed"]["contents"]["instruction"];
+        this.openSnackbar(display, "");
         break;
       }
       case "instruction": {

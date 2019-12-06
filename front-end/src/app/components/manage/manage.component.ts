@@ -13,26 +13,22 @@ export class ManageComponent implements OnInit {
   ngOnInit() {}
 
   onClickTestButton() {
-    this.app.sendInstruction("test all")
+    this.app.sendInstruction("test all");
   }
 
   /**
    * Test for the processing of messages, for now just a placeholder for confirming start instruction.
    */
   onClickStartButton() {
-    let msg = new Message("front-end",
-      "confirmation",
-      new Date(),
-      {
-        "completed": true,
-        "instructed": {
-          "device_id": "door",
-          "time_sent": "10-05-2019 15:09:14",
-          "type": "instruction",
-          "contents": {"instruction": "start"}
-        }
+    let msg = new Message("front-end", "confirmation", new Date(), {
+      completed: true,
+      instructed: {
+        device_id: "door",
+        time_sent: "10-05-2019 15:09:14",
+        type: "instruction",
+        contents: { instruction: "start" }
       }
-    );
+    });
     let res = this.app.jsonConvert.serialize(msg);
     this.app.processMessage(JSON.stringify(res));
   }

@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { ManageComponent } from "./manage.component";
 import { MqttModule, MqttService } from "ngx-mqtt";
-import {AppModule, MQTT_SERVICE_OPTIONS} from "../../app.module";
-import {AppComponent} from "../../app.component";
-import {MatSnackBar} from "@angular/material/snack-bar";
-import {Overlay} from "@angular/cdk/overlay";
+import { AppModule, MQTT_SERVICE_OPTIONS } from "../../app.module";
+import { AppComponent } from "../../app.component";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { Overlay } from "@angular/cdk/overlay";
 
 describe("ManageComponent", () => {
   let component: ManageComponent;
