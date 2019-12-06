@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"reflect"
 )
 
@@ -138,7 +137,7 @@ func (constraint Constraint) CheckConstraints(condition Condition, config Workin
 					case "string":
 						{
 							if valueType != reflect.String {
-								return fmt.Errorf("input type string expected but %s found as type of %v", valueType.String(), constraint.Value)
+								return fmt.Errorf("input type string expected but %s found as type of value %v", valueType.String(), constraint.Value)
 							}
 							if comparision != "eq" {
 								return fmt.Errorf("comparision %s not allowed on a string", comparision)
@@ -147,16 +146,16 @@ func (constraint Constraint) CheckConstraints(condition Condition, config Workin
 					case "boolean":
 						{
 							if valueType != reflect.Bool {
-								return fmt.Errorf("input type boolean expected but %s found as type of %v", valueType.String(), constraint.Value)
+								return fmt.Errorf("input type boolean expected but %s found as type of value %v", valueType.String(), constraint.Value)
 							}
 							if comparision != "eq" {
-								return fmt.Errorf("comparision %s not allowed on a bool", comparision)
+								return fmt.Errorf("comparision %s not allowed on a boolean", comparision)
 							}
 						}
 					case "numeric":
 						{
 							if valueType != reflect.Int && valueType != reflect.Float64 {
-								return fmt.Errorf("input type numeric expected but %s found as type of %v", valueType.String(), constraint.Value)
+								return fmt.Errorf("input type numeric expected but %s found as type of value %v", valueType.String(), constraint.Value)
 							}
 							if comparision == "contains" {
 								return fmt.Errorf("comparision %s not allowed on a numeric", comparision)
@@ -165,7 +164,7 @@ func (constraint Constraint) CheckConstraints(condition Condition, config Workin
 					case "array":
 						{
 							if valueType != reflect.Slice {
-								return fmt.Errorf("input type array expected but %s found as type of %v", valueType.String(), constraint.Value)
+								return fmt.Errorf("input type array/slice expected but %s found as type of value %v", valueType.String(), constraint.Value)
 							}
 							if comparision != "contains" && comparision != "eq" {
 								return fmt.Errorf("comparision %s not allowed on an array", comparision)
@@ -173,6 +172,7 @@ func (constraint Constraint) CheckConstraints(condition Condition, config Workin
 						}
 					default:
 						// todo custom types
+						return fmt.Errorf("custom types like: %s, are not yet implemented", inputType)
 					}
 				} else {
 					return fmt.Errorf("device with id %s not found in map", constraint.ComponentID)
@@ -182,7 +182,7 @@ func (constraint Constraint) CheckConstraints(condition Condition, config Workin
 			}
 		}
 	case "timer":
-		return nil // todo
+		return nil // todo timer
 	default:
 		return fmt.Errorf("invalid type of condition: %v", condition.Type)
 	}
@@ -201,8 +201,7 @@ func (constraint Constraint) Resolve(condition Condition, config WorkingConfig) 
 	case "timer": //todo
 		return false
 	default:
-		logrus.Errorf("cannot resolve constraint %v because condition.type is an unknown type", constraint)
-		return false
+		panic(fmt.Sprintf("cannot resolve constraint %v because condition.type is an unknown type", constraint))
 	}
 }
 
