@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from "@angular/core";
 import {Subscription} from "rxjs";
 import {IMqttMessage, MqttService} from "ngx-mqtt";
-import {Devices} from "./Devices";
+import {Devices} from "./devices";
 
 @Component({
   selector: "app-device",

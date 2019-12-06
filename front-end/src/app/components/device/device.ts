@@ -17,7 +17,7 @@ export class Device {
    * updateConnection is called on every status update to update the connections status.
    * @param connection boolean
    */
-  updateConnection(connection){
+  updateConnection(connection) {
     this.connection = connection;
   }
 
@@ -27,7 +27,6 @@ export class Device {
    */
   updateStatus(jsonStatus) {
     const keys = Object.keys(jsonStatus);
-
     for (const key of keys) {
       if (this.status.has(key)) {
         this.status.delete(key);
@@ -38,5 +37,11 @@ export class Device {
     }
   }
 
+  /**
+   * getValue returns status of specific component
+   * @param comp component id
+   */
+  getValue(comp) {
+    return this.status.get(comp);
+  }
 }
-
