@@ -66,7 +66,7 @@ This can be displayed in the front-end, so should be readable and in Dutch.
                 - `operator`: this can `AND` or `OR`
                 - `list`: this is an array of constraints / logical operators
             2.
-                - `comp`: this is the type of comparison and can be `eq`, `lt`, `gt`, `contains` , `lte`, `gte`. `eq` will work on all types, `lt`, `gt`, `lte`, `gte` only on numeric, and `contains` only on arrays
+                - `comparison`: this is the type of comparison and can be `eq`, `lt`, `gt`, `contains` , `lte`, `gte`. `eq` will work on all types, `lt`, `gt`, `lte`, `gte` only on numeric, and `contains` only on arrays
                 - `value`: this is the value on which the comparison is made. This should be in the same type as specified in the input of the device. 
                 If it has custom input, then enter value in preferred type and deal with it on the client.
                 In case of "timer" type, it should be in the format "hh:mm:ss"

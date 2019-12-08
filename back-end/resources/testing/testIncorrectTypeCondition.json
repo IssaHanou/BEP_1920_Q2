@@ -29,7 +29,7 @@
             "type": "not device or timer",
             "type_id": "timer1",
             "constraints": {
-              "comp": "eq",
+              "comparison": "eq",
               "value": "30:00"
             }
           },
