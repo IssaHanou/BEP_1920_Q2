@@ -11,6 +11,7 @@ except (RuntimeError, ModuleNotFoundError):
 
 scclib = None
 
+
 class Door(Device):
     """
     Define pin numbers to which units are connected on Pi.
@@ -66,7 +67,6 @@ class Door(Device):
         self.status = True
         scclib.statusChanged()
 
-
     def turn_off(self):
         GPIO.output(self.door, GPIO.HIGH)
         self.status = False
@@ -76,6 +76,7 @@ class Door(Device):
         GPIO.output(self.door, GPIO.LOW)
         self.status = True
         scclib.statusChanged()
+
 
 try:
     device = Door()
