@@ -54,28 +54,28 @@
   "messageInstructionTest": {
     "device_id": "controlBoard",
     "time_sent": "01-10-2019 13:59:02",
-    "type": "instruction",
+    "type": "instructions",
     "contents": {
-      "instruction": "test"
+      "instructions": "test"
     }
   },
   "messageInstructionStart": {
     "device_id": "controlBoard",
     "time_sent": "01-10-2019 13:59:02",
-    "type": "instruction",
+    "type": "instructions",
     "contents": {
-      "instruction": "start"
+      "instructions": "start"
     }
   },
   "messageInstructionOutput": {
     "device_id": "controlBoard",
     "time_sent": "01-10-2019 13:59:02",
-    "type": "instruction",
+    "type": "instructions",
     "contents": {
-      "instruction": "output",
+      "instructions": "output",
       "output": {
         "greenLight1": {
-          "instruction": "blink",
+          "instructions": "blink",
           "interval": 0.5,
           "delay": 0
         },

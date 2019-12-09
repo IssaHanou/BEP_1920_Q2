@@ -94,7 +94,7 @@ type Device struct {
 	ID          string
 	Description string
 	Input       map[string]string
-	Output      OutputObject
+	Output      map[string]OutputObject
 	Status      map[string]interface{}
 	Connection  bool
 }

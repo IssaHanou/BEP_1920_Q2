@@ -41,9 +41,9 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, error) {
 	config.Puzzles = generatePuzzles(readConfig.Puzzles)
 	config.GeneralEvents = generateGeneralEvents(readConfig.GeneralEvents)
 	config.Devices = make(map[string]Device)
-	for _, d := range readConfig.Devices {
-		config.Devices[d.ID] = Device{d.ID, d.Description, d.Input,
-			d.Output, make(map[string]interface{}), false}
+	for _, readDevice := range readConfig.Devices {
+		config.Devices[readDevice.ID] = Device{readDevice.ID, readDevice.Description, readDevice.Input,
+			readDevice.Output, make(map[string]interface{}), false}
 	}
 
 	return config, checkConfig(config)
@@ -192,7 +192,7 @@ func generateLogicalConstraint(constraints interface{}) LogicalConstraint {
 //	for _, a := range actions {
 //		output := a.Message.Output
 //		if a.Type == "timer" {
-//			instruction, ok := output["instruction"]
+//			instruction, ok := output["instructions"]
 //			if !ok {
 //				return actions, errors.New("timer should have an instruction defined")
 //			}

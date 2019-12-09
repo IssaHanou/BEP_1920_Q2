@@ -43,7 +43,7 @@ func (handler *Handler) NewHandler(client mqtt.Client, message mqtt.Message) {
 // msgMapper sends the right message through to the right function
 func (handler *Handler) msgMapper(raw Message) {
 	switch raw.Type {
-	case "instruction":
+	case "instructions":
 		{
 			handler.onInstructionMsg(raw)
 		}
@@ -113,11 +113,11 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 			msg := original.(map[string]interface{})
 			if !value.(bool) {
 				logrus.Error("device " + raw.DeviceID + " did not complete instruction " +
-					fmt.Sprint(msg["contents"].(map[string]interface{})["instruction"]) +
+					fmt.Sprint(msg["contents"].(map[string]interface{})["instructions"]) +
 					" at " + raw.TimeSent)
 			} else {
 				logrus.Info("device " + raw.DeviceID + " completed instruction " +
-					fmt.Sprint(msg["contents"].(map[string]interface{})["instruction"]) +
+					fmt.Sprint(msg["contents"].(map[string]interface{})["instructions"]) +
 					" at " + raw.TimeSent)
 			}
 			// If original message to which device responded with confirmation was sent by front-end,
@@ -171,9 +171,9 @@ func (handler *Handler) openDoorBeun(raw Message) {
 			message := Message{
 				DeviceID: "back-end",
 				TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-				Type:     "instruction",
+				Type:     "instructions",
 				Contents: map[string]interface{}{
-					"instruction": instruction,
+					"instructions": instruction,
 				},
 			}
 			jsonMessage, err := json.Marshal(&message)
@@ -189,13 +189,13 @@ func (handler *Handler) openDoorBeun(raw Message) {
 //onInstructionMsg is the function to process instruction messages.
 func (handler *Handler) onInstructionMsg(raw Message) {
 	logrus.Info("instruction message received from: ", raw.DeviceID)
-	if raw.Contents["instruction"] == "test all" && raw.DeviceID == "front-end" { // TODO maybe switch again
+	if raw.Contents["instructions"] == "test all" && raw.DeviceID == "front-end" { // TODO maybe switch again
 		message := Message{
 			DeviceID: raw.DeviceID,
 			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-			Type:     "instruction",
+			Type:     "instructions",
 			Contents: map[string]interface{}{
-				"instruction": "test",
+				"instructions": "test",
 			},
 		}
 		jsonMessage, err := json.Marshal(&message)
@@ -205,7 +205,7 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 			handler.Communicator.Publish("test", string(jsonMessage), 3)
 		}
 	}
-	if raw.Contents["instruction"] == "send status" && raw.DeviceID == "front-end" {
+	if raw.Contents["instructions"] == "send status" && raw.DeviceID == "front-end" {
 		for _, value := range handler.Config.Devices {
 			handler.SendStatus(value.ID)
 		}

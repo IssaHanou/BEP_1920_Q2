@@ -229,8 +229,8 @@ func TestOnConfirmationMsgTrue(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]interface{}{"instruction": "test"},
-				"type":      "instruction",
+				"contents":  map[string]interface{}{"instructions": "test"},
+				"type":      "instructions",
 			},
 		},
 	}
@@ -249,8 +249,8 @@ func TestOnConfirmationMsgFalse(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]interface{}{"instruction": "test"},
-				"type":      "instruction",
+				"contents":  map[string]interface{}{"instructions": "test"},
+				"type":      "instructions",
 			},
 		},
 	}
@@ -269,8 +269,8 @@ func TestOnConfirmationMsgIncorrect1(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]interface{}{"instruction": "test"},
-				"type":      "instruction",
+				"contents":  map[string]interface{}{"instructions": "test"},
+				"type":      "instructions",
 			},
 		},
 	}
@@ -286,11 +286,11 @@ func TestOnConfirmationMsgIncorrect2(t *testing.T) {
 		Type:     "confirmation",
 		Contents: map[string]interface{}{
 			"completed": true,
-			"instruction": map[string]interface{}{
+			"instructions": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]interface{}{"instruction": "test"},
-				"type":      "instruction",
+				"contents":  map[string]interface{}{"instructions": "test"},
+				"type":      "instructions",
 			},
 		},
 	}
@@ -309,8 +309,8 @@ func TestOnConfirmationMsgIncorrect3(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]interface{}{"instruction": "test"},
-				"type":      "instruction",
+				"contents":  map[string]interface{}{"instructions": "test"},
+				"type":      "instructions",
 			},
 		},
 	}
@@ -329,8 +329,8 @@ func TestMsgMapperConfirmation(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]interface{}{"instruction": "test"},
-				"type":      "instruction",
+				"contents":  map[string]interface{}{"instructions": "test"},
+				"type":      "instructions",
 			},
 		},
 	}

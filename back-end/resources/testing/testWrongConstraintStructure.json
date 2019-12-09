@@ -21,42 +21,42 @@
       "output": {
         "greenLight1": {
           "type": "string",
-          "instruction": {
+          "instructions": {
             "interval": "numeric",
             "delay": "numeric"
           }
         },
         "greenLight2": {
           "type": "string",
-          "instruction": {
+          "instructions": {
             "interval": "numeric",
             "delay": "numeric"
           }
         },
         "greenLight3": {
           "type": "string",
-          "instruction": {
+          "instructions": {
             "interval": "numeric",
             "delay": "numeric"
           }
         },
         "redLight1": {
           "type": "string",
-          "instruction": {
+          "instructions": {
             "interval": "numeric",
             "delay": "numeric"
           }
         },
         "redLight2": {
           "type": "string",
-          "instruction": {
+          "instructions": {
             "interval": "numeric",
             "delay": "numeric"
           }
         },
         "redLight3": {
           "type": "string",
-          "instruction": {
+          "instructions": {
             "interval": "numeric",
             "delay": "numeric"
           }
@@ -110,7 +110,7 @@
                 "message": {
                   "output": {
                     "greenLight1": {
-                      "instruction": "blink",
+                      "instructions": "blink",
                       "interval": 0.5,
                       "delay": 0
                     },
@@ -119,7 +119,7 @@
                     "redLight1": false,
                     "redLight2": false,
                     "redLight3": {
-                      "instruction": "blink",
+                      "instructions": "blink",
                       "interval": 0.5,
                       "delay": 0
                     }
@@ -239,7 +239,7 @@
               "type_id": "timer1",
               "message": {
                 "output": {
-                  "instruction": "stop"
+                  "instructions": "stop"
                 }
               }
             }
