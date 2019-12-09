@@ -25,18 +25,14 @@
           "id": "correctSequence",
           "description": "De juiste volgorde van cijfers moet gedraaid worden.",
           "limit": 1,
-          "conditions": [
-            {
-              "type": "mytype",
-              "type_id": "timer1",
-              "constraints": [
-                {
-                  "comp": "eq",
-                  "value": "30:00"
-                }
-              ]
+          "conditions": {
+            "type": "not device or timer",
+            "type_id": "timer1",
+            "constraints": {
+              "comparison": "eq",
+              "value": "30:00"
             }
-          ],
+          },
           "actions": []
         }
       ]

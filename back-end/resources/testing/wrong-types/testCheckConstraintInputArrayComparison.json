@@ -10,7 +10,7 @@
       "id": "controlBoard",
       "description": "Control board with three switches, three slides with lights and one main switch.",
       "input": {
-        "redSwitch": "boolean",
+        "redSwitch": "array",
         "orangeSwitch": "boolean",
         "greenSwitch": "boolean",
         "slider1": "numeric",
@@ -172,13 +172,13 @@
                     },
                     {
                       "component_id": "redSwitch",
-                      "comparison": "eq",
-                      "value": true
+                      "comparison": "lte",
+                      "value": [true, false, true, true, true]
                     },
                     {
                       "component_id": "slider2",
                       "comparison": "lt",
-                      "value": 20
+                      "value": 30
                     }
                   ]
                 }

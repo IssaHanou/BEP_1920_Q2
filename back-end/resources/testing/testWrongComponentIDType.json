@@ -176,9 +176,9 @@
                       "value": true
                     },
                     {
-                      "component_id": "slider2",
+                      "component_id": 6,
                       "comparison": "lt",
-                      "value": 20
+                      "value": 30
                     }
                   ]
                 }
