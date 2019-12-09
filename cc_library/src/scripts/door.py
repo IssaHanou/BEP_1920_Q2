@@ -55,17 +55,11 @@ class Door(Device):
 
     def test(self):
         for i in range(0, 2):
-            GPIO.output(self.door, GPIO.LOW)
-            self.status = True
-            scclib.statusChanged()
+            self.turn_on()
             time.sleep(2)
-            GPIO.output(self.door, GPIO.HIGH)
-            self.status = False
-            scclib.statusChanged()
+            self.turn_off()
             time.sleep(2)
-        GPIO.output(self.door, GPIO.LOW)
-        self.status = True
-        scclib.statusChanged()
+        self.turn_on()
 
     def turn_off(self):
         GPIO.output(self.door, GPIO.HIGH)
