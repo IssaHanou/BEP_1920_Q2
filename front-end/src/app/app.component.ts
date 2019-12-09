@@ -12,7 +12,7 @@ import { Devices } from "./components/device/devices";
   templateUrl: "./app.component.html",
   styleUrls: [
     "./app.component.css",
-    "../assets/css/main.css",
+    "../assets/css/main.css"
     // "../../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css"
   ],
   encapsulation: ViewEncapsulation.None
@@ -69,7 +69,7 @@ export class AppComponent implements OnInit, OnDestroy {
    */
   public sendInstruction(instruction: string) {
     const msg = new Message("front-end", "instruction", new Date(), {
-      instruction,
+      instruction
     });
     const jsonMessage: string = this.jsonConvert.serialize(msg);
     this.mqttService.unsafePublish("instruction", JSON.stringify(jsonMessage));
