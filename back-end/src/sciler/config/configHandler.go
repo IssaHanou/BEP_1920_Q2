@@ -164,17 +164,17 @@ func generateLogicalConstraint(constraints interface{}) LogicalConstraint {
 		} else {
 			panic(fmt.Sprintf("JSON config in wrong format, operator: %v, could not be processed", logic["operator"]))
 		}
-	} else if logic["comp"] != nil && reflect.TypeOf(logic["comp"]).Kind() == reflect.String {
+	} else if logic["comparison"] != nil && reflect.TypeOf(logic["comparison"]).Kind() == reflect.String {
 		var constraint Constraint
 		if logic["component_id"] != nil && reflect.TypeOf(logic["component_id"]).Kind() == reflect.String {
 			constraint = Constraint{
-				Comparison:  logic["comp"].(string),
+				Comparison:  logic["comparison"].(string),
 				ComponentID: logic["component_id"].(string),
 				Value:       logic["value"],
 			}
 		} else if logic["component_id"] == nil {
 			constraint = Constraint{
-				Comparison:  logic["comp"].(string),
+				Comparison:  logic["comparison"].(string),
 				ComponentID: "",
 				Value:       logic["value"],
 			}

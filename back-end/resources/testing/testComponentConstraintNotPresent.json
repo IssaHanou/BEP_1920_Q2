@@ -29,7 +29,7 @@
             "type": "device",
             "type_id": "ledLights",
             "constraints": {
-              "comp": "eq",
+              "comparison": "eq",
               "component_id": "non existing",
               "value": true
             }

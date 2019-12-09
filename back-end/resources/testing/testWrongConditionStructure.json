@@ -101,7 +101,7 @@
             "type": "device",
             "type_id": "telephone",
             "constraints": {
-              "comp": "eq",
+              "comparison": "eq",
               "component_id": "turningWheel",
               "value": [
                 0,
@@ -202,7 +202,7 @@
                   "operator": "AND",
                   "list": [
                     {
-                      "comp": "eq",
+                      "comparison": "eq",
                       "value": "00:01:01"
                     }
                   ]
@@ -235,7 +235,7 @@
             "type": "device",
             "type_id": "controlBoard",
             "constraints": {
-              "comp": "eq",
+              "comparison": "eq",
               "value": true,
               "component_id": "mainSwitch"
             }

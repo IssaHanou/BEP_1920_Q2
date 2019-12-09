@@ -195,7 +195,7 @@
                   "operator": "AND",
                   "list": [
                     {
-                      "comp": "eq",
+                      "comparison": "eq",
                       "value": "00:01:01"
                     }
                   ]
@@ -228,7 +228,7 @@
             "type": "device",
             "type_id": "controlBoard",
             "constraints": {
-              "comp": "eq",
+              "comparison": "eq",
               "value": true,
               "component_id": "mainSwitch"
             }

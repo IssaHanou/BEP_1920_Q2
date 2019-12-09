@@ -102,7 +102,7 @@
             "type_id": "telephone",
             "constraints":
             {
-              "comp": "eq",
+              "comparison": "eq",
               "component_id": "turningWheel",
               "value": [
                 0,
@@ -162,22 +162,22 @@
                   "list": [
                     {
                       "component_id": "mainSwitch",
-                      "comp": "eq",
+                      "comparison": "eq",
                       "value": true
                     },
                     {
                       "component_id": "greenSwitch",
-                      "comp": "eq",
+                      "comparison": "eq",
                       "value": true
                     },
                     {
                       "component_id": "redSwitch",
-                      "comp": "lte",
+                      "comparison": "lte",
                       "value": "some string"
                     },
                     {
                       "component_id": "slider2",
-                      "comp": "lt",
+                      "comparison": "lt",
                       "value": 30
                     }
                   ]
@@ -235,7 +235,7 @@
                   "operator": "AND",
                   "list": [
                     {
-                      "comp": "eq",
+                      "comparison": "eq",
                       "value": "00:01:01"
                     }
                   ]
@@ -268,7 +268,7 @@
             "type": "device",
             "type_id": "controlBoard",
             "constraints": {
-              "comp": "eq",
+              "comparison": "eq",
               "value": true,
               "component_id": "mainSwitch"
             }
