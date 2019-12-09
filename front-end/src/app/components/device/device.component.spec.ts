@@ -3,6 +3,9 @@ import { DeviceComponent } from "./device.component";
 import { MqttModule, MqttService } from "ngx-mqtt";
 import { MQTT_SERVICE_OPTIONS } from "../../app.module";
 import { FormsModule } from "@angular/forms";
+import { AppComponent } from "../../app.component";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { Overlay } from "@angular/cdk/overlay";
 
 describe("DeviceComponent", () => {
   let component: DeviceComponent;
@@ -12,7 +15,7 @@ describe("DeviceComponent", () => {
     TestBed.configureTestingModule({
       imports: [FormsModule, MqttModule.forRoot(MQTT_SERVICE_OPTIONS)],
       declarations: [DeviceComponent],
-      providers: [MqttService]
+      providers: [MqttService, AppComponent, MatSnackBar, Overlay]
     }).compileComponents();
   }));
 
@@ -36,6 +39,6 @@ describe("DeviceComponent", () => {
     const tableHeaders = compiled.querySelectorAll("th");
     expect(tableHeaders.item(0).textContent).toContain("Apparaat");
     expect(tableHeaders.item(1).textContent).toContain("Connectie status");
-    expect(tableHeaders.item(2).textContent).toContain("Component status");
+    expect(tableHeaders.item(2).textContent).toContain("Onderdeel status");
   });
 });

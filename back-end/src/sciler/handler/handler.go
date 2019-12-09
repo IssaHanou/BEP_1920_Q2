@@ -2,8 +2,10 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/sirupsen/logrus"
+	"reflect"
 	"sciler/communication"
 	"sciler/config"
 	"time"
@@ -33,7 +35,7 @@ func (handler *Handler) NewHandler(client mqtt.Client, message mqtt.Message) {
 	// TODO: Make advanced message handler which acts according to the events / configuration
 	var raw Message
 	if err := json.Unmarshal(message.Payload(), &raw); err != nil {
-		logrus.Errorf("Invalid JSON received: %v", err)
+		logrus.Errorf("invalid JSON received: %v", err)
 	}
 	handler.msgMapper(raw)
 }
@@ -49,10 +51,11 @@ func (handler *Handler) msgMapper(raw Message) {
 		{
 			handler.onStatusMsg(raw)
 			handler.openDoorBeun(raw)
+			handler.SendStatus(raw.DeviceID)
 		}
 	case "confirmation":
 		{
-			logrus.Info("confirmation message received from: ", raw.DeviceID)
+			handler.onConfirmationMsg(raw)
 		}
 	case "connection":
 		{
@@ -60,7 +63,8 @@ func (handler *Handler) msgMapper(raw Message) {
 		}
 	default:
 		{
-			logrus.Error("message received from ", raw.DeviceID, ", but no message type could be found: ", raw.Type)
+			logrus.Error("message received from ", raw.DeviceID,
+				", but no message type could be found for: ", raw.Type)
 		}
 	}
 
@@ -68,26 +72,69 @@ func (handler *Handler) msgMapper(raw Message) {
 
 //onConnectionMsg is the function to process connection messages.
 func (handler *Handler) onConnectionMsg(raw Message) {
-	logrus.Info("connection message received from:", raw.DeviceID)
-	con := handler.Config.Devices[raw.DeviceID]
-	con.Connection = raw.Contents["connection"].(bool)
-	handler.Config.Devices[raw.DeviceID] = con
-	handler.SendStatus(raw.DeviceID)
+	device, ok := handler.Config.Devices[raw.DeviceID]
+	if !ok {
+		logrus.Warn("connection message received from device " + raw.DeviceID + ", which is not in the config")
+	} else {
+		logrus.Info("connection message received from: ", raw.DeviceID)
+		value, ok2 := raw.Contents["connection"]
+		if !ok2 || reflect.TypeOf(value).Kind() != reflect.Bool {
+			logrus.Error("received improperly structured connection message from device " + raw.DeviceID)
+		}
+		device.Connection = value.(bool)
+		handler.Config.Devices[raw.DeviceID] = device
+		handler.SendStatus(raw.DeviceID)
+	}
 }
 
 //onStatusMsg is the function to process status messages.
 func (handler *Handler) onStatusMsg(raw Message) {
-	logrus.Info("status  message received from: ", raw.DeviceID)
-	for k, v := range raw.Contents {
-		handler.Config.Devices[raw.DeviceID].Status[k] = v
+	_, ok := handler.Config.Devices[raw.DeviceID]
+	if !ok {
+		logrus.Warn("status message received from device " + raw.DeviceID + ", which is not in the config")
+	} else {
+		logrus.Info("status message received from: " + raw.DeviceID + ", status: " + fmt.Sprint(raw.Contents))
+		for k, v := range raw.Contents {
+			handler.Config.Devices[raw.DeviceID].Status[k] = v
+		}
+	}
+}
+
+//onConfirmationMsg is the function to process confirmation messages.
+func (handler *Handler) onConfirmationMsg(raw Message) {
+	value, ok := raw.Contents["completed"]
+	if !ok || reflect.TypeOf(value).Kind() != reflect.Bool {
+		logrus.Error("received improperly structured confirmation message from device " + raw.DeviceID)
+	} else {
+		original, ok := raw.Contents["instructed"]
+		if !ok {
+			logrus.Error("received improperly structured confirmation message from device " + raw.DeviceID)
+		} else {
+			msg := original.(map[string]interface{})
+			if !value.(bool) {
+				logrus.Error("device " + raw.DeviceID + " did not complete instruction " +
+					fmt.Sprint(msg["contents"].(map[string]interface{})["instruction"]) +
+					" at " + raw.TimeSent)
+			} else {
+				logrus.Info("device " + raw.DeviceID + " completed instruction " +
+					fmt.Sprint(msg["contents"].(map[string]interface{})["instruction"]) +
+					" at " + raw.TimeSent)
+			}
+			// If original message to which device responded with confirmation was sent by front-end,
+			// pass confirmation through
+			if msg["device_id"] == "front-end" {
+				jsonMessage, _ := json.Marshal(raw)
+				handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+			}
+		}
 	}
 	con := handler.Config.Devices[raw.DeviceID]
 	con.Connection = true
 	handler.Config.Devices[raw.DeviceID] = con
-	handler.SendStatus(raw.DeviceID)
 }
 
 // SendStatus sends all status and connection data of a device to the front-end.
+// Information retrieved from config.
 func (handler *Handler) SendStatus(deviceID string) {
 	message := Message{
 		DeviceID: "back-end",
@@ -102,9 +149,9 @@ func (handler *Handler) SendStatus(deviceID string) {
 
 	jsonMessage, err := json.Marshal(&message)
 	if err != nil {
-		logrus.Errorf("Error occurred while constructing message to publish: %v", err)
+		logrus.Errorf("error occurred while constructing message to publish: %v", err)
 	} else {
-		logrus.Info("Sending status data to front-end")
+		logrus.Info("sending status data to front-end: " + fmt.Sprint(message.Contents))
 		handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 	}
 
@@ -112,12 +159,12 @@ func (handler *Handler) SendStatus(deviceID string) {
 
 // openDoorBeun is the test function for developers to test the door and switch combo.
 func (handler *Handler) openDoorBeun(raw Message) {
-	logrus.Info("status message received, checking if door needs to open.")
+	logrus.Info("checking if door needs to open based on received status message")
 	if raw.DeviceID == "controlBoard" {
 		var instruction string
-		if raw.Contents["mainSwitch"] == "1" {
+		if raw.Contents["mainSwitch"] == float64(0) {
 			instruction = "turn off"
-		} else if raw.Contents["mainSwitch"] == "0" {
+		} else if raw.Contents["mainSwitch"] == float64(1) {
 			instruction = "turn on"
 		}
 		if instruction != "" {
@@ -131,9 +178,9 @@ func (handler *Handler) openDoorBeun(raw Message) {
 			}
 			jsonMessage, err := json.Marshal(&message)
 			if err != nil {
-				logrus.Errorf("Error occurred while constructing message to publish: %v", err)
+				logrus.Errorf("error occurred while constructing message to publish: %v", err)
 			} else {
-				handler.Communicator.Publish("test", string(jsonMessage), 3)
+				handler.Communicator.Publish("door", string(jsonMessage), 3)
 			}
 		}
 	}
@@ -144,7 +191,7 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 	logrus.Info("instruction message received from: ", raw.DeviceID)
 	if raw.Contents["instruction"] == "test all" && raw.DeviceID == "front-end" { // TODO maybe switch again
 		message := Message{
-			DeviceID: "back-end",
+			DeviceID: raw.DeviceID,
 			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 			Type:     "instruction",
 			Contents: map[string]interface{}{
@@ -153,7 +200,7 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 		}
 		jsonMessage, err := json.Marshal(&message)
 		if err != nil {
-			logrus.Errorf("Error occurred while constructing message to publish: %v", err)
+			logrus.Errorf("error occurred while constructing message to publish: %v", err)
 		} else {
 			handler.Communicator.Publish("test", string(jsonMessage), 3)
 		}

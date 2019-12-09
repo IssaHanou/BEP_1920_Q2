@@ -2,12 +2,17 @@
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.3.19.
 
 # Installation
+In `front-end` module.
+### Set-up dependencies
+````
+    npm install
+````
 ### Set-up mqtt library
 ````
     npm install ngx-mqtt --save
 ````
 
-### setup prettier
+### Set-up prettier
 ```
     npm install --save-dev --save-exact prettier
     npm install --save-dev tslint-config-prettier

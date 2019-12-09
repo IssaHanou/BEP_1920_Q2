@@ -1,7 +1,6 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
-import { Subscription } from "rxjs";
-import { IMqttMessage, MqttService } from "ngx-mqtt";
-import { Devices } from "./devices";
+import { Component, OnInit } from "@angular/core";
+import { Device } from "./device";
+import { AppComponent } from "../../app.component";
 
 @Component({
   selector: "app-device",
@@ -9,60 +8,16 @@ import { Devices } from "./devices";
   styleUrls: ["./device.component.css", "../../../assets/css/main.css"]
 })
 export class DeviceComponent implements OnInit {
-  msg: IMqttMessage;
-  private subscription: Subscription;
-  topicname = "front-end";
-  deviceList: Devices;
+  constructor(private app: AppComponent) {}
 
-  onMessageArrived(message) {
-    let jsonData = JSON.parse(message);
-    jsonData = jsonData.contents;
-    this.deviceList.setDevice(jsonData);
-  }
+  ngOnInit() {}
 
-  subscribeNewTopic(): void {
-    console.log("inside subscribe new topic");
-    this.subscription = this.mqttService
-      .observe(this.topicname)
-      .subscribe((message: IMqttMessage) => {
-        this.msg = message;
-        console.log(
-          "Message: " +
-            message.payload.toString() +
-            "<br> for topic: " +
-            message.topic
-        );
-        this.onMessageArrived(message.payload);
-      });
-    console.log("subscribed to topic: " + this.topicname);
-  }
-
-  constructor(private mqttService: MqttService) {
-    this.subscribeNewTopic();
-  }
-
-  ngOnInit() {
-    this.deviceList = new Devices();
-    const now = new Date();
-    const message = {
-      device_id: "front-end",
-      time_sent:
-        now.getDate() +
-        "-" +
-        (now.getMonth() + 1) +
-        "-" +
-        now.getFullYear() +
-        " " +
-        now.getHours() +
-        ":" +
-        now.getMinutes() +
-        ":" +
-        now.getSeconds(),
-      type: "instruction",
-      contents: {
-        instruction: "send status"
-      }
-    };
-    this.mqttService.unsafePublish("back-end", JSON.stringify(message));
+  public getDeviceStatus(): Device[] {
+    const devices: Device[] = [];
+    for (const device of this.app.deviceList.all.values()) {
+      devices.push(device);
+    }
+    devices.sort((a: Device, b: Device) => a.id.localeCompare(b.id));
+    return devices;
   }
 }

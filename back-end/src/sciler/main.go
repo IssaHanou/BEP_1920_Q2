@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-var topics = []string{"back-end", "status", "hint", "connect"}
+var topics = []string{"back-end", "hint", "status", "connection", "confirmation", "instruction"}
 
 func main() {
 	dir, dirErr := os.Getwd()
@@ -35,14 +35,14 @@ func main() {
 	port := configurations.General.Port
 
 	communicator := communication.NewCommunicator(host, port, topics)
-	handler := handler.GetHandler(configurations, *communicator)
+	messageHandler := handler.GetHandler(configurations, *communicator)
+	go communicator.Start(messageHandler.NewHandler)
 
-	go communicator.Start(handler.NewHandler)
-	for _, value := range handler.Config.Devices {
-		handler.SendStatus(value.ID)
+	for _, value := range messageHandler.Config.Devices {
+		messageHandler.SendStatus(value.ID)
 	}
 	// loop for now preventing app to exit
 	for {
-		time.Sleep(time.Microsecond * time.Duration(250))
+		time.Sleep(time.Microsecond * time.Duration(10))
 	}
 }

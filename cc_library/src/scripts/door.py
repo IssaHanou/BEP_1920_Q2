@@ -9,6 +9,8 @@ try:
 except (RuntimeError, ModuleNotFoundError):
     from fake_rpi.RPi import GPIO
 
+scclib = None
+
 
 class Door(Device):
     """
@@ -19,45 +21,57 @@ class Door(Device):
     door = 17
     GPIO.setup(door, GPIO.OUT)
 
+    status = False
+
     def get_status(self):
         """
         Return status of the door.
         """
         status = "{"
-        status += "'door': " + str(GPIO.input(self.door))
+        status += "'door': "
+        if self.status:
+            status += "'open'"
+        else:
+            status += "'closed'"
         status += "}"
         return status
 
     def perform_instruction(self, contents):
         """
         Set here the mapping from messages to methods.
+        Should return warning when illegal instruction was sent
+        or instruction could not be performed.
         """
         instruction = contents.get("instruction")
         if instruction == "test":
             self.test()
         elif instruction == "turn off":
-            self.turn_off(contents)
+            self.turn_off()
         elif instruction == "turn on":
-            self.turn_on(contents),
+            self.turn_on()
+        else:
+            return True
+        return False
 
     def test(self):
         for i in range(0, 2):
-            GPIO.output(self.door, GPIO.LOW)
+            self.turn_on()
             time.sleep(2)
-            GPIO.output(self.door, GPIO.HIGH)
+            self.turn_off()
             time.sleep(2)
+        self.turn_on()
+
+    def turn_off(self):
+        GPIO.output(self.door, GPIO.HIGH)
+        self.status = False
+        scclib.statusChanged()
+
+    def turn_on(self):
         GPIO.output(self.door, GPIO.LOW)
-
-    def turn_off(self, data):
-        door = getattr(self, data.get("door"))
-        GPIO.output(door, GPIO.HIGH)
-
-    def turn_on(self, data):
-        door = getattr(self, data.get("door"))
-        GPIO.output(door, GPIO.LOW)
+        self.status = True
+        scclib.statusChanged()
 
 
-scclib = None
 try:
     device = Door()
 

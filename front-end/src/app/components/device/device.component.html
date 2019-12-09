@@ -6,11 +6,11 @@
       <tr>
         <th>Apparaat</th>
         <th>Connectie status</th>
-        <th>Component status</th>
+        <th>Onderdeel status</th>
       </tr>
       </thead>
       <tbody>
-              <tr *ngFor="let dev of deviceList.all.values() ">
+          <tr *ngFor="let dev of getDeviceStatus()">
               <td>{{ dev.id }}</td>
               <td>{{ dev.connection }}</td>
                 <td>

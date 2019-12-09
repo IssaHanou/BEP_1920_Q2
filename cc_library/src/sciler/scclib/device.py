@@ -18,6 +18,8 @@ class Device:
         """
         Defines how instructions are handled.
         :param contents: contains instruction tag and calls the appropriate functions.
+        :return boolean: True if instruction was valid and False if illegal instruction
+        was sent or error occurred such that instruction could not be performed.
         """
 
     @abstractmethod
