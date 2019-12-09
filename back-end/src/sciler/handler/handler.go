@@ -122,7 +122,6 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 			}
 			// If original message to which device responded with confirmation was sent by front-end,
 			// pass confirmation through
-			//TODO is this what we want because device id is changed to back-end
 			if msg["device_id"] == "front-end" {
 				jsonMessage, _ := json.Marshal(raw)
 				handler.Communicator.Publish("front-end", string(jsonMessage), 3)
