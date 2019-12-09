@@ -13,8 +13,8 @@ export class DeviceComponent implements OnInit {
   ngOnInit() {}
 
   public getDeviceStatus(): Device[] {
-    let devices: Device[] = [];
-    for (let device of this.app.deviceList.all.values()) {
+    const devices: Device[] = [];
+    for (const device of this.app.deviceList.all.values()) {
       devices.push(device);
     }
     devices.sort((a: Device, b: Device) => a.id.localeCompare(b.id));

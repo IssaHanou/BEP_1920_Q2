@@ -20,7 +20,7 @@ export class ManageComponent implements OnInit {
    * Test for the processing of messages, for now just a placeholder for confirming start instruction.
    */
   onClickStartButton() {
-    let msg = new Message("front-end", "confirmation", new Date(), {
+    const msg = new Message("front-end", "confirmation", new Date(), {
       completed: true,
       instructed: {
         device_id: "door",
@@ -29,7 +29,7 @@ export class ManageComponent implements OnInit {
         contents: { instruction: "start" }
       }
     });
-    let res = this.app.jsonConvert.serialize(msg);
+    const res = this.app.jsonConvert.serialize(msg);
     this.app.processMessage(JSON.stringify(res));
   }
 }

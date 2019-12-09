@@ -13,7 +13,7 @@ import { Devices } from "./components/device/devices";
   styleUrls: [
     "./app.component.css",
     "../assets/css/main.css",
-    "../../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css"
+    // "../../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css"
   ],
   encapsulation: ViewEncapsulation.None
 })
@@ -31,8 +31,8 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    for (let i = 0; i < this.topics.length; i++) {
-      this.subscribeNewTopic(this.topics[i]);
+    for (const topic of this.topics) {
+      this.subscribeNewTopic(topic);
     }
     this.sendInstruction("send status");
   }
@@ -68,10 +68,10 @@ export class AppComponent implements OnInit, OnDestroy {
    * @param instruction instruction to be sent.
    */
   public sendInstruction(instruction: string) {
-    let msg = new Message("front-end", "instruction", new Date(), {
+    const msg = new Message("front-end", "instruction", new Date(), {
       instruction: instruction
     });
-    let jsonMessage: string = this.jsonConvert.serialize(msg);
+    const jsonMessage: string = this.jsonConvert.serialize(msg);
     this.mqttService.unsafePublish("instruction", JSON.stringify(jsonMessage));
     console.log(
       "log: sent instruction message: " + JSON.stringify(jsonMessage)
@@ -83,22 +83,24 @@ export class AppComponent implements OnInit, OnDestroy {
    * @param jsonMessage json message.
    */
   public processMessage(jsonMessage: string) {
-    let msg: Message = Message.deserialize(jsonMessage);
+    const msg: Message = Message.deserialize(jsonMessage);
     switch (msg.type) {
       case "confirmation": {
-        /** When the front-end receives confirmation message from client computer
+        const keys = ["instructed", "contents", "instruction"];
+        /**
+         * When the front-end receives confirmation message from client computer
          * that instruction was completed, show the message to the user.
-         **/
-        let display =
+         */
+        const display =
           "received confirmation from " +
           msg.deviceId +
           " for instruction: " +
-          msg.contents["instructed"]["contents"]["instruction"];
+          msg.contents[keys[0]][keys[1]][keys[2]];
         this.openSnackbar(display, "");
         break;
       }
       case "instruction": {
-        //TODO instructions to front-end? e.g. ask for hint
+        // TODO instructions to front-end? e.g. ask for hint
         break;
       }
       case "status": {
@@ -117,7 +119,7 @@ export class AppComponent implements OnInit, OnDestroy {
    * @param action: button to display
    */
   public openSnackbar(message: string, action: string) {
-    let config = new MatSnackBarConfig();
+    const config = new MatSnackBarConfig();
     config.duration = 3000;
     config.panelClass = ["custom-snack-bar"];
     this.snackBar.open(message, action, config);
