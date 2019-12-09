@@ -25,19 +25,15 @@
           "id": "correctSequence",
           "description": "De juiste volgorde van cijfers moet gedraaid worden.",
           "limit": 1,
-          "conditions": [
-            {
-              "type": "device",
-              "type_id": "ledLights",
-              "constraints": [
-                {
-                  "comp": "eq",
-                  "component_id": "color",
-                  "value": true
-                }
-              ]
+          "conditions": {
+            "type": "device",
+            "type_id": "ledLights",
+            "constraints": {
+              "comparison": "eq",
+              "component_id": "non existing",
+              "value": true
             }
-          ],
+          },
           "actions": [
             {
               "type": "device",

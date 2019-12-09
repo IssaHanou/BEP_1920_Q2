@@ -67,7 +67,7 @@
       "id": "telephone",
       "description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
       "input": {
-        "turningWheel": "num-array"
+        "turningWheel": "array"
       },
       "output": {
         "audio": "string",
@@ -76,11 +76,15 @@
     },
     {
       "id": "door",
-      "description": "De deur kan open en dicht zijn en neemt geen input.",
-      "input": {
-      },
+      "description": "device that controls a door magnet through a relay",
+      "input": {},
       "output": {
-        "open": "boolean"
+        "door":  {
+          "type": "string",
+          "instruction": {
+            "instruction": "string"
+          }
+        }
       }
     }
   ],
@@ -92,48 +96,46 @@
           "id": "correctSequence",
           "description": "De juiste volgorde van cijfers moet gedraaid worden.",
           "limit": 1,
-          "conditions": [
-            {
-              "type": "device",
-              "type_id": "telephone",
-              "constraints": [
-                {
-                  "comp": "eq",
-                  "component_id": "turningWheel",
-                  "value": [
-                    0,
-                    1,
-                    2,
-                    7
-                  ]
-                }
-              ],
-              "actions": [
-                {
-                  "type": "device",
-                  "type_id": "controlBoard",
-                  "message": {
-                    "output": {
-                      "greenLight1": {
-                        "instruction": "blink",
-                        "interval": 0.5,
-                        "delay": 0
-                      },
-                      "greenLight2": false,
-                      "greenLight3": false,
-                      "redLight1": false,
-                      "redLight2": false,
-                      "redLight3": {
-                        "instruction": "blink",
-                        "interval": 0.5,
-                        "delay": 0
-                      }
+          "conditions": {
+            "type": "device",
+            "type_id": "telephone",
+            "constraints":
+              {
+                "comparison": "eq",
+                "component_id": "turningWheel",
+                "value": [
+                  0,
+                  1,
+                  2,
+                  7
+                ]
+              }
+            ,
+            "actions": [
+              {
+                "type": "device",
+                "type_id": "controlBoard",
+                "message": {
+                  "output": {
+                    "greenLight1": {
+                      "instruction": "blink",
+                      "interval": 0.5,
+                      "delay": 0
+                    },
+                    "greenLight2": false,
+                    "greenLight3": false,
+                    "redLight1": false,
+                    "redLight2": false,
+                    "redLight3": {
+                      "instruction": "blink",
+                      "interval": 0.5,
+                      "delay": 0
                     }
                   }
                 }
-              ]
-            }
-          ]
+              }
+            ]
+          }
         }
       ],
       "hints": [
@@ -148,34 +150,40 @@
           "id": "controlSwitch",
           "description": "Als de grote switch wordt geflipt, worden alle condities gecheckt (tweede schuif en groene of rode switch aan) en gaat het lichtje branden en de telefoon ringt.",
           "limit": 1,
-          "conditions": [
-            {
-              "type": "device",
-              "type_id": "controlBoard",
-              "constraints": [
-                {
-                  "component_id": "mainSwitch",
-                  "comp": "eq",
-                  "value": true
-                },
-                {
-                  "component_id": "greenSwitch",
-                  "comp": "eq",
-                  "value": true
-                },
-                {
-                  "component_id": "redSwitch",
-                  "comp": "eq",
-                  "value": true
-                },
-                {
-                  "component_id": "slider2",
-                  "comp": "lt",
-                  "value": 30
+          "conditions": {
+            "operator": "AND",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "controlBoard",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "component_id": "mainSwitch",
+                      "comparison": "eq",
+                      "value": true
+                    },
+                    {
+                      "component_id": "greenSwitch",
+                      "comparison": "eq",
+                      "value": true
+                    },
+                    {
+                      "component_id": "redSwitch",
+                      "comparison": "eq",
+                      "value": true
+                    },
+                    {
+                      "component_id": "slider2",
+                      "comparison": "lt",
+                      "value": 30
+                    }
+                  ]
                 }
-              ]
-            }
-          ],
+              }
+            ]
+          },
           "actions": [
             {
               "type": "device",
@@ -216,25 +224,30 @@
           "id": "telephoneRings",
           "description": "Als het spel start, moet de telefoon na 1 minuut ringen.",
           "limit": 1,
-          "conditions": [
-            {
-              "type": "timer",
-              "type_id": "timer1",
-              "constraints": [
-                {
-                  "comp": "eq",
-                  "value": "00:01:00"
+          "conditions": {
+            "operator": "AND",
+            "list": [
+              {
+                "type": "timer",
+                "type_id": "timer1",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "value": "00:01:01"
+                    }
+                  ]
                 }
-              ]
-            }
-          ],
+              }
+            ]
+          },
           "actions": [
             {
               "type": "device",
               "type_id": "telephone",
               "message": {
                 "output": {
-                  "ringTone": "standard",
                   "audio": "audio_1"
                 }
               }
@@ -248,21 +261,17 @@
       "rules": [
         {
           "id": "flipSwitch",
-          "description": "Als de knop omgaat, stopt het spel: tijd stopt en deur gaat open.",
+          "description": "Als de knop omgaat, stopt het spel.",
           "limit": 1,
-          "conditions": [
-            {
-              "type": "device",
-              "type_id": "controlBoard",
-              "constraints": [
-                {
-                  "component_id": "mainSwitch",
-                  "comp": "eq",
-                  "value": true
-                }
-              ]
+          "conditions": {
+            "type": "device",
+            "type_id": "controlBoard",
+            "constraints": {
+              "comparison": "eq",
+              "value": true,
+              "component_id": "mainSwitch"
             }
-          ],
+          },
           "actions": [
             {
               "type": "timer",
@@ -270,15 +279,6 @@
               "message": {
                 "output": {
                   "instruction": "stop"
-                }
-              }
-            },
-            {
-              "type": "device",
-              "type_id": "door",
-              "message": {
-                "output": {
-                  "open": true
                 }
               }
             }

@@ -172,13 +172,13 @@
                     },
                     {
                       "component_id": "redSwitch",
-                      "comparison": "eq",
+                      "comparison": "lte",
                       "value": true
                     },
                     {
                       "component_id": "slider2",
                       "comparison": "lt",
-                      "value": 20
+                      "value": 30
                     }
                   ]
                 }

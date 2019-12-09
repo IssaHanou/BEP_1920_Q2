@@ -35,9 +35,6 @@ func getTestHandler() *Handler {
 				Connection: false,
 			},
 		},
-		Rules:         nil,
-		ActionMap:     nil,
-		ConstraintMap: nil,
 	}
 	communicator := communication.NewCommunicator(workingConfig.General.Host,
 		workingConfig.General.Port, []string{"back-end", "test"})
@@ -55,9 +52,6 @@ func Test_GetHandler(t *testing.T) {
 		Puzzles:       nil,
 		GeneralEvents: nil,
 		Devices:       nil,
-		Rules:         nil,
-		ActionMap:     nil,
-		ConstraintMap: nil,
 	}
 	communicator := communication.NewCommunicator(workingConfig.General.Host,
 		workingConfig.General.Port, []string{"back-end", "test"})

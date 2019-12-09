@@ -152,23 +152,23 @@
           "description": "Als de grote switch wordt geflipt, worden alle condities gecheckt (tweede schuif en groene of rode switch aan) en gaat het lichtje branden en de telefoon ringt.",
           "limit": 1,
           "conditions": {
-            "operator": "AND",
+            "operator": "OR",
             "list": [
               {
                 "type": "device",
                 "type_id": "controlBoard",
                 "constraints": {
-                  "operator": "OR",
+                  "operator": "AND",
                   "list": [
                     {
                       "component_id": "mainSwitch",
                       "comparison": "eq",
-                      "value": true
+                      "value": false
                     },
                     {
                       "component_id": "greenSwitch",
                       "comparison": "eq",
-                      "value": true
+                      "value": false
                     },
                     {
                       "component_id": "redSwitch",
@@ -178,11 +178,25 @@
                     {
                       "component_id": "slider2",
                       "comparison": "lt",
-                      "value": 20
+                      "value": 30
+                    }
+                  ]
+                }
+              },               {
+                "type": "device",
+                "type_id": "controlBoard",
+                "constraints": {
+                  "operator": "OR",
+                  "list": [
+                    {
+                      "component_id": "mainSwitch",
+                      "comparison": "eq",
+                      "value": true
                     }
                   ]
                 }
               }
+
             ]
           },
           "actions": [
