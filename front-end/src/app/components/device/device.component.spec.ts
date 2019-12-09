@@ -3,9 +3,9 @@ import { DeviceComponent } from "./device.component";
 import { MqttModule, MqttService } from "ngx-mqtt";
 import { MQTT_SERVICE_OPTIONS } from "../../app.module";
 import { FormsModule } from "@angular/forms";
-import {AppComponent} from "../../app.component";
-import {MatSnackBar} from "@angular/material/snack-bar";
-import {Overlay} from "@angular/cdk/overlay";
+import { AppComponent } from "../../app.component";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { Overlay } from "@angular/cdk/overlay";
 
 describe("DeviceComponent", () => {
   let component: DeviceComponent;

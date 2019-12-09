@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
-import {Device} from "./device";
-import {AppComponent} from "../../app.component";
+import { Device } from "./device";
+import { AppComponent } from "../../app.component";
 
 @Component({
   selector: "app-device",
@@ -8,12 +8,9 @@ import {AppComponent} from "../../app.component";
   styleUrls: ["./device.component.css", "../../../assets/css/main.css"]
 })
 export class DeviceComponent implements OnInit {
+  constructor(private app: AppComponent) {}
 
-  constructor(private app: AppComponent) {
-  }
-
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   public getDeviceStatus(): Device[] {
     let devices: Device[] = [];
