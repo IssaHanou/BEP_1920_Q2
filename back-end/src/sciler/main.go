@@ -43,6 +43,6 @@ func main() {
 	}
 	// loop for now preventing app to exit
 	for {
-		time.Sleep(time.Microsecond * time.Duration(250))
+		time.Sleep(time.Microsecond * time.Duration(10))
 	}
 }

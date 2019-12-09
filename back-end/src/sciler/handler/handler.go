@@ -131,7 +131,6 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 	con := handler.Config.Devices[raw.DeviceID]
 	con.Connection = true
 	handler.Config.Devices[raw.DeviceID] = con
-	handler.SendStatus(raw.DeviceID)
 }
 
 // SendStatus sends all status and connection data of a device to the front-end.

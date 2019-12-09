@@ -146,16 +146,16 @@ try:
     scclib = SccLib(config, device)
 
     GPIO.add_event_detect(
-        device.redSwitch, GPIO.BOTH, callback=scclib.statusChanged, bouncetime=200
+        device.redSwitch, GPIO.BOTH, callback=scclib.statusChangedOnChannel, bouncetime=100
     )
     GPIO.add_event_detect(
-        device.orangeSwitch, GPIO.BOTH, callback=scclib.statusChanged, bouncetime=200
+        device.orangeSwitch, GPIO.BOTH, callback=scclib.statusChangedOnChannel, bouncetime=100
     )
     GPIO.add_event_detect(
-        device.greenSwitch, GPIO.BOTH, callback=scclib.statusChanged, bouncetime=200
+        device.greenSwitch, GPIO.BOTH, callback=scclib.statusChangedOnChannel, bouncetime=100
     )
     GPIO.add_event_detect(
-        device.mainSwitch, GPIO.BOTH, callback=scclib.statusChanged, bouncetime=200
+        device.mainSwitch, GPIO.BOTH, callback=scclib.statusChangedOnChannel, bouncetime=100
     )
     GPIO.add_event_detect(device.a_pin0, GPIO.BOTH, callback=scclib.status_changed)
     GPIO.add_event_detect(device.a_pin1, GPIO.BOTH, callback=scclib.status_changed)

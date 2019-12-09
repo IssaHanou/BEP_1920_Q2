@@ -25,6 +25,7 @@ class SccLib:
         self.logger.log("Start of log for device: " + self.name)
 
         self.statusChanged = self.status_changed
+        self.statusChangedOnChannel = self.status_changed_on_channel
         self.client = mqtt.Client(self.name)
         self.client.on_message = self.__on_message
         self.client.on_log = self.__on_log
@@ -114,11 +115,17 @@ class SccLib:
         client.disconnect_flag = True
         self.logger.close()
 
-    def status_changed(self, channel):
+    def status_changed_on_channel(self, channel):
         """
         This is called from the client computer to message a status update.
         """
         self.logger.log("status changed of pin " + str(channel))
+        self.__send_status_message(self.device.get_status())
+
+    def status_changed(self):
+        """
+        This is called from the client computer to message a status update.
+        """
         self.__send_status_message(self.device.get_status())
 
     def __send_status_message(self, msg):
@@ -170,7 +177,6 @@ class SccLib:
         }
         msg = json.dumps(msg_dict)
         self.__send_message("confirmation", msg)
-        self.__send_status_message(self.device.get_status())
         if failed_result:
             self.logger.log(("instruction could not be performed", message))
         else:
