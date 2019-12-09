@@ -2,12 +2,11 @@
   "name": "sciler",
   "version": "0.0.0",
   "scripts": {
-    "node": "node --max-old-space-size=8192 src/main.ts",
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
-    "lint": "ng lint",
+    "lint": "node --max_old_space_size=2048 ng lint",
     "e2e": "ng e2e"
   },
   "private": true,
