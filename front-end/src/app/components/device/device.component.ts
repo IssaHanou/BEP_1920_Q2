@@ -1,4 +1,6 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
+import { Device } from "./device";
+import { AppComponent } from "../../app.component";
 
 @Component({
   selector: "app-device",
@@ -6,7 +8,16 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
   styleUrls: ["./device.component.css", "../../../assets/css/main.css"]
 })
 export class DeviceComponent implements OnInit {
-  constructor() {}
+  constructor(private app: AppComponent) {}
 
   ngOnInit() {}
+
+  public getDeviceStatus(): Device[] {
+    const devices: Device[] = [];
+    for (const device of this.app.deviceList.all.values()) {
+      devices.push(device);
+    }
+    devices.sort((a: Device, b: Device) => a.id.localeCompare(b.id));
+    return devices;
+  }
 }

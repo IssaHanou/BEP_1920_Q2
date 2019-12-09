@@ -2,20 +2,32 @@
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.3.19.
 
 # Installation
+In `front-end` module.
+### Set-up dependencies
+````
+    npm install
+````
 ### Set-up mqtt library
 ````
     npm install ngx-mqtt --save
 ````
 
-# setup prettier
+### Set-up prettier
 ```
     npm install --save-dev --save-exact prettier
     npm install --save-dev tslint-config-prettier
 ```
-- natigate to Settings > Tools > File Watchers 
+- navigate to Settings > Tools > File Watchers 
 - press `+` and select `Prettier`
 - enable auto saved files to trigger the watcher in advanced settings
 - press `ok`
+
+### Run prettier manually
+- navigate to `BEP_1920_Q2/front-end/`
+- run following command: 
+```
+prettier --write "**/*.ts"
+```
 
 ### Development server
 

@@ -1,0 +1,305 @@
+{
+  "general": {
+    "name": "Escape X",
+    "duration": "00:30:00",
+    "host": "localhost",
+    "port": 1883
+  },
+  "devices": [
+    {
+      "id": "controlBoard",
+      "description": "Control board with three switches, three slides with lights and one main switch.",
+      "input": {
+        "redSwitch": "boolean",
+        "orangeSwitch": "boolean",
+        "greenSwitch": "boolean",
+        "slider1": "numeric",
+        "slider2": "numeric",
+        "slider3": "numeric",
+        "mainSwitch": "boolean"
+      },
+      "output": {
+        "greenLight1": {
+          "type": "string",
+          "instruction": {
+            "interval": "numeric",
+            "delay": "numeric"
+          }
+        },
+        "greenLight2": {
+          "type": "string",
+          "instruction": {
+            "interval": "numeric",
+            "delay": "numeric"
+          }
+        },
+        "greenLight3": {
+          "type": "string",
+          "instruction": {
+            "interval": "numeric",
+            "delay": "numeric"
+          }
+        },
+        "redLight1": {
+          "type": "string",
+          "instruction": {
+            "interval": "numeric",
+            "delay": "numeric"
+          }
+        },
+        "redLight2": {
+          "type": "string",
+          "instruction": {
+            "interval": "numeric",
+            "delay": "numeric"
+          }
+        },
+        "redLight3": {
+          "type": "string",
+          "instruction": {
+            "interval": "numeric",
+            "delay": "numeric"
+          }
+        }
+      }
+    },
+    {
+      "id": "telephone",
+      "description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
+      "input": {
+        "turningWheel": "array"
+      },
+      "output": {
+        "audio": "string",
+        "ringTone": "string"
+      }
+    },
+    {
+      "id": "testDevice",
+      "description": "Device with all types of input for testing",
+      "input": {
+        "string": "string",
+        "bool": "bool",
+        "numeric": "numeric",
+        "num-array": "num-array",
+        "bool-array": "bool-array",
+        "string-array": "string-array",
+        "custom": "custom",
+        "timer": "timer"
+      }
+    }
+  ],
+  "puzzles": [
+    {
+      "name": "Telefoon puzzels",
+      "rules": [
+        {
+          "id": "correctSequence",
+          "description": "De juiste volgorde van cijfers moet gedraaid worden.",
+          "limit": 1,
+          "conditions": {
+            "type": "device",
+            "type_id": "telephone",
+            "constraints":
+            {
+              "comparison": "eq",
+              "component_id": "turningWheel",
+              "value": [
+                0,
+                1,
+                2,
+                7
+              ]
+            }
+          ,
+            "actions": [
+              {
+                "type": "device",
+                "type_id": "controlBoard",
+                "message": {
+                  "output": {
+                    "greenLight1": {
+                      "instruction": "blink",
+                      "interval": 0.5,
+                      "delay": 0
+                    },
+                    "greenLight2": false,
+                    "greenLight3": false,
+                    "redLight1": false,
+                    "redLight2": false,
+                    "redLight3": {
+                      "instruction": "blink",
+                      "interval": 0.5,
+                      "delay": 0
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "hints": [
+        "De knop verzend jouw volgorde",
+        "Heb je al even gewacht?"
+      ]
+    },
+    {
+      "name": "Control puzzel",
+      "rules": [
+        {
+          "id": "controlSwitch",
+          "description": "Als de grote switch wordt geflipt, worden alle condities gecheckt (tweede schuif en groene of rode switch aan) en gaat het lichtje branden en de telefoon ringt.",
+          "limit": 1,
+          "conditions": {
+            "operator": "OR",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "controlBoard",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "component_id": "mainSwitch",
+                      "comparison": "eq",
+                      "value": false
+                    },
+                    {
+                      "component_id": "greenSwitch",
+                      "comparison": "eq",
+                      "value": false
+                    },
+                    {
+                      "component_id": "redSwitch",
+                      "comparison": "eq",
+                      "value": true
+                    },
+                    {
+                      "component_id": "slider2",
+                      "comparison": "lt",
+                      "value": 30
+                    }
+                  ]
+                }
+              },               {
+                "type": "device",
+                "type_id": "controlBoard",
+                "constraints": {
+                  "operator": "OR",
+                  "list": [
+                    {
+                      "component_id": "mainSwitch",
+                      "comparison": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              }
+
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "telephone",
+              "message": {
+                "output": {
+                  "audio": "audio_1"
+                }
+              }
+            },
+            {
+              "type": "device",
+              "type_id": "controlBoard",
+              "message": {
+                "output": {
+                  "greenLight1": false,
+                  "greenLight2": true,
+                  "greenLight3": false,
+                  "redLight1": false,
+                  "redLight2": false,
+                  "redLight3": false
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "hints": [
+        "Zet de schuiven nauwkeurig"
+      ]
+    }
+  ],
+  "general_events": [
+    {
+      "name": "Start",
+      "rules": [
+        {
+          "id": "telephoneRings",
+          "description": "Als het spel start, moet de telefoon na 1 minuut ringen.",
+          "limit": 1,
+          "conditions": {
+            "operator": "OR",
+            "list": [
+              {
+                "type": "timer",
+                "type_id": "timer1",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "value": "00:01:01"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "telephone",
+              "message": {
+                "output": {
+                  "audio": "audio_1"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stop",
+      "rules": [
+        {
+          "id": "flipSwitch",
+          "description": "Als de knop omgaat, stopt het spel.",
+          "limit": 1,
+          "conditions": {
+            "type": "device",
+            "type_id": "controlBoard",
+            "constraints": {
+              "comparison": "eq",
+              "value": true,
+              "component_id": "mainSwitch"
+            }
+          },
+          "actions": [
+            {
+              "type": "timer",
+              "type_id": "timer1",
+              "message": {
+                "output": {
+                  "instruction": "stop"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

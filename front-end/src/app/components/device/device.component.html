@@ -5,26 +5,22 @@
       <thead>
       <tr>
         <th>Apparaat</th>
-        <th>Connectie</th>
-        <th>Status</th>
+        <th>Connectie status</th>
+        <th>Onderdeel status</th>
       </tr>
       </thead>
       <tbody>
-      <tr>
-        <td>Telefoon</td>
-        <td>&#10005;</td>
-        <td>-</td>
-      </tr>
-      <tr>
-        <td>Weegschaal</td>
-        <td>&#10003;</td>
-        <td>50</td>
-      </tr>
-      <tr>
-        <td>Super mega lange apparaatnaam</td>
-        <td>&#10003;</td>
-        <td>100000000</td>
-      </tr>
+          <tr *ngFor="let dev of getDeviceStatus()">
+              <td>{{ dev.id }}</td>
+              <td>{{ dev.connection }}</td>
+                <td>
+                <ul>
+                  <li *ngFor="let comp of dev.status | keyvalue">
+                    {{comp.key}} : {{comp.value}}
+                  </li>
+                </ul>
+                </td>
+            </tr>
       </tbody>
     </table>
   </div>
