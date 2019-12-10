@@ -27,9 +27,9 @@ func getTestHandler() *Handler {
 					"testComponent2": "string",
 				},
 				Output: map[string]config.OutputObject{
-					"testComponent4": {"string", map[string]string{}},
-					"testComponent5": {"string", map[string]string{}},
-					"testComponent6": {"string", map[string]string{}},
+					"testComponent4": {Type: "string", Instructions: map[string]string{}},
+					"testComponent5": {Type: "string", Instructions: map[string]string{}},
+					"testComponent6": {Type: "string", Instructions: map[string]string{}},
 				},
 				Status:     map[string]interface{}{},
 				Connection: false,

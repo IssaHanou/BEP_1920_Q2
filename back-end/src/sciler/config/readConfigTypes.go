@@ -91,13 +91,13 @@ type ConstraintInfo map[string]interface{}
 
 // Action is a struct that determines what happens when a rule is fired.
 type Action struct {
-	Type    string          `json:"type"`
-	TypeID  string          `json:"type_id"`
-	Message []ActionMessage `json:"message"`
+	Type    string                 `json:"type"`
+	TypeID  string                 `json:"type_id"`
+	Message []ComponentInstruction `json:"message"`
 }
 
-// ActionMessage can be sent across clients of the brokers.
-type ActionMessage struct {
+// ComponentInstruction can be sent across clients of the brokers.
+type ComponentInstruction struct {
 	ComponentID string      `json:"component_id"`
 	Instruction string      `json:"instruction"`
 	Value       interface{} `json:"value"`

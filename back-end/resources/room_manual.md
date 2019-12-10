@@ -76,6 +76,7 @@ This can be displayed in the front-end, so should be readable and in Dutch.
         
     - `type`: this can be `device` or `timer`
     - `type_id`: the id of device or timer, depending on type respectively
-    - `message`: this defines the `output` message sent. The output defines the type of values to be expected as output. 
-        In case of device type, the keys are component ids and the value is a type. An additional "instructions" property may be defined.
-        In the case of timer, the message should have `instruction` specified as `stop`, `start`, `add`, `subtract` or `set`, in all cases (except `stop` and `start`), a `value` should also be passed. 
+    - `message`: this defines a list of componentInstructions which have:
+        - `component_id`: this will be the id of a component in a timer or device
+        - `instruction`: one of the instructions specified for this device and component
+        - `value`: this is the value for the instruction of the type specified for this device and component
