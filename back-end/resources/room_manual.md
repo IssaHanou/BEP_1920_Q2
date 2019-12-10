@@ -27,8 +27,9 @@ This will be a list of all devices in the room. Each device is defined as a JSON
 - `description`: this is optional and can contain more information about the device. This can be displayed in the front-end, so should be readable and in Dutch. 
 - `input`: defines type of values to be expected as input. The keys are component ids and values are types of input (in string format).  
     Possible types are: "string", "boolean", "numeric", "array", or a custom name. 
-- `output`: defines type of values to be expected as output. The keys are component ids and the value is a map with a `type` property 
-    and an optional `instruction`, which defines a map with custom instruction for the device. 
+- `output`: defines what this components outputs as their status and what instructions can be performed on this component
+    - `type`: the type of the status output
+    - `instructions`: this is a map of the name of an instruction to the type of argument the instruction takes
     
 ### Puzzles
 Puzzles is an array of puzzle objects, which have a 

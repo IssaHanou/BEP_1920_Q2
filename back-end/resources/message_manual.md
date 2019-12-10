@@ -17,7 +17,7 @@
         - `instructed`: the instruction message that the client computer acted on regarding this confirmation
     - If type is `connection`, then the message contents is:
         - `connection`: "true" or "false" depending on connection status 
-    - If type is `instruction`, then the message contents is:
+    - If type is `instructions`, then the message contents is:
         - `instruction`: this is the type of instruction, which can be one of the following:
             `output`, `test`, `start`, `reset`, `stop`. With output, the next property will be:
         - ` output`: defines values for each output_component (in the form "componentId": "value")``
