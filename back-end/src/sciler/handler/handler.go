@@ -180,7 +180,7 @@ func (handler *Handler) openDoorBeun(raw Message) {
 			if err != nil {
 				logrus.Errorf("error occurred while constructing message to publish: %v", err)
 			} else {
-				handler.Communicator.Publish("client/door", string(jsonMessage), 3)
+				handler.Communicator.Publish("door", string(jsonMessage), 3)
 			}
 		}
 	}
