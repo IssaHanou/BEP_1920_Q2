@@ -50,7 +50,7 @@ func (handler *Handler) msgMapper(raw Message) {
 	case "status":
 		{
 			handler.onStatusMsg(raw)
-			handler.openDoorBeun(raw)
+			//handler.openDoorBeun(raw)
 			handler.SendStatus(raw.DeviceID)
 		}
 	case "confirmation":
@@ -89,14 +89,91 @@ func (handler *Handler) onConnectionMsg(raw Message) {
 
 //onStatusMsg is the function to process status messages.
 func (handler *Handler) onStatusMsg(raw Message) {
-	_, ok := handler.Config.Devices[raw.DeviceID]
-	if !ok {
-		logrus.Warn("status message received from device " + raw.DeviceID + ", which is not in the config")
-	} else {
-		logrus.Info("status message received from: " + raw.DeviceID + ", status: " + fmt.Sprint(raw.Contents))
+	if device, ok := handler.Config.Devices[raw.DeviceID]; ok {
 		for k, v := range raw.Contents {
-			handler.Config.Devices[raw.DeviceID].Status[k] = v
+			valueType := reflect.TypeOf(v).Kind()
+			if inputType, ok := device.Input[k]; ok {
+				switch inputType {
+				case "string":
+					{
+						if valueType == reflect.String {
+							handler.Config.Devices[raw.DeviceID].Status[k] = v
+						} else {
+							logrus.Warn("input type string expected but ", valueType.String(), " found as type of value ", v, " for ", k)
+						}
+					}
+				case "boolean":
+					{
+						if valueType == reflect.Bool {
+							handler.Config.Devices[raw.DeviceID].Status[k] = v
+						} else {
+							logrus.Warn("input type boolean expected but ", valueType.String(), " found as type of value ", v, " for ", k)
+						}
+					}
+				case "numeric":
+					{
+						if valueType == reflect.Int || valueType == reflect.Float64 {
+							handler.Config.Devices[raw.DeviceID].Status[k] = v
+						} else {
+							logrus.Warn("input type numeric expected but ", valueType.String(), " found as type of value ", v, " for ", k)
+						}
+					}
+				case "array":
+					{
+						if valueType == reflect.Slice {
+							handler.Config.Devices[raw.DeviceID].Status[k] = v
+						} else {
+							logrus.Warn("input type array/slice expected but ", valueType.String(), " found as type of value ", v, " for ", k)
+						}
+					}
+				default:
+					// todo custom types
+					logrus.Warn("custom types like: ", inputType, ", are not yet implemented")
+				}
+				//} else if inputType, ok := device.Output[k]; ok {
+				//	switch inputType {
+				//	case "string":
+				//		{
+				//			if valueType == reflect.String {
+				//				handler.Config.Devices[raw.DeviceID].Status[k] = v
+				//			} else {
+				//				logrus.Warn("input type string expected but ", valueType.String(), " found as type of value ", v)
+				//			}
+				//		}
+				//	case "boolean":
+				//		{
+				//			if valueType == reflect.Bool {
+				//				handler.Config.Devices[raw.DeviceID].Status[k] = v
+				//			} else {
+				//				logrus.Warn("input type boolean expected but ", valueType.String(), " found as type of value ", v)
+				//			}
+				//		}
+				//	case "numeric":
+				//		{
+				//			if valueType == reflect.Int || valueType == reflect.Float64 {
+				//				handler.Config.Devices[raw.DeviceID].Status[k] = v
+				//			} else {
+				//				logrus.Warn("input type numeric expected but ", valueType.String(), " found as type of value ", v)
+				//			}
+				//		}
+				//	case "array":
+				//		{
+				//			if valueType == reflect.Slice {
+				//				handler.Config.Devices[raw.DeviceID].Status[k] = v
+				//			} else {
+				//				logrus.Warn("input type array/slice expected but ", valueType.String(), " found as type of value ", v)
+				//			}
+				//		}
+				//	default:
+				//		// todo custom types
+				//		logrus.Warn("custom types like: ", inputType, ", are not yet implemented")
+				//	}
+			} else {
+				logrus.Warn("status message received from component ", k, ", which is not in the config under device ", raw.DeviceID)
+			}
 		}
+	} else {
+		logrus.Warn("status message received from device ", raw.DeviceID, ", which is not in the config")
 	}
 }
 
