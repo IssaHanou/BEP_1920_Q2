@@ -54,38 +54,58 @@
   "messageInstructionTest": {
     "device_id": "controlBoard",
     "time_sent": "01-10-2019 13:59:02",
-    "type": "instructions",
+    "type": "user_instruction",
     "contents": {
-      "instructions": "test"
+      "instruction": "test"
     }
   },
   "messageInstructionStart": {
     "device_id": "controlBoard",
     "time_sent": "01-10-2019 13:59:02",
-    "type": "instructions",
+    "type": "user_instruction",
     "contents": {
-      "instructions": "start"
+      "instruction": "start"
     }
   },
   "messageInstructionOutput": {
     "device_id": "controlBoard",
     "time_sent": "01-10-2019 13:59:02",
-    "type": "instructions",
-    "contents": {
-      "instructions": "output",
-      "output": {
-        "greenLight1": {
-          "instructions": "blink",
-          "interval": 0.5,
-          "delay": 0
-        },
-        "greenLight2": true,
-        "greenLight3": true,
-        "redLight1": false,
-        "redLight2": false,
-        "redLight3": false
+    "type": "instruction",
+    "contents": [
+      {
+        "component_id": "greenLight1",
+        "instruction": "blink",
+        "value": [
+          0.5,
+          0
+        ]
+      },
+      {
+        "component_id": "greenLight2",
+        "instruction": "turnOnOff",
+        "value": true
+      },
+      {
+        "component_id": "greenLight3",
+        "instruction": "turnOnOff",
+        "value": false
+      },
+      {
+        "component_id": "redLight1",
+        "instruction": "turnOnOff",
+        "value": false
+      },
+      {
+        "component_id": "redLight2",
+        "instruction": "turnOnOff",
+        "value": true
+      },
+      {
+        "component_id": "redLight3",
+        "instruction": "turnOnOff",
+        "value": false
       }
-    }
+    ]
   },
   "messageConnectionConfirmation": {
     "device_id": "telephone",

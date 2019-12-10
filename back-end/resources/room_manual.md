@@ -77,7 +77,7 @@ This can be displayed in the front-end, so should be readable and in Dutch.
         
     - `type`: this can be `device` or `timer`
     - `type_id`: the id of device or timer, depending on type respectively
-    - `message`: this defines a list of componentInstructions which have:
+    - `message`: this defines a list of `componentInstructions` which have:
         - `component_id`: this will be the id of a component in a timer or device
         - `instruction`: one of the instructions specified for this device and component
         - `value`: this is the value for the instruction of the type specified for this device and component
