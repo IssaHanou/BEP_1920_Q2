@@ -23,42 +23,48 @@
           "type": "string",
           "instructions": {
             "interval": "numeric",
-            "delay": "numeric"
+            "delay": "numeric",
+            "state": "string"
           }
         },
         "greenLight2": {
           "type": "string",
           "instructions": {
             "interval": "numeric",
-            "delay": "numeric"
+            "delay": "numeric",
+            "state": "string"
           }
         },
         "greenLight3": {
           "type": "string",
           "instructions": {
             "interval": "numeric",
-            "delay": "numeric"
+            "delay": "numeric",
+            "state": "string"
           }
         },
         "redLight1": {
           "type": "string",
           "instructions": {
             "interval": "numeric",
-            "delay": "numeric"
+            "delay": "numeric",
+            "state": "string"
           }
         },
         "redLight2": {
           "type": "string",
           "instructions": {
             "interval": "numeric",
-            "delay": "numeric"
+            "delay": "numeric",
+            "state": "string"
           }
         },
         "redLight3": {
           "type": "string",
           "instructions": {
             "interval": "numeric",
-            "delay": "numeric"
+            "delay": "numeric",
+            "state": "string"
           }
         }
       }
@@ -92,7 +98,7 @@
         "door": {
           "type": "string",
           "instructions": {
-            "instruction": "string"
+            "open": "boolean"
           }
         }
       }
@@ -137,7 +143,7 @@
                 },
                 {
                   "component_id": "greenLight1",
-                  "instruction": "instruction",
+                  "instruction": "state",
                   "value": "blink"
                 }
               ]
@@ -209,32 +215,32 @@
               "message": [
                 {
                   "component_id": "greenLight1",
-                  "instruction": "instruction",
+                  "instruction": "state",
                   "value": "off"
                 },
                 {
                   "component_id": "greenLight2",
-                  "instruction": "instruction",
+                  "instruction": "state",
                   "value": "on"
                 },
                 {
                   "component_id": "greenLight3",
-                  "instruction": "instruction",
+                  "instruction": "state",
                   "value": "off"
                 },
                 {
                   "component_id": "redLight1",
-                  "instruction": "instruction",
+                  "instruction": "state",
                   "value": "on"
                 },
                 {
                   "component_id": "redLight2",
-                  "instruction": "instruction",
+                  "instruction": "state",
                   "value": "off"
                 },
                 {
                   "component_id": "redLight3",
-                  "instruction": "instruction",
+                  "instruction": "state",
                   "value": "on"
                 }
               ]

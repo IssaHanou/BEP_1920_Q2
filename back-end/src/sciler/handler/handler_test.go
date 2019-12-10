@@ -26,10 +26,10 @@ func getTestHandler() *Handler {
 					"testComponent1": "numeric",
 					"testComponent2": "string",
 				},
-				Output: map[string]interface{}{
-					"testComponent4": false,
-					"testComponent5": true,
-					"testComponent6": false,
+				Output: map[string]config.OutputObject{
+					"testComponent4": {"string", map[string]string{}},
+					"testComponent5": {"string", map[string]string{}},
+					"testComponent6": {"string", map[string]string{}},
 				},
 				Status:     map[string]interface{}{},
 				Connection: false,
