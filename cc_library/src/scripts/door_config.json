@@ -2,7 +2,7 @@
   "id": "door",
   "description": "Door can open and close",
   "host": "192.168.178.82",
-  "hint": false,
+  "labels": [],
   "port": 1883,
   "input": {},
   "output": {

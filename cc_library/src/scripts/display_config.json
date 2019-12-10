@@ -2,7 +2,7 @@
   "id": "display",
   "description": "Display can print hints",
   "host": "192.168.178.82",
-  "hint": true,
+  "labels": ["hint"],
   "port": 1883,
   "input": {},
   "output": {

@@ -22,3 +22,15 @@ When there is a mosquitto broker already running, this will not work. Then, firs
 mosquitto -t <topic>
 mosquitto -h <ip.ad.dr.ess>
 ```
+
+### Topics
+
+All messages to the front-end should be send on topic `front-end`
+
+All messages to the back-end should be send on topic `back-end`
+
+All messages to all client computers should be send on topic `client-computers`
+
+All messages to single client computers should be sent to topic `<device.name>`
+
+All messages to labeled client computers should be sent to topic `<label>` (like `hint`)

@@ -21,7 +21,7 @@ class SccLib:
         self.info = self.config.get("description")
         self.host = self.config.get("host")
         self.port = self.config.get("port")
-        self.hint = self.config.get("hint")
+        self.labels = self.config.get("labels")
         self.logger = Logger()
         self.logger.log("Start of log for device: " + self.name)
 
@@ -73,8 +73,8 @@ class SccLib:
 
                 msg = json.dumps(msg_dict)
                 self.__send_message("back-end", msg)
-                if self.hint:
-                    self.__subscribe_topic("hint")
+                for label in self.labels:
+                    self.__subscribe_topic(label)
                 self.__subscribe_topic("client-computers")
                 self.__subscribe_topic(self.name)
                 self.client.loop_forever()
