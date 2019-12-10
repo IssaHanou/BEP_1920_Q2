@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
 import { MqttService } from "ngx-mqtt";
-import {Message} from '../../message';
-import {AppComponent} from '../../app.component';
+import {Message} from "../../message";
+import {AppComponent} from "../../app.component";
 
 @Component({
   selector: "app-hint",

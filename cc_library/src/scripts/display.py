@@ -1,5 +1,4 @@
 import os
-import time
 
 from cc_library.src.sciler.scclib.app import SccLib
 from cc_library.src.sciler.scclib.device import Device

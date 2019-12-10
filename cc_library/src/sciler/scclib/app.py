@@ -73,7 +73,7 @@ class SccLib:
 
                 msg = json.dumps(msg_dict)
                 self.__send_message("back-end", msg)
-                if self.hint :
+                if self.hint:
                     self.__subscribe_topic("hint")
                 self.__subscribe_topic("client-computers")
                 self.__subscribe_topic(self.name)
