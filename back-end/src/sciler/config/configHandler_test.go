@@ -45,7 +45,7 @@ func TestDeviceConstraintNotPresent(t *testing.T) {
 func TestComponentConstraintNotPresent(t *testing.T) {
 	filename := "../../../resources/testing/testComponentConstraintNotPresent.json"
 	assert.PanicsWithValue(t,
-		"device with id non existing not found in map",
+		"component with id non existing not found in map",
 		func() { ReadFile(filename) },
 		"Component used in constraint should be present in device logics")
 }
@@ -96,4 +96,77 @@ func TestWrongComponentIDType(t *testing.T) {
 		"JSON config in wrong format, component_id should be of type string, 6 is of type float64",
 		func() { ReadFile(filename) },
 		"constraint should have a component_id of type string (if the condition is of type device)")
+}
+
+func Test_CheckActionWrongType(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckActionWrongType.json"
+	assert.PanicsWithValue(t,
+		"only device and timer are accepted as type for an action, however type was specified as: non existing",
+		func() { ReadFile(filename) },
+		"Only device and timer are not supported as action type")
+
+}
+
+func Test_CheckActionWrongDevice(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckActionWrongDevice.json"
+	assert.PanicsWithValue(t,
+		"device with id non existing not found in map",
+		func() { ReadFile(filename) },
+		"Cannot try to perform an action on an unknown device")
+}
+
+func Test_CheckActionWrongComponent(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckActionWrongComponent.json"
+	assert.PanicsWithValue(t,
+		"component with id non existing not found in map",
+		func() { ReadFile(filename) },
+		"Cannot try to perform an action on an unknown component")
+}
+
+func Test_CheckActionWrongInstruction(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckActionWrongInstruction.json"
+	assert.PanicsWithValue(t,
+		"instruction non existing not found in map",
+		func() { ReadFile(filename) },
+		"Cannot try to perform an action with an unknown instruction")
+}
+
+func Test_CheckActionCustom(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckActionCustom.json"
+	assert.PanicsWithValue(t,
+		"custom types like: custom, are not yet implemented",
+		func() { ReadFile(filename) },
+		"custom types are not implemented yet")
+}
+
+func Test_CheckActionString(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckActionString.json"
+	assert.PanicsWithValue(t,
+		"instruction type string expected but float64 found as type of value 0.5",
+		func() { ReadFile(filename) },
+		"custom types are not implemented yet")
+}
+
+func Test_CheckActionBoolean(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckActionBoolean.json"
+	assert.PanicsWithValue(t,
+		"instruction type boolean expected but string found as type of value blink",
+		func() { ReadFile(filename) },
+		"instruction type does not match given value in an action")
+}
+
+func Test_CheckActionNumeric(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckActionNumeric.json"
+	assert.PanicsWithValue(t,
+		"instruction type numeric expected but slice found as type of value [true true false string]",
+		func() { ReadFile(filename) },
+		"instruction type does not match given value in an action")
+}
+
+func Test_CheckActionArray(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckActionArray.json"
+	assert.PanicsWithValue(t,
+		"instruction type array/slice expected but bool found as type of value true",
+		func() { ReadFile(filename) },
+		"instruction type does not match given value in an action")
 }

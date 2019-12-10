@@ -79,7 +79,7 @@
         "audio": {
           "type": "string",
           "instructions": {
-            "play": "string,"
+            "play": "string"
           }
         },
         "ringTone": {
@@ -98,7 +98,7 @@
         "bool": "bool",
         "numeric": "numeric",
         "boolean":"boolean",
-        "string": "string,",
+        "string": "string",
         "array": "array",
         "custom": "custom"
       },
