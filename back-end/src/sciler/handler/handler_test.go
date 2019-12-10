@@ -96,7 +96,7 @@ func TestOnConnectionMsgFalse(t *testing.T) {
 	handler := getTestHandler()
 	msg := Message{
 		DeviceID: "TestDevice",
-		TimeSent: "",
+		TimeSent: "05-12-2019 09:42:10",
 		Type:     "connection",
 		Contents: map[string]interface{}{
 			"connection": false,
