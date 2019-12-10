@@ -25,6 +25,7 @@ func getTestHandler() *Handler {
 					"testComponent0": "boolean",
 					"testComponent1": "numeric",
 					"testComponent2": "string",
+					"testComponent3": "array",
 				},
 				Output: map[string]interface{}{
 					"testComponent4": false,
@@ -91,50 +92,6 @@ func TestOnConnectionMsg(t *testing.T) {
 		"Device should set connection to true on connection message")
 }
 
-func TestMsgMapperConnectionOtherDevice(t *testing.T) {
-	handler := getTestHandler()
-	msg := Message{
-		DeviceID: "TestDevice2",
-		TimeSent: "05-12-2019 09:42:10",
-		Type:     "connection",
-		Contents: map[string]interface{}{
-			"connection": true},
-	}
-	handler.msgMapper(msg)
-
-	_, ok := handler.Config.Devices["TestDevice2"]
-	assert.Equal(t, false, ok,
-		"Device should not exist in devices because it was not in config")
-}
-
-func TestMsgMapperConnectionOtherDeviceInvalid(t *testing.T) {
-	handler := getTestHandler()
-	msg := Message{
-		DeviceID: "TestDevice2",
-		TimeSent: "05-12-2019 09:42:10",
-		Type:     "connection",
-		Contents: map[string]interface{}{
-			"connection": "true"},
-	}
-	handler.onConnectionMsg(msg)
-	assert.Equal(t, false, handler.Config.Devices["TestDevice"].Connection,
-		"Device should not set connection to true on incorrect connection message")
-}
-
-func TestMsgMapperConnectionOtherDeviceInvalid2(t *testing.T) {
-	handler := getTestHandler()
-	msg := Message{
-		DeviceID: "TestDevice2",
-		TimeSent: "05-12-2019 09:42:10",
-		Type:     "connection",
-		Contents: map[string]interface{}{
-			"connected": "true"},
-	}
-	handler.onConnectionMsg(msg)
-	assert.Equal(t, false, handler.Config.Devices["TestDevice"].Connection,
-		"Device should not set connection to true on incorrect connection message")
-}
-
 func TestOnConnectionMsgFalse(t *testing.T) {
 	handler := getTestHandler()
 	msg := Message{
@@ -149,6 +106,50 @@ func TestOnConnectionMsgFalse(t *testing.T) {
 
 	assert.Equal(t, false, handler.Config.Devices["TestDevice"].Connection,
 		"Device should set connection to false on connection message")
+}
+
+func TestOnConnectionMsgOtherDevice(t *testing.T) {
+	handler := getTestHandler()
+	msg := Message{
+		DeviceID: "WrongDevice",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "connection",
+		Contents: map[string]interface{}{
+			"connection": true},
+	}
+	handler.onConnectionMsg(msg)
+
+	_, ok := handler.Config.Devices["WrongDevice"]
+	assert.Equal(t, false, ok,
+		"Device should not exist in devices because it was not in config")
+}
+
+func TestOnConnectionMsgInvalid(t *testing.T) {
+	handler := getTestHandler()
+	msg := Message{
+		DeviceID: "TestDevice",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "connection",
+		Contents: map[string]interface{}{
+			"connection": "true"},
+	}
+	handler.onConnectionMsg(msg)
+	assert.Equal(t, false, handler.Config.Devices["TestDevice"].Connection,
+		"Device should not set connection to true on incorrect connection message")
+}
+
+func TestOnConnectionMsgInvalid2(t *testing.T) {
+	handler := getTestHandler()
+	msg := Message{
+		DeviceID: "TestDevice",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "connection",
+		Contents: map[string]interface{}{
+			"connected": "true"},
+	}
+	handler.onConnectionMsg(msg)
+	assert.Equal(t, false, handler.Config.Devices["TestDevice"].Connection,
+		"Device should not set connection to true on incorrect connection message")
 }
 
 func TestMsgMapperConnection(t *testing.T) {
@@ -172,20 +173,27 @@ func TestOnStatusMsg(t *testing.T) {
 		TimeSent: "05-12-2019 09:42:10",
 		Type:     "status",
 		Contents: map[string]interface{}{
-			"testComponent0": false,
-			"testComponent1": true,
-			"testComponent2": false},
+			"testComponent0": true,
+			"testComponent1": 40,
+			"testComponent2": "blue",
+			"testComponent3": []int{1, 2, 3}},
 	}
 	handler.onStatusMsg(msg)
 
-	assert.Equal(t, true, handler.Config.Devices["TestDevice"].Status["testComponent1"],
-		"Device should set status to true on component 1")
+	assert.Equal(t, true, handler.Config.Devices["TestDevice"].Status["testComponent0"],
+		"Device should set status to true on component 0")
+	assert.Equal(t, 40, handler.Config.Devices["TestDevice"].Status["testComponent1"],
+		"Device should set status to 40 on component 1")
+	assert.Equal(t, "blue", handler.Config.Devices["TestDevice"].Status["testComponent2"],
+		"Device should set status to blue on component 2")
+	assert.Equal(t, []int{1, 2, 3}, handler.Config.Devices["TestDevice"].Status["testComponent3"],
+		"Device should set status to [1,2,3] on component 3")
 }
 
 func TestOnStatusMsgOtherDevice(t *testing.T) {
 	handler := getTestHandler()
 	msg := Message{
-		DeviceID: "TestDevice2",
+		DeviceID: "WrongDevice",
 		TimeSent: "05-12-2019 09:42:10",
 		Type:     "status",
 		Contents: map[string]interface{}{
@@ -195,9 +203,54 @@ func TestOnStatusMsgOtherDevice(t *testing.T) {
 	}
 	handler.onStatusMsg(msg)
 
-	_, ok := handler.Config.Devices["TestDevice2"]
+	_, ok := handler.Config.Devices["WrongDevice"]
 	assert.Equal(t, false, ok,
 		"Device should not exist in devices because it was not in config")
+}
+
+func TestOnStatusMsgWrongComponent(t *testing.T) {
+	handler := getTestHandler()
+	msg := Message{
+		DeviceID: "TestDevice",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "status",
+		Contents: map[string]interface{}{
+			"testComponent7": true},
+	}
+	handler.onStatusMsg(msg)
+
+	_, ok := handler.Config.Devices["TestDevice"].Status["testComponent7"]
+	assert.Equal(t, false, ok,
+		"Component should not exist in device because it was not in config")
+}
+
+func TestOnStatusMsgWrongType(t *testing.T) {
+	handler := getTestHandler()
+	msg := Message{
+		DeviceID: "TestDevice",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "status",
+		Contents: map[string]interface{}{
+			"testComponent1": true,
+			"testComponent2": 40,
+			"testComponent3": "blue",
+			"testComponent0": []int{1, 2, 3}},
+	}
+	handler.onStatusMsg(msg)
+
+	_, ok := handler.Config.Devices["TestDevice"].Status["testComponent0"]
+	assert.Equal(t, false, ok,
+		"Component0 should not been updated in device because it was not the right type")
+	_, ok2 := handler.Config.Devices["TestDevice"].Status["testComponent1"]
+	assert.Equal(t, false, ok2,
+		"Component1 should not been updated in device because it was not the right type")
+	_, ok3 := handler.Config.Devices["TestDevice"].Status["testComponent2"]
+	assert.Equal(t, false, ok3,
+		"Component2 should not been updated in device because it was not the right type")
+	_, ok4 := handler.Config.Devices["TestDevice"].Status["testComponent3"]
+	assert.Equal(t, false, ok4,
+		"Component3 should not been updated in device because it was not the right type")
+
 }
 
 func TestMsgMapperStatus(t *testing.T) {
@@ -207,15 +260,18 @@ func TestMsgMapperStatus(t *testing.T) {
 		TimeSent: "05-12-2019 09:42:10",
 		Type:     "status",
 		Contents: map[string]interface{}{
-			"testComponent0": false,
-			"testComponent1": true,
-			"testComponent2": false},
+			"testComponent0": true,
+			"testComponent1": 40,
+			"testComponent2": "blue"},
 	}
 	handler.msgMapper(msg)
 
-	assert.Equal(t, true, handler.Config.Devices["TestDevice"].Status["testComponent1"],
-		"Device should set status for component 1 to true on status message")
-
+	assert.Equal(t, true, handler.Config.Devices["TestDevice"].Status["testComponent0"],
+		"Device should set status to true on component 0")
+	assert.Equal(t, 40, handler.Config.Devices["TestDevice"].Status["testComponent1"],
+		"Device should set status to 40 on component 1")
+	assert.Equal(t, "blue", handler.Config.Devices["TestDevice"].Status["testComponent2"],
+		"Device should set status to blue on component 2")
 }
 
 func TestOnConfirmationMsgTrue(t *testing.T) {

@@ -79,7 +79,8 @@ func (handler *Handler) onConnectionMsg(raw Message) {
 		logrus.Info("connection message received from: ", raw.DeviceID)
 		value, ok2 := raw.Contents["connection"]
 		if !ok2 || reflect.TypeOf(value).Kind() != reflect.Bool {
-			logrus.Error("received improperly structured connection message from device " + raw.DeviceID)
+			logrus.Warn("received improperly structured connection message from device " + raw.DeviceID)
+			return
 		}
 		device.Connection = value.(bool)
 		handler.Config.Devices[raw.DeviceID] = device
