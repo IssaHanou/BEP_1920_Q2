@@ -1,8 +1,9 @@
 {
   "id": "controlBoard",
   "description": "Control board with three switches, three slides with lights and one main switch.",
-  "host": "192.168.178.82",
+  "host": "localhost",
   "port": 1883,
+  "hint": false,
   "input": {
     "redSwitch": "boolean",
     "orangeSwitch":  "boolean",

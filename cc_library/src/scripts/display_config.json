@@ -1,0 +1,11 @@
+{
+  "id": "display",
+  "description": "Display can print hints",
+  "host": "localhost",
+  "hint": true,
+  "port": 1883,
+  "input": {},
+  "output": {
+    "door": "string"
+  }
+}

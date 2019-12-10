@@ -34,6 +34,7 @@ func GetHandler(workingConfig config.WorkingConfig, communicator communication.C
 func (handler *Handler) NewHandler(client mqtt.Client, message mqtt.Message) {
 	// TODO: Make advanced message handler which acts according to the events / configuration
 	var raw Message
+	logrus.Info(raw)
 	if err := json.Unmarshal(message.Payload(), &raw); err != nil {
 		logrus.Errorf("invalid JSON received: %v", err)
 	}
@@ -180,7 +181,7 @@ func (handler *Handler) openDoorBeun(raw Message) {
 			if err != nil {
 				logrus.Errorf("error occurred while constructing message to publish: %v", err)
 			} else {
-				handler.Communicator.Publish("door", string(jsonMessage), 3)
+				handler.Communicator.Publish("client/door", string(jsonMessage), 3)
 			}
 		}
 	}
@@ -202,12 +203,26 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 		if err != nil {
 			logrus.Errorf("error occurred while constructing message to publish: %v", err)
 		} else {
-			handler.Communicator.Publish("test", string(jsonMessage), 3)
+			handler.Communicator.Publish("client/#", string(jsonMessage), 3)
 		}
 	}
 	if raw.Contents["instruction"] == "send status" && raw.DeviceID == "front-end" {
 		for _, value := range handler.Config.Devices {
 			handler.SendStatus(value.ID)
+		}
+	}
+	if raw.Contents["instruction"] == "hint" && raw.DeviceID == "front-end" {
+		message := Message{
+			DeviceID: raw.DeviceID,
+			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+			Type:     "instruction",
+			Contents: raw.Contents,
+		}
+		jsonMessage, err := json.Marshal(&message)
+		if err != nil {
+			logrus.Errorf("error occurred while constructing message to publish: %v", err)
+		} else {
+			handler.Communicator.Publish("client/+/hint", string(jsonMessage), 3)
 		}
 	}
 }
