@@ -8,7 +8,7 @@
     - `confirmation`
     - `connection`
     - `instruction`
-    - `user_instruction`
+    - `front-end instruction`
 - `contents`:
     - If type is `status`, then the message contents is:
         - `input`: specifies current values for every input_component (in the form "componentId": "value") or an empty string if there is no input 
@@ -18,10 +18,8 @@
         - `instructed`: the instruction message that the client computer acted on regarding this confirmation
     - If type is `connection`, then the message contents is:
         - `connection`: "true" or "false" depending on connection status 
-    - If type is `instruction`, then the message contents is list of `componentInstructions` that have:
-        - `component_id`: this will be the id of a component in a timer or device
-        - `instruction`: one of the instructions specified for this device and component
-        - `value`: this is the value for the instruction of the type specified for this device and component
-    - If type is `user_instruction`, then the message contents is:
-        - `instruction`: this is the type of instruction, which can be one of the following: `test`, `start`, `reset`, `stop`. 
+    - If type is `instruction`, then the message contents is list of instructions that have:
+        - `component_id`: this will be the id of a component in a timer or device, (optional)
+        - `instruction`: one of the instructions specified for this device or component
+        - `value`: this is the value (argument) for the instruction (optional)
         

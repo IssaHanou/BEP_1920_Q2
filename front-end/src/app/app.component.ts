@@ -68,9 +68,9 @@ export class AppComponent implements OnInit, OnDestroy {
    * @param instruction instruction to be sent.
    */
   public sendInstruction(instruction: string) {
-    const msg = new Message("front-end", "instruction", new Date(), {
-      instruction
-    });
+    const msg = new Message("front-end", "instruction", new Date(), [
+      { instruction }
+    ]);
     const jsonMessage: string = this.jsonConvert.serialize(msg);
     this.mqttService.unsafePublish("instruction", JSON.stringify(jsonMessage));
     console.log(
