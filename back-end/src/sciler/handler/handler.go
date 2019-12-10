@@ -131,7 +131,7 @@ func (handler *Handler) onStatusMsg(raw Message) {
 					// todo custom types
 					logrus.Warn("custom types like: ", inputType, ", are not yet implemented")
 				}
-				//} else if inputType, ok := device.Output[k]; ok {
+				//} else if inputType, ok := device.Output[k].Type; ok {
 				//	switch inputType {
 				//	case "string":
 				//		{
