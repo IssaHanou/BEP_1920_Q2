@@ -1,3 +1,5 @@
+@import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
+
 /*Global variables - don't work*/
 :root {
   --blue-color: #3498DB;
