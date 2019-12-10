@@ -50,8 +50,8 @@ class Door(Device):
         elif instruction == "turn on":
             self.turn_on()
         else:
-            return True
-        return False
+            return False
+        return True
 
     def test(self):
         for i in range(0, 2):
@@ -64,27 +64,32 @@ class Door(Device):
     def turn_off(self):
         GPIO.output(self.door, GPIO.HIGH)
         self.status = False
-        scclib.statusChanged()
+        scclib.status_changed()
 
     def turn_on(self):
         GPIO.output(self.door, GPIO.LOW)
         self.status = True
-        scclib.statusChanged()
+        scclib.status_changed()
+
+    def main(self):
+        try:
+            device = self
+
+            two_up = os.path.abspath(os.path.join(__file__, ".."))
+            rel_path = "./door_config.json"
+            abs_file_path = os.path.join(two_up, rel_path)
+            abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
+            config = open(file=abs_file_path)
+            self.scclib = SccLib(config=config, device=device)
+            self.scclib.start()
+        except KeyboardInterrupt:
+            self.scclib.logger.log("program was terminated from keyboard input")
+        finally:
+            GPIO.cleanup()
+            self.scclib.logger.log("Cleanly exited Door program")
+            self.scclib.logger.close()
 
 
-try:
+if __name__ == "__main__":
     device = Door()
-
-    two_up = os.path.abspath(os.path.join(__file__, ".."))
-    rel_path = "./door_config.json"
-    abs_file_path = os.path.join(two_up, rel_path)
-    abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
-    config = open(file=abs_file_path)
-    scclib = SccLib(config=config, device=device)
-    scclib.start()
-except KeyboardInterrupt:
-    scclib.logger.log("program was terminated from keyboard input")
-finally:
-    GPIO.cleanup()
-    scclib.logger.log("Cleanly exited Door program")
-    scclib.logger.close()
+    device.main()

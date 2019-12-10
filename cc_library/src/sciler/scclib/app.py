@@ -168,19 +168,19 @@ class SccLib:
         """
         message = message.payload.decode("utf-8")
         message = json.loads(message)
-        failed_result = self.device.perform_instruction(message.get("contents"))
+        success = self.device.perform_instruction(message.get("contents"))
         msg_dict = {
             "device_id": self.name,
             "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
             "type": "confirmation",
-            "contents": {"completed": not failed_result, "instructed": message},
+            "contents": {"completed": success, "instructed": message},
         }
         msg = json.dumps(msg_dict)
         self.__send_message("confirmation", msg)
-        if failed_result:
-            self.logger.log(("instruction could not be performed", message))
-        else:
+        if success:
             self.logger.log(("instruction performed", message))
+        else:
+            self.logger.log(("instruction could not be performed", message))
 
     def __subscribe_topic(self, topic):
         """

@@ -3,7 +3,13 @@ import time
 
 from cc_library.src.sciler.scclib.app import SccLib
 from cc_library.src.sciler.scclib.device import Device
-import Adafruit_ADS1x15
+
+try:
+    import Adafruit_ADS1x15 as AdaFruit
+    print("using real deal")
+except (RuntimeError, ImportError, ModuleNotFoundError):
+    print("mocking")
+    import fake_rpi.Adafruit as AdaFruit
 
 try:
     import RPi.GPIO as GPIO
@@ -50,7 +56,7 @@ class ControlBoard(Device):
     GPIO.setup(greenLED1, GPIO.OUT)
     GPIO.setup(greenLED2, GPIO.OUT)
 
-    adc = Adafruit_ADS1x15.ADS1115()
+    adc = AdaFruit.ADS1115()
 
     GPIO.setup(a_pin0, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     GPIO.setup(a_pin1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
@@ -103,8 +109,8 @@ class ControlBoard(Device):
         elif instruction == "turnOn":
             self.turn_on(contents)
         else:
-            return True
-        return None
+            return False
+        return True
 
     def blink(self, data):
         led = getattr(self, data.get("led"))
@@ -133,41 +139,45 @@ class ControlBoard(Device):
                 GPIO.output(self.greenLEDs[i], GPIO.LOW)
                 time.sleep(0.2)
 
+    def main(self):
+        try:
+            device = ControlBoard()
 
-scclib = None
-try:
+            two_up = os.path.abspath(os.path.join(__file__, ".."))
+            rel_path = "./controlboard_config.json"
+            abs_file_path = os.path.join(two_up, rel_path)
+            abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
+            config = open(file=abs_file_path)
+            self.scclib = SccLib(config, device)
+
+            GPIO.add_event_detect(
+                device.redSwitch, GPIO.BOTH, callback=self.scclib.statusChangedOnChannel, bouncetime=100
+            )
+            GPIO.add_event_detect(
+                device.orangeSwitch, GPIO.BOTH, callback=self.scclib.statusChangedOnChannel, bouncetime=100
+            )
+            GPIO.add_event_detect(
+                device.greenSwitch, GPIO.BOTH, callback=self.scclib.statusChangedOnChannel, bouncetime=100
+            )
+            GPIO.add_event_detect(
+                device.mainSwitch, GPIO.BOTH, callback=self.scclib.statusChangedOnChannel, bouncetime=100
+            )
+            GPIO.add_event_detect(device.a_pin0, GPIO.BOTH, callback=self.scclib.status_changed)
+            GPIO.add_event_detect(device.a_pin1, GPIO.BOTH, callback=self.scclib.status_changed)
+            GPIO.add_event_detect(device.a_pin2, GPIO.BOTH, callback=self.scclib.status_changed)
+            GPIO.add_event_detect(device.b_pin0, GPIO.BOTH, callback=self.scclib.status_changed)
+            GPIO.add_event_detect(device.b_pin1, GPIO.BOTH, callback=self.scclib.status_changed)
+            GPIO.add_event_detect(device.b_pin2, GPIO.BOTH, callback=self.scclib.status_changed)
+
+            self.scclib.start()
+        except KeyboardInterrupt:
+            self.scclib.logger.log("program was terminated from keyboard input")
+        finally:
+            GPIO.cleanup()
+            self.scclib.logger.log("Cleanly exited ControlBoard program")
+            self.scclib.logger.close()
+
+
+if __name__ == "__main__":
     device = ControlBoard()
-
-    two_up = os.path.abspath(os.path.join(__file__, ".."))
-    rel_path = "./controlboard_config.json"
-    abs_file_path = os.path.join(two_up, rel_path)
-    abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
-    config = open(file=abs_file_path)
-    scclib = SccLib(config, device)
-
-    GPIO.add_event_detect(
-        device.redSwitch, GPIO.BOTH, callback=scclib.statusChangedOnChannel, bouncetime=100
-    )
-    GPIO.add_event_detect(
-        device.orangeSwitch, GPIO.BOTH, callback=scclib.statusChangedOnChannel, bouncetime=100
-    )
-    GPIO.add_event_detect(
-        device.greenSwitch, GPIO.BOTH, callback=scclib.statusChangedOnChannel, bouncetime=100
-    )
-    GPIO.add_event_detect(
-        device.mainSwitch, GPIO.BOTH, callback=scclib.statusChangedOnChannel, bouncetime=100
-    )
-    GPIO.add_event_detect(device.a_pin0, GPIO.BOTH, callback=scclib.status_changed)
-    GPIO.add_event_detect(device.a_pin1, GPIO.BOTH, callback=scclib.status_changed)
-    GPIO.add_event_detect(device.a_pin2, GPIO.BOTH, callback=scclib.status_changed)
-    GPIO.add_event_detect(device.b_pin0, GPIO.BOTH, callback=scclib.status_changed)
-    GPIO.add_event_detect(device.b_pin1, GPIO.BOTH, callback=scclib.status_changed)
-    GPIO.add_event_detect(device.b_pin2, GPIO.BOTH, callback=scclib.status_changed)
-
-    scclib.start()
-except KeyboardInterrupt:
-    scclib.logger.log("program was terminated from keyboard input")
-finally:
-    GPIO.cleanup()
-    scclib.logger.log("Cleanly exited ControlBoard program")
-    scclib.logger.close()
+    device.main()
