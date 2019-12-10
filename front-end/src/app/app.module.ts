@@ -16,6 +16,7 @@ import {
 } from "@angular/material/snack-bar";
 import { Overlay } from "@angular/cdk/overlay";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { MatPaginatorModule, MatTableModule } from "@angular/material";
 
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   hostname: "192.168.178.82",
@@ -45,7 +46,9 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     FormsModule,
     MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
     BrowserAnimationsModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatTableModule,
+    MatPaginatorModule,
   ],
   providers: [MqttService, MatSnackBar, Overlay],
   bootstrap: [AppComponent],

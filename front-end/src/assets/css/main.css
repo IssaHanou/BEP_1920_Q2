@@ -153,10 +153,24 @@ body {
 .device-table tbody td:nth-child(3) {
   text-align: left;
 }
-.puzzle-table tbody td {
-  text-align: left;
-}
 
+
+
+
+.puzzle-table th, td {
+  text-align: center;
+}
+.custom-md-table {
+  width: 100%;
+  background-color: #EEEEEE;
+  text-align: center;
+}
+.custom-md-table th {
+  font-weight: bold;
+}
+.custom-md-table-page {
+  background-color: #EEEEEE;
+}
 
 
 

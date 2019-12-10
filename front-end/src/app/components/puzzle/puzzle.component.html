@@ -1,27 +1,19 @@
 <div class="home-box puzzle-box">
   <h3 class="header">Puzzels</h3>
   <div class="contents">
-    <table class="overview-table puzzle-table">
-      <thead>
-      <tr>
-        <th>Puzzel</th>
-        <th>Status</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-        <td>Telefoon puzzle</td>
-        <td>3 pogingen</td>
-      </tr>
-      <tr>
-        <td>Weegschaal puzzel</td>
-        <td>&#10003;</td>
-      </tr>
-      <tr>
-        <td>Super mega lange puzzels, supermoeilijk</td>
-        <td>&#10005;</td>
-      </tr>
-      </tbody>
+    <table mat-table [dataSource]="puzzleData" class="mat-elevation-z8 custom-md-table puzzle-table">
+      <ng-container matColumnDef="puzzel">
+        <th mat-header-cell *matHeaderCellDef> Puzzel </th>
+        <td mat-cell *matCellDef="let element"> {{element.puzzle}} </td>
+      </ng-container>
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef> Status </th>
+        <td mat-cell *matCellDef="let element"> {{element.status}} </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="puzzleColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: puzzleColumns;"></tr>
     </table>
+    <mat-paginator [pageSizeOptions]="[5]" showFirstLastButtons class="custom-md-table-page"></mat-paginator>
   </div>
 </div>

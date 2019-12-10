@@ -8,6 +8,9 @@ import { AppComponent } from "../../app.component";
   styleUrls: ["./device.component.css", "../../../assets/css/main.css"]
 })
 export class DeviceComponent implements OnInit {
+  deviceColumns: string[] = ['device', 'con-status', 'ond-status'];
+  deviceData = this.app.deviceList.all.values();
+
   constructor(private app: AppComponent) {}
 
   ngOnInit() {}
