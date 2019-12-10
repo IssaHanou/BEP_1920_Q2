@@ -112,7 +112,7 @@ func Test_CheckActionWrongDevice(t *testing.T) {
 	assert.PanicsWithValue(t,
 		"device with id non existing not found in map",
 		func() { ReadFile(filename) },
-		"Cannot try to perform an action on an unknown device")
+		"Cannot perform an action on an unknown device")
 }
 
 func Test_CheckActionWrongComponent(t *testing.T) {
@@ -120,7 +120,7 @@ func Test_CheckActionWrongComponent(t *testing.T) {
 	assert.PanicsWithValue(t,
 		"component with id non existing not found in map",
 		func() { ReadFile(filename) },
-		"Cannot try to perform an action on an unknown component")
+		"Cannot perform an action on an unknown component")
 }
 
 func Test_CheckActionWrongInstruction(t *testing.T) {
@@ -128,7 +128,7 @@ func Test_CheckActionWrongInstruction(t *testing.T) {
 	assert.PanicsWithValue(t,
 		"instruction non existing not found in map",
 		func() { ReadFile(filename) },
-		"Cannot try to perform an action with an unknown instruction")
+		"Cannot perform an action with an unknown instruction")
 }
 
 func Test_CheckActionCustom(t *testing.T) {
