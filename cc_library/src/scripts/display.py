@@ -4,8 +4,6 @@ import time
 from cc_library.src.sciler.scclib.app import SccLib
 from cc_library.src.sciler.scclib.device import Device
 
-# import Adafruit_ADS1x15
-
 try:
     import RPi.GPIO as GPIO
 except (RuntimeError, ModuleNotFoundError):
@@ -13,12 +11,13 @@ except (RuntimeError, ModuleNotFoundError):
 
 scclib = None
 
+
 class Display(Device):
     hint = ""
 
     def get_status(self):
         status = "{"
-        status += "'hint': " + self.hint
+        status += "'hint': " + "'" + str(self.hint) + "'"
         status += "}"
         return status
 
@@ -35,10 +34,12 @@ class Display(Device):
     def test(self):
         self.hint = "test"
         print(self.hint)
+        scclib.statusChanged()
 
     def show_hint(self, data):
-        self.hint = getattr(self, data.get("hint"))
+        self.hint = data.get("hint")
         print(self.hint)
+        scclib.statusChanged()
 
 
 try:

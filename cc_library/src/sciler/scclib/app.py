@@ -74,13 +74,9 @@ class SccLib:
                 msg = json.dumps(msg_dict)
                 self.__send_message("back-end", msg)
                 if self.hint :
-                    topic = "client/" + self.name + "/hint"
-                else :
-                    topic = "client/" + self.name
-                #self.__subscribe_topic("client-computers")
-                #self.__subscribe_topic("test")
-                #self.__subscribe_topic(self.name)
-                self.__subscribe_topic(topic)
+                    self.__subscribe_topic("hint")
+                self.__subscribe_topic("client-computers")
+                self.__subscribe_topic(self.name)
                 self.client.loop_forever()
                 break
             except ConnectionRefusedError:
@@ -146,8 +142,8 @@ class SccLib:
             "type": "status",
             "contents": eval(msg),
         }
-        msg = json.dumps(json_msg)
-        self.__send_message("back-end", msg)
+        res_msg = json.dumps(json_msg)
+        self.__send_message("back-end", res_msg)
 
     def __on_message(self, client, userdata, message):
         """
