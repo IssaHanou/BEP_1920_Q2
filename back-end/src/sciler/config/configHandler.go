@@ -81,55 +81,62 @@ func checkActions(actions []Action, config WorkingConfig) error {
 		switch action.Type {
 		case "device":
 			{
-				if device, ok := config.Devices[action.TypeID]; ok { // checks if device can be found in the map, if so, it is stored in variable device
-					for _, actionMessage := range action.Message {
-						if outputObject, ok := device.Output[actionMessage.ComponentID]; ok {
-							valueType := reflect.TypeOf(actionMessage.Value).Kind()
-							if instructionType, ok := outputObject.Instructions[actionMessage.Instruction]; ok {
-								switch instructionType {
-								case "string":
-									{
-										if valueType != reflect.String {
-											return fmt.Errorf("instruction type string expected but %s found as type of value %v", valueType.String(), actionMessage.Value)
-										}
-									}
-								case "boolean":
-									{
-										if valueType != reflect.Bool {
-											return fmt.Errorf("instruction type boolean expected but %s found as type of value %v", valueType.String(), actionMessage.Value)
-										}
-									}
-								case "numeric":
-									{
-										if valueType != reflect.Int && valueType != reflect.Float64 {
-											return fmt.Errorf("instruction type numeric expected but %s found as type of value %v", valueType.String(), actionMessage.Value)
-										}
-									}
-								case "array":
-									{
-										if valueType != reflect.Slice {
-											return fmt.Errorf("instruction type array/slice expected but %s found as type of value %v", valueType.String(), actionMessage.Value)
-										}
-									}
-								default:
-									// todo custom types
-									return fmt.Errorf("custom types like: %s, are not yet implemented", instructionType)
-								}
-							} else {
-								return fmt.Errorf("instruction %s not found in map", actionMessage.Instruction)
-							}
-						} else {
-							return fmt.Errorf("component with id %s not found in map", actionMessage.ComponentID)
-						}
-					}
-				} else {
-					return fmt.Errorf("device with id %s not found in map", action.TypeID)
+				if err := checkActionDevice(action, config); err != nil {
+					return err
 				}
 			}
 		case "timer":
 		default:
 			return fmt.Errorf("only device and timer are accepted as type for an action, however type was specified as: %s", action.Type)
 		}
+	}
+	return nil
+}
+
+func checkActionDevice(action Action, config WorkingConfig) error {
+	if device, ok := config.Devices[action.TypeID]; ok { // checks if device can be found in the map, if so, it is stored in variable device
+		for _, actionMessage := range action.Message {
+			if outputObject, ok := device.Output[actionMessage.ComponentID]; ok {
+				valueType := reflect.TypeOf(actionMessage.Value).Kind()
+				if instructionType, ok := outputObject.Instructions[actionMessage.Instruction]; ok {
+					switch instructionType {
+					case "string":
+						{
+							if valueType != reflect.String {
+								return fmt.Errorf("instruction type string expected but %s found as type of value %v", valueType.String(), actionMessage.Value)
+							}
+						}
+					case "boolean":
+						{
+							if valueType != reflect.Bool {
+								return fmt.Errorf("instruction type boolean expected but %s found as type of value %v", valueType.String(), actionMessage.Value)
+							}
+						}
+					case "numeric":
+						{
+							if valueType != reflect.Int && valueType != reflect.Float64 {
+								return fmt.Errorf("instruction type numeric expected but %s found as type of value %v", valueType.String(), actionMessage.Value)
+							}
+						}
+					case "array":
+						{
+							if valueType != reflect.Slice {
+								return fmt.Errorf("instruction type array/slice expected but %s found as type of value %v", valueType.String(), actionMessage.Value)
+							}
+						}
+					default:
+						// todo custom types
+						return fmt.Errorf("custom types like: %s, are not yet implemented", instructionType)
+					}
+				} else {
+					return fmt.Errorf("instruction %s not found in map", actionMessage.Instruction)
+				}
+			} else {
+				return fmt.Errorf("component with id %s not found in map", actionMessage.ComponentID)
+			}
+		}
+	} else {
+		return fmt.Errorf("device with id %s not found in map", action.TypeID)
 	}
 	return nil
 }
