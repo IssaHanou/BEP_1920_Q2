@@ -31,6 +31,6 @@ All messages to the back-end should be sent on topic `back-end`
 
 All messages to all client computers should be sent on topic `client-computers`
 
-All messages to single client computers should be sent to topic `<device.name>`
+All messages to single client computers should be sent to topic `<devicename>`
 
 All messages to labeled client computers should be sent to topic `<label>` (like `hint`)
