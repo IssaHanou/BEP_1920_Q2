@@ -188,7 +188,7 @@ func (handler *Handler) openDoorBeun(raw Message) {
 
 //onInstructionMsg is the function to process instruction messages.
 func (handler *Handler) onInstructionMsg(raw Message) {
-	logrus.Info("instruction message received from: ", raw.DeviceID)
+	logrus.Info("instruction message received from: ", raw.DeviceID, " with instruction: ", raw.Contents["instruction"])
 	if raw.Contents["instruction"] == "test all" && raw.DeviceID == "front-end" { // TODO maybe switch again
 		message := Message{
 			DeviceID: raw.DeviceID,
@@ -202,12 +202,26 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 		if err != nil {
 			logrus.Errorf("error occurred while constructing message to publish: %v", err)
 		} else {
-			handler.Communicator.Publish("test", string(jsonMessage), 3)
+			handler.Communicator.Publish("client-computers", string(jsonMessage), 3)
 		}
 	}
 	if raw.Contents["instruction"] == "send status" && raw.DeviceID == "front-end" {
 		for _, value := range handler.Config.Devices {
 			handler.SendStatus(value.ID)
+		}
+	}
+	if raw.Contents["instruction"] == "hint" && raw.DeviceID == "front-end" {
+		message := Message{
+			DeviceID: raw.DeviceID,
+			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+			Type:     "instruction",
+			Contents: raw.Contents,
+		}
+		jsonMessage, err := json.Marshal(&message)
+		if err != nil {
+			logrus.Errorf("error occurred while constructing message to publish: %v", err)
+		} else {
+			handler.Communicator.Publish("hint", string(jsonMessage), 3)
 		}
 	}
 }
