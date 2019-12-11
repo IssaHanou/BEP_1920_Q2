@@ -6,6 +6,7 @@
   --orange-color: #fcdd90;
   --blue-color-light: #65bdf7;
   --blue-color-dark: #0f88d9;
+  --mat-primary: #3f51b5;
 }
 
 
@@ -48,7 +49,7 @@
 
 /*General styling*/
 body {
-  background-color: #3498DB;
+  background-color: #3f51b5;
   height: 100%;
 }
 .home{
@@ -80,10 +81,13 @@ body {
 }
 .home-box .header {
   font-family: 'din-med', sans-serif;
-  color: #65bdf7;
+  color: #3f51b5;
   background-color: #EEEEEE;
   margin-bottom: 5px;
   padding: 5px;
+}
+.subtitle, .title {
+  color: #EEEEEE;
 }
 .home-box .contents {
   background-color: #EEEEEE;
