@@ -100,6 +100,8 @@ class ControlBoard(Device):
                 self.blink(action.get("component_id"), action.get("value"))
             elif instruction == "turnOnOff":
                 self.turn_on_off(action.get("component_id"), action.get("value"))
+            elif instruction == "test": # Todo: make the library check for this instruction and coll it directly
+                self.test()
             else:
                 return True
         return False

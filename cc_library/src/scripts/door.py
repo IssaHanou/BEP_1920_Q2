@@ -49,6 +49,8 @@ class Door(Device):
                     self.turn_off()
                 else:
                     self.turn_on()
+            elif instruction == "test":
+                self.test()
             else:
                 return True
         return False

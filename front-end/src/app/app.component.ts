@@ -6,6 +6,7 @@ import { MatSnackBar, MatSnackBarConfig } from "@angular/material";
 import "@angular/material/prebuilt-themes/deeppurple-amber.css";
 import { Subscription } from "rxjs";
 import { Devices } from "./components/device/devices";
+import { stringify } from "querystring";
 
 @Component({
   selector: "app-root",
@@ -91,12 +92,15 @@ export class AppComponent implements OnInit, OnDestroy {
          * When the front-end receives confirmation message from client computer
          * that instruction was completed, show the message to the user.
          */
-        const display =
-          "received confirmation from " +
-          msg.deviceId +
-          " for instruction: " +
-          msg.contents[keys[0]][keys[1]][keys[2]];
-        this.openSnackbar(display, "");
+
+        for (const instruction of msg.contents[keys[0]][keys[1]]) {
+          const display =
+            "received confirmation from " +
+            msg.deviceId +
+            " for instruction: " +
+            instruction[keys[2]];
+          this.openSnackbar(display, "");
+        }
         break;
       }
       case "instruction": {

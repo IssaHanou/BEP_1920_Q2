@@ -114,14 +114,23 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 			logrus.Error("received improperly structured confirmation message from device " + raw.DeviceID)
 		} else {
 			msg := original.(map[string]interface{})
+			contents, err := getMapSlice(msg["contents"])
+			if err != nil {
+				logrus.Error(err)
+				return
+			}
+
+			var instructionString string
+			for i, instruction := range contents {
+				instructionString = fmt.Sprintf("%s%d: %s ", instructionString, i, instruction["instruction"])
+			}
+
 			if !value.(bool) {
-				logrus.Error("device " + raw.DeviceID + " did not complete instruction " +
-					fmt.Sprint(msg["contents"].(map[string]interface{})["instruction"]) +
-					" at " + raw.TimeSent)
+				logrus.Error("device " + raw.DeviceID + " did not complete instructions: " +
+					instructionString + "at " + raw.TimeSent)
 			} else {
-				logrus.Info("device " + raw.DeviceID + " completed instruction " +
-					fmt.Sprint(msg["contents"].(map[string]interface{})["instruction"]) +
-					" at " + raw.TimeSent)
+				logrus.Info("device " + raw.DeviceID + " completed instructions: " +
+					instructionString + "at " + raw.TimeSent)
 			}
 			// If original message to which device responded with confirmation was sent by front-end,
 			// pass confirmation through
@@ -193,13 +202,8 @@ func (handler *Handler) openDoorBeun(raw Message) {
 //onInstructionMsg is the function to process instruction messages.
 func (handler *Handler) onInstructionMsg(raw Message) {
 	logrus.Info("instruction message received from: ", raw.DeviceID)
-	bytes, err := json.Marshal(raw.Contents)
-	if err != nil {
-		logrus.Error(err)
-		return
-	}
-	var instructions []map[string]interface{} // dirty trick to go from interface{} to []map[string]interface{}
-	err = json.Unmarshal(bytes, &instructions)
+
+	instructions, err := getMapSlice(raw.Contents)
 	if err != nil {
 		logrus.Error(err)
 		return
@@ -228,4 +232,17 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 			}
 		}
 	}
+}
+
+func getMapSlice(input interface{}) ([]map[string]interface{}, error) {
+	bytes, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+	var output []map[string]interface{} // dirty trick to go from interface{} to []map[string]interface{}
+	err = json.Unmarshal(bytes, &output)
+	if err != nil {
+		return nil, err
+	}
+	return output, nil
 }
