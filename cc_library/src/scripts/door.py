@@ -44,7 +44,7 @@ class Door(Device):
         """
         for action in contents:
             instruction = action.get("instruction")
-            if instruction == "door":
+            if instruction == "open":
                 if action.get("value"):
                     self.turn_off()
                 else:

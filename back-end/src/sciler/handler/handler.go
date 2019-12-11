@@ -174,27 +174,31 @@ func (handler *Handler) openDoorBeun(raw Message) {
 	contents := raw.Contents.(map[string]interface{})
 	logrus.Info("checking if door needs to open based on received status message")
 	if raw.DeviceID == "controlBoard" {
-		var instruction string
+		var instruction bool
 		if contents["mainSwitch"] == float64(0) {
-			instruction = "turn off"
+			instruction = false
 		} else if contents["mainSwitch"] == float64(1) {
-			instruction = "turn on"
+			instruction = true
+		} else {
+			return
 		}
-		if instruction != "" {
-			message := Message{
-				DeviceID: "back-end",
-				TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-				Type:     "instruction",
-				Contents: []map[string]interface{}{
-					{"instructions": instruction},
+
+		message := Message{
+			DeviceID: "back-end",
+			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+			Type:     "instruction",
+			Contents: []map[string]interface{}{
+				{
+					"instruction": "open",
+					"value":       instruction,
 				},
-			}
-			jsonMessage, err := json.Marshal(&message)
-			if err != nil {
-				logrus.Errorf("error occurred while constructing message to publish: %v", err)
-			} else {
-				handler.Communicator.Publish("door", string(jsonMessage), 3)
-			}
+			},
+		}
+		jsonMessage, err := json.Marshal(&message)
+		if err != nil {
+			logrus.Errorf("error occurred while constructing message to publish: %v", err)
+		} else {
+			handler.Communicator.Publish("door", string(jsonMessage), 3)
 		}
 	}
 }
