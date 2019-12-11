@@ -87,6 +87,7 @@ class ControlBoard(Device):
         status += "}"
         return status
 
+    # Todo: make the library check for this instruction and coll it directly
     def perform_instruction(self, contents):
         """
         Set here the mapping from messages to methods.
@@ -100,7 +101,7 @@ class ControlBoard(Device):
                 self.blink(action.get("component_id"), action.get("value"))
             elif instruction == "turnOnOff":
                 self.turn_on_off(action.get("component_id"), action.get("value"))
-            elif instruction == "test": # Todo: make the library check for this instruction and coll it directly
+            elif instruction == "test":
                 self.test()
             else:
                 return True
@@ -146,16 +147,28 @@ try:
     scclib = SccLib(config, device)
 
     GPIO.add_event_detect(
-        device.redSwitch, GPIO.BOTH, callback=scclib.statusChangedOnChannel, bouncetime=100
+        device.redSwitch,
+        GPIO.BOTH,
+        callback=scclib.statusChangedOnChannel,
+        bouncetime=100,
     )
     GPIO.add_event_detect(
-        device.orangeSwitch, GPIO.BOTH, callback=scclib.statusChangedOnChannel, bouncetime=100
+        device.orangeSwitch,
+        GPIO.BOTH,
+        callback=scclib.statusChangedOnChannel,
+        bouncetime=100,
     )
     GPIO.add_event_detect(
-        device.greenSwitch, GPIO.BOTH, callback=scclib.statusChangedOnChannel, bouncetime=100
+        device.greenSwitch,
+        GPIO.BOTH,
+        callback=scclib.statusChangedOnChannel,
+        bouncetime=100,
     )
     GPIO.add_event_detect(
-        device.mainSwitch, GPIO.BOTH, callback=scclib.statusChangedOnChannel, bouncetime=100
+        device.mainSwitch,
+        GPIO.BOTH,
+        callback=scclib.statusChangedOnChannel,
+        bouncetime=100,
     )
     GPIO.add_event_detect(device.a_pin0, GPIO.BOTH, callback=scclib.status_changed)
     GPIO.add_event_detect(device.a_pin1, GPIO.BOTH, callback=scclib.status_changed)
