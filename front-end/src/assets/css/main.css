@@ -1,5 +1,3 @@
-@import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
-
 /*Global variables - don't work*/
 :root {
   --blue-color: #3498DB;
@@ -78,6 +76,7 @@ body {
   font-family: 'din', sans-serif;
   margin: 30px;
   max-width: 100%;
+  max-height: 100%;
 }
 .home-box .header {
   font-family: 'din-med', sans-serif;
@@ -92,6 +91,7 @@ body {
   text-align: center;
   float: none;
   justify-content: center;
+  max-height: 100%;
 }
 
 /*Small screens should have small margin*/
@@ -119,53 +119,12 @@ body {
 
 
 /*Tables for devices and events*/
-.overview-table {
-  border-collapse: collapse;
-  border: 1px solid black;
-  border-radius: 4px;
-  width: 100%;
-}
-.overview-table thead {
-  font-family: 'din-bold', sans-serif;
-}
-.overview-table th {
-  border-bottom: 2px solid black;
-}
-.overview-table tbody {
-  font-family: 'din', sans-serif;
-}
-.overview-table td {
-  margin-left: 5px;
-  margin-right: 5px;
-}
-.overview-table tbody tr:nth-child(odd) {
-  background-color: #fcf790;
-}
-.overview-table tbody tr:nth-child(even) {
-  background-color: #fcdd90;
-}
-.device-table tbody td:nth-child(1) {
-  text-align: left;
-}
-.device-table tbody td:nth-child(2) {
-  text-align: center;
-}
-.device-table tbody td:nth-child(3) {
-  text-align: left;
-}
-
-
-
-
-.puzzle-table th, td {
-  text-align: center;
-}
 .custom-md-table {
   width: 100%;
   background-color: #EEEEEE;
-  text-align: center;
+  text-align: left;
 }
-.custom-md-table th {
+.custom-md-table-header {
   font-weight: bold;
 }
 .custom-md-table-page {
