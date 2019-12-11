@@ -1,6 +1,4 @@
 import { Component } from "@angular/core";
-import { MqttService } from "ngx-mqtt";
-import { Message } from "../../message";
 import { AppComponent } from "../../app.component";
 
 @Component({
@@ -11,22 +9,16 @@ import { AppComponent } from "../../app.component";
 export class HintComponent {
   hint: string;
 
-  constructor(private mqttService: MqttService, private app: AppComponent) {}
-
-  public unsafePublish(topic: string, message: string): void {
-    this.mqttService.unsafePublish(topic, message, { qos: 1, retain: true });
+  constructor(private app: AppComponent) {
   }
 
   onSubmit() {
-    const msg = new Message("front-end", "instruction", new Date(), [
-      {
+    if (this.hint !== "" && this.hint !== undefined ) {
+      this.app.sendInstruction([{
         instruction: "hint",
         value: this.hint
-      }
-    ]);
-    const res = this.app.jsonConvert.serialize(msg);
-    this.unsafePublish("back-end", JSON.stringify(res));
-    console.log("log: sent instruction message: " + JSON.stringify(res));
-    this.hint = "";
+      }]);
+      this.hint = "";
+    }
   }
 }
