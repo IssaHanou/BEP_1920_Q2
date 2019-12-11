@@ -24,7 +24,7 @@
           "instructions": {
             "interval": "numeric",
             "delay": "numeric",
-            "state": "string"
+            "state": "boolean"
           }
         },
         "greenLight2": {
@@ -187,9 +187,9 @@
                       "value": true
                     },
                     {
-                      "component_id": 6,
+                      "component_id": "slider2",
                       "comparison": "lt",
-                      "value": 30
+                      "value": 20
                     }
                   ]
                 }

@@ -27,10 +27,11 @@ func getTestHandler() *Handler {
 					"testComponent2": "string",
 					"testComponent3": "array",
 				},
-				Output: map[string]interface{}{
-					"testComponent4": false,
-					"testComponent5": true,
-					"testComponent6": false,
+				Output: map[string]config.OutputObject{
+					"testComponent4": {Type: "boolean", Instructions: map[string]string{}},
+					"testComponent5": {Type: "numeric", Instructions: map[string]string{}},
+					"testComponent6": {Type: "string", Instructions: map[string]string{}},
+					"testComponent7": {Type: "array", Instructions: map[string]string{}},
 				},
 				Status:     map[string]interface{}{},
 				Connection: false,
@@ -176,7 +177,12 @@ func TestOnStatusMsg(t *testing.T) {
 			"testComponent0": true,
 			"testComponent1": 40,
 			"testComponent2": "blue",
-			"testComponent3": []int{1, 2, 3}},
+			"testComponent3": []int{1, 2, 3},
+			"testComponent4": true,
+			"testComponent5": 40,
+			"testComponent6": "blue",
+			"testComponent7": []int{1, 2, 3},
+		},
 	}
 	handler.onStatusMsg(msg)
 
@@ -188,6 +194,14 @@ func TestOnStatusMsg(t *testing.T) {
 		"Device should set status to blue on component 2")
 	assert.Equal(t, []int{1, 2, 3}, handler.Config.Devices["TestDevice"].Status["testComponent3"],
 		"Device should set status to [1,2,3] on component 3")
+	assert.Equal(t, true, handler.Config.Devices["TestDevice"].Status["testComponent4"],
+		"Device should set status to true on component 4")
+	assert.Equal(t, 40, handler.Config.Devices["TestDevice"].Status["testComponent5"],
+		"Device should set status to 40 on component 5")
+	assert.Equal(t, "blue", handler.Config.Devices["TestDevice"].Status["testComponent6"],
+		"Device should set status to blue on component 6")
+	assert.Equal(t, []int{1, 2, 3}, handler.Config.Devices["TestDevice"].Status["testComponent7"],
+		"Device should set status to [1,2,3] on component 7")
 }
 
 func TestOnStatusMsgOtherDevice(t *testing.T) {
@@ -215,11 +229,11 @@ func TestOnStatusMsgWrongComponent(t *testing.T) {
 		TimeSent: "05-12-2019 09:42:10",
 		Type:     "status",
 		Contents: map[string]interface{}{
-			"testComponent7": true},
+			"wrongComponent": true},
 	}
 	handler.onStatusMsg(msg)
 
-	_, ok := handler.Config.Devices["TestDevice"].Status["testComponent7"]
+	_, ok := handler.Config.Devices["TestDevice"].Status["wrongComponent"]
 	assert.Equal(t, false, ok,
 		"Component should not exist in device because it was not in config")
 }
@@ -234,12 +248,16 @@ func TestOnStatusMsgWrongType(t *testing.T) {
 			"testComponent1": true,
 			"testComponent2": 40,
 			"testComponent3": "blue",
-			"testComponent0": []int{1, 2, 3}},
+			"testComponent0": []int{1, 2, 3},
+			"testComponent5": true,
+			"testComponent6": 40,
+			"testComponent7": "blue",
+			"testComponent4": []int{1, 2, 3}},
 	}
 	handler.onStatusMsg(msg)
 
-	_, ok := handler.Config.Devices["TestDevice"].Status["testComponent0"]
-	assert.Equal(t, false, ok,
+	_, ok1 := handler.Config.Devices["TestDevice"].Status["testComponent0"]
+	assert.Equal(t, false, ok1,
 		"Component0 should not been updated in device because it was not the right type")
 	_, ok2 := handler.Config.Devices["TestDevice"].Status["testComponent1"]
 	assert.Equal(t, false, ok2,
@@ -250,6 +268,18 @@ func TestOnStatusMsgWrongType(t *testing.T) {
 	_, ok4 := handler.Config.Devices["TestDevice"].Status["testComponent3"]
 	assert.Equal(t, false, ok4,
 		"Component3 should not been updated in device because it was not the right type")
+	_, ok5 := handler.Config.Devices["TestDevice"].Status["testComponent4"]
+	assert.Equal(t, false, ok5,
+		"Component4 should not been updated in device because it was not the right type")
+	_, ok6 := handler.Config.Devices["TestDevice"].Status["testComponent5"]
+	assert.Equal(t, false, ok6,
+		"Component5 should not been updated in device because it was not the right type")
+	_, ok7 := handler.Config.Devices["TestDevice"].Status["testComponent6"]
+	assert.Equal(t, false, ok7,
+		"Component6 should not been updated in device because it was not the right type")
+	_, ok8 := handler.Config.Devices["TestDevice"].Status["testComponent7"]
+	assert.Equal(t, false, ok8,
+		"Component7 should not been updated in device because it was not the right type")
 
 }
 
@@ -285,8 +315,8 @@ func TestOnConfirmationMsgTrue(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]interface{}{"instruction": "test"},
-				"type":      "instruction",
+				"contents":  map[string]interface{}{"instructions": "test"},
+				"type":      "instructions",
 			},
 		},
 	}
@@ -305,8 +335,8 @@ func TestOnConfirmationMsgFalse(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]interface{}{"instruction": "test"},
-				"type":      "instruction",
+				"contents":  map[string]interface{}{"instructions": "test"},
+				"type":      "instructions",
 			},
 		},
 	}
@@ -325,8 +355,8 @@ func TestOnConfirmationMsgIncorrect1(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]interface{}{"instruction": "test"},
-				"type":      "instruction",
+				"contents":  map[string]interface{}{"instructions": "test"},
+				"type":      "instructions",
 			},
 		},
 	}
@@ -342,11 +372,11 @@ func TestOnConfirmationMsgIncorrect2(t *testing.T) {
 		Type:     "confirmation",
 		Contents: map[string]interface{}{
 			"completed": true,
-			"instruction": map[string]interface{}{
+			"instructions": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]interface{}{"instruction": "test"},
-				"type":      "instruction",
+				"contents":  map[string]interface{}{"instructions": "test"},
+				"type":      "instructions",
 			},
 		},
 	}
@@ -365,8 +395,8 @@ func TestOnConfirmationMsgIncorrect3(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]interface{}{"instruction": "test"},
-				"type":      "instruction",
+				"contents":  map[string]interface{}{"instructions": "test"},
+				"type":      "instructions",
 			},
 		},
 	}
@@ -385,8 +415,8 @@ func TestMsgMapperConfirmation(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]interface{}{"instruction": "test"},
-				"type":      "instruction",
+				"contents":  map[string]interface{}{"instructions": "test"},
+				"type":      "instructions",
 			},
 		},
 	}

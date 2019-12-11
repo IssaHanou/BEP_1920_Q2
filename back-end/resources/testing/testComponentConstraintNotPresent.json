@@ -7,14 +7,100 @@
   },
   "devices": [
     {
-      "id": "ledLights",
-      "description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
+      "id": "controlBoard",
+      "description": "Control board with three switches, three slides with lights and one main switch.",
       "input": {
-        "light": "boolean"
+        "redSwitch": "boolean",
+        "orangeSwitch": "boolean",
+        "greenSwitch": "boolean",
+        "slider1": "numeric",
+        "slider2": "numeric",
+        "slider3": "numeric",
+        "mainSwitch": "boolean"
       },
       "output": {
-        "color": "string"
+        "greenLight1": {
+          "type": "string",
+          "instructions": {
+            "interval": "numeric",
+            "delay": "numeric",
+            "state": "string"
+          }
+        },
+        "greenLight2": {
+          "type": "string",
+          "instructions": {
+            "interval": "numeric",
+            "delay": "numeric",
+            "state": "string"
+          }
+        },
+        "greenLight3": {
+          "type": "string",
+          "instructions": {
+            "interval": "numeric",
+            "delay": "numeric",
+            "state": "string"
+          }
+        },
+        "redLight1": {
+          "type": "string",
+          "instructions": {
+            "interval": "numeric",
+            "delay": "numeric",
+            "state": "string"
+          }
+        },
+        "redLight2": {
+          "type": "string",
+          "instructions": {
+            "interval": "numeric",
+            "delay": "numeric",
+            "state": "string"
+          }
+        },
+        "redLight3": {
+          "type": "string",
+          "instructions": {
+            "interval": "numeric",
+            "delay": "numeric",
+            "state": "string"
+          }
+        }
       }
+    },
+    {
+      "id": "telephone",
+      "description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
+      "input": {
+        "turningWheel": "array"
+      },
+      "output": {
+        "audio": {
+          "type": "string",
+          "instructions": {
+            "play": "string"
+          }
+        },
+        "ringTone": {
+          "type": "string",
+          "instructions": {
+            "play": "string"
+          }
+        }
+      }
+    },
+    {
+      "id": "test device",
+      "description": "device that has all types of input",
+      "input": {
+        "numeric": "numeric",
+        "boolean":"boolean",
+        "string": "string",
+        "array": "array",
+        "custom": "custom"
+      },
+      "output": {}
     }
   ],
   "puzzles": [
@@ -27,7 +113,7 @@
           "limit": 1,
           "conditions": {
             "type": "device",
-            "type_id": "ledLights",
+            "type_id": "telephone",
             "constraints": {
               "comparison": "eq",
               "component_id": "non existing",
@@ -37,12 +123,128 @@
           "actions": [
             {
               "type": "device",
-              "type_id": "ledLights",
-              "message": {
-                "output": {
-                  "color": "green"
+              "type_id": "telephone",
+              "message": [
+                {
+                  "component_id": "audio",
+                  "instruction": "play",
+                  "value": "audio1"
+                }
+              ]
+            },
+            {
+              "type": "device",
+              "type_id": "controlBoard",
+              "message": [
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "state",
+                  "value": "off"
+                },
+                {
+                  "component_id": "greenLight2",
+                  "instruction": "state",
+                  "value": "on"
+                },
+                {
+                  "component_id": "greenLight3",
+                  "instruction": "state",
+                  "value": "off"
+                },
+                {
+                  "component_id": "redLight1",
+                  "instruction": "state",
+                  "value": "on"
+                },
+                {
+                  "component_id": "redLight2",
+                  "instruction": "state",
+                  "value": "off"
+                },
+                {
+                  "component_id": "redLight3",
+                  "instruction": "state",
+                  "value": "on"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "hints": [
+        "Zet de schuiven nauwkeurig"
+      ]
+    }
+  ],
+  "general_events": [
+    {
+      "name": "Start",
+      "rules": [
+        {
+          "id": "telephoneRings",
+          "description": "Als het spel start, moet de telefoon na 1 minuut ringen.",
+          "limit": 1,
+          "conditions": {
+            "operator": "OR",
+            "list": [
+              {
+                "type": "timer",
+                "type_id": "timer1",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "value": "00:01:01"
+                    }
+                  ]
                 }
               }
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "telephone",
+              "message": [
+                {
+                  "component_id": "audio",
+                  "instruction": "play",
+                  "value": "audio1"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stop",
+      "rules": [
+        {
+          "id": "flipSwitch",
+          "description": "Als de knop omgaat, stopt het spel.",
+          "limit": 1,
+          "conditions": {
+            "type": "device",
+            "type_id": "controlBoard",
+            "constraints": {
+              "comparison": "eq",
+              "value": true,
+              "component_id": "mainSwitch"
+            }
+          },
+          "actions": [
+            {
+              "type": "timer",
+              "type_id": "timer1",
+              "message": [
+                {
+                  "component_id": "timer1",
+                  "instruction": "instruction",
+                  "value": "stop"
+                }
+              ]
             }
           ]
         }

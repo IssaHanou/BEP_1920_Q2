@@ -187,9 +187,9 @@
                       "value": true
                     },
                     {
-                      "component_id": 6,
+                      "component_id": "slider2",
                       "comparison": "lt",
-                      "value": 30
+                      "value": 20
                     }
                   ]
                 }
@@ -281,7 +281,7 @@
           "actions": [
             {
               "type": "device",
-              "type_id": "telephone",
+              "type_id": "non existing",
               "message": [
                 {
                   "component_id": "audio",

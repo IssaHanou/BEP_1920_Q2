@@ -42,15 +42,17 @@ class Door(Device):
         Should return warning when illegal instruction was sent
         or instruction could not be performed.
         """
-        instruction = contents.get("instruction")
-        if instruction == "test":
-            self.test()
-        elif instruction == "turn off":
-            self.turn_off()
-        elif instruction == "turn on":
-            self.turn_on()
-        else:
-            return True
+        for action in contents:
+            instruction = action.get("instruction")
+            if instruction == "open":
+                if action.get("value"):
+                    self.turn_off()
+                else:
+                    self.turn_on()
+            elif instruction == "test":
+                self.test()
+            else:
+                return True
         return False
 
     def test(self):

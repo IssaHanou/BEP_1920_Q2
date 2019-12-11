@@ -3,9 +3,9 @@ import { HintComponent } from "./hint.component";
 import { FormsModule } from "@angular/forms";
 import { MqttModule, MqttService } from "ngx-mqtt";
 import { MQTT_SERVICE_OPTIONS } from "../../app.module";
-import {AppComponent} from "../../app.component";
-import {MatSnackBar} from "@angular/material/snack-bar";
-import {Overlay} from "@angular/cdk/overlay";
+import { AppComponent } from "../../app.component";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { Overlay } from "@angular/cdk/overlay";
 
 describe("HintComponent", () => {
   let component: HintComponent;

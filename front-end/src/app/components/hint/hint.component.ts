@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
 import { MqttService } from "ngx-mqtt";
-import {Message} from "../../message";
-import {AppComponent} from "../../app.component";
+import { Message } from "../../message";
+import { AppComponent } from "../../app.component";
 
 @Component({
   selector: "app-hint",
@@ -18,13 +18,15 @@ export class HintComponent {
   }
 
   onSubmit() {
-    const msg = new Message("front-end", "instruction", new Date(), {
-      instruction: "hint",
-      hint: this.hint
-    });
+    const msg = new Message("front-end", "instruction", new Date(), [
+      {
+        instruction: "hint",
+        value: this.hint
+      }
+    ]);
     const res = this.app.jsonConvert.serialize(msg);
     this.unsafePublish("back-end", JSON.stringify(res));
-    console.log("log: sent instruction message: " + JSON.stringify(res))
+    console.log("log: sent instruction message: " + JSON.stringify(res));
     this.hint = "";
   }
 }
