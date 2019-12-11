@@ -21,14 +21,15 @@ class Display(Device):
         return status
 
     def perform_instruction(self, contents):
-        instruction = contents.get("instruction")
-        if instruction == "test":
-            self.test()
-        elif instruction == "hint":
-            self.show_hint(contents)
-        else:
-            return True
-        return None
+        for action in contents:
+            instruction = action.get("instruction")
+            if instruction == "test":
+                self.test()
+            elif instruction == "hint":
+                self.show_hint(action)
+            else:
+                return True
+        return False
 
     def test(self):
         self.hint = "test"
@@ -36,7 +37,7 @@ class Display(Device):
         scclib.statusChanged()
 
     def show_hint(self, data):
-        self.hint = data.get("hint")
+        self.hint = data.get("value")
         print(self.hint)
         scclib.statusChanged()
 

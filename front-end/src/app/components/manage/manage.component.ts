@@ -26,7 +26,7 @@ export class ManageComponent implements OnInit {
         device_id: "door",
         time_sent: "10-05-2019 15:09:14",
         type: "instruction",
-        contents: { instruction: "start" }
+        contents: [{ instruction: "start" }]
       }
     });
     const res = this.app.jsonConvert.serialize(msg);
