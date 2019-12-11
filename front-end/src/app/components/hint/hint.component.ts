@@ -13,10 +13,12 @@ export class HintComponent {
   }
 
   onSubmit() {
-    this.app.sendInstruction([{
-      instruction: "hint",
-      value: this.hint
-    }]);
-    this.hint = "";
+    if (this.hint !== "" && this.hint !== undefined ) {
+      this.app.sendInstruction([{
+        instruction: "hint",
+        value: this.hint
+      }]);
+      this.hint = "";
+    }
   }
 }
