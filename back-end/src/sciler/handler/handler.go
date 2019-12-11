@@ -276,7 +276,7 @@ func (handler *Handler) HandleEvent(id string) {
 	if rules, ok := handler.Config.StatusMap[id]; ok {
 		for _, rule := range rules {
 			if rule.Executed < rule.Limit && rule.Conditions.Resolve(handler.Config) {
-				rule.Execute(*handler)
+				rule.Execute(handler)
 			}
 		}
 	}

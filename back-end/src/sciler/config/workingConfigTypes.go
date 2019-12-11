@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"reflect"
 )
 
@@ -32,10 +33,11 @@ type InstructionSender interface {
 
 // Execute performs all actions of a rule
 func (r *Rule) Execute(handler InstructionSender) {
-	r.Executed++
 	for _, action := range r.Actions {
 		action.Execute(handler)
 	}
+	r.Executed++
+	logrus.Infof("Executed rule %s", r.ID)
 	handler.HandleEvent(r.ID)
 }
 
