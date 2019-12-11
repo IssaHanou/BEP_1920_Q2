@@ -227,12 +227,26 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 			if err != nil {
 				logrus.Errorf("error occurred while constructing message to publish: %v", err)
 			} else {
-				handler.Communicator.Publish("test", string(jsonMessage), 3)
+				handler.Communicator.Publish("client-computers", string(jsonMessage), 3)
 			}
 		}
 		if instruction["instruction"] == "send status" && raw.DeviceID == "front-end" {
 			for _, value := range handler.Config.Devices {
 				handler.SendStatus(value.ID)
+			}
+		}
+		if instruction["instruction"] == "hint" && raw.DeviceID == "front-end" {
+			message := Message{
+				DeviceID: raw.DeviceID,
+				TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+				Type:     "instruction",
+				Contents: raw.Contents,
+			}
+			jsonMessage, err := json.Marshal(&message)
+			if err != nil {
+				logrus.Errorf("error occurred while constructing message to publish: %v", err)
+			} else {
+				handler.Communicator.Publish("hint", string(jsonMessage), 3)
 			}
 		}
 	}

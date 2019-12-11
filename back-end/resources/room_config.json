@@ -85,6 +85,19 @@
       }
     },
     {
+      "id": "display",
+      "description": "The display can print messages",
+      "input": {},
+      "output": {
+        "display": {
+          "type": "string",
+          "instructions:": {
+            "hint": "string"
+          }
+        }
+      }
+    },
+    {
       "id": "door",
       "description": "device that controls a door magnet through a relay",
       "input": {},
@@ -128,7 +141,10 @@
                 {
                   "component_id": "greenLight1",
                   "instruction": "blink",
-                  "value": [0.5, 0]
+                  "value": [
+                    0.5,
+                    0
+                  ]
                 }
               ]
             }
