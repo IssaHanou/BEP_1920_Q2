@@ -52,7 +52,7 @@ func (handler *Handler) msgMapper(raw Message) {
 			handler.onStatusMsg(raw)
 			//handler.openDoorBeun(raw)
 			handler.SendStatus(raw.DeviceID)
-			handler.handleEvent(raw.DeviceID)
+			handler.HandleEvent(raw.DeviceID)
 		}
 	case "confirmation":
 		{
@@ -167,42 +167,60 @@ func (handler *Handler) SendStatus(deviceID string) {
 		logrus.Info("sending status data to front-end: " + fmt.Sprint(message.Contents))
 		handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 	}
-
 }
 
-// openDoorBeun is the test function for developers to test the door and switch combo.
-func (handler *Handler) openDoorBeun(raw Message) {
-	contents := raw.Contents.(map[string]interface{})
-	logrus.Info("checking if door needs to open based on received status message")
-	if raw.DeviceID == "controlBoard" {
-		var instruction bool
-		if contents["mainSwitch"] == float64(0) {
-			instruction = false
-		} else if contents["mainSwitch"] == float64(1) {
-			instruction = true
-		} else {
-			return
-		}
+// SendInstruction sends a list of instructions to a client
+func (handler *Handler) SendInstruction(clientID string, instructions []config.ComponentInstruction) {
+	message := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: instructions,
+	}
 
-		message := Message{
-			DeviceID: "back-end",
-			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-			Type:     "instruction",
-			Contents: []map[string]interface{}{
-				{
-					"instruction": "open",
-					"value":       instruction,
-				},
-			},
-		}
-		jsonMessage, err := json.Marshal(&message)
-		if err != nil {
-			logrus.Errorf("error occurred while constructing message to publish: %v", err)
-		} else {
-			handler.Communicator.Publish("door", string(jsonMessage), 3)
-		}
+	jsonMessage, err := json.Marshal(&message)
+	if err != nil {
+		logrus.Errorf("error occurred while constructing message to publish: %v", err)
+	} else {
+		logrus.Infof("sending instruction data to %s: %s", clientID, fmt.Sprint(message.Contents))
+		handler.Communicator.Publish(clientID, string(jsonMessage), 3)
 	}
 }
+
+// todo remove openDOorBeun
+//// openDoorBeun is the test function for developers to test the door and switch combo.
+//func (handler *Handler) openDoorBeun(raw Message) {
+//	contents := raw.Contents.(map[string]interface{})
+//	logrus.Info("checking if door needs to open based on received status message")
+//	if raw.DeviceID == "controlBoard" {
+//		var instruction bool
+//		if contents["mainSwitch"] == float64(0) {
+//			instruction = false
+//		} else if contents["mainSwitch"] == float64(1) {
+//			instruction = true
+//		} else {
+//			return
+//		}
+//
+//		message := Message{
+//			DeviceID: "back-end",
+//			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+//			Type:     "instruction",
+//			Contents: []map[string]interface{}{
+//				{
+//					"instruction": "open",
+//					"value":       instruction,
+//				},
+//			},
+//		}
+//		jsonMessage, err := json.Marshal(&message)
+//		if err != nil {
+//			logrus.Errorf("error occurred while constructing message to publish: %v", err)
+//		} else {
+//			handler.Communicator.Publish("door", string(jsonMessage), 3)
+//		}
+//	}
+//}
 
 //onInstructionMsg is the function to process instruction messages.
 func (handler *Handler) onInstructionMsg(raw Message) {
@@ -253,8 +271,15 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 	}
 }
 
-func (handler *Handler) handleEvent(id string) {
-
+// HandleEvent is a function that checks and possible executes all rules according to the given (device/rule/timer) id
+func (handler *Handler) HandleEvent(id string) {
+	if rules, ok := handler.Config.StatusMap[id]; ok {
+		for _, rule := range rules {
+			if rule.Executed < rule.Limit && rule.Conditions.Resolve(handler.Config) {
+				rule.Execute(*handler)
+			}
+		}
+	}
 }
 
 func getMapSlice(input interface{}) ([]map[string]interface{}, error) {

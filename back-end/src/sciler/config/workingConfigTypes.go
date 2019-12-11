@@ -24,6 +24,21 @@ type Rule struct {
 	Actions     []Action
 }
 
+// InstructionSender is an interface needed for preventing cyclic imports
+type InstructionSender interface {
+	SendInstruction(string, []ComponentInstruction)
+	HandleEvent(string)
+}
+
+// Execute performs all actions of a rule
+func (r *Rule) Execute(handler InstructionSender) {
+	r.Executed++
+	for _, action := range r.Actions {
+		action.Execute(handler)
+	}
+	handler.HandleEvent(r.ID)
+}
+
 // Puzzle is a struct that describes contents of a puzzle.
 type Puzzle struct {
 	Event GeneralEvent

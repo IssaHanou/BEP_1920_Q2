@@ -23,7 +23,7 @@ This is the general information of the escape room. It includes the following ta
 ### Devices
 This will be a list of all devices in the room. Each device is defined as a JSON object with the following properties:
 
-- `id`: this is the id of a device. Write it in camelCase, e.g. "controlBoard".
+- `id`: this is the id of a device. Write it in camelCase, e.g. "controlBoard".This id should be unique compared to other device ids and also the rule ids as well as the timer ids.
 - `description`: this is optional and can contain more information about the device. This can be displayed in the front-end, so should be readable and in Dutch. 
 - `input`: defines type of values to be expected as input. The keys are component ids and values are types of input (in string format).  
     Possible types are: "string", "boolean", "numeric", "array", or a custom name. 
@@ -49,7 +49,7 @@ General events have the following properties:
 ### Rules
 Rules are defined by:
 
-- `id`: this is the id of a rule. Write it in camelCase, e.g. "solvingControlBoard".
+- `id`: this is the id of a rule. Write it in camelCase, e.g. "solvingControlBoard". This id should be unique compared to other rule ids and also the device ids as well as the timer ids.
 - `description`: this is optional and can contain more information about the rule. 
 This can be displayed in the front-end, so should be readable and in Dutch.
 - `limit`: this sets the number of times this rule can be triggered. 

@@ -161,7 +161,7 @@
       "rules": [
         {
           "id": "controlSwitch",
-          "description": "Als de grote switch wordt geflipt, worden alle condities gecheckt (tweede schuif en groene of rode switch aan) en gaat het lichtje branden en de telefoon ringt.",
+          "description": "Wanneer slider 1 en 2 op 100 staan, en 3 oon 0 en de mainSwitch word geflipt, dan gaan alle groene lampjes aan",
           "limit": 1,
           "conditions": {
             "operator": "AND",
@@ -175,22 +175,22 @@
                     {
                       "component_id": "mainSwitch",
                       "comparison": "eq",
-                      "value": true
+                      "value": false
                     },
                     {
-                      "component_id": "greenSwitch",
+                      "component_id": "slider1",
                       "comparison": "eq",
-                      "value": true
-                    },
-                    {
-                      "component_id": "redSwitch",
-                      "comparison": "eq",
-                      "value": true
+                      "value": 100
                     },
                     {
                       "component_id": "slider2",
-                      "comparison": "lt",
-                      "value": 30
+                      "comparison": "eq",
+                      "value": 100
+                    },
+                    {
+                      "component_id": "slider3",
+                      "comparison": "eq",
+                      "value": 0
                     }
                   ]
                 }
@@ -200,23 +200,12 @@
           "actions": [
             {
               "type": "device",
-              "type_id": "telephone",
-              "message": [
-                {
-                  "component_id": "audio",
-                  "instruction": "play",
-                  "value": "audio1"
-                }
-              ]
-            },
-            {
-              "type": "device",
               "type_id": "controlBoard",
               "message": [
                 {
                   "component_id": "greenLight1",
                   "instruction": "turnOnOff",
-                  "value": false
+                  "value": true
                 },
                 {
                   "component_id": "greenLight2",
@@ -225,21 +214,6 @@
                 },
                 {
                   "component_id": "greenLight3",
-                  "instruction": "turnOnOff",
-                  "value": false
-                },
-                {
-                  "component_id": "redLight1",
-                  "instruction": "turnOnOff",
-                  "value": true
-                },
-                {
-                  "component_id": "redLight2",
-                  "instruction": "turnOnOff",
-                  "value": false
-                },
-                {
-                  "component_id": "redLight3",
                   "instruction": "turnOnOff",
                   "value": true
                 }
@@ -253,79 +227,5 @@
       ]
     }
   ],
-  "general_events": [
-    {
-      "name": "Start",
-      "rules": [
-        {
-          "id": "telephoneRings",
-          "description": "Als het spel start, moet de telefoon na 1 minuut ringen.",
-          "limit": 1,
-          "conditions": {
-            "operator": "AND",
-            "list": [
-              {
-                "type": "timer",
-                "type_id": "timer1",
-                "constraints": {
-                  "operator": "AND",
-                  "list": [
-                    {
-                      "comparison": "eq",
-                      "value": "00:01:01"
-                    }
-                  ]
-                }
-              }
-            ]
-          },
-          "actions": [
-            {
-              "type": "device",
-              "type_id": "telephone",
-              "message": [
-                {
-                  "component_id": "audio",
-                  "instruction": "play",
-                  "value": "audio1"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Stop",
-      "rules": [
-        {
-          "id": "flipSwitch",
-          "description": "Als de knop omgaat, stopt het spel.",
-          "limit": 1,
-          "conditions": {
-            "type": "device",
-            "type_id": "controlBoard",
-            "constraints": {
-              "comparison": "eq",
-              "value": true,
-              "component_id": "mainSwitch"
-            }
-          },
-          "actions": [
-            {
-              "type": "timer",
-              "type_id": "timer1",
-              "message": [
-                {
-                  "component_id": "timer1",
-                  "instruction": "instruction",
-                  "value": "stop"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ]
+  "general_events": []
 }
