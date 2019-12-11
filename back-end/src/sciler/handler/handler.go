@@ -122,7 +122,7 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 
 			var instructionString string
 			for i, instruction := range contents {
-				instructionString = fmt.Sprintf("%s%d: %s ", instructionString, i, instruction["instruction"])
+				instructionString += fmt.Sprintf("%d: %s ", i, instruction["instruction"])
 			}
 
 			if !value.(bool) {
