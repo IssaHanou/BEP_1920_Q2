@@ -3,10 +3,8 @@ import { IMqttMessage, MqttService } from "ngx-mqtt";
 import { Message } from "./message";
 import { JsonConvert } from "json2typescript";
 import { MatSnackBar, MatSnackBarConfig } from "@angular/material";
-import "@angular/material/prebuilt-themes/deeppurple-amber.css";
 import { Subscription } from "rxjs";
 import { Devices } from "./components/device/devices";
-import { stringify } from "querystring";
 
 @Component({
   selector: "app-root",
@@ -14,7 +12,6 @@ import { stringify } from "querystring";
   styleUrls: [
     "./app.component.css",
     "../assets/css/main.css"
-    // "../../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css"
   ],
   encapsulation: ViewEncapsulation.None
 })
@@ -35,7 +32,7 @@ export class AppComponent implements OnInit, OnDestroy {
     for (const topic of this.topics) {
       this.subscribeNewTopic(topic);
     }
-    this.sendInstruction("send status");
+    this.sendInstruction([{instruction: "send status"}]);
   }
 
   /**
@@ -68,10 +65,8 @@ export class AppComponent implements OnInit, OnDestroy {
    * Send an instruction to the broker, over instruction topic.
    * @param instruction instruction to be sent.
    */
-  public sendInstruction(instruction: string) {
-    const msg = new Message("front-end", "instruction", new Date(), [
-      { instruction }
-    ]);
+  public sendInstruction(instruction: any[]) {
+    const msg = new Message("front-end", "instruction", new Date(), instruction);
     const jsonMessage: string = this.jsonConvert.serialize(msg);
     this.mqttService.unsafePublish("back-end", JSON.stringify(jsonMessage));
     console.log(
