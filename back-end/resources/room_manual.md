@@ -27,8 +27,9 @@ This will be a list of all devices in the room. Each device is defined as a JSON
 - `description`: this is optional and can contain more information about the device. This can be displayed in the front-end, so should be readable and in Dutch. 
 - `input`: defines type of values to be expected as input. The keys are component ids and values are types of input (in string format).  
     Possible types are: "string", "boolean", "numeric", "array", or a custom name. 
-- `output`: defines type of values to be expected as output. The keys are component ids and the value is a map with a `type` property 
-    and an optional `instruction`, which defines a map with custom instruction for the device. 
+- `output`: defines what this components outputs as their status and what instructions can be performed on this component
+    - `type`: defines type of values to be expected as output. Possible types are: "string", "boolean", "numeric", "array", or a custom name. 
+    - `instructions`: this is a map of the name of an instruction to the type of argument the instruction takes
     
 ### Puzzles
 Puzzles is an array of puzzle objects, which have a 
@@ -76,6 +77,7 @@ This can be displayed in the front-end, so should be readable and in Dutch.
         
     - `type`: this can be `device` or `timer`
     - `type_id`: the id of device or timer, depending on type respectively
-    - `message`: this defines the `output` message sent. The output defines the type of values to be expected as output. 
-        In case of device type, the keys are component ids and the value is a type. An additional "instruction" property may be defined.
-        In the case of timer, the message should have `instruction` specified as `stop`, `start`, `add`, `subtract` or `set`, in all cases (except `stop` and `start`), a `value` should also be passed. 
+    - `message`: this defines a list of componentInstructions which have:
+        - `component_id`: this will be the id of a component in a timer or device
+        - `instruction`: one of the instructions specified for this device and component
+        - `value`: this is the value for the instruction of the type specified for this device and component

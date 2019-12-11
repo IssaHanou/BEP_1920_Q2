@@ -40,7 +40,7 @@
           "instructions": {
             "interval": "numeric",
             "delay": "numeric",
-            "state": "string"
+            "state": "array"
           }
         },
         "redLight1": {
@@ -187,9 +187,9 @@
                       "value": true
                     },
                     {
-                      "component_id": 6,
+                      "component_id": "slider2",
                       "comparison": "lt",
-                      "value": 30
+                      "value": 20
                     }
                   ]
                 }
@@ -225,7 +225,7 @@
                 {
                   "component_id": "greenLight3",
                   "instruction": "state",
-                  "value": "off"
+                  "value": true
                 },
                 {
                   "component_id": "redLight1",

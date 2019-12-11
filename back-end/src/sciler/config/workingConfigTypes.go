@@ -94,7 +94,7 @@ type Device struct {
 	ID          string
 	Description string
 	Input       map[string]string
-	Output      OutputObject
+	Output      map[string]OutputObject
 	Status      map[string]interface{}
 	Connection  bool
 }
@@ -106,9 +106,9 @@ type Condition struct {
 	Constraints LogicalConstraint
 }
 
-// CheckConstraints is a method that checks types and comparator operators
-func (condition Condition) CheckConstraints(config WorkingConfig) error {
-	return condition.Constraints.CheckConstraints(condition, config)
+// checkConstraints is a method that checks types and comparator operators
+func (condition Condition) checkConstraints(config WorkingConfig) error {
+	return condition.Constraints.checkConstraints(condition, config)
 }
 
 // Resolve is a method that checks if a condition is met
@@ -123,12 +123,12 @@ type Constraint struct {
 	Value       interface{}
 }
 
-// CheckConstraints is a method that checks types and comparator operators
-func (constraint Constraint) CheckConstraints(condition Condition, config WorkingConfig) error {
+// checkConstraints is a method that checks types and comparator operators
+func (constraint Constraint) checkConstraints(condition Condition, config WorkingConfig) error {
 	switch condition.Type {
 	case "device":
 		{
-			if device, ok := config.Devices[condition.TypeID]; ok {
+			if device, ok := config.Devices[condition.TypeID]; ok { // checks if device can be found in the map, if so, it is stored in variable device
 
 				valueType := reflect.TypeOf(constraint.Value).Kind()
 				comparision := constraint.Comparison
@@ -175,7 +175,7 @@ func (constraint Constraint) CheckConstraints(condition Condition, config Workin
 						return fmt.Errorf("custom types like: %s, are not yet implemented", inputType)
 					}
 				} else {
-					return fmt.Errorf("device with id %s not found in map", constraint.ComponentID)
+					return fmt.Errorf("component with id %s not found in map", constraint.ComponentID)
 				}
 			} else {
 				return fmt.Errorf("device with id %s not found in map", condition.TypeID)
@@ -208,7 +208,7 @@ func (constraint Constraint) Resolve(condition Condition, config WorkingConfig) 
 // LogicalCondition is an interface for operators and conditions
 type LogicalCondition interface {
 	Resolve(config WorkingConfig) bool
-	CheckConstraints(config WorkingConfig) error
+	checkConstraints(config WorkingConfig) error
 }
 
 // AndCondition is an operator which implements the LogicalCondition interface
@@ -216,10 +216,10 @@ type AndCondition struct {
 	logics []LogicalCondition
 }
 
-// CheckConstraints is a method that checks types and comparator operators
-func (and AndCondition) CheckConstraints(config WorkingConfig) error {
+// checkConstraints is a method that checks types and comparator operators
+func (and AndCondition) checkConstraints(config WorkingConfig) error {
 	for _, logic := range and.logics {
-		err := logic.CheckConstraints(config)
+		err := logic.checkConstraints(config)
 		if err != nil {
 			return err
 		}
@@ -241,10 +241,10 @@ type OrCondition struct {
 	logics []LogicalCondition
 }
 
-// CheckConstraints is a method that checks types and comparator operators
-func (or OrCondition) CheckConstraints(config WorkingConfig) error {
+// checkConstraints is a method that checks types and comparator operators
+func (or OrCondition) checkConstraints(config WorkingConfig) error {
 	for _, logic := range or.logics {
-		err := logic.CheckConstraints(config)
+		err := logic.checkConstraints(config)
 		if err != nil {
 			return err
 		}
@@ -264,7 +264,7 @@ func (or OrCondition) Resolve(config WorkingConfig) bool {
 // LogicalConstraint is an interface for operators and constraints
 type LogicalConstraint interface {
 	Resolve(condition Condition, config WorkingConfig) bool
-	CheckConstraints(condition Condition, config WorkingConfig) error
+	checkConstraints(condition Condition, config WorkingConfig) error
 }
 
 // AndConstraint is an operator which implement the LogicalConstraint interface
@@ -272,10 +272,10 @@ type AndConstraint struct {
 	logics []LogicalConstraint
 }
 
-// CheckConstraints is a method that checks types and comparator operators
-func (and AndConstraint) CheckConstraints(condition Condition, config WorkingConfig) error {
+// checkConstraints is a method that checks types and comparator operators
+func (and AndConstraint) checkConstraints(condition Condition, config WorkingConfig) error {
 	for _, logic := range and.logics {
-		err := logic.CheckConstraints(condition, config)
+		err := logic.checkConstraints(condition, config)
 		if err != nil {
 			return err
 		}
@@ -297,10 +297,10 @@ type OrConstraint struct {
 	logics []LogicalConstraint
 }
 
-// CheckConstraints is a method that checks types and comparator operators
-func (or OrConstraint) CheckConstraints(condition Condition, config WorkingConfig) error {
+// checkConstraints is a method that checks types and comparator operators
+func (or OrConstraint) checkConstraints(condition Condition, config WorkingConfig) error {
 	for _, logic := range or.logics {
-		err := logic.CheckConstraints(condition, config)
+		err := logic.checkConstraints(condition, config)
 		if err != nil {
 			return err
 		}
