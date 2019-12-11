@@ -24,6 +24,7 @@ export class HintComponent {
     });
     const res = this.app.jsonConvert.serialize(msg);
     this.unsafePublish("back-end", JSON.stringify(res));
+    console.log("log: sent instruction message: " + JSON.stringify(res))
     this.hint = "";
   }
 }
