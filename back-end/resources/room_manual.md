@@ -28,7 +28,7 @@ This will be a list of all devices in the room. Each device is defined as a JSON
 - `input`: defines type of values to be expected as input. The keys are component ids and values are types of input (in string format).  
     Possible types are: "string", "boolean", "numeric", "array", or a custom name. 
 - `output`: defines what this components outputs as their status and what instructions can be performed on this component
-    - `type`: the type of the status output
+    - `type`: defines type of values to be expected as output. Possible types are: "string", "boolean", "numeric", "array", or a custom name. 
     - `instructions`: this is a map of the name of an instruction to the type of argument the instruction takes
     
 ### Puzzles
