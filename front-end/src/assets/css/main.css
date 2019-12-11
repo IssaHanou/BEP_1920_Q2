@@ -115,7 +115,16 @@ body {
   }
 }
 
-
+.custom-md-button, button {
+  margin: 5px;
+  font-size: 16px;
+  border-radius: 4px;
+}
+.hint-box {
+  font-size: 16px;
+  border-radius: 4px;
+  max-width: 500px;
+}
 
 
 /*Tables for devices and events*/

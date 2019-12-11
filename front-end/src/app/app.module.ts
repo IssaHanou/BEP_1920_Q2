@@ -16,7 +16,14 @@ import {
 } from "@angular/material/snack-bar";
 import { Overlay } from "@angular/cdk/overlay";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import {MATERIAL_SANITY_CHECKS, MatPaginatorModule, MatSortModule, MatTableModule} from "@angular/material";
+import {
+  MatButtonModule,
+  MATERIAL_SANITY_CHECKS,
+  MatFormFieldModule, MatInputModule,
+  MatPaginatorModule,
+  MatSortModule,
+  MatTableModule
+} from "@angular/material";
 import {CdkTableModule} from "@angular/cdk/table";
 
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
@@ -49,6 +56,9 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     BrowserAnimationsModule,
     MatSnackBarModule,
     MatTableModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
     MatPaginatorModule,
     MatSortModule,
     CdkTableModule,
