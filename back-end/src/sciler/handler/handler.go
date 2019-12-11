@@ -50,7 +50,7 @@ func (handler *Handler) msgMapper(raw Message) {
 	case "status":
 		{
 			handler.onStatusMsg(raw)
-			//handler.openDoorBeun(raw)
+			handler.openDoorBeun(raw)
 			handler.SendStatus(raw.DeviceID)
 		}
 	case "confirmation":
