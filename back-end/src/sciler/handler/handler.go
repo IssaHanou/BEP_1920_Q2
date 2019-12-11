@@ -50,8 +50,9 @@ func (handler *Handler) msgMapper(raw Message) {
 	case "status":
 		{
 			handler.onStatusMsg(raw)
-			handler.openDoorBeun(raw)
+			//handler.openDoorBeun(raw)
 			handler.SendStatus(raw.DeviceID)
+			handler.handleEvent(raw.DeviceID)
 		}
 	case "confirmation":
 		{
@@ -250,6 +251,10 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 			}
 		}
 	}
+}
+
+func (handler *Handler) handleEvent(id string) {
+
 }
 
 func getMapSlice(input interface{}) ([]map[string]interface{}, error) {

@@ -45,8 +45,38 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, error) {
 		config.Devices[readDevice.ID] = Device{readDevice.ID, readDevice.Description, readDevice.Input,
 			readDevice.Output, make(map[string]interface{}), false}
 	}
-
+	config.StatusMap = generateStatusMap(config)
 	return config, checkConfig(config)
+}
+
+func generateStatusMap(config WorkingConfig) map[string][]Rule {
+	statusMap := make(map[string][]Rule)
+	var rules []Rule
+	for _, event := range config.GeneralEvents {
+		rules = append(rules, event.GetRules()...)
+	}
+
+	for _, event := range config.Puzzles {
+		rules = append(rules, event.GetRules()...)
+	}
+
+	for _, rule := range rules {
+		for _, id := range rule.Conditions.GetConditionIDs() {
+			statusMap[id] = appendWhenUnique(statusMap[id], rule)
+		}
+	}
+
+	return statusMap
+}
+
+// todo make this more efficient
+func appendWhenUnique(rules []Rule, rule Rule) []Rule {
+	for _, existingRule := range rules {
+		if reflect.DeepEqual(existingRule, rule) {
+			return rules
+		}
+	}
+	return append(rules, rule)
 }
 
 // checkConfig is a method that will return an error if the constraints value type is not equal to the device input type specified, the actions type is not equal to the device output type, or some other not allowed json configuration
@@ -175,6 +205,7 @@ func generateRules(readRules []ReadRule) []Rule {
 			ID:          readRule.ID,
 			Description: readRule.Description,
 			Limit:       readRule.Limit,
+			Executed:    0,
 			Conditions:  nil,
 			Actions:     readRule.Actions,
 		}
@@ -254,54 +285,6 @@ func generateLogicalConstraint(constraints interface{}) LogicalConstraint {
 	}
 	panic(fmt.Sprintf("JSON config in wrong constraint format, conditions: %v, could not be processed", constraints))
 }
-
-// TODO: rewrite this code in GH-73
-//func checkActions(devices map[string]Device, actions []Action) ([]Action, error) {
-//	for _, a := range actions {
-//		output := a.Message.Output
-//		if a.Type == "timer" {
-//			instruction, ok := output["instructions"]
-//			if !ok {
-//				return actions, errors.New("timer should have an instruction defined")
-//			}
-//			if instruction != "stop" && instruction != "subtract" {
-//				return actions, errors.New("timer should have an instruction defined, which is either stop or subtract")
-//			}
-//			if instruction == "subtract" {
-//				value, ok2 := output["value"]
-//				if !ok2 {
-//					return actions, errors.New("timer with subtract instruction should have value")
-//				}
-//				if reflect.TypeOf(value).Kind() != reflect.String {
-//					return actions, errors.New("timer with subtract instruction should have value in string format")
-//				}
-//				var rgxPat = regexp.MustCompile(`^[0-9]{2}:[0-9]{2}:[0-9]{2}$`)
-//				if !rgxPat.MatchString(value.(string)) {
-//					return actions, errors.New(value.(string) + " did not match pattern 'hh:mm:ss'")
-//				}
-//			}
-//		} else if a.Type == "device" {
-//			device, ok := devices[a.TypeID]
-//			if !ok {
-//				return actions, errors.New("device with id " + a.TypeID + " not found in map")
-//			}
-//			for key, value := range output {
-//				expectedType, ok2 := device.Output[key]
-//				if !ok2 {
-//					return actions, errors.New("component id: " + key + " not found in device input")
-//				}
-//				// value should be of type specified in device output
-//				err := CheckComponentType(expectedType, value)
-//				if err != nil {
-//					return actions, err
-//				}
-//			}
-//		} else {
-//			return actions, errors.New("invalid type of action: " + a.Type)
-//		}
-//	}
-//	return actions, nil
-//}
 
 //TODO multiple errors?
 //TODO check device present

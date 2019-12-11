@@ -11,6 +11,7 @@ type WorkingConfig struct {
 	Puzzles       []Puzzle
 	GeneralEvents []GeneralEvent
 	Devices       map[string]Device
+	StatusMap     map[string][]Rule
 }
 
 // Rule is a struct that describes how action flow is handled in the escape room.
@@ -18,6 +19,7 @@ type Rule struct {
 	ID          string
 	Description string
 	Limit       int
+	Executed    int
 	Conditions  LogicalCondition
 	Actions     []Action
 }
@@ -106,8 +108,14 @@ type Condition struct {
 	Constraints LogicalConstraint
 }
 
+// GetConditionIDs returns a slice of all condition type IDs in the LogicalCondition
+func (condition Condition) GetConditionIDs() []string {
+	return []string{condition.TypeID}
+}
+
 // checkConstraints is a method that checks types and comparator operators
 func (condition Condition) checkConstraints(config WorkingConfig) error {
+	// todo check if type id exists
 	return condition.Constraints.checkConstraints(condition, config)
 }
 
@@ -183,6 +191,8 @@ func (constraint Constraint) checkConstraints(condition Condition, config Workin
 		}
 	case "timer":
 		return nil // todo timer
+	case "rule":
+		return nil // todo rule
 	default:
 		return fmt.Errorf("invalid type of condition: %v", condition.Type)
 	}
@@ -209,11 +219,21 @@ func (constraint Constraint) Resolve(condition Condition, config WorkingConfig) 
 type LogicalCondition interface {
 	Resolve(config WorkingConfig) bool
 	checkConstraints(config WorkingConfig) error
+	GetConditionIDs() []string
 }
 
 // AndCondition is an operator which implements the LogicalCondition interface
 type AndCondition struct {
 	logics []LogicalCondition
+}
+
+// GetConditionIDs returns a slice of all condition type IDs in the LogicalCondition
+func (and AndCondition) GetConditionIDs() []string {
+	var IDs []string
+	for _, logic := range and.logics {
+		IDs = append(IDs, logic.GetConditionIDs()...)
+	}
+	return IDs
 }
 
 // checkConstraints is a method that checks types and comparator operators
@@ -239,6 +259,15 @@ func (and AndCondition) Resolve(config WorkingConfig) bool {
 // OrCondition is an operator which implements the LogicalCondition interface
 type OrCondition struct {
 	logics []LogicalCondition
+}
+
+// GetConditionIDs returns a slice of all condition type IDs in the LogicalCondition
+func (or OrCondition) GetConditionIDs() []string {
+	var IDs []string
+	for _, logic := range or.logics {
+		IDs = append(IDs, logic.GetConditionIDs()...)
+	}
+	return IDs
 }
 
 // checkConstraints is a method that checks types and comparator operators
