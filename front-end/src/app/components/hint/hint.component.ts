@@ -12,7 +12,6 @@ export class HintComponent {
   hint: string;
 
   constructor(private app: AppComponent) {
-
   }
 
   onSubmit() {
