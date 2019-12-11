@@ -75,6 +75,14 @@
       }
     },
     {
+      "id": "display",
+      "description": "The display can print messages",
+      "input": {},
+      "output": {
+        "hint": "string"
+      }
+    },
+    {
       "id": "door",
       "description": "device that controls a door magnet through a relay",
       "input": {},

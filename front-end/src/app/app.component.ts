@@ -72,7 +72,7 @@ export class AppComponent implements OnInit, OnDestroy {
       instruction
     });
     const jsonMessage: string = this.jsonConvert.serialize(msg);
-    this.mqttService.unsafePublish("instruction", JSON.stringify(jsonMessage));
+    this.mqttService.unsafePublish("back-end", JSON.stringify(jsonMessage));
     console.log(
       "log: sent instruction message: " + JSON.stringify(jsonMessage)
     );
