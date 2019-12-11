@@ -168,6 +168,7 @@ func (handler *Handler) checkStatusType(device config.Device, v interface{}, k s
 //onStatusMsg is the function to process status messages.
 func (handler *Handler) onStatusMsg(raw Message) {
 	if device, ok := handler.Config.Devices[raw.DeviceID]; ok {
+		logrus.Info("status message received from: " + raw.DeviceID + ", status: " + fmt.Sprint(raw.Contents))
 		for k, v := range raw.Contents {
 			err := handler.checkStatusType(device, v, k)
 			if err != nil {
