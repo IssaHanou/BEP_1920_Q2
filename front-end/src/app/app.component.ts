@@ -3,10 +3,8 @@ import { IMqttMessage, MqttService } from "ngx-mqtt";
 import { Message } from "./message";
 import { JsonConvert } from "json2typescript";
 import { MatSnackBar, MatSnackBarConfig } from "@angular/material";
-import "@angular/material/prebuilt-themes/deeppurple-amber.css";
 import { Subscription } from "rxjs";
 import { Devices } from "./components/device/devices";
-import { stringify } from "querystring";
 
 @Component({
   selector: "app-root",
@@ -14,7 +12,6 @@ import { stringify } from "querystring";
   styleUrls: [
     "./app.component.css",
     "../assets/css/main.css"
-    // "../../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css"
   ],
   encapsulation: ViewEncapsulation.None
 })
