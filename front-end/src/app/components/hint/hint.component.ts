@@ -12,13 +12,16 @@ export class HintComponent {
   hint: string;
 
   constructor(private app: AppComponent) {
+
   }
 
   onSubmit() {
-    this.app.sendInstruction([{
-      instruction: "hint",
-      value: this.hint
-    }]);
-    this.hint = "";
+    if (this.hint !== "" && this.hint !== undefined ) {
+      this.app.sendInstruction([{
+        instruction: "hint",
+        value: this.hint
+      }]);
+      this.hint = "";
+    }
   }
 }
