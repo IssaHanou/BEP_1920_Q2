@@ -231,9 +231,9 @@ func (handler *Handler) openDoorBeun(raw Message) {
 	logrus.Info("checking if door needs to open based on received status message")
 	if raw.DeviceID == "controlBoard" {
 		var instruction bool
-		if contents["mainSwitch"] == float64(0) {
+		if contents["mainSwitch"] == true {
 			instruction = false
-		} else if contents["mainSwitch"] == float64(1) {
+		} else if contents["mainSwitch"] == false {
 			instruction = true
 		} else {
 			return

@@ -36,7 +36,6 @@ class Display(Device):
         print(self.hint)
         self.scclib.statusChanged()
 
-
     def main(self):
         try:
             device = self

@@ -12,7 +12,7 @@ This mainly consists of:
 ## Set-up device with package.
 - create custom device script, which should inherit from `Device`, add it to `cc_library/src/scripts`
 - write configuration for the the device, according to `device_manual.md`, add it to `cc_library/src/scripts`
-- test the device script, by altering `device_test.py`, make sure the class is imported, change the device class in line 13 and the config file name in line 17
+- test the device script, by altering `device_test.py`, import the class on line 7, change the device class in line 15 and the config file name in line 21
 
 
 

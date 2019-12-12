@@ -14,7 +14,7 @@ except (RuntimeError, ModuleNotFoundError):
 
 class ControlBoard(Device):
 
-    adc = ADC
+    adc = ADC()
     GPIO.setmode(GPIO.BCM)
     """
     Define pin numbers to which units are connected on Pi.
@@ -84,32 +84,59 @@ class ControlBoard(Device):
         Return status of switches, LEDs and sliders of device.
         """
         status = "{"
-        status += "'redSwitch': " + \
-                  str(self.status_binair_to_bool(GPIO.input(self.redSwitch))) + ","
-        status += "'orangeSwitch': " + \
-                  str(self.status_binair_to_bool(GPIO.input(self.orangeSwitch))) + ","
-        status += "'greenSwitch': " + \
-                  str(self.status_binair_to_bool(GPIO.input(self.greenSwitch))) + ","
-        status += "'mainSwitch': " + \
-                  str(self.status_binair_to_bool(GPIO.input(self.mainSwitch))) + ","
-        status += "'greenLight1': " + \
-                  str(self.status_binair_to_sting(GPIO.input(self.greenLight1))) + ","
-        status += "'greenLight2': " + \
-                  str(self.status_binair_to_sting(GPIO.input(self.greenLight2))) + ","
-        status += "'greenLight3': " + \
-                  str(self.status_binair_to_sting(GPIO.input(self.greenLight3))) + ","
-        status += "'redLight1': " + \
-                  str(self.status_binair_to_sting(GPIO.input(self.redLight1))) + ","
-        status += "'redLight2': " + \
-                  str(self.status_binair_to_sting(GPIO.input(self.redLight2))) + ","
-        status += "'redLight3': " + \
-                  str(self.status_binair_to_sting(GPIO.input(self.redLight3))) + ","
-        status += "'slider1': " + \
-                  str(self.get_sliders_analog_reading()[0]) + ","
-        status += "'slider2': " + \
-                  str(self.get_sliders_analog_reading()[1]) + ","
-        status += "'slider3': " + \
-                  str(self.get_sliders_analog_reading()[2])
+        status += (
+            "'redSwitch': "
+            + str(self.status_binair_to_bool(GPIO.input(self.redSwitch)))
+            + ","
+        )
+        status += (
+            "'orangeSwitch': "
+            + str(self.status_binair_to_bool(GPIO.input(self.orangeSwitch)))
+            + ","
+        )
+        status += (
+            "'greenSwitch': "
+            + str(self.status_binair_to_bool(GPIO.input(self.greenSwitch)))
+            + ","
+        )
+        status += (
+            "'mainSwitch': "
+            + str(self.status_binair_to_bool(GPIO.input(self.mainSwitch)))
+            + ","
+        )
+        status += (
+            "'greenLight1': "
+            + str(self.status_binair_to_sting(GPIO.input(self.greenLight1)))
+            + ","
+        )
+        status += (
+            "'greenLight2': "
+            + str(self.status_binair_to_sting(GPIO.input(self.greenLight2)))
+            + ","
+        )
+        status += (
+            "'greenLight3': "
+            + str(self.status_binair_to_sting(GPIO.input(self.greenLight3)))
+            + ","
+        )
+        status += (
+            "'redLight1': "
+            + str(self.status_binair_to_sting(GPIO.input(self.redLight1)))
+            + ","
+        )
+        status += (
+            "'redLight2': "
+            + str(self.status_binair_to_sting(GPIO.input(self.redLight2)))
+            + ","
+        )
+        status += (
+            "'redLight3': "
+            + str(self.status_binair_to_sting(GPIO.input(self.redLight3)))
+            + ","
+        )
+        status += "'slider1': " + str(self.get_sliders_analog_reading()[0]) + ","
+        status += "'slider2': " + str(self.get_sliders_analog_reading()[1]) + ","
+        status += "'slider3': " + str(self.get_sliders_analog_reading()[2])
         status += "}"
         return status
 
@@ -192,12 +219,24 @@ class ControlBoard(Device):
                 callback=self.scclib.statusChangedOnChannel,
                 bouncetime=100,
             )
-            GPIO.add_event_detect(device.a_pin0, GPIO.BOTH, callback=self.scclib.status_changed)
-            GPIO.add_event_detect(device.a_pin1, GPIO.BOTH, callback=self.scclib.status_changed)
-            GPIO.add_event_detect(device.a_pin2, GPIO.BOTH, callback=self.scclib.status_changed)
-            GPIO.add_event_detect(device.b_pin0, GPIO.BOTH, callback=self.scclib.status_changed)
-            GPIO.add_event_detect(device.b_pin1, GPIO.BOTH, callback=self.scclib.status_changed)
-            GPIO.add_event_detect(device.b_pin2, GPIO.BOTH, callback=self.scclib.status_changed)
+            GPIO.add_event_detect(
+                device.a_pin0, GPIO.BOTH, callback=self.scclib.status_changed
+            )
+            GPIO.add_event_detect(
+                device.a_pin1, GPIO.BOTH, callback=self.scclib.status_changed
+            )
+            GPIO.add_event_detect(
+                device.a_pin2, GPIO.BOTH, callback=self.scclib.status_changed
+            )
+            GPIO.add_event_detect(
+                device.b_pin0, GPIO.BOTH, callback=self.scclib.status_changed
+            )
+            GPIO.add_event_detect(
+                device.b_pin1, GPIO.BOTH, callback=self.scclib.status_changed
+            )
+            GPIO.add_event_detect(
+                device.b_pin2, GPIO.BOTH, callback=self.scclib.status_changed
+            )
 
             self.scclib.start()
         except KeyboardInterrupt:

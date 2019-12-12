@@ -21,7 +21,8 @@ class Device:
     @abstractmethod
     def perform_instruction(self, contents):
         """
-        Defines how instructions are handled, for all instructions defined in output of device in config.
+        Defines how instructions are handled,
+        for all instructions defined in output of device in config.
         :param contents: contains instruction tag and calls the appropriate functions.
         :return boolean: True if instruction was valid and False if illegal instruction
         was sent or error occurred such that instruction could not be performed.

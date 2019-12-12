@@ -171,7 +171,9 @@ class SccLib:
         message = message.payload.decode("utf-8")
         message = json.loads(message)
         if message.get("type") != "instruction":
-            self.logger.log(("received non-instruction message of type", message.get("type")))
+            self.logger.log(
+                ("received non-instruction message of type", message.get("type"))
+            )
         else:
             success = self.__check_message(message.get("contents"))
             conf_msg_dict = {
@@ -195,7 +197,12 @@ class SccLib:
                 if success:
                     self.logger.log(("instruction performed", contents))
                 else:
-                    self.logger.log(("instruction: " + failed_action + " could not be performed", contents))
+                    self.logger.log(
+                        (
+                            "instruction: " + failed_action + " could not be performed",
+                            contents,
+                        )
+                    )
                 return success
 
     def __subscribe_topic(self, topic):
