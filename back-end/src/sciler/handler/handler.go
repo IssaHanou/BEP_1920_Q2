@@ -75,85 +75,67 @@ func (handler *Handler) onConnectionMsg(raw Message) {
 	contents := raw.Contents.(map[string]interface{})
 	device, ok := handler.Config.Devices[raw.DeviceID]
 	if !ok {
-		logrus.Warn("connection message received from device " + raw.DeviceID + ", which is not in the config")
+		logrus.Error("connection message received from device " + raw.DeviceID + ", which is not in the config")
 	} else {
 		logrus.Info("connection message received from: ", raw.DeviceID)
 		value, ok2 := contents["connection"]
 		if !ok2 || reflect.TypeOf(value).Kind() != reflect.Bool {
-			logrus.Warn("received improperly structured connection message from device " + raw.DeviceID)
-			return
+			logrus.Error("received improperly structured connection message from device " + raw.DeviceID)
+		} else {
+			device.Connection = value.(bool)
+			handler.Config.Devices[raw.DeviceID] = device
+			handler.SendStatus(raw.DeviceID)
 		}
-		device.Connection = value.(bool)
-		handler.Config.Devices[raw.DeviceID] = device
-		handler.SendStatus(raw.DeviceID)
 	}
 }
 
-// checkStatusType checks if the type of the status change is correct for the component
-func (handler *Handler) checkStatusType(device config.Device, v interface{}, k string) error {
-	valueType := reflect.TypeOf(v).Kind()
-	if inputType, ok := device.Input[k]; ok {
-		switch inputType {
-		case "string":
-			{
-				if valueType != reflect.String {
-					return fmt.Errorf("input type string expected but %sfound as type of value %v for %s", valueType.String(), v, k)
-				}
+// compareType compares a reflect.Kind and a string type and returns an error if not the same
+func compareType(valueType reflect.Kind, inputType string) error {
+	switch inputType {
+	case "string":
+		{
+			if valueType != reflect.String {
+				return fmt.Errorf("status type string expected but %sfound as type", valueType.String())
 			}
-		case "boolean":
-			{
-				if valueType != reflect.Bool {
-					return fmt.Errorf("input type boolean expected but %s found as type of value %v for %s", valueType.String(), v, k)
-				}
-			}
-		case "numeric":
-			{
-				if valueType != reflect.Int && valueType != reflect.Float64 {
-					return fmt.Errorf("input type numeric expected but %s found as type of value %v for %s", valueType.String(), v, k)
-				}
-			}
-		case "array":
-			{
-				if valueType != reflect.Slice {
-					return fmt.Errorf("input type array/slice expected but %s found as type of value %v for %s", valueType.String(), v, k)
-				}
-			}
-		default:
-			// todo custom types
-			return fmt.Errorf("custom types like: %s, are not yet implemented", inputType)
 		}
-	} else if output, ok2 := device.Output[k]; ok2 {
-		switch output.Type {
-		case "string":
-			{
-				if valueType != reflect.String {
-					return fmt.Errorf("input type string expected but %sfound as type of value %v for %s", valueType.String(), v, k)
-				}
+	case "boolean":
+		{
+			if valueType != reflect.Bool {
+				return fmt.Errorf("status type boolean expected but %s found as type", valueType.String())
 			}
-		case "boolean":
-			{
-				if valueType != reflect.Bool {
-					return fmt.Errorf("input type boolean expected but %s found as type of value %v for %s", valueType.String(), v, k)
-				}
+		}
+	case "numeric":
+		{
+			if valueType != reflect.Int && valueType != reflect.Float64 {
+				return fmt.Errorf("status type numeric expected but %s found as type", valueType.String())
 			}
-		case "numeric":
-			{
-				if valueType != reflect.Int && valueType != reflect.Float64 {
-					return fmt.Errorf("input type numeric expected but %s found as type of value %v for %s", valueType.String(), v, k)
-				}
+		}
+	case "array":
+		{
+			if valueType != reflect.Slice {
+				return fmt.Errorf("status type array/slice expected but %s found as type", valueType.String())
 			}
-		case "array":
-			{
-				if valueType != reflect.Slice {
-					return fmt.Errorf("input type array/slice expected but %s found as type of value %v for %s", valueType.String(), v, k)
-				}
-			}
-		default:
-			// todo custom types
-			return fmt.Errorf("custom types like: %s, are not yet implemented", inputType)
+		}
+	default:
+		// todo custom types
+		return fmt.Errorf("custom types like: %s, are not yet implemented", inputType)
+	}
+	return nil
+}
+
+// checkStatusType checks if the type of the status change is correct for the component
+func (handler *Handler) checkStatusType(device config.Device, status interface{}, component string) error {
+	valueType := reflect.TypeOf(status).Kind()
+	if inputType, ok := device.Input[component]; ok {
+		if error := compareType(valueType, inputType); error != nil {
+			return fmt.Errorf("%v with status %v for component %s", error.Error(), status, component)
+		}
+	} else if output, ok2 := device.Output[component]; ok2 {
+		if error := compareType(valueType, output.Type); error != nil {
+			return fmt.Errorf("%v with status %v for component %s", error.Error(), status, component)
 		}
 	} else {
-		return fmt.Errorf("status message received from component %s, which is not in the config under device %s", k, device.ID)
+		return fmt.Errorf("status message received from component %s, which is not in the config under device %s", component, device.ID)
 	}
 	return nil
 }
@@ -166,13 +148,13 @@ func (handler *Handler) onStatusMsg(raw Message) {
 		for k, v := range contents {
 			err := handler.checkStatusType(device, v, k)
 			if err != nil {
-				logrus.Warn(err)
+				logrus.Error(err)
 			} else {
 				handler.Config.Devices[raw.DeviceID].Status[k] = v
 			}
 		}
 	} else {
-		logrus.Warn("status message received from device ", raw.DeviceID, ", which is not in the config")
+		logrus.Error("status message received from device ", raw.DeviceID, ", which is not in the config")
 	}
 }
 
