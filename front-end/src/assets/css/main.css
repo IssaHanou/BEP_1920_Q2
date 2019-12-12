@@ -1,50 +1,8 @@
 /*Global variables - don't work*/
 :root {
-  --blue-color: #3498DB;
-  --yellow-color: #fcf790;
-  --white-color: #EEEEEE;
-  --orange-color: #fcdd90;
-  --blue-color-light: #65bdf7;
-  --blue-color-dark: #0f88d9;
   --mat-primary: #3f51b5;
+  --mat-font: Roboto, "Helvetica Neue", sans-serif;
 }
-
-
-
-
-/*Fonts*/
-@font-face {
-  font-family: 'din-bold';
-  src: url('../fonts/din-bold-webfont.woff2') format('woff2'),
-  url('../fonts/din-bold-webfont.woff') format('woff');
-  font-weight: 700;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'din-light';
-  src: url('../fonts/din-light-webfont.woff2') format('woff2'),
-  url('../fonts/din-light-webfont.woff') format('woff');
-  font-weight: 300;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'din-med';
-  src: url('../fonts/din-medium-webfont.woff2') format('woff2'),
-  url('../fonts/din-medium-webfont.woff') format('woff');
-  font-weight: 500;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'din';
-  src: url('../fonts/din-regular-webfont.woff2') format('woff2'),
-  url('../fonts/din-regular-webfont.woff') format('woff');
-  font-weight: 400;
-  font-style: normal;
-}
-
 
 
 /*General styling*/
@@ -64,23 +22,19 @@ body {
 }
 .home-header {
   max-width: 100%;
-  font-family: 'din-bold', sans-serif;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
   text-align: center;
 }
 
 
-
-
-
-
 /*Boxes on home page*/
 .home-box {
-  font-family: 'din', sans-serif;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
   margin: 30px;
   max-width: 100%;
 }
 .home-box .header {
-  font-family: 'din-med', sans-serif;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
   color: #3f51b5;
   background-color: #EEEEEE;
   margin-bottom: 5px;
@@ -97,6 +51,8 @@ body {
   justify-content: center;
   max-height: 100%;
 }
+
+
 
 /*Small screens should have small margin*/
 @media only screen and (max-width: 400px) {
@@ -124,11 +80,6 @@ body {
   }
 }
 
-.custom-md-button, button {
-  margin: 5px;
-  font-size: 16px;
-  border-radius: 4px;
-}
 
 
 /*Tables for devices and events*/
@@ -145,5 +96,12 @@ body {
   background-color: #EEEEEE;
 }
 
+
+/*Other components*/
+.custom-md-button, button {
+  margin: 5px;
+  font-size: 16px;
+  border-radius: 4px;
+}
 
 
