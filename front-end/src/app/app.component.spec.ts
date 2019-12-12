@@ -10,6 +10,8 @@ import { PuzzleComponent } from "./components/puzzle/puzzle.component";
 import { TimerComponent } from "./components/timer/timer.component";
 import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import { Overlay } from "@angular/cdk/overlay";
+import {MatFormFieldModule, MatInputModule, MatPaginatorModule, MatSortModule, MatTableModule} from "@angular/material";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
 describe("AppComponent", () => {
   beforeEach(async(() => {
@@ -17,7 +19,13 @@ describe("AppComponent", () => {
       imports: [
         FormsModule,
         MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
-        MatSnackBarModule
+        MatTableModule,
+        MatSortModule,
+        MatPaginatorModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSnackBarModule,
+        BrowserAnimationsModule
       ],
       declarations: [
         AppComponent,

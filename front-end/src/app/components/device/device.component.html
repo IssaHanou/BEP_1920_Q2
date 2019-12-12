@@ -12,16 +12,17 @@
       </ng-container>
       <ng-container matColumnDef="component">
         <th mat-header-cell *matHeaderCellDef class="custom-md-table-header"> Onderdeel </th>
-        <td mat-cell *matCellDef="let element" style="white-space: pre-line"> {{ getComponents(element.status) }} </td>
+        <td mat-cell *matCellDef="let element" class="component-cell"> {{ getComponents(element.status) }} </td>
       </ng-container>
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef class="custom-md-table-header"> Status </th>
-        <td mat-cell *matCellDef="let element" style="white-space: pre-line"> {{ formatStatus(element.status) }} </td>
+        <td mat-cell *matCellDef="let element" class="component-cell"> {{ formatStatus(element.status) }} </td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="deviceColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: deviceColumns;"></tr>
     </table>
-    <mat-paginator [pageSize]="3" showFirstLastButtons class="custom-md-table-page"></mat-paginator>
+    <mat-paginator #DevicePaginator [pageSize]="3"  [pageSizeOptions]="[1,3,5,10]"
+                   showFirstLastButtons class="custom-md-table-page"></mat-paginator>
   </div>
 </div>

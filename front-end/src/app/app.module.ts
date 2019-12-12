@@ -47,7 +47,9 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     DeviceComponent,
     TimerComponent,
     ManageComponent,
-    PuzzleComponent
+    PuzzleComponent,
+    MatFormFieldModule,
+    MatSortModule
   ],
   imports: [
     BrowserModule,

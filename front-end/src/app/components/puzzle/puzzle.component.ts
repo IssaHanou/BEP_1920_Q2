@@ -1,8 +1,9 @@
-import {Component, OnInit, ViewChild} from "@angular/core";
-import {MatSort, MatTableDataSource} from "@angular/material";
+import { Component, OnInit, ViewChild } from "@angular/core";
+import { MatPaginator, MatSort, MatTableDataSource } from "@angular/material";
+import { AppComponent } from "../../app.component";
 
 export interface Puzzle {
-  puzzle: string
+  id: string
   status: boolean
 }
 
@@ -12,16 +13,31 @@ export interface Puzzle {
   styleUrls: ["./puzzle.component.css", "../../../assets/css/main.css"]
 })
 export class PuzzleComponent implements OnInit {
-  puzzleColumns: string[] = ['puzzle', 'status'];
-  puzzleData = new MatTableDataSource([
-    {puzzle: "Telefoon puzzle", status: true},
-    {puzzle: "controle board", status: false},
-    {puzzle: "yet another", status: false}
-  ]);
+  puzzleColumns: string[] = ["id", "status"];
 
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
+  @ViewChild("PuzzleTableSort", {static: true}) sort: MatSort;
+  @ViewChild("PuzzlePaginator", {static: true}) paginator: MatPaginator;
+
+  constructor(private app: AppComponent) {}
 
   ngOnInit() {
-    this.puzzleData.sort = this.sort
+  }
+
+  /**
+   * Returns list of Device object with their current status and connection.
+   * Return in the form of map table data source, with sorting enabled.
+   */
+  public getPuzzleStatus(): MatTableDataSource<Puzzle> {
+    const puzzles: Puzzle[] = [
+      {id: "Telefoon puzzle", status: true},
+      {id: "controle board", status: false},
+      {id: "yet another", status: false}
+    ];
+    puzzles.sort((a: Puzzle, b: Puzzle) => a.id.localeCompare(b.id));
+
+    const dataSource = new MatTableDataSource<Puzzle>(puzzles);
+    dataSource.sort = this.sort;
+    setTimeout(() => dataSource.paginator = this.paginator);
+    return dataSource;
   }
 }
