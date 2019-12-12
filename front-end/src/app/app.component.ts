@@ -9,10 +9,7 @@ import { Devices } from "./components/device/devices";
 @Component({
   selector: "app-root",
   templateUrl: "./app.component.html",
-  styleUrls: [
-    "./app.component.css",
-    "../assets/css/main.css"
-  ],
+  styleUrls: ["./app.component.css", "../assets/css/main.css"],
   encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit, OnDestroy {
@@ -32,7 +29,7 @@ export class AppComponent implements OnInit, OnDestroy {
     for (const topic of this.topics) {
       this.subscribeNewTopic(topic);
     }
-    this.sendInstruction([{instruction: "send status"}]);
+    this.sendInstruction([{ instruction: "send status" }]);
   }
 
   /**
@@ -66,7 +63,12 @@ export class AppComponent implements OnInit, OnDestroy {
    * @param instruction instruction to be sent.
    */
   public sendInstruction(instruction: any[]) {
-    const msg = new Message("front-end", "instruction", new Date(), instruction);
+    const msg = new Message(
+      "front-end",
+      "instruction",
+      new Date(),
+      instruction
+    );
     const jsonMessage: string = this.jsonConvert.serialize(msg);
     this.mqttService.unsafePublish("back-end", JSON.stringify(jsonMessage));
     console.log(

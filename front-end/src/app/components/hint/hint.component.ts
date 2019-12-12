@@ -9,15 +9,16 @@ import { AppComponent } from "../../app.component";
 export class HintComponent {
   hint: string;
 
-  constructor(private app: AppComponent) {
-  }
+  constructor(private app: AppComponent) {}
 
   onSubmit() {
-    if (this.hint !== "" && this.hint !== undefined ) {
-      this.app.sendInstruction([{
-        instruction: "hint",
-        value: this.hint
-      }]);
+    if (this.hint !== "" && this.hint !== undefined) {
+      this.app.sendInstruction([
+        {
+          instruction: "hint",
+          value: this.hint
+        }
+      ]);
       this.hint = "";
     }
   }
