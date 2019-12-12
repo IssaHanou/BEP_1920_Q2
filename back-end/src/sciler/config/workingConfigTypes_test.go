@@ -324,3 +324,28 @@ func Test_ResolveTimer(t *testing.T) {
 		"Timers are not supported yet")
 
 }
+
+func Test_CheckRuleValue(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckRuleValue.json"
+	assert.PanicsWithValue(t,
+		"value type numeric expected but bool found as type of value true",
+		func() { ReadFile(filename) },
+		"The value in a constraint on a condition of type rule may only be of type numeric")
+
+}
+
+func Test_CheckRuleComparison(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckRuleComparison.json"
+	assert.PanicsWithValue(t,
+		"comparision contains not allowed on rule",
+		func() { ReadFile(filename) },
+		"The comparison in a constraint on a condition of type rule may only be a numeric comparator")
+}
+
+func Test_CheckRuleID(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckRuleID.json"
+	assert.PanicsWithValue(t,
+		"rule with id non existing not found in map",
+		func() { ReadFile(filename) },
+		"The rule id is unknown")
+}
