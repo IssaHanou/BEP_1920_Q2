@@ -146,7 +146,7 @@ func (handler *Handler) onStatusMsg(raw Message) {
 	if device, ok := handler.Config.Devices[raw.DeviceID]; ok {
 		logrus.Info("status message received from: " + raw.DeviceID + ", status: " + fmt.Sprint(raw.Contents))
 		for k, v := range contents {
-			err := handler.checkStatusType(device, v, k)
+			err := handler.checkStatusType(*device, v, k)
 			if err != nil {
 				logrus.Error(err)
 			} else {
