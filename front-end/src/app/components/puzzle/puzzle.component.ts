@@ -16,7 +16,6 @@ export class PuzzleComponent implements OnInit {
   puzzleColumns: string[] = ["id", "status"];
 
   @ViewChild("PuzzleTableSort", {static: true}) sort: MatSort;
-  @ViewChild("PuzzlePaginator", {static: true}) paginator: MatPaginator;
 
   constructor(private app: AppComponent) {}
 
@@ -37,7 +36,6 @@ export class PuzzleComponent implements OnInit {
 
     const dataSource = new MatTableDataSource<Puzzle>(puzzles);
     dataSource.sort = this.sort;
-    setTimeout(() => dataSource.paginator = this.paginator);
     return dataSource;
   }
 }

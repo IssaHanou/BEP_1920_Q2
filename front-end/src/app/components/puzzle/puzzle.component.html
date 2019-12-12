@@ -14,7 +14,5 @@
       <tr mat-header-row *matHeaderRowDef="puzzleColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: puzzleColumns;"></tr>
     </table>
-    <mat-paginator #PuzzlePaginator [pageSize]="5" [pageSizeOptions]="[1,3,5,10]"
-                   showFirstLastButtons class="custom-md-table-page"></mat-paginator>
   </div>
 </div>

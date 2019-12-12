@@ -12,7 +12,6 @@ export class DeviceComponent implements OnInit {
   deviceColumns: string[] = ["id", "connection", "component", "status"];
 
   @ViewChild("DeviceTableSort", {static: true}) sort: MatSort;
-  @ViewChild("DevicePaginator", {static: true}) paginator: MatPaginator;
 
   constructor(private app: AppComponent) {}
 
@@ -32,7 +31,6 @@ export class DeviceComponent implements OnInit {
 
     const dataSource = new MatTableDataSource<Device>(devices);
     dataSource.sort = this.sort;
-    setTimeout(() => dataSource.paginator = this.paginator);
     return dataSource;
   }
 
