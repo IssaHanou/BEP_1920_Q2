@@ -187,42 +187,7 @@ func (handler *Handler) SendInstruction(clientID string, instructions []config.C
 	}
 }
 
-// todo remove openDOorBeun
-//// openDoorBeun is the test function for developers to test the door and switch combo.
-//func (handler *Handler) openDoorBeun(raw Message) {
-//	contents := raw.Contents.(map[string]interface{})
-//	logrus.Info("checking if door needs to open based on received status message")
-//	if raw.DeviceID == "controlBoard" {
-//		var instruction bool
-//		if contents["mainSwitch"] == float64(0) {
-//			instruction = false
-//		} else if contents["mainSwitch"] == float64(1) {
-//			instruction = true
-//		} else {
-//			return
-//		}
-//
-//		message := Message{
-//			DeviceID: "back-end",
-//			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-//			Type:     "instruction",
-//			Contents: []map[string]interface{}{
-//				{
-//					"instruction": "open",
-//					"value":       instruction,
-//				},
-//			},
-//		}
-//		jsonMessage, err := json.Marshal(&message)
-//		if err != nil {
-//			logrus.Errorf("error occurred while constructing message to publish: %v", err)
-//		} else {
-//			handler.Communicator.Publish("door", string(jsonMessage), 3)
-//		}
-//	}
-//}
-
-//onInstructionMsg is the function to process instruction messages.
+// onInstructionMsg is the function to process instruction messages.
 func (handler *Handler) onInstructionMsg(raw Message) {
 	logrus.Info("instruction message received from: ", raw.DeviceID)
 

@@ -13,6 +13,7 @@ type WorkingConfig struct {
 	GeneralEvents []GeneralEvent
 	Devices       map[string]Device
 	StatusMap     map[string][]Rule
+	RuleMap       map[string]Rule
 }
 
 // Rule is a struct that describes how action flow is handled in the escape room.
@@ -209,7 +210,18 @@ func (constraint Constraint) checkConstraints(condition Condition, config Workin
 	case "timer":
 		return nil // todo timer
 	case "rule":
-		return nil // todo rule
+		if _, ok := config.RuleMap[condition.TypeID]; ok { // checks if rule can be found in the map, if so, it is stored in variable device
+			valueType := reflect.TypeOf(constraint.Value).Kind()
+			comparision := constraint.Comparison
+			if valueType != reflect.Int && valueType != reflect.Float64 {
+				return fmt.Errorf("value type numeric expected but %s found as type of value %v", valueType.String(), constraint.Value)
+			}
+			if comparision == "contains" {
+				return fmt.Errorf("comparision %s not allowed on rule", comparision)
+			}
+		} else {
+			return fmt.Errorf("rule with id %s not found in map", condition.TypeID)
+		}
 	default:
 		return fmt.Errorf("invalid type of condition: %v", condition.Type)
 	}
@@ -224,6 +236,11 @@ func (constraint Constraint) Resolve(condition Condition, config WorkingConfig) 
 			device := config.Devices[condition.TypeID]
 			status := device.Status[constraint.ComponentID]
 			return compare(status, constraint.Value, constraint.Comparison)
+		}
+	case "rule":
+		{
+			rule := config.RuleMap[condition.TypeID]
+			return compare(rule.Executed, constraint.Value, constraint.Comparison)
 		}
 	case "timer": //todo timer
 		panic(fmt.Sprintf("cannot resolve constraint %v because condition.type is an timer type, which is not implemented yet", constraint))

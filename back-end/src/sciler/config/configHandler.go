@@ -46,11 +46,11 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, error) {
 			readDevice.Output, make(map[string]interface{}), false}
 	}
 	config.StatusMap = generateStatusMap(config)
+	config.RuleMap = generateRuleMap(config)
 	return config, checkConfig(config)
 }
 
-func generateStatusMap(config WorkingConfig) map[string][]Rule {
-	statusMap := make(map[string][]Rule)
+func getAllRules(config WorkingConfig) []Rule {
 	var rules []Rule
 	for _, event := range config.GeneralEvents {
 		rules = append(rules, event.GetRules()...)
@@ -59,6 +59,22 @@ func generateStatusMap(config WorkingConfig) map[string][]Rule {
 	for _, event := range config.Puzzles {
 		rules = append(rules, event.GetRules()...)
 	}
+	return rules
+}
+
+func generateRuleMap(config WorkingConfig) map[string]Rule {
+	ruleMap := make(map[string]Rule)
+	rules := getAllRules(config)
+
+	for _, rule := range rules {
+		ruleMap[rule.ID] = rule
+	}
+	return ruleMap
+}
+
+func generateStatusMap(config WorkingConfig) map[string][]Rule {
+	statusMap := make(map[string][]Rule)
+	rules := getAllRules(config)
 
 	for _, rule := range rules {
 		for _, id := range rule.Conditions.GetConditionIDs() {
@@ -102,6 +118,7 @@ func checkConfig(config WorkingConfig) error {
 			}
 		}
 	}
+	// todo check uniqueness of all device_id, timer_id and rule_id
 	return nil
 }
 
