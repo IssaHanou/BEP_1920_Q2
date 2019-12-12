@@ -21,6 +21,7 @@ class SccLib:
         self.info = self.config.get("description")
         self.host = self.config.get("host")
         self.port = self.config.get("port")
+        self.labels = self.config.get("labels")
         self.logger = Logger()
         self.logger.log("Start of log for device: " + self.name)
 
@@ -71,9 +72,10 @@ class SccLib:
                 }
 
                 msg = json.dumps(msg_dict)
-                self.__send_message("connection", msg)
+                self.__send_message("back-end", msg)
+                for label in self.labels:
+                    self.__subscribe_topic(label)
                 self.__subscribe_topic("client-computers")
-                self.__subscribe_topic("test")
                 self.__subscribe_topic(self.name)
                 self.client.loop_forever()
                 break
@@ -109,7 +111,7 @@ class SccLib:
         }
 
         msg = json.dumps(msg_dict)
-        self.__send_message("connection", msg)
+        self.__send_message("back-end", msg)
         self.logger.log(("disconnecting, reason  " + str(rc)))
         client.connected_flag = False
         client.disconnect_flag = True
@@ -140,8 +142,8 @@ class SccLib:
             "type": "status",
             "contents": eval(msg),
         }
-        msg = json.dumps(json_msg)
-        self.__send_message("status", msg)
+        res_msg = json.dumps(json_msg)
+        self.__send_message("back-end", res_msg)
 
     def __on_message(self, client, userdata, message):
         """
@@ -168,7 +170,11 @@ class SccLib:
         """
         message = message.payload.decode("utf-8")
         message = json.loads(message)
-        success = self.device.perform_instruction(message.get("contents"))
+        if message.get("instruction") == "test":
+            self.device.test()
+            success, failed_action = True, None
+        else:
+            (success, failed_action) = self.device.perform_instruction(message.get("contents"))
         msg_dict = {
             "device_id": self.name,
             "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
@@ -176,11 +182,11 @@ class SccLib:
             "contents": {"completed": success, "instructed": message},
         }
         msg = json.dumps(msg_dict)
-        self.__send_message("confirmation", msg)
+        self.__send_message("back-end", msg)
         if success:
-            self.logger.log(("instruction performed", message))
-        else:
             self.logger.log(("instruction could not be performed", message))
+        else:
+            self.logger.log(("instruction: " + failed_action + " could not be performed", message))
 
     def __subscribe_topic(self, topic):
         """

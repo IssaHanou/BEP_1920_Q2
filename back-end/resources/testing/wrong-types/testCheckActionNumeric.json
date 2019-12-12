@@ -133,7 +133,7 @@
                 {
                   "component_id": "greenLight1",
                   "instruction": "interval",
-                  "value": 0.5
+                  "value": [true, true, false, "string"]
                 },
                 {
                   "component_id": "greenLight1",
@@ -187,9 +187,9 @@
                       "value": true
                     },
                     {
-                      "component_id": 6,
+                      "component_id": "slider2",
                       "comparison": "lt",
-                      "value": 30
+                      "value": 20
                     }
                   ]
                 }

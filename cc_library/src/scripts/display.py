@@ -1,5 +1,4 @@
 import os
-import time
 
 from cc_library.src.sciler.scclib.app import SccLib
 from cc_library.src.sciler.scclib.device import Device
@@ -12,73 +11,43 @@ except (RuntimeError, ModuleNotFoundError):
 scclib = None
 
 
-class Door(Device):
-    """
-    Define pin numbers to which units are connected on Pi.
-    """
-
-    GPIO.setmode(GPIO.BCM)
-    door = 17
-    GPIO.setup(door, GPIO.OUT)
-
-    status = False
+class Display(Device):
+    hint = ""
 
     def get_status(self):
-        """
-        Return status of the door.
-        """
         status = "{"
-        status += "'door': "
-        if self.status:
-            status += "'open'"
-        else:
-            status += "'closed'"
+        status += "'hint': " + "'" + str(self.hint) + "'"
         status += "}"
         return status
 
     def perform_instruction(self, contents):
-        """
-        Set here the mapping from messages to methods.
-        Should return warning when illegal instruction was sent
-        or instruction could not be performed.
-        """
         for action in contents:
             instruction = action.get("instruction")
-            if instruction == "open":
-                if action.get("value"):
-                    self.turn_off()
-                else:
-                    self.turn_on()
-            elif instruction == "test":
+            if instruction == "test":
                 self.test()
+            elif instruction == "hint":
+                self.show_hint(action)
             else:
                 return False, action
         return True, None
 
     def test(self):
-        for i in range(0, 2):
-            self.turn_on()
-            time.sleep(2)
-            self.turn_off()
-            time.sleep(2)
-        self.turn_on()
+        self.hint = "test"
+        print(self.hint)
+        scclib.statusChanged()
 
-    def turn_off(self):
-        GPIO.output(self.door, GPIO.HIGH)
-        self.status = False
-        scclib.status_changed()
+    def show_hint(self, data):
+        self.hint = data.get("value")
+        print(self.hint)
+        scclib.statusChanged()
 
-    def turn_on(self):
-        GPIO.output(self.door, GPIO.LOW)
-        self.status = True
-        scclib.status_changed()
 
     def main(self):
         try:
             device = self
 
             two_up = os.path.abspath(os.path.join(__file__, ".."))
-            rel_path = "./door_config.json"
+            rel_path = "./display_config.json"
             abs_file_path = os.path.join(two_up, rel_path)
             abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
             config = open(file=abs_file_path)
@@ -93,5 +62,5 @@ class Door(Device):
 
 
 if __name__ == "__main__":
-    device = Door()
+    device = Display()
     device.main()

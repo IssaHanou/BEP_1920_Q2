@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { MqttService } from "ngx-mqtt";
+import { AppComponent } from "../../app.component";
 
 @Component({
   selector: "app-hint",
@@ -9,14 +9,16 @@ import { MqttService } from "ngx-mqtt";
 export class HintComponent {
   hint: string;
 
-  constructor(private mqttService: MqttService) {}
-
-  public unsafePublish(topic: string, message: string): void {
-    this.mqttService.unsafePublish(topic, message, { qos: 1, retain: true });
+  constructor(private app: AppComponent) {
   }
 
   onSubmit() {
-    this.unsafePublish("hint", this.hint);
-    this.hint = "";
+    if (this.hint !== "" && this.hint !== undefined ) {
+      this.app.sendInstruction([{
+        instruction: "hint",
+        value: this.hint
+      }]);
+      this.hint = "";
+    }
   }
 }
