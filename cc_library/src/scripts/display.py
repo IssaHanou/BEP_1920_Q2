@@ -18,13 +18,12 @@ class Display(Device):
         status += "}"
         return status
 
-    def perform_instruction(self, contents):
-        for action in contents:
-            instruction = action.get("instruction")
-            if instruction == "hint":
-                self.show_hint(action)
-            else:
-                return False, action
+    def perform_instruction(self, action):
+        instruction = action.get("instruction")
+        if instruction == "hint":
+            self.show_hint(action)
+        else:
+            return False, action
         return True, None
 
     def test(self):
@@ -53,7 +52,7 @@ class Display(Device):
             self.scclib.logger.log("program was terminated from keyboard input")
         finally:
             GPIO.cleanup()
-            self.scclib.logger.log("Cleanly exited Door program")
+            self.scclib.logger.log("cleanly exited Display program")
             self.scclib.logger.close()
 
 

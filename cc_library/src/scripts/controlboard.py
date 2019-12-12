@@ -204,7 +204,7 @@ class ControlBoard(Device):
             self.scclib.logger.log("program was terminated from keyboard input")
         finally:
             GPIO.cleanup()
-            self.scclib.logger.log("Cleanly exited ControlBoard program")
+            self.scclib.logger.log("cleanly exited ControlBoard program")
             self.scclib.logger.close()
 
 

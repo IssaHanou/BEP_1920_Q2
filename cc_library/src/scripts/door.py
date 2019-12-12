@@ -34,21 +34,20 @@ class Door(Device):
         status += "}"
         return status
 
-    def perform_instruction(self, contents):
+    def perform_instruction(self, action):
         """
         Set here the mapping from messages to methods.
         Should return warning when illegal instruction was sent
         or instruction could not be performed.
         """
-        for action in contents:
-            instruction = action.get("instruction")
-            if instruction == "open":
-                if action.get("value"):
-                    self.turn_off()
-                else:
-                    self.turn_on()
+        instruction = action.get("instruction")
+        if instruction == "open":
+            if action.get("value"):
+                self.turn_off()
             else:
-                return False, action
+                self.turn_on()
+        else:
+            return False, action
         return True, None
 
     def test(self):
@@ -84,7 +83,7 @@ class Door(Device):
             self.scclib.logger.log("program was terminated from keyboard input")
         finally:
             GPIO.cleanup()
-            self.scclib.logger.log("Cleanly exited Door program")
+            self.scclib.logger.log("cleanly exited Door program")
             self.scclib.logger.close()
 
 
