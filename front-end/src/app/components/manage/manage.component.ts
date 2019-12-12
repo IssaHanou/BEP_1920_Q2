@@ -13,7 +13,7 @@ export class ManageComponent implements OnInit {
   ngOnInit() {}
 
   onClickTestButton() {
-    this.app.sendInstruction([{instruction: "test all"}]);
+    this.app.sendInstruction([{ instruction: "test all" }]);
   }
 
   /**

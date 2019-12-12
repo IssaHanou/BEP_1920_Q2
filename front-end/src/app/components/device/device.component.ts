@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { Device } from "./device";
 import { AppComponent } from "../../app.component";
-import {MatPaginator, MatSort, MatTableDataSource} from "@angular/material";
+import { MatPaginator, MatSort, MatTableDataSource } from "@angular/material";
 
 @Component({
   selector: "app-device",
@@ -11,12 +11,11 @@ import {MatPaginator, MatSort, MatTableDataSource} from "@angular/material";
 export class DeviceComponent implements OnInit {
   deviceColumns: string[] = ["id", "connection", "component", "status"];
 
-  @ViewChild("DeviceTableSort", {static: true}) sort: MatSort;
+  @ViewChild("DeviceTableSort", { static: true }) sort: MatSort;
 
   constructor(private app: AppComponent) {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   /**
    * Returns list of Device object with their current status and connection.
@@ -49,7 +48,9 @@ export class DeviceComponent implements OnInit {
         result += "[";
         for (let i = 0; i < value.length; i++) {
           result += value[i];
-          if (i < value.length - 1) {result += ","}
+          if (i < value.length - 1) {
+            result += ",";
+          }
         }
         result += "]\n";
       } else {
@@ -67,7 +68,9 @@ export class DeviceComponent implements OnInit {
     const keys = Array.from(status.keys());
     keys.sort();
     let result = "";
-    keys.forEach((key: string) => {result += key + "\n"});
+    keys.forEach((key: string) => {
+      result += key + "\n";
+    });
     return result;
   }
 }

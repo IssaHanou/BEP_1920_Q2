@@ -1,4 +1,4 @@
-import {BrowserModule, HAMMER_LOADER} from "@angular/platform-browser";
+import { BrowserModule, HAMMER_LOADER } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
 import { AppComponent } from "./app.component";
 import { HintComponent } from "./components/hint/hint.component";
@@ -19,17 +19,18 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import {
   MatButtonModule,
   MATERIAL_SANITY_CHECKS,
-  MatFormFieldModule, MatInputModule,
+  MatFormFieldModule,
+  MatInputModule,
   MatPaginatorModule,
   MatSortModule,
   MatTableModule
 } from "@angular/material";
-import {CdkTableModule} from "@angular/cdk/table";
+import { CdkTableModule } from "@angular/cdk/table";
 
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   hostname: "192.168.178.82",
   port: 8083,
-  clientId: "front-end"
+  clientId: "front-endng "
 };
 
 @NgModule({
@@ -63,11 +64,15 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     MatInputModule,
     MatPaginatorModule,
     MatSortModule,
-    CdkTableModule,
+    CdkTableModule
   ],
-  providers: [MqttService, MatSnackBar, Overlay, DeviceComponent,
-    {provide: HAMMER_LOADER, useValue: () => new Promise(() => {})}, // prevents warning in console
-    {provide: MATERIAL_SANITY_CHECKS, useValue: false} // prevents warning in console
+  providers: [
+    MqttService,
+    MatSnackBar,
+    Overlay,
+    DeviceComponent,
+    { provide: HAMMER_LOADER, useValue: () => new Promise(() => {}) }, // prevents warning in console
+    { provide: MATERIAL_SANITY_CHECKS, useValue: false } // prevents warning in console
   ],
   bootstrap: [AppComponent],
   entryComponents: [MatSnackBarContainer]

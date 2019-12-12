@@ -11,11 +11,11 @@ import {
   MatTableDataSource,
   MatTableModule
 } from "@angular/material";
-import {MqttModule, MqttService} from "ngx-mqtt";
-import {AppComponent} from "../../app.component";
-import {Overlay} from "@angular/cdk/overlay";
-import {MQTT_SERVICE_OPTIONS} from "../../app.module";
-import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import { MqttModule, MqttService } from "ngx-mqtt";
+import { AppComponent } from "../../app.component";
+import { Overlay } from "@angular/cdk/overlay";
+import { MQTT_SERVICE_OPTIONS } from "../../app.module";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
 describe("PuzzleComponent", () => {
   let component: PuzzleComponent;
@@ -23,14 +23,15 @@ describe("PuzzleComponent", () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
+      imports: [
+        MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
         MatTableModule,
         MatSortModule,
         MatPaginatorModule,
         BrowserAnimationsModule
       ],
       declarations: [PuzzleComponent],
-      providers: [MqttService, AppComponent, MatSnackBar, Overlay],
+      providers: [MqttService, AppComponent, MatSnackBar, Overlay]
     }).compileComponents();
   }));
 
