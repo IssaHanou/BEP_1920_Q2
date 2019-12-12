@@ -1,8 +1,12 @@
 import unittest
 import json
-from unittest.mock import Mock
-from cc_library.src.sciler.scclib.app import SccLib
+import os
+from unittest.mock import Mock, MagicMock
+
+from cc_library.src.scripts.display import Display
+from cc_library.src.scripts.controlboard import ControlBoard
 from cc_library.src.scripts.door import Door
+from Adafruit_ADS1x15 import ADS1115 as ADC
 
 class TestDevice(unittest.TestCase):
 
@@ -10,11 +14,16 @@ class TestDevice(unittest.TestCase):
         """
         Change this to test the device class you want to test.
         """
-        self.device = Door()
+        self.device = ControlBoard()
         self.device.scclib = Mock(self.device.scclib)
-        print("1 " + str(self.device.scclib))
-        self.device.scclib.status_changed = Mock()
-        print(self.device.scclib.status_changed())
+        self.device.adc = Mock(ADC)
+        self.device.adc.read_adc = MagicMock(return_value=50)
+
+        two_up = os.path.abspath(os.path.join(__file__, ".."))
+        rel_path = "../../scripts/controlboard_config.json"
+        abs_file_path = os.path.join(two_up, rel_path)
+        abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
+        self.config = json.load(open(file=abs_file_path))
 
     def test_get_status_str(self):
         result = self.device.get_status()
@@ -29,17 +38,41 @@ class TestDevice(unittest.TestCase):
         finally:
             self.assertTrue(True)
 
-    def test_perform_instruction_test(self):
-        print("2:" + str(self.device.scclib))
-        contents = '{"instruction": "test"}'
-        message = json.loads(contents)
-        result = self.device.perform_instruction(message)
-        self.assertTrue(result, "perform_instruction should be implemented to return true for test instruction")
+    def test_perform_instruction(self):
+        """
+        Test all instruction specified in output are implemented.
+        """
+        output = self.config.get("output")
+        for k in output:
+            if isinstance(output.get(k), dict):
+                for ins in output.get(k).get("instructions"):
+                    print(ins)
+                    contents = "[{\"instruction\": \"" + ins + "\"}]"
+                    message = json.loads(contents)
+                    try:
+                        result, action_failed = self.device.perform_instruction(message)
+                        self.assertTrue(result, "perform_instruction should be "
+                                                "implemented to return true for instruction from config: " + ins)
+                    except TypeError:
+                        print("value missing for testing")
+                        self.assertTrue(True, "instruction was implemented")
+            else:
+                contents = "[{\"instruction\": \"" + k + "\"}]"
+                message = json.loads(contents)
+                try:
+                    result, action_failed = self.device.perform_instruction(message)
+                    self.assertTrue(result, "perform_instruction should be "
+                                            "implemented to return true for instruction from config: " + k)
+                except TypeError:
+                    print("value missing for testing")
+                finally:
+                    print("value missing for testing")
+                    self.assertTrue(True, "instruction was implemented")
 
     def test_perform_instruction_invalid(self):
-        contents = '{"instruction": "my own random instruction"}'
+        contents = "[{\"instruction\": \"my own non-existing instruction\"}]"
         message = json.loads(contents)
-        result = self.device.perform_instruction(message)
+        result, action_failed = self.device.perform_instruction(message)
         self.assertFalse(result, "perform_instruction should be implemented to return false for invalid instruction")
 
     def test_test_exists(self):

@@ -3,13 +3,8 @@ import time
 
 from cc_library.src.sciler.scclib.app import SccLib
 from cc_library.src.sciler.scclib.device import Device
+from Adafruit_ADS1x15 import ADS1115 as ADC
 
-try:
-    import Adafruit_ADS1x15 as AdaFruit
-    print("using real deal")
-except (RuntimeError, ImportError, ModuleNotFoundError):
-    print("mocking")
-    import fake_rpi.Adafruit as AdaFruit
 
 try:
     import RPi.GPIO as GPIO
@@ -18,6 +13,8 @@ except (RuntimeError, ModuleNotFoundError):
 
 
 class ControlBoard(Device):
+
+    adc = ADC
     GPIO.setmode(GPIO.BCM)
     """
     Define pin numbers to which units are connected on Pi.
@@ -56,8 +53,6 @@ class ControlBoard(Device):
     GPIO.setup(greenLight1, GPIO.OUT)
     GPIO.setup(greenLight2, GPIO.OUT)
     GPIO.setup(greenLight3, GPIO.OUT)
-
-    adc = AdaFruit.ADS1115()
 
     GPIO.setup(a_pin0, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     GPIO.setup(a_pin1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
@@ -131,8 +126,6 @@ class ControlBoard(Device):
                 self.blink(action.get("component_id"), action.get("value"))
             elif instruction == "turnOnOff":
                 self.turn_on_off(action.get("component_id"), action.get("value"))
-            elif instruction == "test":
-                self.test()
             else:
                 return False, action
         return True, None

@@ -6,7 +6,7 @@
   "labels": [],
   "input": {
     "redSwitch": "boolean",
-    "orangeSwitch":  "boolean",
+    "orangeSwitch": "boolean",
     "greenSwitch": "boolean",
     "slider1": "numeric",
     "slider2": "numeric",
@@ -14,46 +14,46 @@
     "mainSwitch": "numeric"
   },
   "output": {
-    "greenLED0": {
+    "greenLight1": {
       "type": "string",
-      "instruction": {
-        "interval": "integer",
-        "delay": "integer"
+      "instructions": {
+        "blink": "array",
+        "turnOnOff": "boolean"
       }
     },
-    "greenLED1": {
+    "greenLight2": {
       "type": "string",
-      "instruction": {
-        "interval": "integer",
-        "delay": "integer"
+      "instructions": {
+        "blink": "array",
+        "turnOnOff": "boolean"
       }
     },
-    "greenLED2": {
+    "greenLight3": {
       "type": "string",
-      "instruction": {
-        "interval": "integer",
-        "delay": "integer"
+      "instructions": {
+        "blink": "array",
+        "turnOnOff": "boolean"
       }
     },
-    "redLED0": {
+    "redLight1": {
       "type": "string",
-      "instruction": {
-        "interval": "integer",
-        "delay": "integer"
+      "instructions": {
+        "blink": "array",
+        "turnOnOff": "boolean"
       }
     },
-    "redLED1":  {
+    "redLight2": {
       "type": "string",
-      "instruction": {
-        "interval": "integer",
-        "delay": "integer"
+      "instructions": {
+        "blink": "array",
+        "turnOnOff": "boolean"
       }
     },
-    "redLED2":  {
+    "redLight3": {
       "type": "string",
-      "instruction": {
-        "interval": "integer",
-        "delay": "integer"
+      "instructions": {
+        "blink": "array",
+        "turnOnOff": "boolean"
       }
     }
   }

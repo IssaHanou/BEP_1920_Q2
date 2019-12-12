@@ -6,6 +6,6 @@
   "port": 1883,
   "input": {},
   "output": {
-    "door": "boolean"
+    "open": "boolean"
   }
 }

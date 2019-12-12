@@ -170,23 +170,30 @@ class SccLib:
         """
         message = message.payload.decode("utf-8")
         message = json.loads(message)
-        if message.get("instruction") == "test":
+        if message.get("type") != "instruction":
+            self.logger.log(("received non-instruction message of type", message.get("type")))
+        else:
+            success = self.__check_message(message)
+            conf_msg_dict = {
+                "device_id": self.name,
+                "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+                "type": "confirmation",
+                "contents": {"completed": success, "instructed": message},
+            }
+            msg = json.dumps(conf_msg_dict)
+            self.__send_message("back-end", msg)
+
+    def __check_message(self, message):
+        instruction = message.get("instruction")
+        if instruction == "test":
             self.device.test()
-            success, failed_action = True, None
+            return True
         else:
             (success, failed_action) = self.device.perform_instruction(message.get("contents"))
-        msg_dict = {
-            "device_id": self.name,
-            "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
-            "type": "confirmation",
-            "contents": {"completed": success, "instructed": message},
-        }
-        msg = json.dumps(msg_dict)
-        self.__send_message("back-end", msg)
-        if success:
-            self.logger.log(("instruction could not be performed", message))
-        else:
-            self.logger.log(("instruction: " + failed_action + " could not be performed", message))
+            if success:
+                self.logger.log(("instruction performed", message))
+            else:
+                self.logger.log(("instruction: " + failed_action + " could not be performed", message))
 
     def __subscribe_topic(self, topic):
         """

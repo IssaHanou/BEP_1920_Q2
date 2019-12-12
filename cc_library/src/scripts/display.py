@@ -8,8 +8,6 @@ try:
 except (RuntimeError, ModuleNotFoundError):
     from fake_rpi.RPi import GPIO
 
-scclib = None
-
 
 class Display(Device):
     hint = ""
@@ -23,9 +21,7 @@ class Display(Device):
     def perform_instruction(self, contents):
         for action in contents:
             instruction = action.get("instruction")
-            if instruction == "test":
-                self.test()
-            elif instruction == "hint":
+            if instruction == "hint":
                 self.show_hint(action)
             else:
                 return False, action
@@ -34,12 +30,12 @@ class Display(Device):
     def test(self):
         self.hint = "test"
         print(self.hint)
-        scclib.statusChanged()
+        self.scclib.statusChanged()
 
     def show_hint(self, data):
         self.hint = data.get("value")
         print(self.hint)
-        scclib.statusChanged()
+        self.scclib.statusChanged()
 
 
     def main(self):

@@ -9,8 +9,6 @@ try:
 except (RuntimeError, ModuleNotFoundError):
     from fake_rpi.RPi import GPIO
 
-scclib = None
-
 
 class Door(Device):
     """
@@ -49,8 +47,6 @@ class Door(Device):
                     self.turn_off()
                 else:
                     self.turn_on()
-            elif instruction == "test":
-                self.test()
             else:
                 return False, action
         return True, None
@@ -66,12 +62,12 @@ class Door(Device):
     def turn_off(self):
         GPIO.output(self.door, GPIO.HIGH)
         self.status = False
-        scclib.status_changed()
+        self.scclib.status_changed()
 
     def turn_on(self):
         GPIO.output(self.door, GPIO.LOW)
         self.status = True
-        scclib.status_changed()
+        self.scclib.status_changed()
 
     def main(self):
         try:
