@@ -186,22 +186,58 @@ func TestOnStatusMsg(t *testing.T) {
 	}
 	handler.onStatusMsg(msg)
 
-	assert.Equal(t, true, handler.Config.Devices["TestDevice"].Status["testComponent0"],
-		"Device should set status to true on component 0")
-	assert.Equal(t, 40, handler.Config.Devices["TestDevice"].Status["testComponent1"],
-		"Device should set status to 40 on component 1")
-	assert.Equal(t, "blue", handler.Config.Devices["TestDevice"].Status["testComponent2"],
-		"Device should set status to blue on component 2")
-	assert.Equal(t, []int{1, 2, 3}, handler.Config.Devices["TestDevice"].Status["testComponent3"],
-		"Device should set status to [1,2,3] on component 3")
-	assert.Equal(t, true, handler.Config.Devices["TestDevice"].Status["testComponent4"],
-		"Device should set status to true on component 4")
-	assert.Equal(t, 40, handler.Config.Devices["TestDevice"].Status["testComponent5"],
-		"Device should set status to 40 on component 5")
-	assert.Equal(t, "blue", handler.Config.Devices["TestDevice"].Status["testComponent6"],
-		"Device should set status to blue on component 6")
-	assert.Equal(t, []int{1, 2, 3}, handler.Config.Devices["TestDevice"].Status["testComponent7"],
-		"Device should set status to [1,2,3] on component 7")
+	tests := []struct {
+		name      string
+		component string
+		status    interface{}
+	}{
+		{
+			name:      "component0 test",
+			component: "testComponent0",
+			status:    true,
+		},
+		{
+			name:      "component1 test",
+			component: "testComponent1",
+			status:    40,
+		},
+		{
+			name:      "component2 test",
+			component: "testComponent2",
+			status:    "blue",
+		},
+		{
+			name:      "component3 test",
+			component: "testComponent3",
+			status:    []int{1, 2, 3},
+		},
+		{
+			name:      "component4 test",
+			component: "testComponent4",
+			status:    true,
+		},
+		{
+			name:      "component5 test",
+			component: "testComponent5",
+			status:    40,
+		},
+		{
+			name:      "component6 test",
+			component: "testComponent6",
+			status:    "blue",
+		},
+		{
+			name:      "component7 test",
+			component: "testComponent7",
+			status:    []int{1, 2, 3},
+		}}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.status, handler.Config.Devices["TestDevice"].Status[tt.component],
+				"Device should set status right")
+		})
+	}
 }
 
 func TestOnStatusMsgOtherDevice(t *testing.T) {
@@ -256,31 +292,50 @@ func TestOnStatusMsgWrongType(t *testing.T) {
 	}
 	handler.onStatusMsg(msg)
 
-	_, ok1 := handler.Config.Devices["TestDevice"].Status["testComponent0"]
-	assert.Equal(t, false, ok1,
-		"Component0 should not been updated in device because it was not the right type")
-	_, ok2 := handler.Config.Devices["TestDevice"].Status["testComponent1"]
-	assert.Equal(t, false, ok2,
-		"Component1 should not been updated in device because it was not the right type")
-	_, ok3 := handler.Config.Devices["TestDevice"].Status["testComponent2"]
-	assert.Equal(t, false, ok3,
-		"Component2 should not been updated in device because it was not the right type")
-	_, ok4 := handler.Config.Devices["TestDevice"].Status["testComponent3"]
-	assert.Equal(t, false, ok4,
-		"Component3 should not been updated in device because it was not the right type")
-	_, ok5 := handler.Config.Devices["TestDevice"].Status["testComponent4"]
-	assert.Equal(t, false, ok5,
-		"Component4 should not been updated in device because it was not the right type")
-	_, ok6 := handler.Config.Devices["TestDevice"].Status["testComponent5"]
-	assert.Equal(t, false, ok6,
-		"Component5 should not been updated in device because it was not the right type")
-	_, ok7 := handler.Config.Devices["TestDevice"].Status["testComponent6"]
-	assert.Equal(t, false, ok7,
-		"Component6 should not been updated in device because it was not the right type")
-	_, ok8 := handler.Config.Devices["TestDevice"].Status["testComponent7"]
-	assert.Equal(t, false, ok8,
-		"Component7 should not been updated in device because it was not the right type")
+	tests := []struct {
+		name      string
+		component string
+	}{
+		{
+			name:      "component0 test",
+			component: "testComponent0",
+		},
+		{
+			name:      "component1 test",
+			component: "testComponent1",
+		},
+		{
+			name:      "component2 test",
+			component: "testComponent2",
+		},
+		{
+			name:      "component3 test",
+			component: "testComponent3",
+		},
+		{
+			name:      "component4 test",
+			component: "testComponent4",
+		},
+		{
+			name:      "component5 test",
+			component: "testComponent5",
+		},
+		{
+			name:      "component6 test",
+			component: "testComponent6",
+		},
+		{
+			name:      "component7 test",
+			component: "testComponent7",
+		}}
 
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, ok := handler.Config.Devices["TestDevice"].Status[tt.component]
+			assert.Equal(t, false, ok,
+				"component should not been updated in device because it was not the right type")
+		})
+	}
 }
 
 func TestMsgMapperStatus(t *testing.T) {
