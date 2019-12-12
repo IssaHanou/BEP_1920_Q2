@@ -16,12 +16,16 @@ func TestGeneralEvent_GetName(t *testing.T) {
 }
 
 func TestGeneralEvent_GetRules(t *testing.T) {
+	rule := new(Rule)
+
 	generalEvent := GeneralEvent{
-		Name:  "event",
-		Rules: make([]Rule, 2),
+		Name: "event",
+		Rules: []Rule{
+			*rule,
+		},
 	}
 
-	assert.Equal(t, generalEvent.GetRules(), make([]Rule, 2))
+	assert.Equal(t, generalEvent.GetRules(), []*Rule{rule})
 }
 
 func TestPuzzle_GetName(t *testing.T) {
@@ -36,14 +40,18 @@ func TestPuzzle_GetName(t *testing.T) {
 }
 
 func TestPuzzle_GetRules(t *testing.T) {
+	rule := new(Rule)
 	puzzle := Puzzle{
 		Event: GeneralEvent{
-			Name:  "event",
-			Rules: make([]Rule, 2)},
+			Name: "event",
+			Rules: []Rule{
+				*rule,
+			},
+		},
 		Hints: nil,
 	}
 
-	assert.Equal(t, puzzle.GetRules(), make([]Rule, 2))
+	assert.Equal(t, puzzle.GetRules(), []*Rule{rule})
 }
 
 func Test_CompareWrongComparison(t *testing.T) {

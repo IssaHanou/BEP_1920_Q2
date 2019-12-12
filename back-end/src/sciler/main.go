@@ -35,7 +35,7 @@ func main() {
 	port := configurations.General.Port
 
 	communicator := communication.NewCommunicator(host, port, topics)
-	messageHandler := handler.GetHandler(configurations, *communicator)
+	messageHandler := handler.Handler{Config: configurations, Communicator: communicator}
 	go communicator.Start(messageHandler.NewHandler)
 
 	for _, value := range messageHandler.Config.Devices {

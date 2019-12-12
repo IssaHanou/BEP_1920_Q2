@@ -11,9 +11,9 @@ type WorkingConfig struct {
 	General       General
 	Puzzles       []Puzzle
 	GeneralEvents []GeneralEvent
-	Devices       map[string]Device
-	StatusMap     map[string][]Rule
-	RuleMap       map[string]Rule
+	Devices       map[string]*Device
+	StatusMap     map[string][]*Rule
+	RuleMap       map[string]*Rule
 }
 
 // Rule is a struct that describes how action flow is handled in the escape room.
@@ -37,6 +37,7 @@ func (r *Rule) Execute(handler InstructionSender) {
 	for _, action := range r.Actions {
 		action.Execute(handler)
 	}
+	fmt.Println(r.Executed)
 	r.Executed++
 	logrus.Infof("Executed rule %s", r.ID)
 	handler.HandleEvent(r.ID)
@@ -54,8 +55,12 @@ func (p Puzzle) GetName() string {
 }
 
 // GetRules returns the rules of a Puzzle
-func (p Puzzle) GetRules() []Rule {
-	return p.Event.Rules
+func (p Puzzle) GetRules() []*Rule {
+	var rules []*Rule
+	for _, rule := range p.Event.Rules {
+		rules = append(rules, &rule)
+	}
+	return rules
 }
 
 // GeneralEvent defines a general event, like start.
@@ -70,14 +75,18 @@ func (g GeneralEvent) GetName() string {
 }
 
 // GetRules returns the rules of a GeneralEvent
-func (g GeneralEvent) GetRules() []Rule {
-	return g.Rules
+func (g *GeneralEvent) GetRules() []*Rule {
+	var rules []*Rule
+	for _, rule := range g.Rules {
+		rules = append(rules, &rule)
+	}
+	return rules
 }
 
 // Event is an interface that both Puzzle and GeneralEvent implement
 type Event interface {
 	GetName() string
-	GetRules() []Rule
+	GetRules() []*Rule
 }
 
 func compare(param1 interface{}, param2 interface{}, comparision string) bool {

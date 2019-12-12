@@ -40,18 +40,18 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, error) {
 	config.General = readConfig.General
 	config.Puzzles = generatePuzzles(readConfig.Puzzles)
 	config.GeneralEvents = generateGeneralEvents(readConfig.GeneralEvents)
-	config.Devices = make(map[string]Device)
+	config.Devices = make(map[string]*Device)
 	for _, readDevice := range readConfig.Devices {
-		config.Devices[readDevice.ID] = Device{readDevice.ID, readDevice.Description, readDevice.Input,
-			readDevice.Output, make(map[string]interface{}), false}
+		config.Devices[readDevice.ID] = &(Device{readDevice.ID, readDevice.Description, readDevice.Input,
+			readDevice.Output, make(map[string]interface{}), false})
 	}
-	config.StatusMap = generateStatusMap(config)
-	config.RuleMap = generateRuleMap(config)
+	config.StatusMap = generateStatusMap(&config)
+	config.RuleMap = generateRuleMap(&config)
 	return config, checkConfig(config)
 }
 
-func getAllRules(config WorkingConfig) []Rule {
-	var rules []Rule
+func getAllRules(config *WorkingConfig) []*Rule {
+	var rules []*Rule
 	for _, event := range config.GeneralEvents {
 		rules = append(rules, event.GetRules()...)
 	}
@@ -62,8 +62,8 @@ func getAllRules(config WorkingConfig) []Rule {
 	return rules
 }
 
-func generateRuleMap(config WorkingConfig) map[string]Rule {
-	ruleMap := make(map[string]Rule)
+func generateRuleMap(config *WorkingConfig) map[string]*Rule {
+	ruleMap := make(map[string]*Rule)
 	rules := getAllRules(config)
 
 	for _, rule := range rules {
@@ -72,8 +72,8 @@ func generateRuleMap(config WorkingConfig) map[string]Rule {
 	return ruleMap
 }
 
-func generateStatusMap(config WorkingConfig) map[string][]Rule {
-	statusMap := make(map[string][]Rule)
+func generateStatusMap(config *WorkingConfig) map[string][]*Rule {
+	statusMap := make(map[string][]*Rule)
 	rules := getAllRules(config)
 
 	for _, rule := range rules {
@@ -86,9 +86,9 @@ func generateStatusMap(config WorkingConfig) map[string][]Rule {
 }
 
 // todo make this more efficient
-func appendWhenUnique(rules []Rule, rule Rule) []Rule {
+func appendWhenUnique(rules []*Rule, rule *Rule) []*Rule {
 	for _, existingRule := range rules {
-		if reflect.DeepEqual(existingRule, rule) {
+		if reflect.DeepEqual(*existingRule, *rule) {
 			return rules
 		}
 	}

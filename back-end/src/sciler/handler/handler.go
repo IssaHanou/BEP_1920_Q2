@@ -6,7 +6,6 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/sirupsen/logrus"
 	"reflect"
-	"sciler/communication"
 	"sciler/config"
 	"time"
 )
@@ -19,15 +18,16 @@ type Message struct {
 	Contents interface{} `json:"contents"`
 }
 
+// Communicator interface is an interface for mqtt communication
+type Communicator interface {
+	Start(handler mqtt.MessageHandler)
+	Publish(topic string, message string, retrials int)
+}
+
 // Handler is a type that mqqt handlers have
 type Handler struct {
 	Config       config.WorkingConfig
-	Communicator communication.Communicator
-}
-
-//GetHandler creates an instance of Handler
-func GetHandler(workingConfig config.WorkingConfig, communicator communication.Communicator) *Handler {
-	return &Handler{workingConfig, communicator}
+	Communicator Communicator
 }
 
 // NewHandler is the actual MessageHandler
@@ -50,7 +50,6 @@ func (handler *Handler) msgMapper(raw Message) {
 	case "status":
 		{
 			handler.onStatusMsg(raw)
-			//handler.openDoorBeun(raw)
 			handler.SendStatus(raw.DeviceID)
 			handler.HandleEvent(raw.DeviceID)
 		}
