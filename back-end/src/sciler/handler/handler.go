@@ -128,11 +128,11 @@ func (handler *Handler) checkStatusType(device config.Device, status interface{}
 	valueType := reflect.TypeOf(status).Kind()
 	if inputType, ok := device.Input[component]; ok {
 		if error := compareType(valueType, inputType); error != nil {
-			return fmt.Errorf("%v with status %v for component %s", error.Error(), status, component)
+			return fmt.Errorf("%v with status %v for component %s", error, status, component)
 		}
 	} else if output, ok2 := device.Output[component]; ok2 {
 		if error := compareType(valueType, output.Type); error != nil {
-			return fmt.Errorf("%v with status %v for component %s", error.Error(), status, component)
+			return fmt.Errorf("%v with status %v for component %s", error, status, component)
 		}
 	} else {
 		return fmt.Errorf("status message received from component %s, which is not in the config under device %s", component, device.ID)
