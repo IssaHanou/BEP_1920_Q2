@@ -199,7 +199,7 @@
                 "type_id": "correctSequence",
                 "constraints": {
                   "comparison": "gte",
-                  "value": 2
+                  "value": true
                 }
               }
             ]

@@ -64,34 +64,13 @@
       }
     },
     {
-      "id": "telephone",
-      "description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
-      "input": {
-        "turningWheel": "array"
-      },
-      "output": {
-        "audio": {
-          "type": "string",
-          "instructions": {
-            "play": "string"
-          }
-        },
-        "ringTone": {
-          "type": "string",
-          "instructions": {
-            "play": "string"
-          }
-        }
-      }
-    },
-    {
       "id": "display",
-      "description": "The display can print messages",
+      "description": "displays messages",
       "input": {},
       "output": {
         "display": {
           "type": "string",
-          "instructions:": {
+          "instructions": {
             "hint": "string"
           }
         }
@@ -113,55 +92,11 @@
   ],
   "puzzles": [
     {
-      "name": "Telefoon puzzels",
+      "name": "puzzel rood",
       "rules": [
         {
-          "id": "correctSequence",
-          "description": "De juiste volgorde van cijfers moet gedraaid worden.",
-          "limit": 1,
-          "conditions": {
-            "type": "device",
-            "type_id": "telephone",
-            "constraints": {
-              "comparison": "eq",
-              "component_id": "turningWheel",
-              "value": [
-                0,
-                1,
-                2,
-                7
-              ]
-            }
-          },
-          "actions": [
-            {
-              "type": "device",
-              "type_id": "controlBoard",
-              "message": [
-                {
-                  "component_id": "greenLight1",
-                  "instruction": "blink",
-                  "value": [
-                    0.5,
-                    0
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "hints": [
-        "De knop verzend jouw volgorde",
-        "Heb je al even gewacht?"
-      ]
-    },
-    {
-      "name": "Control puzzel",
-      "rules": [
-        {
-          "id": "controlSwitch",
-          "description": "Als de grote switch wordt geflipt, worden alle condities gecheckt (tweede schuif en groene of rode switch aan) en gaat het lichtje branden en de telefoon ringt.",
+          "id": "rood",
+          "description": "Wanneer de rode switch op true staat en de slider 100, dan sturen we een hint met 'puzzle rood opgelost'",
           "limit": 1,
           "conditions": {
             "operator": "AND",
@@ -173,24 +108,14 @@
                   "operator": "AND",
                   "list": [
                     {
-                      "component_id": "mainSwitch",
-                      "comparison": "eq",
-                      "value": true
-                    },
-                    {
-                      "component_id": "greenSwitch",
-                      "comparison": "eq",
-                      "value": true
-                    },
-                    {
                       "component_id": "redSwitch",
                       "comparison": "eq",
                       "value": true
                     },
                     {
-                      "component_id": "slider2",
-                      "comparison": "lt",
-                      "value": 30
+                      "component_id": "slider1",
+                      "comparison": "eq",
+                      "value": 100
                     }
                   ]
                 }
@@ -200,21 +125,81 @@
           "actions": [
             {
               "type": "device",
-              "type_id": "telephone",
+              "type_id": "controlBoard",
               "message": [
                 {
-                  "component_id": "audio",
-                  "instruction": "play",
-                  "value": "audio1"
+                  "component_id": "redLight1",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "turnOnOff",
+                  "value": true
                 }
               ]
             },
             {
               "type": "device",
+              "type_id": "display",
+              "message": [
+                {
+                  "component_id": "display",
+                  "instruction": "hint",
+                  "value": "puzzle rood opgelost!"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "hints": [
+        "Zet de schuiven nauwkeurig"
+      ]
+    },
+    {
+      "name": "puzzel oranje",
+      "rules": [
+        {
+          "id": "oranje",
+          "description": "Wanneer de rode oranje op true staat en de slider tussen 50 en 80, dan sturen we een hint met 'puzzle oranje opgelost'",
+          "limit": 1,
+          "conditions": {
+            "operator": "AND",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "controlBoard",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "component_id": "orangeSwitch",
+                      "comparison": "eq",
+                      "value": true
+                    },
+                    {
+                      "component_id": "slider2",
+                      "comparison": "lte",
+                      "value": 80
+                    },
+                    {
+                      "component_id": "slider2",
+                      "comparison": "gte",
+                      "value": 50
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
               "type_id": "controlBoard",
               "message": [
                 {
-                  "component_id": "greenLight1",
+                  "component_id": "redLight2",
                   "instruction": "turnOnOff",
                   "value": false
                 },
@@ -222,26 +207,91 @@
                   "component_id": "greenLight2",
                   "instruction": "turnOnOff",
                   "value": true
+                }
+              ]
+            },
+            {
+              "type": "device",
+              "type_id": "display",
+              "message": [
+                {
+                  "component_id": "display",
+                  "instruction": "hint",
+                  "value": "puzzle oranje opgelost!"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "hints": [
+        "Zet de schuiven nauwkeurig"
+      ]
+    },
+    {
+      "name": "puzzel groen",
+      "rules": [
+        {
+          "id": "groen",
+          "description": "Wanneer de groen switch op true staat en de slider 100, en rule rood is al opgelost, dan sturen we een hint met 'puzzle groen opgelost'",
+          "limit": 1,
+          "conditions": {
+            "operator": "AND",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "controlBoard",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "component_id": "greenSwitch",
+                      "comparison": "eq",
+                      "value": true
+                    },
+                    {
+                      "component_id": "slider3",
+                      "comparison": "eq",
+                      "value": 100
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "rood",
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "controlBoard",
+              "message": [
+                {
+                  "component_id": "redLight3",
+                  "instruction": "turnOnOff",
+                  "value": false
                 },
                 {
                   "component_id": "greenLight3",
                   "instruction": "turnOnOff",
-                  "value": false
-                },
-                {
-                  "component_id": "redLight1",
-                  "instruction": "turnOnOff",
                   "value": true
-                },
+                }
+              ]
+            },
+            {
+              "type": "device",
+              "type_id": "display",
+              "message": [
                 {
-                  "component_id": "redLight2",
-                  "instruction": "turnOnOff",
-                  "value": false
-                },
-                {
-                  "component_id": "redLight3",
-                  "instruction": "turnOnOff",
-                  "value": true
+                  "component_id": "display",
+                  "instruction": "hint",
+                  "value": "puzzle groen opgelost!"
                 }
               ]
             }
@@ -258,21 +308,27 @@
       "name": "Start",
       "rules": [
         {
-          "id": "telephoneRings",
-          "description": "Als het spel start, moet de telefoon na 1 minuut ringen.",
+          "id": "start",
+          "description": "Als het spel start, moeten alle rode leds aan gaan en de groene uit",
           "limit": 1,
           "conditions": {
-            "operator": "AND",
+            "operator": "OR",
             "list": [
               {
-                "type": "timer",
-                "type_id": "timer1",
+                "type": "device",
+                "type_id": "controlBoard",
                 "constraints": {
-                  "operator": "AND",
+                  "operator": "OR",
                   "list": [
                     {
+                      "component_id": "mainSwitch",
                       "comparison": "eq",
-                      "value": "00:01:01"
+                      "value": true
+                    },
+                    {
+                      "component_id": "mainSwitch",
+                      "comparison": "eq",
+                      "value": false
                     }
                   ]
                 }
@@ -282,44 +338,37 @@
           "actions": [
             {
               "type": "device",
-              "type_id": "telephone",
+              "type_id": "controlBoard",
               "message": [
                 {
-                  "component_id": "audio",
-                  "instruction": "play",
-                  "value": "audio1"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Stop",
-      "rules": [
-        {
-          "id": "flipSwitch",
-          "description": "Als de knop omgaat, stopt het spel.",
-          "limit": 1,
-          "conditions": {
-            "type": "device",
-            "type_id": "controlBoard",
-            "constraints": {
-              "comparison": "eq",
-              "value": true,
-              "component_id": "mainSwitch"
-            }
-          },
-          "actions": [
-            {
-              "type": "timer",
-              "type_id": "timer1",
-              "message": [
+                  "component_id": "redLight1",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
                 {
-                  "component_id": "timer1",
-                  "instruction": "instruction",
-                  "value": "stop"
+                  "component_id": "redLight2",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "redLight3",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "greenLight2",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "greenLight3",
+                  "instruction": "turnOnOff",
+                  "value": false
                 }
               ]
             }
