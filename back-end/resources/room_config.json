@@ -134,8 +134,8 @@
                 },
                 {
                   "component_id": "greenLight1",
-                  "instruction": "blink",
-                  "value": [0.5, 0]
+                  "instruction": "turnOnOff",
+                  "value": true
                 }
               ]
             },
@@ -205,8 +205,8 @@
                 },
                 {
                   "component_id": "greenLight2",
-                  "instruction": "blink",
-                  "value": [0.5, 0]
+                  "instruction": "turnOnOff",
+                  "value": true
                 }
               ]
             },
@@ -279,8 +279,8 @@
                 },
                 {
                   "component_id": "greenLight3",
-                  "instruction": "blink",
-                  "value": [0.5, 0]
+                  "instruction": "turnOnOff",
+                  "value": true
                 }
               ]
             },
