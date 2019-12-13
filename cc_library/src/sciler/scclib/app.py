@@ -47,6 +47,9 @@ class SccLib:
         self.__connect()
 
     def stop(self):
+        """
+        Stop method for the client loop.
+        """
         self.client.loop_stop()
 
     def __send_message(self, topic, json_message):
