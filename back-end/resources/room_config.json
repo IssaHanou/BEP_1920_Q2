@@ -89,9 +89,9 @@
       "description": "The display can print messages",
       "input": {},
       "output": {
-        "display": {
+        "hint": {
           "type": "string",
-          "instructions:": {
+          "instructions": {
             "hint": "string"
           }
         }
