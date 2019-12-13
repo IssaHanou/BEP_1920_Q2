@@ -88,22 +88,34 @@ type Event interface {
 	GetRules() []*Rule
 }
 
+// todo make sure all numeric are saved as float64 on reading in / status received
 func compare(param1 interface{}, param2 interface{}, comparision string) bool {
 	switch comparision {
 	case "eq":
 		return reflect.DeepEqual(param1, param2)
 	case "lt":
-		return param1.(float64) < param2.(float64)
+		return numericToFloat64(param1) < numericToFloat64(param2)
 	case "gt":
-		return param1.(float64) > param2.(float64)
+		return numericToFloat64(param1) > numericToFloat64(param2)
 	case "lte":
-		return param1.(float64) <= param2.(float64)
+		return numericToFloat64(param1) <= numericToFloat64(param2)
 	case "gte":
-		return param1.(float64) >= param2.(float64)
+		return numericToFloat64(param1) >= numericToFloat64(param2)
 	case "contains":
 		return contains(param1, param2)
 	default:
 		panic(fmt.Sprintf("cannot compare on: %s", comparision))
+	}
+}
+
+func numericToFloat64(input interface{}) float64 {
+	switch input.(type) {
+	case float64:
+		return input.(float64)
+	case int:
+		return float64(input.(int))
+	default:
+		panic(fmt.Sprintf("%v, is not of type Numeric, it is of type %s", input, reflect.TypeOf(input).Kind()))
 	}
 }
 

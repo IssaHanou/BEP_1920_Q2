@@ -161,7 +161,7 @@
       "rules": [
         {
           "id": "controlSwitch",
-          "description": "Wanneer slider 1 en 2 op 100 staan, en 3 oon 0 en de mainSwitch word geflipt, dan gaan alle groene lampjes aan",
+          "description": "Wanneer slider 1 en 2 op 100 staan, en 3 op 0 en de mainSwitch word geflipt, dan gaan alle groene lampjes aan",
           "limit": 100,
           "conditions": {
             "operator": "AND",

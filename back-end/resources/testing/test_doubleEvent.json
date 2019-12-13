@@ -107,15 +107,14 @@
             "operator": "OR",
             "list": [
               {
-                "type": "device",
-                "type_id": "controlBoard",
+                "type": "rule",
+                "type_id": "mainSwitch flipped",
                 "constraints": {
                   "operator": "AND",
                   "list": [
                     {
-                      "component_id": "mainSwitch",
-                      "comparison": "eq",
-                      "value": true
+                      "comparison": "gte",
+                      "value": 1
                     }
                   ]
                 }

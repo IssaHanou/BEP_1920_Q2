@@ -20,8 +20,8 @@ func TestGeneralEvent_GetRules(t *testing.T) {
 
 	generalEvent := GeneralEvent{
 		Name: "event",
-		Rules: []Rule{
-			*rule,
+		Rules: []*Rule{
+			rule,
 		},
 	}
 
@@ -29,10 +29,15 @@ func TestGeneralEvent_GetRules(t *testing.T) {
 }
 
 func TestPuzzle_GetName(t *testing.T) {
+	rule := new(Rule)
+
 	puzzle := Puzzle{
-		Event: GeneralEvent{
-			Name:  "event",
-			Rules: make([]Rule, 2)},
+		Event: &GeneralEvent{
+			Name: "event",
+			Rules: []*Rule{
+				rule,
+			},
+		},
 		Hints: nil,
 	}
 
@@ -42,10 +47,10 @@ func TestPuzzle_GetName(t *testing.T) {
 func TestPuzzle_GetRules(t *testing.T) {
 	rule := new(Rule)
 	puzzle := Puzzle{
-		Event: GeneralEvent{
+		Event: &GeneralEvent{
 			Name: "event",
-			Rules: []Rule{
-				*rule,
+			Rules: []*Rule{
+				rule,
 			},
 		},
 		Hints: nil,
