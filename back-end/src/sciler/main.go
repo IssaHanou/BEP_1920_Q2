@@ -42,8 +42,6 @@ func main() {
 		messageHandler.SendStatus(value.ID)
 	}
 
-	// loop for now preventing app to exit
-	for {
-		time.Sleep(time.Nanosecond * time.Duration(10))
-	}
+	// prevent exit
+	select {}
 }
