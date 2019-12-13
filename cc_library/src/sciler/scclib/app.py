@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime
 import json
 
@@ -40,11 +41,11 @@ class SccLib:
         """
         print(self.name, ", broker log: ", buf)
 
-    def start(self):
+    async def start(self):
         """
         Starting method to call from the starting script.
         """
-        self.__connect()
+        await self.__connect()
 
     def __send_message(self, topic, json_message):
         # TODO what to do when publish fails
@@ -52,7 +53,7 @@ class SccLib:
         message_type = topic + " message published"
         self.logger.log((message_type, json_message))
 
-    def __connect(self):
+    async def __connect(self):
         """
         Connect method to set up the connection to the broker.
         When connected:
@@ -60,27 +61,29 @@ class SccLib:
         subscribes to topic "test"
         starts loop_forever
         """
-        while True:
-            try:
-                self.client.connect(self.host, self.port, keepalive=60)
-                self.logger.log("connected to broker")
-                msg_dict = {
-                    "device_id": self.name,
-                    "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
-                    "type": "connection",
-                    "contents": {"connection": True},
-                }
 
-                msg = json.dumps(msg_dict)
-                self.__send_message("back-end", msg)
-                for label in self.labels:
-                    self.__subscribe_topic(label)
-                self.__subscribe_topic("client-computers")
-                self.__subscribe_topic(self.name)
-                self.client.loop_forever()
-                break
-            except ConnectionRefusedError:
-                self.logger.log("ERROR: connection was refused")
+        try:
+            self.client.connect(self.host, self.port, keepalive=60)
+            self.logger.log("connected to broker")
+            msg_dict = {
+                "device_id": self.name,
+                "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+                "type": "connection",
+                "contents": {"connection": True},
+            }
+
+            msg = json.dumps(msg_dict)
+            self.__send_message("back-end", msg)
+            for label in self.labels:
+                self.__subscribe_topic(label)
+            self.__subscribe_topic("client-computers")
+            self.__subscribe_topic(self.name)
+            while True:
+                self.client.loop()
+                print("loop")
+                await asyncio.sleep(0)
+        except ConnectionRefusedError:
+            self.logger.log("ERROR: connection was refused")
 
     def __on_connect(self, client, userdata, flags, rc):
         """

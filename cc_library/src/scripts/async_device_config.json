@@ -1,0 +1,9 @@
+{
+  "id": "asyncDevice",
+  "description": "test device for asynchronous code",
+  "host": "192.168.178.82",
+  "port": 1883,
+  "labels": [],
+  "input": {},
+  "output": {}
+}
