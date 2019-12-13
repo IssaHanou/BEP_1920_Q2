@@ -11,15 +11,16 @@ except (RuntimeError, ModuleNotFoundError):
 
 
 class Door(Device):
-    """
-    Define pin numbers to which units are connected on Pi.
-    """
 
-    GPIO.setmode(GPIO.BCM)
-    door = 17
-    GPIO.setup(door, GPIO.OUT)
-
-    status = False
+    def __init__(self):
+        """
+        Define pin numbers to which units are connected on Pi.
+        """
+        Device.__init__(self)
+        GPIO.setmode(GPIO.BCM)
+        self.door = 17
+        GPIO.setup(self.door, GPIO.OUT)
+        self.status = False
 
     def get_status(self):
         """

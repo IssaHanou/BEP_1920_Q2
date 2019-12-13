@@ -14,52 +14,54 @@ except (RuntimeError, ModuleNotFoundError):
 
 class ControlBoard(Device):
 
-    adc = ADC()
-    GPIO.setmode(GPIO.BCM)
-    """
-    Define pin numbers to which units are connected on Pi.
-    """
-    redSwitch = 27
-    orangeSwitch = 22
-    greenSwitch = 18
-    mainSwitch = 23
-    switches = [redSwitch, orangeSwitch, greenSwitch, mainSwitch]
+    def __init__(self):
+        Device.__init__(self)
+        self.adc = ADC()
+        self.GPIO.setmode(GPIO.BCM)
+        """
+        Define pin numbers to which units are connected on Pi.
+        """
+        self.redSwitch = 27
+        self.orangeSwitch = 22
+        self.greenSwitch = 18
+        self.mainSwitch = 23
+        self.switches = [self.redSwitch, self.orangeSwitch, self.greenSwitch, self.mainSwitch]
 
-    redLight1 = 9
-    redLight2 = 15
-    redLight3 = 17
-    greenLight1 = 10
-    greenLight2 = 14
-    greenLight3 = 4
+        self.redLight1 = 9
+        self.redLight2 = 15
+        self.redLight3 = 17
+        self.greenLight1 = 10
+        self.greenLight2 = 14
+        self.greenLight3 = 4
 
-    redLEDs = [redLight1, redLight2, redLight3]
-    greenLEDs = [greenLight1, greenLight2, greenLight3]
+        self.redLEDs = [self.redLight1, self.redLight2, self.redLight3]
+        self.greenLEDs = [self.greenLight1, self.greenLight2, self.greenLight3]
 
-    a_pin0 = 24
-    a_pin1 = 25
-    a_pin2 = 8
-    b_pin0 = 7
-    b_pin1 = 1
-    b_pin2 = 12
+        self.a_pin0 = 24
+        self.a_pin1 = 25
+        self.a_pin2 = 8
+        self.b_pin0 = 7
+        self.b_pin1 = 1
+        self.b_pin2 = 12
 
-    GPIO.setup(redSwitch, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(orangeSwitch, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(greenSwitch, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.setup(mainSwitch, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(self.redSwitch, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(self.orangeSwitch, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(self.greenSwitch, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(self.mainSwitch, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-    GPIO.setup(redLight1, GPIO.OUT)
-    GPIO.setup(redLight2, GPIO.OUT)
-    GPIO.setup(redLight3, GPIO.OUT)
-    GPIO.setup(greenLight1, GPIO.OUT)
-    GPIO.setup(greenLight2, GPIO.OUT)
-    GPIO.setup(greenLight3, GPIO.OUT)
+        GPIO.setup(self.redLight1, GPIO.OUT)
+        GPIO.setup(self.redLight2, GPIO.OUT)
+        GPIO.setup(self.redLight3, GPIO.OUT)
+        GPIO.setup(self.greenLight1, GPIO.OUT)
+        GPIO.setup(self.greenLight2, GPIO.OUT)
+        GPIO.setup(self.greenLight3, GPIO.OUT)
 
-    GPIO.setup(a_pin0, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(a_pin1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(a_pin2, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(b_pin0, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(b_pin1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    GPIO.setup(b_pin2, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(self.a_pin0, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(self.a_pin1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(self.a_pin2, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(self.b_pin0, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(self.b_pin1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(self.b_pin2, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
     def get_sliders_analog_reading(self):
         positions = [0, 0, 0]

@@ -10,7 +10,10 @@ except (RuntimeError, ModuleNotFoundError):
 
 
 class Display(Device):
-    hint = ""
+
+    def __init__(self):
+        Device.__init__(self)
+        self.hint = ""
 
     def get_status(self):
         status = "{"

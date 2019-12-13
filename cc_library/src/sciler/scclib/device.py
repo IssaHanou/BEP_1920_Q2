@@ -36,6 +36,9 @@ class Device:
         """
 
     def __init__(self):
+        """
+        The init of the subclass should call this method and also initialize all class attributes.
+        """
         self.scclib = None
 
     @abstractmethod
