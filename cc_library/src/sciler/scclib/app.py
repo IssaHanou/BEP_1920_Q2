@@ -70,7 +70,7 @@ class SccLib:
 
     def __send_message(self, topic, json_message):
         # TODO what to do when publish fails
-        self.client.publish(topic, json_message)
+        self.client.publish(topic, json_message, 1)
         message_type = topic + " message published"
         self.logger.log((message_type, json_message))
 
@@ -212,6 +212,16 @@ class SccLib:
                 self.device.test()
                 self.logger.log(("instruction performed", contents))
                 return True
+            if instruction == "status update" :
+                msg_dict = {
+                    "device_id": self.name,
+                    "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+                    "type": "connection",
+                    "contents": {"connection": True},
+                }
+                msg = json.dumps(msg_dict)
+                self.__send_message("back-end", msg)
+                self.status_changed()
             else:
                 (success, failed_action) = self.device.perform_instruction(action)
                 if success:
