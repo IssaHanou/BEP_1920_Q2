@@ -1,4 +1,3 @@
-import asyncio
 import os
 import time
 
@@ -7,7 +6,6 @@ from cc_library.src.sciler.scclib.device import Device
 
 
 class async_device(Device):
-
     def get_status(self):
         print("status")
 
@@ -42,7 +40,6 @@ class async_device(Device):
                     break
 
             self.scclib.stop()
-
 
         except KeyboardInterrupt:
             self.scclib.logger.log("program was terminated from keyboard input")
