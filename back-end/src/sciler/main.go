@@ -39,8 +39,7 @@ func main() {
 	go communicator.Start(messageHandler.NewHandler)
 
 	for _, value := range messageHandler.Config.Devices {
-		massageHandler.Getstatus(value.ID)
-		messageHandler.SendStatus(value.ID)
+		messageHandler.GetStatus(value.ID)
 	}
 	// loop for now preventing app to exit
 	for {

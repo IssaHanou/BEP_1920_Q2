@@ -208,11 +208,12 @@ class SccLib:
     def __check_message(self, contents):
         for action in contents:
             instruction = action.get("instruction")
+            self.logger.log(("status?", instruction))
             if instruction == "test":
                 self.device.test()
                 self.logger.log(("instruction performed", contents))
                 return True
-            if instruction == "status update" :
+            if instruction == "status update":
                 msg_dict = {
                     "device_id": self.name,
                     "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),

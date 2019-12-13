@@ -323,13 +323,14 @@ func getMapSlice(input interface{}) ([]map[string]interface{}, error) {
 	return output, nil
 }
 
+// GetStatus asks devices to send status
 func (handler *Handler) GetStatus(deviceID string) {
 	message := Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "instruction",
-		Contents: map[string]interface{}{
-			"instruction": "status update",
+		Contents: []map[string]interface{}{
+			{"instruction": "status update"},
 		},
 	}
 

@@ -17,7 +17,7 @@ class ControlBoard(Device):
     def __init__(self):
         Device.__init__(self)
         self.adc = ADC()
-        self.GPIO.setmode(GPIO.BCM)
+        GPIO.setmode(GPIO.BCM)
         """
         Define pin numbers to which units are connected on Pi.
         """
