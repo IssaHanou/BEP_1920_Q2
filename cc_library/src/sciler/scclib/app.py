@@ -1,4 +1,3 @@
-import asyncio
 from datetime import datetime
 import json
 
@@ -41,11 +40,14 @@ class SccLib:
         """
         print(self.name, ", broker log: ", buf)
 
-    async def start(self):
+    def start(self):
         """
         Starting method to call from the starting script.
         """
-        await self.__connect()
+        self.__connect()
+
+    def stop(self):
+        self.client.loop_stop()
 
     def __send_message(self, topic, json_message):
         # TODO what to do when publish fails
@@ -53,7 +55,7 @@ class SccLib:
         message_type = topic + " message published"
         self.logger.log((message_type, json_message))
 
-    async def __connect(self):
+    def __connect(self):
         """
         Connect method to set up the connection to the broker.
         When connected:
@@ -78,10 +80,7 @@ class SccLib:
                 self.__subscribe_topic(label)
             self.__subscribe_topic("client-computers")
             self.__subscribe_topic(self.name)
-            while True:
-                self.client.loop()
-                print("loop")
-                await asyncio.sleep(0)
+            self.client.loop_start()
         except ConnectionRefusedError:
             self.logger.log("ERROR: connection was refused")
 

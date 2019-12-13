@@ -14,18 +14,11 @@ class async_device(Device):
     def perform_instruction(self, action):
         print("instruction: " + action)
 
-    async def test(self):
-        await print("test")
+    def test(self):
+        print("test")
 
     def __init__(self):
         Device.__init__(self)
-
-    async def keep_printing(self):
-        while True:
-
-            print("print")
-            time.sleep(5)
-            await asyncio.sleep(0)
 
     def main(self):
 
@@ -37,12 +30,18 @@ class async_device(Device):
             config = open(file=abs_file_path)
             self.scclib = SccLib(config, device)
 
-            loop = asyncio.get_event_loop()
+            self.scclib.start()
 
-            loop.run_until_complete(asyncio.gather(
-                self.scclib.start(),
-                self.keep_printing()
-            ))
+            i = 0
+            while True:
+                print(i)
+                i += 1
+                time.sleep(1)
+
+                if i > 100:
+                    break
+
+            self.scclib.stop()
 
 
         except KeyboardInterrupt:
