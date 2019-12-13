@@ -96,6 +96,17 @@ type Action struct {
 	Message []ComponentInstruction `json:"message"`
 }
 
+// Execute is a method that performs the action
+func (action Action) Execute(handler InstructionSender) {
+	switch action.Type { // this cannot be any other Type than device or timer, (checked in checkActions function)
+	case "device":
+		{
+			handler.SendInstruction(action.TypeID, action.Message)
+		}
+	case "timer": // todo implement timer
+	}
+}
+
 // ComponentInstruction can be sent across clients of the brokers.
 type ComponentInstruction struct {
 	ComponentID string      `json:"component_id"`

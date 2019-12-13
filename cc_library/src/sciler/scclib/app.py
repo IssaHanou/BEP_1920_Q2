@@ -190,20 +190,20 @@ class SccLib:
             instruction = action.get("instruction")
             if instruction == "test":
                 self.device.test()
-                self.logger.log(("instruction performed", contents))
-                return True
+                self.logger.log(("instruction performed", action))
             else:
                 (success, failed_action) = self.device.perform_instruction(action)
                 if success:
-                    self.logger.log(("instruction performed", contents))
+                    self.logger.log(("instruction performed", action))
                 else:
                     self.logger.log(
                         (
                             "instruction: " + failed_action + " could not be performed",
-                            contents,
+                            action,
                         )
                     )
-                return success
+                    return False
+        return True
 
     def __subscribe_topic(self, topic):
         """

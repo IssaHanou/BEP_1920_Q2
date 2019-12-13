@@ -1,0 +1,141 @@
+{
+  "general": {
+    "name": "Escape X",
+    "duration": "00:30:00",
+    "host": "localhost",
+    "port": 1883
+  },
+  "devices": [
+    {
+      "id": "controlBoard",
+      "description": "Control board with three switches, three slides with lights and one main switch.",
+      "input": {
+        "redSwitch": "boolean",
+        "orangeSwitch": "boolean",
+        "greenSwitch": "boolean",
+        "slider1": "numeric",
+        "slider2": "numeric",
+        "slider3": "numeric",
+        "mainSwitch": "boolean"
+      },
+      "output": {
+        "greenLight1": {
+          "type": "string",
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          }
+        },
+        "greenLight2": {
+          "type": "string",
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          }
+        },
+        "greenLight3": {
+          "type": "string",
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          }
+        },
+        "redLight1": {
+          "type": "string",
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          }
+        },
+        "redLight2": {
+          "type": "string",
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          }
+        },
+        "redLight3": {
+          "type": "string",
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          }
+        }
+      }
+    }
+  ],
+  "puzzles": [],
+  "general_events": [
+    {
+      "name": "eventA",
+      "rules": [
+        {
+          "id": "mainSwitch flipped",
+          "description": "Als de mainSwitch true is, gebeurd er nix",
+          "limit": 1,
+          "conditions": {
+            "operator": "OR",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "controlBoard",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "component_id": "mainSwitch",
+                      "comparison": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "actions": []
+        }
+      ]
+    },
+    {
+      "name": "eventB",
+      "rules": [
+        {
+          "id": "",
+          "description": "Als rule 'mainSwitch flipped' is gedaan, dan moet greenLight1 aangaan",
+          "limit": 1,
+          "conditions": {
+            "operator": "OR",
+            "list": [
+              {
+                "type": "rule",
+                "type_id": "mainSwitch flipped",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "comparison": "gte",
+                      "value": 1
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "controlBoard",
+              "message": [
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "turnOnOff",
+                  "value": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

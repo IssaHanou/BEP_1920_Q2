@@ -6,7 +6,6 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/sirupsen/logrus"
 	"reflect"
-	"sciler/communication"
 	"sciler/config"
 	"time"
 )
@@ -19,15 +18,16 @@ type Message struct {
 	Contents interface{} `json:"contents"`
 }
 
+// Communicator interface is an interface for mqtt communication
+type Communicator interface {
+	Start(handler mqtt.MessageHandler)
+	Publish(topic string, message string, retrials int)
+}
+
 // Handler is a type that mqqt handlers have
 type Handler struct {
 	Config       config.WorkingConfig
-	Communicator communication.Communicator
-}
-
-// GetHandler creates an instance of Handler
-func GetHandler(workingConfig config.WorkingConfig, communicator communication.Communicator) *Handler {
-	return &Handler{workingConfig, communicator}
+	Communicator Communicator
 }
 
 // NewHandler is the actual MessageHandler
@@ -50,8 +50,8 @@ func (handler *Handler) msgMapper(raw Message) {
 	case "status":
 		{
 			handler.onStatusMsg(raw)
-			handler.openDoorBeun(raw)
 			handler.SendStatus(raw.DeviceID)
+			handler.HandleEvent(raw.DeviceID)
 		}
 	case "confirmation":
 		{
@@ -146,7 +146,7 @@ func (handler *Handler) onStatusMsg(raw Message) {
 	if device, ok := handler.Config.Devices[raw.DeviceID]; ok {
 		logrus.Info("status message received from: " + raw.DeviceID + ", status: " + fmt.Sprint(raw.Contents))
 		for k, v := range contents {
-			err := handler.checkStatusType(device, v, k)
+			err := handler.checkStatusType(*device, v, k)
 			if err != nil {
 				logrus.Error(err)
 			} else {
@@ -222,44 +222,27 @@ func (handler *Handler) SendStatus(deviceID string) {
 		logrus.Info("sending status data to front-end: " + fmt.Sprint(message.Contents))
 		handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 	}
-
 }
 
-// openDoorBeun is the test function for developers to test the door and switch combo.
-func (handler *Handler) openDoorBeun(raw Message) {
-	contents := raw.Contents.(map[string]interface{})
-	logrus.Info("checking if door needs to open based on received status message")
-	if raw.DeviceID == "controlBoard" {
-		var instruction bool
-		if contents["mainSwitch"] == true {
-			instruction = false
-		} else if contents["mainSwitch"] == false {
-			instruction = true
-		} else {
-			return
-		}
+// SendInstruction sends a list of instructions to a client
+func (handler *Handler) SendInstruction(clientID string, instructions []config.ComponentInstruction) {
+	message := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: instructions,
+	}
 
-		message := Message{
-			DeviceID: "back-end",
-			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-			Type:     "instruction",
-			Contents: []map[string]interface{}{
-				{
-					"instruction": "open",
-					"value":       instruction,
-				},
-			},
-		}
-		jsonMessage, err := json.Marshal(&message)
-		if err != nil {
-			logrus.Errorf("error occurred while constructing message to publish: %v", err)
-		} else {
-			handler.Communicator.Publish("door", string(jsonMessage), 3)
-		}
+	jsonMessage, err := json.Marshal(&message)
+	if err != nil {
+		logrus.Errorf("error occurred while constructing message to publish: %v", err)
+	} else {
+		logrus.Infof("sending instruction data to %s: %s", clientID, fmt.Sprint(message.Contents))
+		handler.Communicator.Publish(clientID, string(jsonMessage), 3)
 	}
 }
 
-//onInstructionMsg is the function to process instruction messages.
+// onInstructionMsg is the function to process instruction messages.
 func (handler *Handler) onInstructionMsg(raw Message) {
 	logrus.Info("instruction message received from: ", raw.DeviceID)
 
@@ -303,6 +286,17 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 				logrus.Errorf("error occurred while constructing message to publish: %v", err)
 			} else {
 				handler.Communicator.Publish("hint", string(jsonMessage), 3)
+			}
+		}
+	}
+}
+
+// HandleEvent is a function that checks and possible executes all rules according to the given (device/rule/timer) id
+func (handler *Handler) HandleEvent(id string) {
+	if rules, ok := handler.Config.StatusMap[id]; ok {
+		for _, rule := range rules {
+			if rule.Executed < rule.Limit && rule.Conditions.Resolve(handler.Config) {
+				rule.Execute(handler)
 			}
 		}
 	}

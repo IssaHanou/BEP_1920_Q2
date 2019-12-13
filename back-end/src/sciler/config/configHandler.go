@@ -38,15 +38,62 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, error) {
 	var config WorkingConfig
 	// Copy information from read config to working config.
 	config.General = readConfig.General
-	config.Puzzles = generatePuzzles(readConfig.Puzzles)
-	config.GeneralEvents = generateGeneralEvents(readConfig.GeneralEvents)
-	config.Devices = make(map[string]Device)
+	config.Puzzles = generatePuzzles(readConfig.Puzzles, &config)
+	config.GeneralEvents = generateGeneralEvents(readConfig.GeneralEvents, &config)
+	config.Devices = make(map[string]*Device)
 	for _, readDevice := range readConfig.Devices {
-		config.Devices[readDevice.ID] = Device{readDevice.ID, readDevice.Description, readDevice.Input,
-			readDevice.Output, make(map[string]interface{}), false}
+		config.Devices[readDevice.ID] = &(Device{readDevice.ID, readDevice.Description, readDevice.Input,
+			readDevice.Output, make(map[string]interface{}), false})
 	}
+	config.StatusMap = generateStatusMap(&config)
+	config.RuleMap = generateRuleMap(&config)
 
 	return config, checkConfig(config)
+}
+
+func getAllRules(config *WorkingConfig) []*Rule {
+	var rules []*Rule
+	for _, event := range config.GeneralEvents {
+		rules = append(rules, event.GetRules()...)
+	}
+
+	for _, event := range config.Puzzles {
+		rules = append(rules, event.GetRules()...)
+	}
+	return rules
+}
+
+func generateRuleMap(config *WorkingConfig) map[string]*Rule {
+	ruleMap := make(map[string]*Rule)
+	rules := getAllRules(config)
+
+	for _, rule := range rules {
+		ruleMap[rule.ID] = rule
+	}
+	return ruleMap
+}
+
+func generateStatusMap(config *WorkingConfig) map[string][]*Rule {
+	statusMap := make(map[string][]*Rule)
+	rules := getAllRules(config)
+
+	for _, rule := range rules {
+		for _, id := range rule.Conditions.GetConditionIDs() {
+			statusMap[id] = appendWhenUnique(statusMap[id], rule)
+		}
+	}
+
+	return statusMap
+}
+
+// todo make this more efficient
+func appendWhenUnique(rules []*Rule, rule *Rule) []*Rule {
+	for _, existingRule := range rules {
+		if reflect.DeepEqual(*existingRule, *rule) {
+			return rules
+		}
+	}
+	return append(rules, rule)
 }
 
 // checkConfig is a method that will return an error if the constraints value type is not equal to the device input type specified, the actions type is not equal to the device output type, or some other not allowed json configuration
@@ -72,6 +119,7 @@ func checkConfig(config WorkingConfig) error {
 			}
 		}
 	}
+	// todo check uniqueness of all device_id, timer_id and rule_id
 	return nil
 }
 
@@ -141,45 +189,46 @@ func checkActionDevice(action Action, config WorkingConfig) error {
 	return nil
 }
 
-func generatePuzzles(readPuzzles []ReadPuzzle) []Puzzle {
-	var result []Puzzle
+func generatePuzzles(readPuzzles []ReadPuzzle, config *WorkingConfig) []*Puzzle {
+	var result []*Puzzle
 	for _, readPuzzle := range readPuzzles {
 		puzzle := Puzzle{
-			Event: generateGeneralEvent(readPuzzle),
+			Event: generateGeneralEvent(readPuzzle, config),
 			Hints: readPuzzle.Hints,
 		}
-		result = append(result, puzzle)
+		result = append(result, &puzzle)
 	}
 	return result
 }
 
-func generateGeneralEvents(readGeneralEvents []ReadGeneralEvent) []GeneralEvent {
-	var result []GeneralEvent
+func generateGeneralEvents(readGeneralEvents []ReadGeneralEvent, config *WorkingConfig) []*GeneralEvent {
+	var result []*GeneralEvent
 	for _, readGeneralEvent := range readGeneralEvents {
-		result = append(result, generateGeneralEvent(readGeneralEvent))
+		result = append(result, generateGeneralEvent(readGeneralEvent, config))
 	}
 	return result
 }
 
-func generateGeneralEvent(event ReadEvent) GeneralEvent {
-	return GeneralEvent{
+func generateGeneralEvent(event ReadEvent, config *WorkingConfig) *GeneralEvent {
+	return &GeneralEvent{
 		Name:  event.GetName(),
-		Rules: generateRules(event.GetRules()),
+		Rules: generateRules(event.GetRules(), config),
 	}
 }
 
-func generateRules(readRules []ReadRule) []Rule {
-	var rules []Rule
+func generateRules(readRules []ReadRule, config *WorkingConfig) []*Rule {
+	var rules []*Rule
 	for _, readRule := range readRules {
 		rule := Rule{
 			ID:          readRule.ID,
 			Description: readRule.Description,
 			Limit:       readRule.Limit,
+			Executed:    0,
 			Conditions:  nil,
 			Actions:     readRule.Actions,
 		}
 		rule.Conditions = generateLogicalCondition(readRule.Conditions)
-		rules = append(rules, rule)
+		rules = append(rules, &rule)
 	}
 	return rules
 }
@@ -254,57 +303,3 @@ func generateLogicalConstraint(constraints interface{}) LogicalConstraint {
 	}
 	panic(fmt.Sprintf("JSON config in wrong constraint format, conditions: %v, could not be processed", constraints))
 }
-
-// TODO: rewrite this code in GH-73
-//func checkActions(devices map[string]Device, actions []Action) ([]Action, error) {
-//	for _, a := range actions {
-//		output := a.Message.Output
-//		if a.Type == "timer" {
-//			instruction, ok := output["instructions"]
-//			if !ok {
-//				return actions, errors.New("timer should have an instruction defined")
-//			}
-//			if instruction != "stop" && instruction != "subtract" {
-//				return actions, errors.New("timer should have an instruction defined, which is either stop or subtract")
-//			}
-//			if instruction == "subtract" {
-//				value, ok2 := output["value"]
-//				if !ok2 {
-//					return actions, errors.New("timer with subtract instruction should have value")
-//				}
-//				if reflect.TypeOf(value).Kind() != reflect.String {
-//					return actions, errors.New("timer with subtract instruction should have value in string format")
-//				}
-//				var rgxPat = regexp.MustCompile(`^[0-9]{2}:[0-9]{2}:[0-9]{2}$`)
-//				if !rgxPat.MatchString(value.(string)) {
-//					return actions, errors.New(value.(string) + " did not match pattern 'hh:mm:ss'")
-//				}
-//			}
-//		} else if a.Type == "device" {
-//			device, ok := devices[a.TypeID]
-//			if !ok {
-//				return actions, errors.New("device with id " + a.TypeID + " not found in map")
-//			}
-//			for key, value := range output {
-//				expectedType, ok2 := device.Output[key]
-//				if !ok2 {
-//					return actions, errors.New("component id: " + key + " not found in device input")
-//				}
-//				// value should be of type specified in device output
-//				err := CheckComponentType(expectedType, value)
-//				if err != nil {
-//					return actions, err
-//				}
-//			}
-//		} else {
-//			return actions, errors.New("invalid type of action: " + a.Type)
-//		}
-//	}
-//	return actions, nil
-//}
-
-//TODO multiple errors?
-//TODO check device present
-//TODO check component present
-//TODO check output types
-//TODO catch non-existing keys in json

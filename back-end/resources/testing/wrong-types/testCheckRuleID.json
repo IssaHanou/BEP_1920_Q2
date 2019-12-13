@@ -196,7 +196,7 @@
               },
               {
                 "type": "rule",
-                "type_id": "correctSequence",
+                "type_id": "non existing",
                 "constraints": {
                   "comparison": "gte",
                   "value": 2
