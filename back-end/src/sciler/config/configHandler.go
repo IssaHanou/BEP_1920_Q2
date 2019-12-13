@@ -38,8 +38,8 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, error) {
 	var config WorkingConfig
 	// Copy information from read config to working config.
 	config.General = readConfig.General
-	config.Puzzles = generatePuzzles(readConfig.Puzzles)
-	config.GeneralEvents = generateGeneralEvents(readConfig.GeneralEvents)
+	config.Puzzles = generatePuzzles(readConfig.Puzzles, &config)
+	config.GeneralEvents = generateGeneralEvents(readConfig.GeneralEvents, &config)
 	config.Devices = make(map[string]*Device)
 	for _, readDevice := range readConfig.Devices {
 		config.Devices[readDevice.ID] = &(Device{readDevice.ID, readDevice.Description, readDevice.Input,
@@ -47,6 +47,7 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, error) {
 	}
 	config.StatusMap = generateStatusMap(&config)
 	config.RuleMap = generateRuleMap(&config)
+
 	return config, checkConfig(config)
 }
 
@@ -188,35 +189,35 @@ func checkActionDevice(action Action, config WorkingConfig) error {
 	return nil
 }
 
-func generatePuzzles(readPuzzles []ReadPuzzle) []Puzzle {
-	var result []Puzzle
+func generatePuzzles(readPuzzles []ReadPuzzle, config *WorkingConfig) []*Puzzle {
+	var result []*Puzzle
 	for _, readPuzzle := range readPuzzles {
 		puzzle := Puzzle{
-			Event: generateGeneralEvent(readPuzzle),
+			Event: generateGeneralEvent(readPuzzle, config),
 			Hints: readPuzzle.Hints,
 		}
-		result = append(result, puzzle)
+		result = append(result, &puzzle)
 	}
 	return result
 }
 
-func generateGeneralEvents(readGeneralEvents []ReadGeneralEvent) []GeneralEvent {
-	var result []GeneralEvent
+func generateGeneralEvents(readGeneralEvents []ReadGeneralEvent, config *WorkingConfig) []*GeneralEvent {
+	var result []*GeneralEvent
 	for _, readGeneralEvent := range readGeneralEvents {
-		result = append(result, generateGeneralEvent(readGeneralEvent))
+		result = append(result, generateGeneralEvent(readGeneralEvent, config))
 	}
 	return result
 }
 
-func generateGeneralEvent(event ReadEvent) GeneralEvent {
-	return GeneralEvent{
+func generateGeneralEvent(event ReadEvent, config *WorkingConfig) *GeneralEvent {
+	return &GeneralEvent{
 		Name:  event.GetName(),
-		Rules: generateRules(event.GetRules()),
+		Rules: generateRules(event.GetRules(), config),
 	}
 }
 
-func generateRules(readRules []ReadRule) []Rule {
-	var rules []Rule
+func generateRules(readRules []ReadRule, config *WorkingConfig) []*Rule {
+	var rules []*Rule
 	for _, readRule := range readRules {
 		rule := Rule{
 			ID:          readRule.ID,
@@ -227,7 +228,7 @@ func generateRules(readRules []ReadRule) []Rule {
 			Actions:     readRule.Actions,
 		}
 		rule.Conditions = generateLogicalCondition(readRule.Conditions)
-		rules = append(rules, rule)
+		rules = append(rules, &rule)
 	}
 	return rules
 }
@@ -302,9 +303,3 @@ func generateLogicalConstraint(constraints interface{}) LogicalConstraint {
 	}
 	panic(fmt.Sprintf("JSON config in wrong constraint format, conditions: %v, could not be processed", constraints))
 }
-
-//TODO multiple errors?
-//TODO check device present
-//TODO check component present
-//TODO check output types
-//TODO catch non-existing keys in json

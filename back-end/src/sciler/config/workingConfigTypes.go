@@ -9,8 +9,8 @@ import (
 // WorkingConfig has additional fields to ReadConfig, with lists of conditions, constraints and actions.
 type WorkingConfig struct {
 	General       General
-	Puzzles       []Puzzle
-	GeneralEvents []GeneralEvent
+	Puzzles       []*Puzzle
+	GeneralEvents []*GeneralEvent
 	Devices       map[string]*Device
 	StatusMap     map[string][]*Rule
 	RuleMap       map[string]*Rule
@@ -37,7 +37,6 @@ func (r *Rule) Execute(handler InstructionSender) {
 	for _, action := range r.Actions {
 		action.Execute(handler)
 	}
-	fmt.Println(r.Executed)
 	r.Executed++
 	logrus.Infof("Executed rule %s", r.ID)
 	handler.HandleEvent(r.ID)
@@ -45,20 +44,20 @@ func (r *Rule) Execute(handler InstructionSender) {
 
 // Puzzle is a struct that describes contents of a puzzle.
 type Puzzle struct {
-	Event GeneralEvent
+	Event *GeneralEvent
 	Hints []string
 }
 
 // GetName returns the name of a Puzzle
-func (p Puzzle) GetName() string {
+func (p *Puzzle) GetName() string {
 	return p.Event.Name
 }
 
 // GetRules returns the rules of a Puzzle
-func (p Puzzle) GetRules() []*Rule {
+func (p *Puzzle) GetRules() []*Rule {
 	var rules []*Rule
 	for _, rule := range p.Event.Rules {
-		rules = append(rules, &rule)
+		rules = append(rules, rule)
 	}
 	return rules
 }
@@ -66,11 +65,11 @@ func (p Puzzle) GetRules() []*Rule {
 // GeneralEvent defines a general event, like start.
 type GeneralEvent struct {
 	Name  string
-	Rules []Rule
+	Rules []*Rule
 }
 
 // GetName returns the name of a GeneralEvent
-func (g GeneralEvent) GetName() string {
+func (g *GeneralEvent) GetName() string {
 	return g.Name
 }
 
@@ -78,7 +77,7 @@ func (g GeneralEvent) GetName() string {
 func (g *GeneralEvent) GetRules() []*Rule {
 	var rules []*Rule
 	for _, rule := range g.Rules {
-		rules = append(rules, &rule)
+		rules = append(rules, rule)
 	}
 	return rules
 }

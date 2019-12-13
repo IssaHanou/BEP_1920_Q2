@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -631,6 +630,7 @@ func TestHandleDoubleEvent(t *testing.T) {
 func TestLimitRule(t *testing.T) {
 	communicatorMock := new(CommunicatorMock)
 	workingConfig := config.ReadFile("../../../resources/testing/test_singleEvent.json")
+	workingConfig.RuleMap["mainSwitch flipped"].Executed = 1
 	handler := Handler{
 		Config:       workingConfig,
 		Communicator: communicatorMock,
@@ -684,7 +684,5 @@ func TestLimitRule(t *testing.T) {
 	communicatorMock.On("Publish", "front-end", string(messageStatus), 3)
 	communicatorMock.On("Publish", "controlBoard", mock.Anything, 3)
 	handler.msgMapper(msg)
-	fmt.Println(handler.Config.RuleMap["mainSwitch flipped"])
-	fmt.Println(handler.Config.GeneralEvents[0].Rules[0])
-	communicatorMock.AssertNotCalled(t, "Publish", "controlBoard", mock.Anything)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 1) // Only publish to front-end for status should be done, no action should be performed
 }

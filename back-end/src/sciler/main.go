@@ -41,8 +41,9 @@ func main() {
 	for _, value := range messageHandler.Config.Devices {
 		messageHandler.SendStatus(value.ID)
 	}
+
 	// loop for now preventing app to exit
 	for {
-		time.Sleep(time.Microsecond * time.Duration(10))
+		time.Sleep(time.Nanosecond * time.Duration(10))
 	}
 }
