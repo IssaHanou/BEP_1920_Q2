@@ -32,6 +32,14 @@ class SccLib:
         self.client.on_log = self.__on_log
         self.client.on_connect = self.__on_connect
         self.client.on_disconnect = self.__on_disconnect
+        msg_dict = {
+            "device_id": self.name,
+            "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+            "type": "connection",
+            "contents": {"connection": False},
+        }
+        msg = json.dumps(msg_dict)
+        self.client.will_set("back-end", msg, 1)
 
     def __on_log(self, level, buf):
         """
@@ -45,6 +53,20 @@ class SccLib:
         Starting method to call from the starting script.
         """
         self.__connect()
+
+    def stop(self):
+        """
+        Stop method to call from the starting script.
+        """
+        msg_dict = {
+            "device_id": self.name,
+            "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+            "type": "connection",
+            "contents": {"connection": False},
+        }
+        msg = json.dumps(msg_dict)
+        self.__send_message("back-end", msg)
+        self.client.disconnect()
 
     def __send_message(self, topic, json_message):
         # TODO what to do when publish fails
@@ -62,17 +84,8 @@ class SccLib:
         """
         while True:
             try:
-                self.client.connect(self.host, self.port, keepalive=60)
+                self.client.connect(self.host, self.port, keepalive=10)
                 self.logger.log("connected to broker")
-                msg_dict = {
-                    "device_id": self.name,
-                    "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
-                    "type": "connection",
-                    "contents": {"connection": True},
-                }
-
-                msg = json.dumps(msg_dict)
-                self.__send_message("back-end", msg)
                 for label in self.labels:
                     self.__subscribe_topic(label)
                 self.__subscribe_topic("client-computers")
@@ -94,6 +107,14 @@ class SccLib:
         if rc == 0:
             client.connected_flag = True  # set flag
             self.logger.log("connected OK")
+            msg_dict = {
+                "device_id": self.name,
+                "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+                "type": "connection",
+                "contents": {"connection": True},
+            }
+            msg = json.dumps(msg_dict)
+            self.__send_message("back-end", msg)
         else:
             self.logger.log(("bad connection, returned code=", rc))
             client.bad_connection_flag = True
@@ -104,12 +125,11 @@ class SccLib:
         When disconnecting from the broker, on_disconnect prints the reason.
         """
         msg_dict = {
-            "device_id": id(client),
-            "time_sent": datetime.now().strftime("%d-%m-%YT%H:%M:%S"),
+            "device_id": self.name,
+            "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
             "type": "connection",
             "contents": {"connection": False},
         }
-
         msg = json.dumps(msg_dict)
         self.__send_message("back-end", msg)
         self.logger.log(("disconnecting, reason  " + str(rc)))

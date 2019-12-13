@@ -36,6 +36,7 @@ func (handler *Handler) NewHandler(client mqtt.Client, message mqtt.Message) {
 	var raw Message
 	if err := json.Unmarshal(message.Payload(), &raw); err != nil {
 		logrus.Errorf("invalid JSON received: %v", err)
+		logrus.Errorf("invalid: %v ", raw.DeviceID)
 	}
 	handler.msgMapper(raw)
 }
@@ -84,6 +85,7 @@ func (handler *Handler) onConnectionMsg(raw Message) {
 		} else {
 			device.Connection = value.(bool)
 			handler.Config.Devices[raw.DeviceID] = device
+			logrus.Info("setting connection status of ", raw.DeviceID, " to ", value)
 			handler.SendStatus(raw.DeviceID)
 		}
 	}

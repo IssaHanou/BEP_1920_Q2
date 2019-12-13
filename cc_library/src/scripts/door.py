@@ -84,7 +84,8 @@ class Door(Device):
         finally:
             GPIO.cleanup()
             self.scclib.logger.log("cleanly exited Door program")
-            self.scclib.logger.close()
+            self.scclib.stop()
+
 
 
 if __name__ == "__main__":
