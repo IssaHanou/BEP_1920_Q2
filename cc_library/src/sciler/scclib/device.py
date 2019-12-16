@@ -19,11 +19,11 @@ class Device:
         """
 
     @abstractmethod
-    def perform_instruction(self, contents):
+    def perform_instruction(self, action):
         """
         Defines how instructions are handled,
         for all instructions defined in output of device in config.
-        :param contents: contains instruction tag and calls the appropriate functions.
+        :param action: a dictionary containing an instruction tag, component_id tag and value tag.
         :return boolean: True if instruction was valid and False if illegal instruction
         was sent or error occurred such that instruction could not be performed.
         Returns tuple, with boolean and None if True and the failed action if false.
