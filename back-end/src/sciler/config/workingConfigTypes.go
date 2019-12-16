@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"reflect"
+	"time"
 )
 
 // WorkingConfig has additional fields to ReadConfig, with lists of conditions, constraints and actions.
@@ -14,6 +15,57 @@ type WorkingConfig struct {
 	Devices       map[string]*Device
 	StatusMap     map[string][]*Rule
 	RuleMap       map[string]*Rule
+}
+
+// General is a struct that describes the configurations of an escape room.
+type General struct {
+	Name     string `json:"name"`
+	Duration Timer  `json:"duration"`
+	Host     string `json:"host"`
+	Port     int    `json:"port"`
+}
+
+// Timer is a timer in the escape game
+type Timer struct {
+	Duration  time.Duration
+	StartedAt time.Time
+	T         *time.Timer
+	Clock     chan time.Time
+	State     string
+	Ending    func()
+}
+
+func newTimer(d time.Duration) *Timer {
+	c := make(chan time.Time, 1)
+	t := new(Timer)
+	t.Clock = c
+	t.Duration = d
+	t.Ending = func() {
+		t.State = "stateExpired	"
+		t.Clock <- time.Now()
+	}
+	return t
+}
+
+// Start starts Timer that will send the current time on its channel after at least duration d.
+func (t *Timer) Start() bool {
+	if t.State != "stateIdle" {
+		return false
+	}
+	t.StartedAt = time.Now()
+	t.State = "stateActive"
+	t.T = time.AfterFunc(t.Duration, t.Ending)
+	return true
+}
+
+func AfterFunc(d time.Duration, f func()) *Timer {
+	t := new(Timer)
+	t.Duration = d
+	t.Ending = func() {
+		t.State = "stateExpired"
+		f()
+	}
+	return t
 }
 
 // Rule is a struct that describes how action flow is handled in the escape room.

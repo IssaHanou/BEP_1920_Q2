@@ -2,14 +2,14 @@ package config
 
 // ReadConfig specifies all configuration elements of an escape room.
 type ReadConfig struct {
-	General       General            `json:"general"`
+	General       ReadGeneral        `json:"general"`
 	Devices       []ReadDevice       `json:"devices"`
 	Puzzles       []ReadPuzzle       `json:"puzzles"`
 	GeneralEvents []ReadGeneralEvent `json:"general_events"`
 }
 
 // General is a struct that describes the configurations of an escape room.
-type General struct {
+type ReadGeneral struct {
 	Name     string `json:"name"`
 	Duration string `json:"duration"`
 	Host     string `json:"host"`

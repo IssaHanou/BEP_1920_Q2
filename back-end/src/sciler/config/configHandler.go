@@ -37,6 +37,7 @@ func ReadJSON(input []byte) WorkingConfig {
 func generateDataStructures(readConfig ReadConfig) (WorkingConfig, error) {
 	var config WorkingConfig
 	// Copy information from read config to working config.
+
 	config.General = readConfig.General
 	config.Puzzles = generatePuzzles(readConfig.Puzzles, &config)
 	config.GeneralEvents = generateGeneralEvents(readConfig.GeneralEvents, &config)
