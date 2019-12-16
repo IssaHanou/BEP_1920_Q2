@@ -39,6 +39,7 @@ func main() {
 	go communicator.Start(messageHandler.NewHandler)
 
 	for _, value := range messageHandler.Config.Devices {
+		messageHandler.SendStatus(value.ID)
 		messageHandler.GetStatus(value.ID)
 	}
 
