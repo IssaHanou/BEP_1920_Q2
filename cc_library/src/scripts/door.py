@@ -79,11 +79,14 @@ class Door(Device):
             config = open(file=abs_file_path)
             self.scclib = SccLib(config=config, device=device)
             self.scclib.start()
+
+            # prevent exit program
+            while True:
+                time.sleep(1 * 1 / 1000)
         except KeyboardInterrupt:
             self.scclib.logger.log("program was terminated from keyboard input")
         finally:
             GPIO.cleanup()
-            self.scclib.logger.log("cleanly exited Door program")
             self.scclib.stop()
 
 

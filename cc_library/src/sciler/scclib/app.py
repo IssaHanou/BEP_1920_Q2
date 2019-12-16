@@ -67,6 +67,8 @@ class SccLib:
         msg = json.dumps(msg_dict)
         self.__send_message("back-end", msg)
         self.client.disconnect()
+        self.logger.log("cleanly exited ControlBoard program and client")
+        self.logger.close()
         self.client.loop_stop()
 
     def __send_message(self, topic, json_message):
@@ -93,6 +95,8 @@ class SccLib:
             self.client.loop_start()
         except ConnectionRefusedError:
             self.logger.log("ERROR: connection was refused")
+        except TimeoutError:
+            self.logger.log("ERROR: connecting failed, socket timed out")
 
     def __on_connect(self, client, userdata, flags, rc):
         """

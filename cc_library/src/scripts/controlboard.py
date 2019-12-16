@@ -257,9 +257,7 @@ class ControlBoard(Device):
         except KeyboardInterrupt:
             self.scclib.logger.log("program was terminated from keyboard input")
         finally:
-            self.scclib.stop()
             GPIO.cleanup()
-            self.scclib.logger.log("cleanly exited ControlBoard program and client")
             self.scclib.stop()
 
 
