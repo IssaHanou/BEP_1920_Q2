@@ -259,8 +259,8 @@ class ControlBoard(Device):
         finally:
             self.scclib.stop()
             GPIO.cleanup()
-            self.scclib.logger.log("cleanly exited ControlBoard program")
-            self.scclib.logger.close()
+            self.scclib.logger.log("cleanly exited ControlBoard program and client")
+            self.scclib.stop()
 
 
 if __name__ == "__main__":

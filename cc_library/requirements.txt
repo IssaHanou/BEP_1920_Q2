@@ -1,4 +1,4 @@
 flake8
 black
-paho.mqtt
+paho-mqtt
 Adafruit_ADS1x15
