@@ -211,7 +211,7 @@ class SccLib:
             self.logger.log(("status?", instruction))
             if instruction == "test":
                 self.device.test()
-                self.logger.log(("instruction performed", contents))
+                self.logger.log(("instruction performed", action))
                 return True
             if instruction == "status update":
                 msg_dict = {
@@ -223,18 +223,20 @@ class SccLib:
                 msg = json.dumps(msg_dict)
                 self.__send_message("back-end", msg)
                 self.status_changed()
+                self.logger.log(("instruction performed", action))
             else:
                 (success, failed_action) = self.device.perform_instruction(action)
                 if success:
-                    self.logger.log(("instruction performed", contents))
+                    self.logger.log(("instruction performed", action))
                 else:
                     self.logger.log(
                         (
                             "instruction: " + failed_action + " could not be performed",
-                            contents,
+                            action,
                         )
                     )
-                return success
+                    return False
+        return True
 
     def __subscribe_topic(self, topic):
         """
