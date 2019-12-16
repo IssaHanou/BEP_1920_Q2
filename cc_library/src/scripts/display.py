@@ -8,11 +8,11 @@ try:
 except (RuntimeError, ModuleNotFoundError):
     from fake_rpi.RPi import GPIO
 
-scclib = None
-
 
 class Display(Device):
-    hint = ""
+    def __init__(self):
+        Device.__init__(self)
+        self.hint = ""
 
     def get_status(self):
         status = "{"
@@ -20,41 +20,43 @@ class Display(Device):
         status += "}"
         return status
 
-    def perform_instruction(self, contents):
-        for action in contents:
-            instruction = action.get("instruction")
-            if instruction == "test":
-                self.test()
-            elif instruction == "hint":
-                self.show_hint(action)
-            else:
-                return True
-        return False
+    def perform_instruction(self, action):
+        instruction = action.get("instruction")
+        if instruction == "hint":
+            self.show_hint(action)
+        else:
+            return False, action
+        return True, None
 
     def test(self):
         self.hint = "test"
         print(self.hint)
-        scclib.statusChanged()
+        self.scclib.statusChanged()
 
     def show_hint(self, data):
         self.hint = data.get("value")
         print(self.hint)
-        scclib.statusChanged()
+        self.scclib.statusChanged()
+
+    def main(self):
+        try:
+            device = self
+
+            two_up = os.path.abspath(os.path.join(__file__, ".."))
+            rel_path = "./display_config.json"
+            abs_file_path = os.path.join(two_up, rel_path)
+            abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
+            config = open(file=abs_file_path)
+            self.scclib = SccLib(config=config, device=device)
+            self.scclib.start()
+        except KeyboardInterrupt:
+            self.scclib.logger.log("program was terminated from keyboard input")
+        finally:
+            GPIO.cleanup()
+            self.scclib.logger.log("cleanly exited Display program")
+            self.scclib.logger.close()
 
 
-try:
+if __name__ == "__main__":
     device = Display()
-
-    two_up = os.path.abspath(os.path.join(__file__, ".."))
-    rel_path = "./display_config.json"
-    abs_file_path = os.path.join(two_up, rel_path)
-    abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
-    config = open(file=abs_file_path)
-    scclib = SccLib(config=config, device=device)
-    scclib.start()
-except KeyboardInterrupt:
-    scclib.logger.log("program was terminated from keyboard input")
-finally:
-    GPIO.cleanup()
-    scclib.logger.log("Cleanly exited Door program")
-    scclib.logger.close()
+    device.main()

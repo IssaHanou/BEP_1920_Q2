@@ -68,7 +68,7 @@
       "description": "displays messages",
       "input": {},
       "output": {
-        "display": {
+        "hint": {
           "type": "string",
           "instructions": {
             "hint": "string"
@@ -144,7 +144,7 @@
               "type_id": "display",
               "message": [
                 {
-                  "component_id": "display",
+                  "component_id": "hint",
                   "instruction": "hint",
                   "value": "puzzle rood opgelost!"
                 }
@@ -215,7 +215,7 @@
               "type_id": "display",
               "message": [
                 {
-                  "component_id": "display",
+                  "component_id": "hint",
                   "instruction": "hint",
                   "value": "puzzle oranje opgelost!"
                 }
@@ -289,7 +289,7 @@
               "type_id": "display",
               "message": [
                 {
-                  "component_id": "display",
+                  "component_id": "hint",
                   "instruction": "hint",
                   "value": "puzzle groen opgelost!"
                 }

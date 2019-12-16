@@ -6,6 +6,12 @@
   "port": 1883,
   "input": {},
   "output": {
-    "door": "string"
+    "display": {
+      "type": "string",
+      "instructions": {
+        "hint": "string",
+        "text": "string"
+      }
+    }
   }
 }

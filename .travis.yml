@@ -6,6 +6,7 @@ matrix:
       python: 3.7
       install:
         - pip install -r cc_library/requirements.txt
+        - pip install fake_rpi
       script:
         - flake8 cc_library
         - python -m unittest discover

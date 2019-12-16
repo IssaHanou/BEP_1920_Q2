@@ -127,12 +127,12 @@ func compareType(valueType reflect.Kind, inputType string) error {
 func (handler *Handler) checkStatusType(device config.Device, status interface{}, component string) error {
 	valueType := reflect.TypeOf(status).Kind()
 	if inputType, ok := device.Input[component]; ok {
-		if error := compareType(valueType, inputType); error != nil {
-			return fmt.Errorf("%v with status %v for component %s", error, status, component)
+		if err := compareType(valueType, inputType); err != nil {
+			return fmt.Errorf("%v with status %v for component %s", err, status, component)
 		}
 	} else if output, ok2 := device.Output[component]; ok2 {
-		if error := compareType(valueType, output.Type); error != nil {
-			return fmt.Errorf("%v with status %v for component %s", error, status, component)
+		if err := compareType(valueType, output.Type); err != nil {
+			return fmt.Errorf("%v with status %v for component %s", err, status, component)
 		}
 	} else {
 		return fmt.Errorf("status message received from component %s, which is not in the config under device %s", component, device.ID)
@@ -177,8 +177,8 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 			}
 
 			var instructionString string
-			for i, instruction := range contents {
-				instructionString += fmt.Sprintf("%d: %s ", i, instruction["instruction"])
+			for _, instruction := range contents {
+				instructionString += fmt.Sprintf("%s", instruction["instruction"])
 			}
 
 			if !value.(bool) {
