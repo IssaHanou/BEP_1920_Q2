@@ -57,7 +57,6 @@ class Display(Device):
             self.scclib.stop()
 
 
-
 if __name__ == "__main__":
     device = Display()
     device.main()
