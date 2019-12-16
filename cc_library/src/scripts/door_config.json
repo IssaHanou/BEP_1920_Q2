@@ -6,6 +6,11 @@
   "port": 1883,
   "input": {},
   "output": {
-    "door": "boolean"
+    "door": {
+      "type": "string",
+      "instructions": {
+        "open": "boolean"
+      }
+    }
   }
 }

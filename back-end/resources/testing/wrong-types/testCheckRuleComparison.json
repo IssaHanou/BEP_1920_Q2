@@ -198,7 +198,7 @@
                 "type": "rule",
                 "type_id": "correctSequence",
                 "constraints": {
-                  "comparison": "gte",
+                  "comparison": "contains",
                   "value": 2
                 }
               }

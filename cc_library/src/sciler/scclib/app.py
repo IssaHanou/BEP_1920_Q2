@@ -170,19 +170,40 @@ class SccLib:
         """
         message = message.payload.decode("utf-8")
         message = json.loads(message)
-        failed_result = self.device.perform_instruction(message.get("contents"))
-        msg_dict = {
-            "device_id": self.name,
-            "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
-            "type": "confirmation",
-            "contents": {"completed": not failed_result, "instructed": message},
-        }
-        msg = json.dumps(msg_dict)
-        self.__send_message("back-end", msg)
-        if failed_result:
-            self.logger.log(("instruction could not be performed", message))
+        if message.get("type") != "instruction":
+            self.logger.log(
+                ("received non-instruction message of type", message.get("type"))
+            )
         else:
-            self.logger.log(("instruction performed", message))
+            success = self.__check_message(message.get("contents"))
+            conf_msg_dict = {
+                "device_id": self.name,
+                "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+                "type": "confirmation",
+                "contents": {"completed": success, "instructed": message},
+            }
+            msg = json.dumps(conf_msg_dict)
+            self.__send_message("back-end", msg)
+
+    def __check_message(self, contents):
+        for action in contents:
+            instruction = action.get("instruction")
+            if instruction == "test":
+                self.device.test()
+                self.logger.log(("instruction performed", action))
+            else:
+                (success, failed_action) = self.device.perform_instruction(action)
+                if success:
+                    self.logger.log(("instruction performed", action))
+                else:
+                    self.logger.log(
+                        (
+                            "instruction: " + failed_action + " could not be performed",
+                            action,
+                        )
+                    )
+                    return False
+        return True
 
     def __subscribe_topic(self, topic):
         """

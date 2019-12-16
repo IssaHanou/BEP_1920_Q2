@@ -1,11 +1,27 @@
 package handler
 
 import (
+	"encoding/json"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"sciler/communication"
 	"sciler/config"
 	"testing"
+	"time"
 )
+
+type CommunicatorMock struct {
+	mock.Mock
+}
+
+func (communicatorMock *CommunicatorMock) Start(handler mqtt.MessageHandler) {
+	// do nothing
+}
+
+func (communicatorMock *CommunicatorMock) Publish(topic string, message string, retrials int) {
+	communicatorMock.Called(topic, message, retrials)
+}
 
 func getTestHandler() *Handler {
 	workingConfig := config.WorkingConfig{
@@ -17,8 +33,8 @@ func getTestHandler() *Handler {
 		},
 		Puzzles:       nil,
 		GeneralEvents: nil,
-		Devices: map[string]config.Device{
-			"TestDevice": {
+		Devices: map[string]*config.Device{
+			"TestDevice": &(config.Device{
 				ID:          "TestDevice",
 				Description: "test uitleg",
 				Input: map[string]string{
@@ -35,48 +51,12 @@ func getTestHandler() *Handler {
 				},
 				Status:     map[string]interface{}{},
 				Connection: false,
-			},
+			}),
 		},
 	}
 	communicator := communication.NewCommunicator(workingConfig.General.Host,
 		workingConfig.General.Port, []string{"back-end", "test"})
-	return GetHandler(workingConfig, *communicator)
-}
-
-func Test_GetHandler(t *testing.T) {
-	workingConfig := config.WorkingConfig{
-		General: config.General{
-			Name:     "Test",
-			Duration: "1",
-			Host:     "localhost",
-			Port:     1883,
-		},
-		Puzzles:       nil,
-		GeneralEvents: nil,
-		Devices:       nil,
-	}
-	communicator := communication.NewCommunicator(workingConfig.General.Host,
-		workingConfig.General.Port, []string{"back-end", "test"})
-
-	tests := []struct {
-		name string
-		want *Handler
-	}{
-		{
-			name: "test",
-			want: &Handler{
-				Config:       workingConfig,
-				Communicator: *communicator,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := GetHandler(workingConfig, *communicator)
-			assert.Equal(t, got.Config, tt.want.Config)
-			assert.Equal(t, got.Communicator, tt.want.Communicator)
-		})
-	}
+	return &Handler{workingConfig, communicator}
 }
 
 func TestOnConnectionMsg(t *testing.T) {
@@ -503,4 +483,206 @@ func TestMsgMapperIllegalType(t *testing.T) {
 	handler.msgMapper(msg)
 	assert.Equal(t, before, handler.Config,
 		"Nothing should have bee changed after an incorrect message type")
+}
+
+func TestHandleSingleEvent(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_singleEvent.json"),
+		Communicator: communicatorMock,
+	}
+	msg := Message{
+		DeviceID: "controlBoard",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "status",
+		Contents: map[string]interface{}{
+			"redSwitch":    false,
+			"orangeSwitch": false,
+			"greenSwitch":  false,
+			"slider1":      0,
+			"slider2":      0,
+			"slider3":      0,
+			"mainSwitch":   true,
+			"greenLight1":  "off",
+			"greenLight2":  "off",
+			"greenLight3":  "off",
+			"redLight1":    "off",
+			"redLight2":    "off",
+			"redLight3":    "off",
+		},
+	}
+
+	messageInstruction, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{
+				"component_id": "greenLight1",
+				"instruction":  "turnOnOff",
+				"value":        true,
+			},
+		},
+	})
+
+	messageStatus, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "status",
+		Contents: map[string]interface{}{
+			"id": "controlBoard",
+			"status": map[string]interface{}{
+				"greenLight1":  "off",
+				"greenLight2":  "off",
+				"greenLight3":  "off",
+				"greenSwitch":  false,
+				"mainSwitch":   true,
+				"orangeSwitch": false,
+				"redLight1":    "off",
+				"redLight2":    "off",
+				"redLight3":    "off",
+				"redSwitch":    false,
+				"slider1":      0,
+				"slider2":      0,
+				"slider3":      0,
+			},
+			"connection": false,
+		},
+	})
+
+	communicatorMock.On("Publish", "front-end", string(messageStatus), 3)
+	communicatorMock.On("Publish", "controlBoard", string(messageInstruction), 3)
+	handler.msgMapper(msg)
+	communicatorMock.AssertExpectations(t) // if this test becomes flaky (only when this test takes longer then 1 second), (message expected includes time...), replace the messages with 'mock.Anything'
+}
+
+func TestHandleDoubleEvent(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_doubleEvent.json"),
+		Communicator: communicatorMock,
+	}
+	msg := Message{
+		DeviceID: "controlBoard",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "status",
+		Contents: map[string]interface{}{
+			"redSwitch":    false,
+			"orangeSwitch": false,
+			"greenSwitch":  false,
+			"slider1":      0,
+			"slider2":      0,
+			"slider3":      0,
+			"mainSwitch":   true,
+			"greenLight1":  "off",
+			"greenLight2":  "off",
+			"greenLight3":  "off",
+			"redLight1":    "off",
+			"redLight2":    "off",
+			"redLight3":    "off",
+		},
+	}
+
+	messageInstruction, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{
+				"component_id": "greenLight1",
+				"instruction":  "turnOnOff",
+				"value":        true,
+			},
+		},
+	})
+
+	messageStatus, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "status",
+		Contents: map[string]interface{}{
+			"id": "controlBoard",
+			"status": map[string]interface{}{
+				"greenLight1":  "off",
+				"greenLight2":  "off",
+				"greenLight3":  "off",
+				"greenSwitch":  false,
+				"mainSwitch":   true,
+				"orangeSwitch": false,
+				"redLight1":    "off",
+				"redLight2":    "off",
+				"redLight3":    "off",
+				"redSwitch":    false,
+				"slider1":      0,
+				"slider2":      0,
+				"slider3":      0,
+			},
+			"connection": false,
+		},
+	})
+
+	communicatorMock.On("Publish", "front-end", string(messageStatus), 3)
+	communicatorMock.On("Publish", "controlBoard", string(messageInstruction), 3)
+	handler.msgMapper(msg)
+	communicatorMock.AssertExpectations(t) // if this test becomes flaky (only when this test takes longer then 1 second), (message expected includes time...), replace the messages with 'mock.Anything'
+}
+
+func TestLimitRule(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	workingConfig := config.ReadFile("../../../resources/testing/test_singleEvent.json")
+	workingConfig.RuleMap["mainSwitch flipped"].Executed = 1
+	handler := Handler{
+		Config:       workingConfig,
+		Communicator: communicatorMock,
+	}
+	msg := Message{
+		DeviceID: "controlBoard",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "status",
+		Contents: map[string]interface{}{
+			"redSwitch":    false,
+			"orangeSwitch": false,
+			"greenSwitch":  false,
+			"slider1":      0,
+			"slider2":      0,
+			"slider3":      0,
+			"mainSwitch":   true,
+			"greenLight1":  "off",
+			"greenLight2":  "off",
+			"greenLight3":  "off",
+			"redLight1":    "off",
+			"redLight2":    "off",
+			"redLight3":    "off",
+		},
+	}
+
+	messageStatus, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "status",
+		Contents: map[string]interface{}{
+			"id": "controlBoard",
+			"status": map[string]interface{}{
+				"greenLight1":  "off",
+				"greenLight2":  "off",
+				"greenLight3":  "off",
+				"greenSwitch":  false,
+				"mainSwitch":   true,
+				"orangeSwitch": false,
+				"redLight1":    "off",
+				"redLight2":    "off",
+				"redLight3":    "off",
+				"redSwitch":    false,
+				"slider1":      0,
+				"slider2":      0,
+				"slider3":      0,
+			},
+			"connection": false,
+		},
+	})
+
+	communicatorMock.On("Publish", "front-end", string(messageStatus), 3)
+	communicatorMock.On("Publish", "controlBoard", mock.Anything, 3)
+	handler.msgMapper(msg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 1) // Only publish to front-end for status should be done, no action should be performed
 }
