@@ -21,44 +21,50 @@
       "output": {
         "greenLight1": {
           "type": "string",
-          "instruction": {
+          "instructions": {
             "interval": "numeric",
-            "delay": "numeric"
+            "delay": "numeric",
+            "state": "string"
           }
         },
         "greenLight2": {
           "type": "string",
-          "instruction": {
+          "instructions": {
             "interval": "numeric",
-            "delay": "numeric"
+            "delay": "numeric",
+            "state": "string"
           }
         },
         "greenLight3": {
           "type": "string",
-          "instruction": {
+          "instructions": {
             "interval": "numeric",
-            "delay": "numeric"
+            "delay": "numeric",
+            "state": "string"
           }
         },
         "redLight1": {
           "type": "string",
-          "instruction": {
+          "instructions": {
             "interval": "numeric",
-            "delay": "numeric"
+            "delay": "numeric",
+            "state": "string"
           }
         },
         "redLight2": {
           "type": "string",
-          "instruction": {
+          "instructions": {
             "interval": "numeric",
-            "delay": "numeric"
+            "delay": "numeric",
+            "state": "string"
           }
         },
         "redLight3": {
           "type": "string",
-          "instruction": {
+          "instructions": {
             "interval": "numeric",
-            "delay": "numeric"
+            "delay": "numeric",
+            "state": "string"
           }
         }
       }
@@ -70,23 +76,31 @@
         "turningWheel": "array"
       },
       "output": {
-        "audio": "string",
-        "ringTone": "string"
+        "audio": {
+          "type": "string",
+          "instructions": {
+            "play": "string"
+          }
+        },
+        "ringTone": {
+          "type": "string",
+          "instructions": {
+            "play": "string"
+          }
+        }
       }
     },
     {
-      "id": "testDevice",
-      "description": "Device with all types of input for testing",
+      "id": "test device",
+      "description": "device that has all types of input",
       "input": {
-        "string": "string",
-        "bool": "bool",
         "numeric": "numeric",
-        "num-array": "num-array",
-        "bool-array": "bool-array",
-        "string-array": "string-array",
-        "custom": "custom",
-        "timer": "timer"
-      }
+        "boolean": "boolean",
+        "string": "string",
+        "array": "array",
+        "custom": "custom"
+      },
+      "output": {}
     }
   ],
   "puzzles": [
@@ -100,8 +114,7 @@
           "conditions": {
             "type": "device",
             "type_id": "telephone",
-            "constraints":
-            {
+            "constraints": {
               "comparison": "eq",
               "component_id": "turningWheel",
               "value": [
@@ -111,32 +124,30 @@
                 7
               ]
             }
-          ,
-            "actions": [
-              {
-                "type": "device",
-                "type_id": "controlBoard",
-                "message": {
-                  "output": {
-                    "greenLight1": {
-                      "instruction": "blink",
-                      "interval": 0.5,
-                      "delay": 0
-                    },
-                    "greenLight2": false,
-                    "greenLight3": false,
-                    "redLight1": false,
-                    "redLight2": false,
-                    "redLight3": {
-                      "instruction": "blink",
-                      "interval": 0.5,
-                      "delay": 0
-                    }
-                  }
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "controlBoard",
+              "message": [
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "interval",
+                  "value": 0.5
+                },
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "delay",
+                  "value": 0
+                },
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "state",
+                  "value": "blink"
                 }
-              }
-            ]
-          }
+              ]
+            }
+          ]
         }
       ],
       "hints": [
@@ -182,6 +193,14 @@
                     }
                   ]
                 }
+              },
+              {
+                "type": "rule",
+                "type_id": "correctSequence",
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 2
+                }
               }
             ]
           },
@@ -189,25 +208,49 @@
             {
               "type": "device",
               "type_id": "telephone",
-              "message": {
-                "output": {
-                  "audio": "audio_1"
+              "message": [
+                {
+                  "component_id": "audio",
+                  "instruction": "play",
+                  "value": "audio1"
                 }
-              }
+              ]
             },
             {
               "type": "device",
               "type_id": "controlBoard",
-              "message": {
-                "output": {
-                  "greenLight1": false,
-                  "greenLight2": true,
-                  "greenLight3": false,
-                  "redLight1": false,
-                  "redLight2": false,
-                  "redLight3": false
+              "message": [
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "state",
+                  "value": "off"
+                },
+                {
+                  "component_id": "greenLight2",
+                  "instruction": "state",
+                  "value": "on"
+                },
+                {
+                  "component_id": "greenLight3",
+                  "instruction": "state",
+                  "value": "off"
+                },
+                {
+                  "component_id": "redLight1",
+                  "instruction": "state",
+                  "value": "on"
+                },
+                {
+                  "component_id": "redLight2",
+                  "instruction": "state",
+                  "value": "off"
+                },
+                {
+                  "component_id": "redLight3",
+                  "instruction": "state",
+                  "value": "on"
                 }
-              }
+              ]
             }
           ]
         }
@@ -247,11 +290,13 @@
             {
               "type": "device",
               "type_id": "telephone",
-              "message": {
-                "output": {
-                  "audio": "audio_1"
+              "message": [
+                {
+                  "component_id": "audio",
+                  "instruction": "play",
+                  "value": "audio1"
                 }
-              }
+              ]
             }
           ]
         }
@@ -277,11 +322,13 @@
             {
               "type": "timer",
               "type_id": "timer1",
-              "message": {
-                "output": {
-                  "instruction": "stop"
+              "message": [
+                {
+                  "component_id": "timer1",
+                  "instruction": "instruction",
+                  "value": "stop"
                 }
-              }
+              ]
             }
           ]
         }

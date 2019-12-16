@@ -1,5 +1,4 @@
 flake8
 black
-paho.mqtt
-fake_rpi
+paho-mqtt
 Adafruit_ADS1x15

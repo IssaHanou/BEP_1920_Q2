@@ -1,9 +1,11 @@
 <div class="home-box hint-box">
   <h3 class="header">Hints</h3>
   <div class="contents">
-    <form class="hint-form" (ngSubmit)="onSubmit()">
-      <input type="text" name="hint" [(ngModel)]="hint" placeholder="Type your hint..." class="hint-box">
-      <input type="submit" value="Submit" class="send-button">
+    <form (ngSubmit)="onSubmit()">
+      <mat-form-field>
+        <input matInput type="text" name="hint" [(ngModel)]="hint" placeholder="Type your hint..." class="hint-field">
+      </mat-form-field>
+      <input type="submit" value="Submit" class="mat-raised-button mat-primary custom-md-button">
     </form>
   </div>
 </div>

@@ -2,19 +2,105 @@
   "general": {
     "name": "Escape X",
     "duration": "00:30:00",
-    "host": "192.0.0.84",
+    "host": "localhost",
     "port": 1883
   },
   "devices": [
     {
-      "id": "ledLights",
-      "description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
+      "id": "controlBoard",
+      "description": "Control board with three switches, three slides with lights and one main switch.",
       "input": {
-        "light": "boolean"
+        "redSwitch": "boolean",
+        "orangeSwitch": "boolean",
+        "greenSwitch": "boolean",
+        "slider1": "numeric",
+        "slider2": "numeric",
+        "slider3": "numeric",
+        "mainSwitch": "boolean"
       },
       "output": {
-        "color": "string"
+        "greenLight1": {
+          "type": "string",
+          "instructions": {
+            "interval": "numeric",
+            "delay": "numeric",
+            "state": "string"
+          }
+        },
+        "greenLight2": {
+          "type": "string",
+          "instructions": {
+            "interval": "numeric",
+            "delay": "numeric",
+            "state": "string"
+          }
+        },
+        "greenLight3": {
+          "type": "string",
+          "instructions": {
+            "interval": "numeric",
+            "delay": "numeric",
+            "state": "string"
+          }
+        },
+        "redLight1": {
+          "type": "string",
+          "instructions": {
+            "interval": "numeric",
+            "delay": "numeric",
+            "state": "string"
+          }
+        },
+        "redLight2": {
+          "type": "string",
+          "instructions": {
+            "interval": "numeric",
+            "delay": "numeric",
+            "state": "string"
+          }
+        },
+        "redLight3": {
+          "type": "string",
+          "instructions": {
+            "interval": "numeric",
+            "delay": "numeric",
+            "state": "string"
+          }
+        }
       }
+    },
+    {
+      "id": "telephone",
+      "description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
+      "input": {
+        "turningWheel": "array"
+      },
+      "output": {
+        "audio": {
+          "type": "string",
+          "instructions": {
+            "play": "string"
+          }
+        },
+        "ringTone": {
+          "type": "string",
+          "instructions": {
+            "play": "string"
+          }
+        }
+      }
+    },
+    {
+      "id": "test device",
+      "description": "device that has all types of input",
+      "input": {
+        "numeric": "numeric",
+        "boolean":"boolean",
+        "string": "string",
+        "array": "array",
+        "custom": "custom"
+      },
+      "output": {}
     }
   ],
   "puzzles": [

@@ -18,10 +18,10 @@ type General struct {
 
 // ReadDevice is a struct that describes the configurations of a device in the room.
 type ReadDevice struct {
-	ID          string            `json:"id"`
-	Description string            `json:"description"`
-	Input       map[string]string `json:"input"`
-	Output      OutputObject      `json:"output"`
+	ID          string                  `json:"id"`
+	Description string                  `json:"description"`
+	Input       map[string]string       `json:"input"`
+	Output      map[string]OutputObject `json:"output"`
 }
 
 // ReadPuzzle is a struct that describes contents of a puzzle.
@@ -91,15 +91,31 @@ type ConstraintInfo map[string]interface{}
 
 // Action is a struct that determines what happens when a rule is fired.
 type Action struct {
-	Type    string        `json:"type"`
-	TypeID  string        `json:"type_id"`
-	Message ActionMessage `json:"message"`
+	Type    string                 `json:"type"`
+	TypeID  string                 `json:"type_id"`
+	Message []ComponentInstruction `json:"message"`
 }
 
-// ActionMessage can be sent across clients of the brokers.
-type ActionMessage struct {
-	Output OutputObject `json:"output"`
+// Execute is a method that performs the action
+func (action Action) Execute(handler InstructionSender) {
+	switch action.Type { // this cannot be any other Type than device or timer, (checked in checkActions function)
+	case "device":
+		{
+			handler.SendInstruction(action.TypeID, action.Message)
+		}
+	case "timer": // todo implement timer
+	}
+}
+
+// ComponentInstruction can be sent across clients of the brokers.
+type ComponentInstruction struct {
+	ComponentID string      `json:"component_id"`
+	Instruction string      `json:"instruction"`
+	Value       interface{} `json:"value"`
 }
 
 // OutputObject contains a map defining either input or output.
-type OutputObject map[string]interface{}
+type OutputObject struct {
+	Type         string            `json:"type"`
+	Instructions map[string]string `json:"instructions"`
+}

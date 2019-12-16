@@ -21,6 +21,7 @@ class SccLib:
         self.info = self.config.get("description")
         self.host = self.config.get("host")
         self.port = self.config.get("port")
+        self.labels = self.config.get("labels")
         self.logger = Logger()
         self.logger.log("Start of log for device: " + self.name)
 
@@ -31,6 +32,14 @@ class SccLib:
         self.client.on_log = self.__on_log
         self.client.on_connect = self.__on_connect
         self.client.on_disconnect = self.__on_disconnect
+        msg_dict = {
+            "device_id": self.name,
+            "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+            "type": "connection",
+            "contents": {"connection": False},
+        }
+        msg = json.dumps(msg_dict)
+        self.client.will_set("back-end", msg, 1)
 
     def __on_log(self, level, buf):
         """
@@ -45,9 +54,23 @@ class SccLib:
         """
         self.__connect()
 
+    def stop(self):
+        """
+        Stop method to call from the starting script.
+        """
+        msg_dict = {
+            "device_id": self.name,
+            "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+            "type": "connection",
+            "contents": {"connection": False},
+        }
+        msg = json.dumps(msg_dict)
+        self.__send_message("back-end", msg)
+        self.client.disconnect()
+
     def __send_message(self, topic, json_message):
         # TODO what to do when publish fails
-        self.client.publish(topic, json_message)
+        self.client.publish(topic, json_message, 1)
         message_type = topic + " message published"
         self.logger.log((message_type, json_message))
 
@@ -61,19 +84,11 @@ class SccLib:
         """
         while True:
             try:
-                self.client.connect(self.host, self.port, keepalive=60)
+                self.client.connect(self.host, self.port, keepalive=10)
                 self.logger.log("connected to broker")
-                msg_dict = {
-                    "device_id": self.name,
-                    "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
-                    "type": "connection",
-                    "contents": {"connection": True},
-                }
-
-                msg = json.dumps(msg_dict)
-                self.__send_message("connection", msg)
+                for label in self.labels:
+                    self.__subscribe_topic(label)
                 self.__subscribe_topic("client-computers")
-                self.__subscribe_topic("test")
                 self.__subscribe_topic(self.name)
                 self.client.loop_forever()
                 break
@@ -92,6 +107,14 @@ class SccLib:
         if rc == 0:
             client.connected_flag = True  # set flag
             self.logger.log("connected OK")
+            msg_dict = {
+                "device_id": self.name,
+                "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+                "type": "connection",
+                "contents": {"connection": True},
+            }
+            msg = json.dumps(msg_dict)
+            self.__send_message("back-end", msg)
         else:
             self.logger.log(("bad connection, returned code=", rc))
             client.bad_connection_flag = True
@@ -102,14 +125,13 @@ class SccLib:
         When disconnecting from the broker, on_disconnect prints the reason.
         """
         msg_dict = {
-            "device_id": id(client),
-            "time_sent": datetime.now().strftime("%d-%m-%YT%H:%M:%S"),
+            "device_id": self.name,
+            "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
             "type": "connection",
             "contents": {"connection": False},
         }
-
         msg = json.dumps(msg_dict)
-        self.__send_message("connection", msg)
+        self.__send_message("back-end", msg)
         self.logger.log(("disconnecting, reason  " + str(rc)))
         client.connected_flag = False
         client.disconnect_flag = True
@@ -140,8 +162,8 @@ class SccLib:
             "type": "status",
             "contents": eval(msg),
         }
-        msg = json.dumps(json_msg)
-        self.__send_message("status", msg)
+        res_msg = json.dumps(json_msg)
+        self.__send_message("back-end", res_msg)
 
     def __on_message(self, client, userdata, message):
         """
@@ -168,19 +190,53 @@ class SccLib:
         """
         message = message.payload.decode("utf-8")
         message = json.loads(message)
-        failed_result = self.device.perform_instruction(message.get("contents"))
-        msg_dict = {
-            "device_id": self.name,
-            "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
-            "type": "confirmation",
-            "contents": {"completed": not failed_result, "instructed": message},
-        }
-        msg = json.dumps(msg_dict)
-        self.__send_message("confirmation", msg)
-        if failed_result:
-            self.logger.log(("instruction could not be performed", message))
+        if message.get("type") != "instruction":
+            self.logger.log(
+                ("received non-instruction message of type", message.get("type"))
+            )
         else:
-            self.logger.log(("instruction performed", message))
+            success = self.__check_message(message.get("contents"))
+            conf_msg_dict = {
+                "device_id": self.name,
+                "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+                "type": "confirmation",
+                "contents": {"completed": success, "instructed": message},
+            }
+            msg = json.dumps(conf_msg_dict)
+            self.__send_message("back-end", msg)
+
+    def __check_message(self, contents):
+        for action in contents:
+            instruction = action.get("instruction")
+            self.logger.log(("status?", instruction))
+            if instruction == "test":
+                self.device.test()
+                self.logger.log(("instruction performed", action))
+                return True
+            if instruction == "status update":
+                msg_dict = {
+                    "device_id": self.name,
+                    "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+                    "type": "connection",
+                    "contents": {"connection": True},
+                }
+                msg = json.dumps(msg_dict)
+                self.__send_message("back-end", msg)
+                self.status_changed()
+                self.logger.log(("instruction performed", action))
+            else:
+                (success, failed_action) = self.device.perform_instruction(action)
+                if success:
+                    self.logger.log(("instruction performed", action))
+                else:
+                    self.logger.log(
+                        (
+                            "instruction: " + failed_action + " could not be performed",
+                            action,
+                        )
+                    )
+                    return False
+        return True
 
     def __subscribe_topic(self, topic):
         """

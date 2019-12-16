@@ -1,6 +1,21 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { PuzzleComponent } from "./puzzle.component";
+import {
+  MatPaginator,
+  MatPaginatorModule,
+  MatSnackBar,
+  MatSort,
+  MatSortModule,
+  MatTable,
+  MatTableDataSource,
+  MatTableModule
+} from "@angular/material";
+import { MqttModule, MqttService } from "ngx-mqtt";
+import { AppComponent } from "../../app.component";
+import { Overlay } from "@angular/cdk/overlay";
+import { MQTT_SERVICE_OPTIONS } from "../../app.module";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
 describe("PuzzleComponent", () => {
   let component: PuzzleComponent;
@@ -8,7 +23,15 @@ describe("PuzzleComponent", () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [PuzzleComponent]
+      imports: [
+        MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
+        MatTableModule,
+        MatSortModule,
+        MatPaginatorModule,
+        BrowserAnimationsModule
+      ],
+      declarations: [PuzzleComponent],
+      providers: [MqttService, AppComponent, MatSnackBar, Overlay]
     }).compileComponents();
   }));
 
