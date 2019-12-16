@@ -11,7 +11,6 @@ except (RuntimeError, ModuleNotFoundError):
 
 
 class Door(Device):
-
     def __init__(self):
         """
         Define pin numbers to which units are connected on Pi.
