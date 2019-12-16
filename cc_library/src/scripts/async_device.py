@@ -28,7 +28,7 @@ class async_device(Device):
             config = open(file=abs_file_path)
             self.scclib = SccLib(config, device)
 
-            self.scclib.start()
+            self.scclib.__start()
 
             i = 0
             while True:
@@ -39,7 +39,7 @@ class async_device(Device):
                 if i > 100:
                     break
 
-            self.scclib.stop()
+            self.scclib.__stop()
 
         except KeyboardInterrupt:
             self.scclib.logger.log("program was terminated from keyboard input")

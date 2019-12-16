@@ -40,25 +40,16 @@ class Display(Device):
         self.scclib.statusChanged()
 
     def main(self):
-        try:
-            device = self
+        device = self
 
-            two_up = os.path.abspath(os.path.join(__file__, ".."))
-            rel_path = "./display_config.json"
-            abs_file_path = os.path.join(two_up, rel_path)
-            abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
-            config = open(file=abs_file_path)
-            self.scclib = SccLib(config=config, device=device)
-            self.scclib.start()
+        two_up = os.path.abspath(os.path.join(__file__, ".."))
+        rel_path = "./display_config.json"
+        abs_file_path = os.path.join(two_up, rel_path)
+        abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
+        config = open(file=abs_file_path)
 
-            # prevent exit program
-            while True:
-                time.sleep(1 * 1 / 1000)
-        except KeyboardInterrupt:
-            self.scclib.logger.log("program was terminated from keyboard input")
-        finally:
-            GPIO.cleanup()
-            self.scclib.stop()
+        self.scclib = SccLib(config=config, device=device)
+        self.scclib.start(stop=GPIO.cleanup)
 
 
 if __name__ == "__main__":

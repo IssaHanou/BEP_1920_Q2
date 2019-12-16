@@ -69,25 +69,16 @@ class Door(Device):
         self.scclib.status_changed()
 
     def main(self):
-        try:
-            device = self
 
-            two_up = os.path.abspath(os.path.join(__file__, ".."))
-            rel_path = "./door_config.json"
-            abs_file_path = os.path.join(two_up, rel_path)
-            abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
-            config = open(file=abs_file_path)
-            self.scclib = SccLib(config=config, device=device)
-            self.scclib.start()
+        device = self
 
-            # prevent exit program
-            while True:
-                time.sleep(1 * 1 / 1000)
-        except KeyboardInterrupt:
-            self.scclib.logger.log("program was terminated from keyboard input")
-        finally:
-            GPIO.cleanup()
-            self.scclib.stop()
+        two_up = os.path.abspath(os.path.join(__file__, ".."))
+        rel_path = "./door_config.json"
+        abs_file_path = os.path.join(two_up, rel_path)
+        abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
+        config = open(file=abs_file_path)
+        self.scclib = SccLib(config=config, device=device)
+        self.scclib.start(stop=GPIO.cleanup)
 
 
 if __name__ == "__main__":

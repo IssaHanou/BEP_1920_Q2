@@ -30,7 +30,7 @@ import { CdkTableModule } from "@angular/cdk/table";
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   hostname: "192.168.178.82",
   port: 8083,
-  clientId: "front-end"
+  clientId: "front-end-marijn"
 };
 
 @NgModule({

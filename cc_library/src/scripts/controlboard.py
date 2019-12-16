@@ -1,7 +1,6 @@
 import os
 import time
 
-from cc_library.src.sciler.scclib.app import SccLib
 from cc_library.src.sciler.scclib.device import Device
 from Adafruit_ADS1x15 import ADS1115 as ADC
 
@@ -13,7 +12,14 @@ except (RuntimeError, ModuleNotFoundError):
 
 class ControlBoard(Device):
     def __init__(self):
-        Device.__init__(self)
+
+        two_up = os.path.abspath(os.path.join(__file__, ".."))
+        rel_path = "./controlboard_config.json"
+        abs_file_path = os.path.join(two_up, rel_path)
+        abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
+        config = open(file=abs_file_path)
+
+        super().__init__(config)
         self.adc = ADC()
         GPIO.setmode(GPIO.BCM)
         """
@@ -90,54 +96,54 @@ class ControlBoard(Device):
         """
         status = "{"
         status += (
-            "'redSwitch': "
-            + str(self.status_binair_to_bool(GPIO.input(self.redSwitch)))
-            + ","
+                "'redSwitch': "
+                + str(self.status_binair_to_bool(GPIO.input(self.redSwitch)))
+                + ","
         )
         status += (
-            "'orangeSwitch': "
-            + str(self.status_binair_to_bool(GPIO.input(self.orangeSwitch)))
-            + ","
+                "'orangeSwitch': "
+                + str(self.status_binair_to_bool(GPIO.input(self.orangeSwitch)))
+                + ","
         )
         status += (
-            "'greenSwitch': "
-            + str(self.status_binair_to_bool(GPIO.input(self.greenSwitch)))
-            + ","
+                "'greenSwitch': "
+                + str(self.status_binair_to_bool(GPIO.input(self.greenSwitch)))
+                + ","
         )
         status += (
-            "'mainSwitch': "
-            + str(self.status_binair_to_bool(GPIO.input(self.mainSwitch)))
-            + ","
+                "'mainSwitch': "
+                + str(self.status_binair_to_bool(GPIO.input(self.mainSwitch)))
+                + ","
         )
         status += (
-            "'greenLight1': "
-            + str(self.status_binair_to_sting(GPIO.input(self.greenLight1)))
-            + ","
+                "'greenLight1': "
+                + str(self.status_binair_to_sting(GPIO.input(self.greenLight1)))
+                + ","
         )
         status += (
-            "'greenLight2': "
-            + str(self.status_binair_to_sting(GPIO.input(self.greenLight2)))
-            + ","
+                "'greenLight2': "
+                + str(self.status_binair_to_sting(GPIO.input(self.greenLight2)))
+                + ","
         )
         status += (
-            "'greenLight3': "
-            + str(self.status_binair_to_sting(GPIO.input(self.greenLight3)))
-            + ","
+                "'greenLight3': "
+                + str(self.status_binair_to_sting(GPIO.input(self.greenLight3)))
+                + ","
         )
         status += (
-            "'redLight1': "
-            + str(self.status_binair_to_sting(GPIO.input(self.redLight1)))
-            + ","
+                "'redLight1': "
+                + str(self.status_binair_to_sting(GPIO.input(self.redLight1)))
+                + ","
         )
         status += (
-            "'redLight2': "
-            + str(self.status_binair_to_sting(GPIO.input(self.redLight2)))
-            + ","
+                "'redLight2': "
+                + str(self.status_binair_to_sting(GPIO.input(self.redLight2)))
+                + ","
         )
         status += (
-            "'redLight3': "
-            + str(self.status_binair_to_sting(GPIO.input(self.redLight3)))
-            + ","
+                "'redLight3': "
+                + str(self.status_binair_to_sting(GPIO.input(self.redLight3)))
+                + ","
         )
         status += "'slider1': " + str(self.get_sliders_analog_reading()[0]) + ","
         status += "'slider2': " + str(self.get_sliders_analog_reading()[1]) + ","
@@ -145,7 +151,6 @@ class ControlBoard(Device):
         status += "}"
         return status
 
-    # Todo: make the library check for this instruction and call it directly
     def perform_instruction(self, action):
         """
         Set here the mapping from messages to methods.
@@ -163,7 +168,6 @@ class ControlBoard(Device):
         return True, None
 
     def blink(self, component, args):
-
         led = getattr(self, component)
 
         time.sleep(args[1])  # delay
@@ -193,72 +197,52 @@ class ControlBoard(Device):
                 GPIO.output(self.greenLEDs[i], GPIO.LOW)
                 time.sleep(0.2)
 
+
     def main(self):
+        GPIO.add_event_detect(
+            device.redSwitch,
+            GPIO.BOTH,
+            callback=self.status_changed,
+            bouncetime=100,
+        )
+        GPIO.add_event_detect(
+            device.orangeSwitch,
+            GPIO.BOTH,
+            callback=self.status_changed,
+            bouncetime=100,
+        )
+        GPIO.add_event_detect(
+            device.greenSwitch,
+            GPIO.BOTH,
+            callback=self.status_changed,
+            bouncetime=100,
+        )
+        GPIO.add_event_detect(
+            device.mainSwitch,
+            GPIO.BOTH,
+            callback=self.status_changed,
+            bouncetime=100,
+        )
+        GPIO.add_event_detect(
+            device.a_pin0, GPIO.BOTH, callback=self.status_changed
+        )
+        GPIO.add_event_detect(
+            device.a_pin1, GPIO.BOTH, callback=self.status_changed
+        )
+        GPIO.add_event_detect(
+            device.a_pin2, GPIO.BOTH, callback=self.status_changed
+        )
+        GPIO.add_event_detect(
+            device.b_pin0, GPIO.BOTH, callback=self.status_changed
+        )
+        GPIO.add_event_detect(
+            device.b_pin1, GPIO.BOTH, callback=self.status_changed
+        )
+        GPIO.add_event_detect(
+            device.b_pin2, GPIO.BOTH, callback=self.status_changed
+        )
 
-        try:
-            device = self
-
-            two_up = os.path.abspath(os.path.join(__file__, ".."))
-            rel_path = "./controlboard_config.json"
-            abs_file_path = os.path.join(two_up, rel_path)
-            abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
-            config = open(file=abs_file_path)
-            self.scclib = SccLib(config, device)
-
-            GPIO.add_event_detect(
-                device.redSwitch,
-                GPIO.BOTH,
-                callback=self.scclib.statusChangedOnChannel,
-                bouncetime=100,
-            )
-            GPIO.add_event_detect(
-                device.orangeSwitch,
-                GPIO.BOTH,
-                callback=self.scclib.statusChangedOnChannel,
-                bouncetime=100,
-            )
-            GPIO.add_event_detect(
-                device.greenSwitch,
-                GPIO.BOTH,
-                callback=self.scclib.statusChangedOnChannel,
-                bouncetime=100,
-            )
-            GPIO.add_event_detect(
-                device.mainSwitch,
-                GPIO.BOTH,
-                callback=self.scclib.statusChangedOnChannel,
-                bouncetime=100,
-            )
-            GPIO.add_event_detect(
-                device.a_pin0, GPIO.BOTH, callback=self.scclib.status_changed
-            )
-            GPIO.add_event_detect(
-                device.a_pin1, GPIO.BOTH, callback=self.scclib.status_changed
-            )
-            GPIO.add_event_detect(
-                device.a_pin2, GPIO.BOTH, callback=self.scclib.status_changed
-            )
-            GPIO.add_event_detect(
-                device.b_pin0, GPIO.BOTH, callback=self.scclib.status_changed
-            )
-            GPIO.add_event_detect(
-                device.b_pin1, GPIO.BOTH, callback=self.scclib.status_changed
-            )
-            GPIO.add_event_detect(
-                device.b_pin2, GPIO.BOTH, callback=self.scclib.status_changed
-            )
-
-            self.scclib.start()
-
-            # prevent exit program
-            while True:
-                time.sleep(1 * 1 / 1000)
-
-        except KeyboardInterrupt:
-            self.scclib.logger.log("program was terminated from keyboard input")
-        finally:
-            GPIO.cleanup()
-            self.scclib.stop()
+        self.start(stop=GPIO.cleanup)
 
 
 if __name__ == "__main__":
