@@ -178,7 +178,6 @@ class ControlBoard(Device):
         time.sleep(interval)
 
     def turn_on_off(self, component, arg):
-
         led = getattr(self, component)
         if arg:
             GPIO.output(led, GPIO.HIGH)
@@ -186,7 +185,6 @@ class ControlBoard(Device):
             GPIO.output(led, GPIO.LOW)
 
     def test(self):
-
         for j in range(0, 3):
             for i in range(0, 3):
                 GPIO.output(self.redLEDs[i], GPIO.HIGH)
@@ -197,8 +195,7 @@ class ControlBoard(Device):
                 GPIO.output(self.greenLEDs[i], GPIO.LOW)
                 time.sleep(0.2)
 
-
-    def main(self):
+    def setup_events(self):
         GPIO.add_event_detect(
             device.redSwitch,
             GPIO.BOTH,
@@ -224,24 +221,43 @@ class ControlBoard(Device):
             bouncetime=100,
         )
         GPIO.add_event_detect(
-            device.a_pin0, GPIO.BOTH, callback=self.status_changed
+            device.a_pin0,
+            GPIO.BOTH,
+            callback=self.status_changed
         )
         GPIO.add_event_detect(
-            device.a_pin1, GPIO.BOTH, callback=self.status_changed
+            device.a_pin1,
+            GPIO.BOTH,
+            callback=self.status_changed
         )
         GPIO.add_event_detect(
-            device.a_pin2, GPIO.BOTH, callback=self.status_changed
+            device.a_pin2,
+            GPIO.BOTH,
+            callback=self.status_changed
         )
         GPIO.add_event_detect(
-            device.b_pin0, GPIO.BOTH, callback=self.status_changed
+            device.b_pin0,
+            GPIO.BOTH,
+            callback=self.status_changed
         )
         GPIO.add_event_detect(
-            device.b_pin1, GPIO.BOTH, callback=self.status_changed
+            device.b_pin1,
+            GPIO.BOTH,
+            callback=self.status_changed
         )
         GPIO.add_event_detect(
-            device.b_pin2, GPIO.BOTH, callback=self.status_changed
+            device.b_pin2,
+            GPIO.BOTH,
+            callback=self.status_changed
         )
 
+    def reset(self):
+        for i in range(0, 3):
+            GPIO.output(self.redLEDs[i], GPIO.LOW)
+            GPIO.output(self.greenLEDs[i], GPIO.LOW)
+
+    def main(self):
+        self.setup_events()
         self.start(stop=GPIO.cleanup)
 
 

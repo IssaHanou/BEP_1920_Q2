@@ -1,7 +1,5 @@
 import os
-import time
 
-from cc_library.src.sciler.scclib.app import SccLib
 from cc_library.src.sciler.scclib.device import Device
 
 try:
@@ -12,7 +10,12 @@ except (RuntimeError, ModuleNotFoundError):
 
 class Display(Device):
     def __init__(self):
-        Device.__init__(self)
+        two_up = os.path.abspath(os.path.join(__file__, ".."))
+        rel_path = "./display_config.json"
+        abs_file_path = os.path.join(two_up, rel_path)
+        abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
+        config = open(file=abs_file_path)
+        super().__init__(config)
         self.hint = ""
 
     def get_status(self):
@@ -32,24 +35,19 @@ class Display(Device):
     def test(self):
         self.hint = "test"
         print(self.hint)
-        self.scclib.statusChanged()
+        self.status_changed()
 
     def show_hint(self, data):
         self.hint = data.get("value")
         print(self.hint)
-        self.scclib.statusChanged()
+        self.status_changed()
+
+    def reset(self):
+        self.hint = ""
+        self.status_changed()
 
     def main(self):
-        device = self
-
-        two_up = os.path.abspath(os.path.join(__file__, ".."))
-        rel_path = "./display_config.json"
-        abs_file_path = os.path.join(two_up, rel_path)
-        abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
-        config = open(file=abs_file_path)
-
-        self.scclib = SccLib(config=config, device=device)
-        self.scclib.start(stop=GPIO.cleanup)
+        self.start(stop=GPIO.cleanup)
 
 
 if __name__ == "__main__":
