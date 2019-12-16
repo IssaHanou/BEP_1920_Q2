@@ -54,7 +54,7 @@ class Display(Device):
         finally:
             GPIO.cleanup()
             self.scclib.logger.log("cleanly exited Display program")
-            self.scclib.logger.close()
+            self.scclib.stop()
 
 
 if __name__ == "__main__":

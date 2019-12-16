@@ -84,6 +84,7 @@ func (handler *Handler) onConnectionMsg(raw Message) {
 		} else {
 			device.Connection = value.(bool)
 			handler.Config.Devices[raw.DeviceID] = device
+			logrus.Info("setting connection status of ", raw.DeviceID, " to ", value)
 			handler.SendStatus(raw.DeviceID)
 		}
 	}
@@ -313,4 +314,24 @@ func getMapSlice(input interface{}) ([]map[string]interface{}, error) {
 		return nil, err
 	}
 	return output, nil
+}
+
+// GetStatus asks devices to send status
+func (handler *Handler) GetStatus(deviceID string) {
+	message := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{"instruction": "status update"},
+		},
+	}
+
+	jsonMessage, err := json.Marshal(&message)
+	if err != nil {
+		logrus.Errorf("error occurred while constructing message to publish: %v", err)
+	} else {
+		logrus.Info("sending status request to client computer: ", deviceID, fmt.Sprint(message.Contents))
+		handler.Communicator.Publish(deviceID, string(jsonMessage), 3)
+	}
 }

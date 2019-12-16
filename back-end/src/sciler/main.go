@@ -41,6 +41,7 @@ func main() {
 
 	for _, value := range messageHandler.Config.Devices {
 		messageHandler.SendStatus(value.ID)
+		messageHandler.GetStatus(value.ID)
 	}
 
 	// prevent exit
