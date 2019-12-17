@@ -127,6 +127,7 @@ class SccLib:
             }
             msg = json.dumps(msg_dict)
             self.__send_message("back-end", msg)
+            self.status_changed()
             self.logger.log("connected OK")
         else:
             self.logger.log(("bad connection, returned code=", rc))
