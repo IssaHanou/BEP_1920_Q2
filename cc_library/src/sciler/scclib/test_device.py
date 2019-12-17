@@ -25,7 +25,7 @@ class TestDevice(unittest.TestCase):
 
     def test_get_status_str(self):
         result = self.device.get_status()
-        self.assertIsInstance(result, str, "get_status should return a string type")
+        self.assertIsInstance(result, dict, "get_status should return a dict type")
 
     def test_get_status_json(self):
         result = self.device.get_status()

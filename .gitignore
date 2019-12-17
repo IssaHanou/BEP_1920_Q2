@@ -9,3 +9,5 @@ back-end/src/*
 !back-end/src/sciler
 */debug.log
 /cc_library/src/scripts/logs/
+/cc_library/venv
+*.log

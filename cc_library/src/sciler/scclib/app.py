@@ -25,8 +25,6 @@ class SccLib:
         self.logger = Logger()
         self.logger.log("Start of log for device: " + self.name)
 
-        self.statusChanged = self.status_changed
-        self.statusChangedOnChannel = self.status_changed_on_channel
         self.client = mqtt.Client(self.name)
         self.client.on_message = self.__on_message
         self.client.on_log = self.__on_log
@@ -48,13 +46,27 @@ class SccLib:
         """
         print(self.name, ", broker log: ", buf)
 
-    def start(self):
+    def start(self, loop=None, stop=None):
         """
         Starting method to call from the starting script.
         """
         self.__connect()
+        try:
+            if loop:
+                self.client.loop_start()
+                loop()
+            else:
+                self.client.loop_forever()
+        except KeyboardInterrupt:
+            self.logger.log("program was terminated from keyboard input")
+        finally:
+            if stop:
+                stop()
+            if loop:
+                self.client.loop_stop()
+            self.__stop()
 
-    def stop(self):
+    def __stop(self):
         """
         Stop method to call from the starting script.
         """
@@ -66,7 +78,9 @@ class SccLib:
         }
         msg = json.dumps(msg_dict)
         self.__send_message("back-end", msg)
+        self.logger.log("cleanly exited ControlBoard program and client")
         self.client.disconnect()
+        self.logger.close()
 
     def __send_message(self, topic, json_message):
         # TODO what to do when publish fails
@@ -82,18 +96,13 @@ class SccLib:
         subscribes to topic "test"
         starts loop_forever
         """
-        while True:
-            try:
-                self.client.connect(self.host, self.port, keepalive=10)
-                self.logger.log("connected to broker")
-                for label in self.labels:
-                    self.__subscribe_topic(label)
-                self.__subscribe_topic("client-computers")
-                self.__subscribe_topic(self.name)
-                self.client.loop_forever()
-                break
-            except ConnectionRefusedError:
-                self.logger.log("ERROR: connection was refused")
+        try:
+            self.client.connect(self.host, self.port, keepalive=10)
+            self.logger.log("connected to broker")
+        except ConnectionRefusedError:
+            self.logger.log("ERROR: connection was refused")
+        except TimeoutError:
+            self.logger.log("ERROR: connecting failed, socket timed out")
 
     def __on_connect(self, client, userdata, flags, rc):
         """
@@ -106,7 +115,10 @@ class SccLib:
         """
         if rc == 0:
             client.connected_flag = True  # set flag
-            self.logger.log("connected OK")
+            for label in self.labels:
+                self.__subscribe_topic(label)
+            self.__subscribe_topic("client-computers")
+            self.__subscribe_topic(self.name)
             msg_dict = {
                 "device_id": self.name,
                 "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
@@ -115,6 +127,8 @@ class SccLib:
             }
             msg = json.dumps(msg_dict)
             self.__send_message("back-end", msg)
+            self.status_changed()
+            self.logger.log("connected OK")
         else:
             self.logger.log(("bad connection, returned code=", rc))
             client.bad_connection_flag = True
@@ -135,14 +149,6 @@ class SccLib:
         self.logger.log(("disconnecting, reason  " + str(rc)))
         client.connected_flag = False
         client.disconnect_flag = True
-        self.logger.close()
-
-    def status_changed_on_channel(self, channel):
-        """
-        This is called from the client computer to message a status update.
-        """
-        self.logger.log("status changed of pin " + str(channel))
-        self.__send_status_message(self.device.get_status())
 
     def status_changed(self):
         """
@@ -160,7 +166,7 @@ class SccLib:
             "device_id": self.name,
             "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
             "type": "status",
-            "contents": eval(msg),
+            "contents": msg,
         }
         res_msg = json.dumps(json_msg)
         self.__send_message("back-end", res_msg)
@@ -208,7 +214,6 @@ class SccLib:
     def __check_message(self, contents):
         for action in contents:
             instruction = action.get("instruction")
-            self.logger.log(("status?", instruction))
             if instruction == "test":
                 self.device.test()
                 self.logger.log(("instruction performed", action))
