@@ -165,7 +165,7 @@ class SccLib:
             "device_id": self.name,
             "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
             "type": "status",
-            "contents": eval(msg),
+            "contents": msg,
         }
         res_msg = json.dumps(json_msg)
         self.__send_message("back-end", res_msg)
