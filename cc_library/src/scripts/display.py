@@ -2,11 +2,6 @@ import os
 
 from cc_library.src.sciler.scclib.device import Device
 
-try:
-    import RPi.GPIO as GPIO
-except (RuntimeError, ModuleNotFoundError):
-    from fake_rpi.RPi import GPIO
-
 
 class Display(Device):
     def __init__(self):
@@ -47,7 +42,7 @@ class Display(Device):
         self.status_changed()
 
     def main(self):
-        self.start(stop=GPIO.cleanup)
+        self.start()
 
 
 if __name__ == "__main__":
