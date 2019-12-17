@@ -10,3 +10,4 @@ back-end/src/*
 */debug.log
 /cc_library/src/scripts/logs/
 /cc_library/venv
+*.log
