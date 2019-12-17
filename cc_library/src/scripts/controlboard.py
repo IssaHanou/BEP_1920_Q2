@@ -237,6 +237,14 @@ class ControlBoard(Device):
             device.b_pin2, GPIO.BOTH, callback=self.__status_update,
         )
 
+    def loop(self):
+        previous = self.get_sliders_analog_reading()
+        while True:
+            positions = self.get_sliders_analog_reading()
+            if previous != positions:
+                self.status_changed()
+                previous = positions
+
     def reset(self):
         for i in range(0, 3):
             GPIO.output(self.redLEDs[i], GPIO.LOW)
@@ -244,7 +252,7 @@ class ControlBoard(Device):
 
     def main(self):
         self.setup_events()
-        self.start(stop=GPIO.cleanup)
+        self.start(loop=self.loop, stop=GPIO.cleanup)
 
 
 if __name__ == "__main__":

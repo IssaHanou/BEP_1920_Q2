@@ -213,7 +213,6 @@ class SccLib:
     def __check_message(self, contents):
         for action in contents:
             instruction = action.get("instruction")
-            self.logger.log(("status?", instruction))
             if instruction == "test":
                 self.device.test()
                 self.logger.log(("instruction performed", action))
