@@ -96,54 +96,54 @@ class ControlBoard(Device):
         """
         status = "{"
         status += (
-                "'redSwitch': "
-                + str(self.status_binair_to_bool(GPIO.input(self.redSwitch)))
-                + ","
+            "'redSwitch': "
+            + str(self.status_binair_to_bool(GPIO.input(self.redSwitch)))
+            + ","
         )
         status += (
-                "'orangeSwitch': "
-                + str(self.status_binair_to_bool(GPIO.input(self.orangeSwitch)))
-                + ","
+            "'orangeSwitch': "
+            + str(self.status_binair_to_bool(GPIO.input(self.orangeSwitch)))
+            + ","
         )
         status += (
-                "'greenSwitch': "
-                + str(self.status_binair_to_bool(GPIO.input(self.greenSwitch)))
-                + ","
+            "'greenSwitch': "
+            + str(self.status_binair_to_bool(GPIO.input(self.greenSwitch)))
+            + ","
         )
         status += (
-                "'mainSwitch': "
-                + str(self.status_binair_to_bool(GPIO.input(self.mainSwitch)))
-                + ","
+            "'mainSwitch': "
+            + str(self.status_binair_to_bool(GPIO.input(self.mainSwitch)))
+            + ","
         )
         status += (
-                "'greenLight1': "
-                + str(self.status_binair_to_sting(GPIO.input(self.greenLight1)))
-                + ","
+            "'greenLight1': "
+            + str(self.status_binair_to_sting(GPIO.input(self.greenLight1)))
+            + ","
         )
         status += (
-                "'greenLight2': "
-                + str(self.status_binair_to_sting(GPIO.input(self.greenLight2)))
-                + ","
+            "'greenLight2': "
+            + str(self.status_binair_to_sting(GPIO.input(self.greenLight2)))
+            + ","
         )
         status += (
-                "'greenLight3': "
-                + str(self.status_binair_to_sting(GPIO.input(self.greenLight3)))
-                + ","
+            "'greenLight3': "
+            + str(self.status_binair_to_sting(GPIO.input(self.greenLight3)))
+            + ","
         )
         status += (
-                "'redLight1': "
-                + str(self.status_binair_to_sting(GPIO.input(self.redLight1)))
-                + ","
+            "'redLight1': "
+            + str(self.status_binair_to_sting(GPIO.input(self.redLight1)))
+            + ","
         )
         status += (
-                "'redLight2': "
-                + str(self.status_binair_to_sting(GPIO.input(self.redLight2)))
-                + ","
+            "'redLight2': "
+            + str(self.status_binair_to_sting(GPIO.input(self.redLight2)))
+            + ","
         )
         status += (
-                "'redLight3': "
-                + str(self.status_binair_to_sting(GPIO.input(self.redLight3)))
-                + ","
+            "'redLight3': "
+            + str(self.status_binair_to_sting(GPIO.input(self.redLight3)))
+            + ","
         )
         status += "'slider1': " + str(self.get_sliders_analog_reading()[0]) + ","
         status += "'slider2': " + str(self.get_sliders_analog_reading()[1]) + ","
@@ -201,10 +201,7 @@ class ControlBoard(Device):
     def setup_events(self):
 
         GPIO.add_event_detect(
-            device.redSwitch,
-            GPIO.BOTH,
-            callback=self.__status_update,
-            bouncetime=100,
+            device.redSwitch, GPIO.BOTH, callback=self.__status_update, bouncetime=100,
         )
         GPIO.add_event_detect(
             device.orangeSwitch,
@@ -219,40 +216,25 @@ class ControlBoard(Device):
             bouncetime=100,
         )
         GPIO.add_event_detect(
-            device.mainSwitch,
-            GPIO.BOTH,
-            callback=self.__status_update,
-            bouncetime=100,
+            device.mainSwitch, GPIO.BOTH, callback=self.__status_update, bouncetime=100,
         )
         GPIO.add_event_detect(
-            device.a_pin0,
-            GPIO.BOTH,
-            callback=self.__status_update,
+            device.a_pin0, GPIO.BOTH, callback=self.__status_update,
         )
         GPIO.add_event_detect(
-            device.a_pin1,
-            GPIO.BOTH,
-            callback=self.__status_update,
+            device.a_pin1, GPIO.BOTH, callback=self.__status_update,
         )
         GPIO.add_event_detect(
-            device.a_pin2,
-            GPIO.BOTH,
-            callback=self.__status_update,
+            device.a_pin2, GPIO.BOTH, callback=self.__status_update,
         )
         GPIO.add_event_detect(
-            device.b_pin0,
-            GPIO.BOTH,
-            callback=self.__status_update,
+            device.b_pin0, GPIO.BOTH, callback=self.__status_update,
         )
         GPIO.add_event_detect(
-            device.b_pin1,
-            GPIO.BOTH,
-            callback=self.__status_update,
+            device.b_pin1, GPIO.BOTH, callback=self.__status_update,
         )
         GPIO.add_event_detect(
-            device.b_pin2,
-            GPIO.BOTH,
-            callback=self.__status_update,
+            device.b_pin2, GPIO.BOTH, callback=self.__status_update,
         )
 
     def reset(self):
