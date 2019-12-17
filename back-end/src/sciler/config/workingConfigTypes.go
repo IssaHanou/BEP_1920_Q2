@@ -29,6 +29,7 @@ type Timer struct {
 	Finish    bool
 }
 
+// newTimer create a new timer
 func newTimer(id string, d time.Duration) *Timer {
 	t := new(Timer)
 	t.ID = id
@@ -40,6 +41,13 @@ func newTimer(id string, d time.Duration) *Timer {
 		t.Finish = true
 	}
 	return t
+}
+
+// GetTimeLeft gets time left of timer
+func (t *Timer) GetTimeLeft() (time.Duration, string) {
+	dif := time.Now().Sub(t.StartedAt)
+	left := t.Duration - dif
+	return left, t.State
 }
 
 // Start starts Timer that will send the current time on its channel after at least duration d.

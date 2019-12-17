@@ -1,8 +1,8 @@
 {
   "general": {
     "name": "Escape X",
-    "duration": "30m",
-    "host": "192.168.178.82",
+    "duration": "20s",
+    "host": "localhost",
     "port": 1883
   },
   "devices": [

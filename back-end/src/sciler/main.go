@@ -43,6 +43,7 @@ func main() {
 		messageHandler.SendStatus(value.ID)
 		messageHandler.GetStatus(value.ID)
 	}
+
 	// prevent exit
 	select {}
 }
