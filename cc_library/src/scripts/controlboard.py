@@ -86,70 +86,29 @@ class ControlBoard(Device):
 
     def status_binair_to_sting(self, binair):
         if binair == 0:
-            return "'uit'"
+            return "uit"
         else:
-            return "'aan'"
+            return "aan"
 
     def get_status(self):
         """
         Return status of switches, LEDs and sliders of device.
         """
-        status = "{"
-        status += (
-            "'redSwitch': "
-            + str(self.status_binair_to_bool(GPIO.input(self.redSwitch)))
-            + ","
-        )
-        status += (
-            "'orangeSwitch': "
-            + str(self.status_binair_to_bool(GPIO.input(self.orangeSwitch)))
-            + ","
-        )
-        status += (
-            "'greenSwitch': "
-            + str(self.status_binair_to_bool(GPIO.input(self.greenSwitch)))
-            + ","
-        )
-        status += (
-            "'mainSwitch': "
-            + str(self.status_binair_to_bool(GPIO.input(self.mainSwitch)))
-            + ","
-        )
-        status += (
-            "'greenLight1': "
-            + str(self.status_binair_to_sting(GPIO.input(self.greenLight1)))
-            + ","
-        )
-        status += (
-            "'greenLight2': "
-            + str(self.status_binair_to_sting(GPIO.input(self.greenLight2)))
-            + ","
-        )
-        status += (
-            "'greenLight3': "
-            + str(self.status_binair_to_sting(GPIO.input(self.greenLight3)))
-            + ","
-        )
-        status += (
-            "'redLight1': "
-            + str(self.status_binair_to_sting(GPIO.input(self.redLight1)))
-            + ","
-        )
-        status += (
-            "'redLight2': "
-            + str(self.status_binair_to_sting(GPIO.input(self.redLight2)))
-            + ","
-        )
-        status += (
-            "'redLight3': "
-            + str(self.status_binair_to_sting(GPIO.input(self.redLight3)))
-            + ","
-        )
-        status += "'slider1': " + str(self.get_sliders_analog_reading()[0]) + ","
-        status += "'slider2': " + str(self.get_sliders_analog_reading()[1]) + ","
-        status += "'slider3': " + str(self.get_sliders_analog_reading()[2])
-        status += "}"
-        return status
+        return {
+            'redSwitch': self.status_binair_to_bool(GPIO.input(self.redSwitch)),
+            'orangeSwitch': self.status_binair_to_bool(GPIO.input(self.orangeSwitch)),
+            'greenSwitch': self.status_binair_to_bool(GPIO.input(self.greenSwitch)),
+            'mainSwitch': self.status_binair_to_bool(GPIO.input(self.mainSwitch)),
+            'greenLight1': self.status_binair_to_sting(GPIO.input(self.greenLight1)),
+            'greenLight2': self.status_binair_to_sting(GPIO.input(self.greenLight2)),
+            'greenLight3': self.status_binair_to_sting(GPIO.input(self.greenLight3)),
+            'redLight1': self.status_binair_to_sting(GPIO.input(self.redLight1)),
+            'redLight2': self.status_binair_to_sting(GPIO.input(self.redLight2)),
+            'redLight3': self.status_binair_to_sting(GPIO.input(self.redLight3)),
+            'slider1': self.get_sliders_analog_reading()[0],
+            'slider2': self.get_sliders_analog_reading()[1],
+            'slider3': self.get_sliders_analog_reading()[2]
+        }
 
     def perform_instruction(self, action):
         """

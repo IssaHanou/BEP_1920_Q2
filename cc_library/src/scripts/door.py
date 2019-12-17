@@ -29,14 +29,10 @@ class Door(Device):
         """
         Return status of the door.
         """
-        status = "{"
-        status += "'door': "
+        status_str = "closed"
         if self.status:
-            status += "'open'"
-        else:
-            status += "'closed'"
-        status += "}"
-        return status
+            status_str = "open"
+        return {"door": status_str}
 
     def perform_instruction(self, action):
         """

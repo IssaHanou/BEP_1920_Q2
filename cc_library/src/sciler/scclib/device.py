@@ -14,7 +14,7 @@ class Device(ABC):
     @abstractmethod
     def get_status(self):
         """
-        Returns status of all custom components, in json format.
+        Returns status of all custom components, in a dictionary
         """
 
     @abstractmethod
