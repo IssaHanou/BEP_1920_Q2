@@ -1,7 +1,7 @@
 {
   "general": {
     "name": "Escape X",
-    "duration": "00:30:00",
+    "duration": "30m",
     "host": "192.168.178.82",
     "port": 1883
   },
@@ -406,6 +406,15 @@
                   "instruction": "start"
                 }
               ]
+            },
+            {
+              "type": "timer",
+              "type_id": "general",
+              "message": [
+                {
+                  "instruction": "start"
+                }
+              ]
             }
           ]
         }
@@ -560,6 +569,73 @@
                   "component_id": "hint",
                   "instruction": "hint",
                   "value": "na 5 seconde hint"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stop Time up",
+      "rules": [
+        {
+          "id": "time up",
+          "description": "Na de duration van het spel faalt de groep",
+          "limit": 1,
+          "conditions": {
+            "type": "timer",
+            "type_id": "general",
+            "constraints": {
+              "comparison": "eq",
+              "value": true
+            }
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "display",
+              "message": [
+                {
+                  "component_id": "hint",
+                  "instruction": "hint",
+                  "value": "Je tijd is voorbij!"
+                }
+              ]
+            },
+            {
+              "type": "device",
+              "type_id": "controlBoard",
+              "message": [
+                {
+                  "component_id": "redLight1",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "redLight2",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "redLight3",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "greenLight2",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "greenLight3",
+                  "instruction": "turnOnOff",
+                  "value": true
                 }
               ]
             }

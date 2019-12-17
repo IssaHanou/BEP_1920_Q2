@@ -54,6 +54,8 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, error) {
 			config.Timers[readTimer.ID] = newTimer(readTimer.ID, duration)
 		}
 	}
+	duration, _ := time.ParseDuration(config.General.Duration)
+	config.Timers["general"] = newTimer("general", duration)
 	config.StatusMap = generateStatusMap(&config)
 	config.RuleMap = generateRuleMap(&config)
 
