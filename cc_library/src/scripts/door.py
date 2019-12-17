@@ -1,7 +1,6 @@
 import os
 import time
 
-from cc_library.src.sciler.scclib.app import SccLib
 from cc_library.src.sciler.scclib.device import Device
 
 try:
@@ -15,7 +14,12 @@ class Door(Device):
         """
         Define pin numbers to which units are connected on Pi.
         """
-        Device.__init__(self)
+        two_up = os.path.abspath(os.path.join(__file__, ".."))
+        rel_path = "./door_config.json"
+        abs_file_path = os.path.join(two_up, rel_path)
+        abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
+        config = open(file=abs_file_path)
+        super().__init__(config)
         GPIO.setmode(GPIO.BCM)
         self.door = 17
         GPIO.setup(self.door, GPIO.OUT)
@@ -61,30 +65,18 @@ class Door(Device):
     def turn_off(self):
         GPIO.output(self.door, GPIO.HIGH)
         self.status = False
-        self.scclib.status_changed()
+        self.status_changed()
 
     def turn_on(self):
         GPIO.output(self.door, GPIO.LOW)
         self.status = True
-        self.scclib.status_changed()
+        self.status_changed()
+
+    def reset(self):
+        self.turn_off()
 
     def main(self):
-        try:
-            device = self
-
-            two_up = os.path.abspath(os.path.join(__file__, ".."))
-            rel_path = "./door_config.json"
-            abs_file_path = os.path.join(two_up, rel_path)
-            abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
-            config = open(file=abs_file_path)
-            self.scclib = SccLib(config=config, device=device)
-            self.scclib.start()
-        except KeyboardInterrupt:
-            self.scclib.logger.log("program was terminated from keyboard input")
-        finally:
-            GPIO.cleanup()
-            self.scclib.logger.log("cleanly exited Door program")
-            self.scclib.stop()
+        self.start(stop=GPIO.cleanup)
 
 
 if __name__ == "__main__":

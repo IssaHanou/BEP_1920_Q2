@@ -88,6 +88,12 @@
           }
         }
       }
+    },
+    {
+      "id": "asyncDevice",
+      "description": "test device for asynchronous code",
+      "input": {},
+      "output": {}
     }
   ],
   "puzzles": [

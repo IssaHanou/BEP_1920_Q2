@@ -1,9 +1,8 @@
-import os
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from cc_library.src.sciler.scclib.app import SccLib
 
 
-class Device:
+class Device(ABC):
     """
     Abstract device class from which all custom devices should inherit.
     Defines main methods needed for communication to S.C.I.L.E.R.
@@ -35,11 +34,23 @@ class Device:
         Defines test sequence for device.
         """
 
-    def __init__(self):
+    @abstractmethod
+    def reset(self):
+        """
+        Defines a reset sequence for device.
+        """
+
+    def __init__(self, config):
         """
         The init of the subclass should call this method and also initialize all class attributes.
         """
-        self.scclib = None
+        self.scclib = SccLib(config, self)
+
+    def status_changed(self):
+        self.scclib.status_changed()
+
+    def start(self, loop=None, stop=None):
+        self.scclib.start(loop, stop)
 
     @abstractmethod
     def main(self):
@@ -48,21 +59,4 @@ class Device:
         It should initialize the SccLib class with config file and device class.
         It should also add event listeners to GPIO for all input components.
         """
-        try:
-            device = self
-
-            two_up = os.path.abspath(os.path.join(__file__, ".."))
-            rel_path = "<enter-filename.json>"
-            abs_file_path = os.path.join(two_up, rel_path)
-            abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
-            config = open(file=abs_file_path)
-            self.scclib = SccLib(config, device)
-
-            """Initialize the event listeners here."""
-
-            self.scclib.start()
-        except KeyboardInterrupt:
-            self.scclib.logger.log("program was terminated from keyboard input")
-        finally:
-            self.scclib.logger.log("Cleanly exited ControlBoard program")
-            self.scclib.logger.close()
+        self.start()
