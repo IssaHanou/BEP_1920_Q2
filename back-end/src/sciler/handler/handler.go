@@ -335,3 +335,18 @@ func (handler *Handler) GetStatus(deviceID string) {
 		handler.Communicator.Publish(deviceID, string(jsonMessage), 3)
 	}
 }
+
+// SetTimer starts given timer
+func (handler *Handler) SetTimer(timerID string, instructions config.ComponentInstruction) {
+	switch instructions.Value {
+	case "start":
+		handler.Config.Timers[timerID].Start(handler)
+	case "pause":
+		handler.Config.Timers[timerID].Pause()
+	case "add": // TODO: implement timer Add
+	case "subtract": // TODO: implement timer subtract
+	case "stop":
+		handler.Config.Timers[timerID].Stop()
+	}
+
+}

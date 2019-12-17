@@ -13,59 +13,84 @@ type WorkingConfig struct {
 	Puzzles       []*Puzzle
 	GeneralEvents []*GeneralEvent
 	Devices       map[string]*Device
+	Timers        map[string]*Timer
 	StatusMap     map[string][]*Rule
 	RuleMap       map[string]*Rule
 }
 
-// General is a struct that describes the configurations of an escape room.
-type General struct {
-	Name     string `json:"name"`
-	Duration Timer  `json:"duration"`
-	Host     string `json:"host"`
-	Port     int    `json:"port"`
-}
-
 // Timer is a timer in the escape game
 type Timer struct {
+	ID        string
 	Duration  time.Duration
 	StartedAt time.Time
 	T         *time.Timer
-	Clock     chan time.Time
 	State     string
 	Ending    func()
+	Finish    bool
 }
 
-func newTimer(d time.Duration) *Timer {
-	c := make(chan time.Time, 1)
+func newTimer(id string, d time.Duration) *Timer {
 	t := new(Timer)
-	t.Clock = c
+	t.ID = id
 	t.Duration = d
+	t.Finish = false
 	t.Ending = func() {
-		t.State = "stateExpired	"
-		t.Clock <- time.Now()
+		t.State = "stateExpired"
+		t.Finish = true
 	}
 	return t
 }
 
+// AfterFunc does func after time
+func AfterFunc(d time.Duration, handler InstructionSender) *time.Timer {
+	t := new(Timer)
+	t.Duration = d
+	t.Ending = func() {
+		t.State = "stateExpired"
+		t.Finish = true
+		handler.HandleEvent(t.ID)
+	}
+	return time.AfterFunc(t.Duration, t.Ending)
+}
+
 // Start starts Timer that will send the current time on its channel after at least duration d.
-func (t *Timer) Start() bool {
+func (t *Timer) Start(handler InstructionSender) bool {
 	if t.State != "stateIdle" {
 		return false
 	}
 	t.StartedAt = time.Now()
 	t.State = "stateActive"
-	t.T = time.AfterFunc(t.Duration, t.Ending)
+	t.T = AfterFunc(t.Duration, handler)
+	logrus.Info("timer started for ", t.Duration)
 	return true
 }
 
-func AfterFunc(d time.Duration, f func()) *Timer {
-	t := new(Timer)
-	t.Duration = d
-	t.Ending = func() {
-		t.State = "stateExpired"
-		f()
+// Pause make a timer pause
+func (t *Timer) Pause() bool {
+	if t.State != "stateActive" {
+		return false
 	}
-	return t
+	if !t.T.Stop() {
+		t.State = "stateExpired"
+		return false
+	}
+	t.State = "stateIdle"
+	dur := time.Now().Sub(t.StartedAt)
+	t.Duration = t.Duration - dur
+	logrus.Info("timer paused with ", t.Duration, " left")
+	return true
+}
+
+// Stop make a timer stop
+func (t *Timer) Stop() bool {
+	if t.State != "stateActive" {
+		return false
+	}
+	t.StartedAt = time.Now()
+	t.State = "stateExpired"
+	t.T.Stop()
+	logrus.Info("timer stopped")
+	return true
 }
 
 // Rule is a struct that describes how action flow is handled in the escape room.
@@ -81,6 +106,7 @@ type Rule struct {
 // InstructionSender is an interface needed for preventing cyclic imports
 type InstructionSender interface {
 	SendInstruction(string, []ComponentInstruction)
+	SetTimer(string, ComponentInstruction)
 	HandleEvent(string)
 }
 
@@ -315,7 +341,12 @@ func (constraint Constraint) Resolve(condition Condition, config WorkingConfig) 
 			return compare(rule.Executed, constraint.Value, constraint.Comparison)
 		}
 	case "timer": //todo timer
-		panic(fmt.Sprintf("cannot resolve constraint %v because condition.type is an timer type, which is not implemented yet", constraint))
+		{
+			timer := config.Timers[condition.TypeID]
+			return compare(timer.Finish, constraint.Value, constraint.Comparison)
+			panic(fmt.Sprintf("cannot resolve constraint %v because condition.type is an timer type, which is not implemented yet", constraint))
+
+		}
 	default:
 		panic(fmt.Sprintf("cannot resolve constraint %v because condition.type is an unknown type, this should already be checked when reading in the JSON", constraint))
 	}

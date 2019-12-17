@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"reflect"
+	"time"
 )
 
 // ReadFile reads filename and call readJSON on contents.
@@ -45,6 +46,13 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, error) {
 	for _, readDevice := range readConfig.Devices {
 		config.Devices[readDevice.ID] = &(Device{readDevice.ID, readDevice.Description, readDevice.Input,
 			readDevice.Output, make(map[string]interface{}), false})
+	}
+	config.Timers = make(map[string]*Timer)
+	for _, readTimer := range readConfig.Timers {
+		duration, ok := time.ParseDuration(readTimer.Duration)
+		if ok == nil {
+			config.Timers[readTimer.ID] = newTimer(readTimer.ID, duration)
+		}
 	}
 	config.StatusMap = generateStatusMap(&config)
 	config.RuleMap = generateRuleMap(&config)

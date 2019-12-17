@@ -2,14 +2,15 @@ package config
 
 // ReadConfig specifies all configuration elements of an escape room.
 type ReadConfig struct {
-	General       ReadGeneral        `json:"general"`
+	General       General            `json:"general"`
 	Devices       []ReadDevice       `json:"devices"`
+	Timers        []ReadTimer        `json:"timers"`
 	Puzzles       []ReadPuzzle       `json:"puzzles"`
 	GeneralEvents []ReadGeneralEvent `json:"general_events"`
 }
 
 // General is a struct that describes the configurations of an escape room.
-type ReadGeneral struct {
+type General struct {
 	Name     string `json:"name"`
 	Duration string `json:"duration"`
 	Host     string `json:"host"`
@@ -22,6 +23,12 @@ type ReadDevice struct {
 	Description string                  `json:"description"`
 	Input       map[string]string       `json:"input"`
 	Output      map[string]OutputObject `json:"output"`
+}
+
+// ReadTimer is a struct that describes time and id of timers
+type ReadTimer struct {
+	ID       string `json:"id"`
+	Duration string `json:"duration"`
 }
 
 // ReadPuzzle is a struct that describes contents of a puzzle.
@@ -104,6 +111,9 @@ func (action Action) Execute(handler InstructionSender) {
 			handler.SendInstruction(action.TypeID, action.Message)
 		}
 	case "timer": // todo implement timer
+		{
+			handler.SetTimer(action.TypeID, action.Message[0])
+		}
 	}
 }
 

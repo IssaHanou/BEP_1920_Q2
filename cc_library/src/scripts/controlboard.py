@@ -172,6 +172,10 @@ class ControlBoard(Device):
         time.sleep(interval)
         GPIO.output(led, GPIO.LOW)
         time.sleep(interval)
+        GPIO.output(led, GPIO.HIGH)
+        time.sleep(interval)
+        GPIO.output(led, GPIO.LOW)
+        time.sleep(interval)
 
     def turn_on_off(self, component, arg):
 
