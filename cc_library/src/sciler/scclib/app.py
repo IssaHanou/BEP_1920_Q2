@@ -99,10 +99,6 @@ class SccLib:
         try:
             self.client.connect(self.host, self.port, keepalive=10)
             self.logger.log("connected to broker")
-            for label in self.labels:
-                self.__subscribe_topic(label)
-            self.__subscribe_topic("client-computers")
-            self.__subscribe_topic(self.name)
         except ConnectionRefusedError:
             self.logger.log("ERROR: connection was refused")
         except TimeoutError:
@@ -119,7 +115,10 @@ class SccLib:
         """
         if rc == 0:
             client.connected_flag = True  # set flag
-            self.logger.log("connected OK")
+            for label in self.labels:
+                self.__subscribe_topic(label)
+            self.__subscribe_topic("client-computers")
+            self.__subscribe_topic(self.name)
             msg_dict = {
                 "device_id": self.name,
                 "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
@@ -128,6 +127,7 @@ class SccLib:
             }
             msg = json.dumps(msg_dict)
             self.__send_message("back-end", msg)
+            self.logger.log("connected OK")
         else:
             self.logger.log(("bad connection, returned code=", rc))
             client.bad_connection_flag = True
