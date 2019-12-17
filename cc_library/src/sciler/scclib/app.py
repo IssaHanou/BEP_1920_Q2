@@ -1,9 +1,8 @@
 from datetime import datetime
+import os
 import json
-
 import paho.mqtt.client as mqtt
-
-from cc_library.src.sciler.scclib.logger import Logger
+import logging
 
 
 class SccLib:
@@ -22,8 +21,16 @@ class SccLib:
         self.host = self.config.get("host")
         self.port = self.config.get("port")
         self.labels = self.config.get("labels")
-        self.logger = Logger()
-        self.logger.log("Start of log for device: " + self.name)
+        if not os.path.exists("logs"):
+            os.mkdir("logs")
+        filename = (
+                "logs/log-"
+                + datetime.now().strftime("%d-%m-%YT--%H-%M-%S")
+                + ".txt"
+        )
+        logging.basicConfig(level=logging.INFO)
+        msg = "Start of log for device: " + self.name
+        logging.info(msg=msg)
 
         self.client = mqtt.Client(self.name)
         self.client.on_message = self.__on_message
@@ -44,7 +51,9 @@ class SccLib:
         MQTT Client method.
         Broker logger that logs everything happening with the mqtt client.
         """
-        print(self.name, ", broker log: ", buf)
+
+        msg = self.name, ", broker log: ", level, ", ", buf
+        logging.info(msg)
 
     def start(self, loop=None, stop=None):
         """
@@ -58,7 +67,7 @@ class SccLib:
             else:
                 self.client.loop_forever()
         except KeyboardInterrupt:
-            self.logger.log("program was terminated from keyboard input")
+            logging.info("program was terminated from keyboard input")
         finally:
             if stop:
                 stop()
@@ -78,15 +87,14 @@ class SccLib:
         }
         msg = json.dumps(msg_dict)
         self.__send_message("back-end", msg)
-        self.logger.log("cleanly exited ControlBoard program and client")
+        logging.info("cleanly exited ControlBoard program and client")
         self.client.disconnect()
-        self.logger.close()
 
     def __send_message(self, topic, json_message):
         # TODO what to do when publish fails
         self.client.publish(topic, json_message, 1)
         message_type = topic + " message published"
-        self.logger.log((message_type, json_message))
+        logging.info((message_type, json_message))
 
     def __connect(self):
         """
@@ -98,11 +106,11 @@ class SccLib:
         """
         try:
             self.client.connect(self.host, self.port, keepalive=10)
-            self.logger.log("connected to broker")
+            logging.info("connected to broker")
         except ConnectionRefusedError:
-            self.logger.log("ERROR: connection was refused")
+            logging.error("ERROR: connection was refused")
         except TimeoutError:
-            self.logger.log("ERROR: connecting failed, socket timed out")
+            logging.error("ERROR: connecting failed, socket timed out")
 
     def __on_connect(self, client, userdata, flags, rc):
         """
@@ -128,9 +136,9 @@ class SccLib:
             msg = json.dumps(msg_dict)
             self.__send_message("back-end", msg)
             self.status_changed()
-            self.logger.log("connected OK")
+            logging.info("connected OK")
         else:
-            self.logger.log(("bad connection, returned code=", rc))
+            logging.error(("bad connection, returned code=", rc))
             client.bad_connection_flag = True
 
     def __on_disconnect(self, client, userdata, rc):
@@ -146,7 +154,7 @@ class SccLib:
         }
         msg = json.dumps(msg_dict)
         self.__send_message("back-end", msg)
-        self.logger.log(("disconnecting, reason  " + str(rc)))
+        logging.info(("disconnecting, reason  " + str(rc)))
         client.connected_flag = False
         client.disconnect_flag = True
 
@@ -178,7 +186,7 @@ class SccLib:
          a message from the broken for a subscribed topic.
         The message is printed and send through to the handler.
         """
-        self.logger.log(
+        logging.info(
             (
                 "message received: topic",
                 message.topic,
@@ -197,7 +205,7 @@ class SccLib:
         message = message.payload.decode("utf-8")
         message = json.loads(message)
         if message.get("type") != "instruction":
-            self.logger.log(
+            logging.info(
                 ("received non-instruction message of type", message.get("type"))
             )
         else:
@@ -216,7 +224,7 @@ class SccLib:
             instruction = action.get("instruction")
             if instruction == "test":
                 self.device.test()
-                self.logger.log(("instruction performed", action))
+                logging.info(("instruction performed", action))
                 return True
             if instruction == "status update":
                 msg_dict = {
@@ -228,13 +236,13 @@ class SccLib:
                 msg = json.dumps(msg_dict)
                 self.__send_message("back-end", msg)
                 self.status_changed()
-                self.logger.log(("instruction performed", action))
+                logging.info(("instruction performed", action))
             else:
                 (success, failed_action) = self.device.perform_instruction(action)
                 if success:
-                    self.logger.log(("instruction performed", action))
+                    logging.info(("instruction performed", action))
                 else:
-                    self.logger.log(
+                    logging.info(
                         (
                             "instruction: " + failed_action + " could not be performed",
                             action,
@@ -249,4 +257,4 @@ class SccLib:
         sciler system wants to receive from the broker.
         """
         self.client.subscribe(topic=topic)
-        self.logger.log(("subscribed to topic", topic))
+        logging.info(("subscribed to topic", topic))
