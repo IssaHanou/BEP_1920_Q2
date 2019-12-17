@@ -97,7 +97,7 @@
     },
     {
       "id": "timer2",
-      "duration": "50s"
+      "duration": "5s"
     },
     {
       "id": "timer3",
@@ -471,18 +471,8 @@
                 {
                   "component_id": "greenLight1",
                   "instruction": "turnOnOff",
-                  "value": false
-                },
-                {
-                  "component_id": "greenLight1",
-                  "instruction": "turnOnOff",
                   "value": true,
                   "delay": "0:00:05"
-                },
-                {
-                  "component_id": "redLight1",
-                  "instruction": "turnOnOff",
-                  "value": false
                 },
                 {
                   "component_id": "redLight1",
@@ -513,7 +503,7 @@
                 "type": "rule",
                 "type_id": "groen",
                 "constraints": {
-                  "comparison": "gte",
+                  "comparison": "eq",
                   "value": 0
                 }
               }
@@ -551,7 +541,7 @@
       "rules": [
         {
           "id": "hint",
-          "description": "50 seconde na de start wordt er een hint verstuurd",
+          "description": "5 seconde na de start wordt er een hint verstuurd",
           "limit": 1,
           "conditions": {
             "type": "timer",
@@ -569,7 +559,7 @@
                 {
                   "component_id": "hint",
                   "instruction": "hint",
-                  "value": "na 50 seconde hint"
+                  "value": "na 5 seconde hint"
                 }
               ]
             }

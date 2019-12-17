@@ -43,9 +43,6 @@ func main() {
 		messageHandler.SendStatus(value.ID)
 		messageHandler.GetStatus(value.ID)
 	}
-	for _, value := range configurations.Timers {
-		logrus.Info(configurations.Timers[value.ID].Duration)
-	}
 	// prevent exit
 	select {}
 }

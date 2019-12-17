@@ -338,7 +338,7 @@ func (handler *Handler) GetStatus(deviceID string) {
 
 // SetTimer starts given timer
 func (handler *Handler) SetTimer(timerID string, instructions config.ComponentInstruction) {
-	switch instructions.Value {
+	switch instructions.Instruction {
 	case "start":
 		handler.Config.Timers[timerID].Start(handler)
 	case "pause":
@@ -347,6 +347,8 @@ func (handler *Handler) SetTimer(timerID string, instructions config.ComponentIn
 	case "subtract": // TODO: implement timer subtract
 	case "stop":
 		handler.Config.Timers[timerID].Stop()
+	default:
+		logrus.Warn("error occurred while reading timer instruction message: %v", instructions.Instruction)
 	}
 
 }

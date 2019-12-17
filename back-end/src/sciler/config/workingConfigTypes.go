@@ -34,23 +34,12 @@ func newTimer(id string, d time.Duration) *Timer {
 	t.ID = id
 	t.Duration = d
 	t.Finish = false
+	t.State = "stateIdle"
 	t.Ending = func() {
 		t.State = "stateExpired"
 		t.Finish = true
 	}
 	return t
-}
-
-// AfterFunc does func after time
-func AfterFunc(d time.Duration, handler InstructionSender) *time.Timer {
-	t := new(Timer)
-	t.Duration = d
-	t.Ending = func() {
-		t.State = "stateExpired"
-		t.Finish = true
-		handler.HandleEvent(t.ID)
-	}
-	return time.AfterFunc(t.Duration, t.Ending)
 }
 
 // Start starts Timer that will send the current time on its channel after at least duration d.
@@ -60,7 +49,13 @@ func (t *Timer) Start(handler InstructionSender) bool {
 	}
 	t.StartedAt = time.Now()
 	t.State = "stateActive"
-	t.T = AfterFunc(t.Duration, handler)
+	t.Ending = func() {
+		t.State = "stateExpired"
+		t.Finish = true
+		logrus.Info("timer finished", t.ID)
+		handler.HandleEvent(t.ID)
+	}
+	t.T = time.AfterFunc(t.Duration, t.Ending)
 	logrus.Info("timer started for ", t.Duration)
 	return true
 }
@@ -340,11 +335,10 @@ func (constraint Constraint) Resolve(condition Condition, config WorkingConfig) 
 			rule := config.RuleMap[condition.TypeID]
 			return compare(rule.Executed, constraint.Value, constraint.Comparison)
 		}
-	case "timer": //todo timer
+	case "timer":
 		{
 			timer := config.Timers[condition.TypeID]
 			return compare(timer.Finish, constraint.Value, constraint.Comparison)
-			panic(fmt.Sprintf("cannot resolve constraint %v because condition.type is an timer type, which is not implemented yet", constraint))
 
 		}
 	default:

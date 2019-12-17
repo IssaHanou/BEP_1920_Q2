@@ -143,6 +143,8 @@ func checkActions(actions []Action, config WorkingConfig) error {
 				}
 			}
 		case "timer":
+			return nil // TODO: implement checkActions for timer
+
 		default:
 			return fmt.Errorf("only device and timer are accepted as type for an action, however type was specified as: %s", action.Type)
 		}
