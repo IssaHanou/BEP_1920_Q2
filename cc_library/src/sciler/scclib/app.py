@@ -149,7 +149,7 @@ class SccLib:
         client.disconnect_flag = True
         self.logger.close()
 
-    def status_changed(self, *args):
+    def status_changed(self):
         """
         This is called from the client computer to message a status update.
         """

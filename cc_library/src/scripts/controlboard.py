@@ -195,60 +195,64 @@ class ControlBoard(Device):
                 GPIO.output(self.greenLEDs[i], GPIO.LOW)
                 time.sleep(0.2)
 
+    def __status_update(self, channel):
+        self.status_changed()
+
     def setup_events(self):
+
         GPIO.add_event_detect(
             device.redSwitch,
             GPIO.BOTH,
-            callback=self.status_changed,
+            callback=self.__status_update,
             bouncetime=100,
         )
         GPIO.add_event_detect(
             device.orangeSwitch,
             GPIO.BOTH,
-            callback=self.status_changed,
+            callback=self.__status_update,
             bouncetime=100,
         )
         GPIO.add_event_detect(
             device.greenSwitch,
             GPIO.BOTH,
-            callback=self.status_changed,
+            callback=self.__status_update,
             bouncetime=100,
         )
         GPIO.add_event_detect(
             device.mainSwitch,
             GPIO.BOTH,
-            callback=self.status_changed,
+            callback=self.__status_update,
             bouncetime=100,
         )
         GPIO.add_event_detect(
             device.a_pin0,
             GPIO.BOTH,
-            callback=self.status_changed
+            callback=self.__status_update,
         )
         GPIO.add_event_detect(
             device.a_pin1,
             GPIO.BOTH,
-            callback=self.status_changed
+            callback=self.__status_update,
         )
         GPIO.add_event_detect(
             device.a_pin2,
             GPIO.BOTH,
-            callback=self.status_changed
+            callback=self.__status_update,
         )
         GPIO.add_event_detect(
             device.b_pin0,
             GPIO.BOTH,
-            callback=self.status_changed
+            callback=self.__status_update,
         )
         GPIO.add_event_detect(
             device.b_pin1,
             GPIO.BOTH,
-            callback=self.status_changed
+            callback=self.__status_update,
         )
         GPIO.add_event_detect(
             device.b_pin2,
             GPIO.BOTH,
-            callback=self.status_changed
+            callback=self.__status_update,
         )
 
     def reset(self):
