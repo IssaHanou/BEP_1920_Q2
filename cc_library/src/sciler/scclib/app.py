@@ -80,6 +80,7 @@ class SccLib:
         self.__send_message("back-end", msg)
         self.logger.log("cleanly exited ControlBoard program and client")
         self.client.disconnect()
+        self.logger.close()
 
     def __send_message(self, topic, json_message):
         # TODO what to do when publish fails
@@ -147,7 +148,6 @@ class SccLib:
         self.logger.log(("disconnecting, reason  " + str(rc)))
         client.connected_flag = False
         client.disconnect_flag = True
-        self.logger.close()
 
     def status_changed(self):
         """
