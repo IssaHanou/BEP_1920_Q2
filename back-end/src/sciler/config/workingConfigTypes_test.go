@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 func TestGeneralEvent_GetName(t *testing.T) {
@@ -331,11 +332,7 @@ func Test_ResolveDeviceTrue(t *testing.T) {
 func Test_ResolveTimer(t *testing.T) {
 	filename := "../../../resources/testing/test_config.json"
 	config := ReadFile(filename)
-	assert.PanicsWithValue(t,
-		"cannot resolve constraint {eq  00:01:01} because condition.type is an timer type, which is not implemented yet",
-		func() { config.GeneralEvents[0].GetRules()[0].Conditions.Resolve(config) },
-		"Timers are not supported yet")
-
+	assert.Equal(t, config.Timers["general"].Duration, time.Minute*30)
 }
 
 func Test_CheckRuleValue(t *testing.T) {

@@ -145,6 +145,14 @@
                     }
                   ]
                 }
+              },
+              {
+                "type": "rule",
+                "type_id": "start",
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                }
               }
             ]
           },
@@ -215,6 +223,14 @@
                       "value": 50
                     }
                   ]
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "start",
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
                 }
               }
             ]
@@ -290,6 +306,14 @@
                   "comparison": "gte",
                   "value": 1
                 }
+              },
+              {
+                "type": "rule",
+                "type_id": "start",
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                }
               }
             ]
           },
@@ -336,7 +360,7 @@
         {
           "id": "start",
           "description": "Als het spel start, moeten alle rode leds aan gaan en de groene uit",
-          "limit": 1,
+          "limit": 3,
           "conditions": {
             "operator": "OR",
             "list": [
@@ -346,11 +370,6 @@
                 "constraints": {
                   "operator": "OR",
                   "list": [
-                    {
-                      "component_id": "mainSwitch",
-                      "comparison": "eq",
-                      "value": true
-                    },
                     {
                       "component_id": "mainSwitch",
                       "comparison": "eq",
@@ -413,131 +432,6 @@
               "message": [
                 {
                   "instruction": "start"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Spooky lights",
-      "rules": [
-        {
-          "id": "Spooky lights",
-          "description": "10 seconde na puzzle rood moet het licht uit gaan en 5 seconde later 1 spotlight aan als puzzle groen nog niet opgelost is",
-          "limit": 1,
-          "conditions": {
-            "type": "rule",
-            "type_id": "rood",
-            "constraints": {
-              "comparison": "gte",
-              "value": 1
-            }
-          },
-          "actions": [
-            {
-              "type": "timer",
-              "type_id": "timer1",
-              "message": [
-                {
-                  "instruction": "start"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "No Spooky lights",
-          "description": "10 seconde na puzzle rood moet het licht aan gaan als groen opgelost is",
-          "limit": 1,
-          "conditions": {
-            "operator": "AND",
-            "list": [
-              {
-                "type": "timer",
-                "type_id": "timer1",
-                "constraints": {
-                  "comparison": "eq",
-                  "value": true
-                }
-              },
-              {
-                "type": "rule",
-                "type_id": "groen",
-                "constraints": {
-                  "comparison": "gte",
-                  "value": 1
-                }
-              }
-            ]
-          },
-          "actions": [
-            {
-              "type": "device",
-              "type_id": "controlBoard",
-              "message": [
-                {
-                  "component_id": "greenLight1",
-                  "instruction": "turnOnOff",
-                  "value": true,
-                  "delay": "0:00:05"
-                },
-                {
-                  "component_id": "redLight1",
-                  "instruction": "turnOnOff",
-                  "value": true,
-                  "delay": "0:00:05"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "No Spooky lights",
-          "description": "10 seconde na puzzle rood moet het licht aan gaan als groen opgelost is",
-          "limit": 1,
-          "conditions": {
-            "operator": "AND",
-            "list": [
-              {
-                "type": "timer",
-                "type_id": "timer1",
-                "constraints": {
-                  "comparison": "eq",
-                  "value": true
-                }
-              },
-              {
-                "type": "rule",
-                "type_id": "groen",
-                "constraints": {
-                  "comparison": "eq",
-                  "value": 0
-                }
-              }
-            ]
-          },
-          "actions": [
-            {
-              "type": "device",
-              "type_id": "controlBoard",
-              "message": [
-                {
-                  "component_id": "greenLight1",
-                  "instruction": "blink",
-                  "value": [
-                    1,
-                    0
-                  ]
-                },
-                {
-                  "component_id": "redLight1",
-                  "instruction": "blink",
-                  "value": [
-                    1,
-                    0
-                  ]
                 }
               ]
             }
@@ -636,6 +530,103 @@
                   "component_id": "greenLight3",
                   "instruction": "turnOnOff",
                   "value": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stop Done",
+      "rules": [
+        {
+          "id": "Puzzles done",
+          "description": "Puzzles zijn opgelost dus time stop",
+          "limit": 1,
+          "conditions": {
+            "operator": "AND",
+            "list": [
+              {
+                "type": "rule",
+                "type_id": "rood",
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "groen",
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "oranje",
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "display",
+              "message": [
+                {
+                  "component_id": "hint",
+                  "instruction": "hint",
+                  "value": "Puzzle opgelost!"
+                }
+              ]
+            },
+            {
+              "type": "device",
+              "type_id": "controlBoard",
+              "message": [
+                {
+                  "component_id": "redLight1",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "redLight2",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "redLight3",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "greenLight2",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "greenLight3",
+                  "instruction": "turnOnOff",
+                  "value": true
+                }
+              ]
+            },
+            {
+              "type": "timer",
+              "type_id": "general",
+              "message": [
+                {
+                  "instruction": "pause"
                 }
               ]
             }

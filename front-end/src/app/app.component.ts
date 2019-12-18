@@ -5,7 +5,6 @@ import { JsonConvert } from "json2typescript";
 import { MatSnackBar, MatSnackBarConfig } from "@angular/material";
 import { Subscription } from "rxjs";
 import { Devices } from "./components/device/devices";
-import * as moment from "moment";
 
 
 @Component({
@@ -27,7 +26,7 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
     this.jsonConvert = new JsonConvert();
     this.deviceList = new Devices();
-    this.remainingTime = 80000;
+    this.remainingTime = 0;
     this.timeState = "stateIdle";
   }
 
@@ -125,6 +124,10 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Timers send their status to the front-end but we only care about the general time.
+   * @param jsonData with id, status and state
+   */
   public processTimeStatus(jsonData) {
     if (jsonData.id === "general") {
       const timeleft = jsonData.status;

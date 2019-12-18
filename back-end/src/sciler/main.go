@@ -39,6 +39,9 @@ func main() {
 	messageHandler := handler.Handler{Config: configurations, Communicator: communicator}
 	go communicator.Start(messageHandler.NewHandler)
 
+	//Set up front-end
+	time.Sleep(5 * time.Second)
+	messageHandler.SendStatus("general")
 	for _, value := range messageHandler.Config.Devices {
 		messageHandler.SendStatus(value.ID)
 		messageHandler.GetStatus(value.ID)

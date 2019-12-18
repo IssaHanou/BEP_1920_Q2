@@ -45,8 +45,13 @@ func newTimer(id string, d time.Duration) *Timer {
 
 // GetTimeLeft gets time left of timer
 func (t *Timer) GetTimeLeft() (time.Duration, string) {
-	dif := time.Now().Sub(t.StartedAt)
-	left := t.Duration - dif
+	left := 0 * time.Second
+	if t.State == "stateActive" {
+		dif := time.Now().Sub(t.StartedAt)
+		left = t.Duration - dif
+	} else {
+		left = t.Duration
+	}
 	return left, t.State
 }
 
