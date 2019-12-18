@@ -145,11 +145,29 @@ func checkActions(actions []Action, config WorkingConfig) error {
 				}
 			}
 		case "timer":
-			return nil // TODO: implement checkActions for timer
+			if err := checkActionTimer(action, config); err != nil {
+				return err
+			}
 
 		default:
 			return fmt.Errorf("only device and timer are accepted as type for an action, however type was specified as: %s", action.Type)
 		}
+	}
+	return nil
+}
+
+func checkActionTimer(action Action, config WorkingConfig) error {
+	if _, ok := config.Timers[action.TypeID]; ok { // checks if timer can be found in the map, if so, it is stored in variable device
+		for _, actionMessage := range action.Message {
+			if actionMessage.Instruction == "add" || actionMessage.Instruction == "subtract" {
+				valueType := reflect.TypeOf(actionMessage.Value).Kind()
+				if valueType != reflect.String {
+					return fmt.Errorf("input type string expected but %s found as type of value %v", valueType.String(), actionMessage.Value)
+				}
+			}
+		}
+	} else {
+		return fmt.Errorf("timer with id %s not found in map", action.TypeID)
 	}
 	return nil
 }
