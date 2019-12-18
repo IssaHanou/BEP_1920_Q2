@@ -310,7 +310,7 @@
                   "list": [
                     {
                       "comparison": "eq",
-                      "value": true
+                      "value": false
                     }
                   ]
                 }

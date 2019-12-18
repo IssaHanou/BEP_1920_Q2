@@ -458,6 +458,12 @@ func Test_ResolveTimerTrue(t *testing.T) {
 	assert.True(t, config.GeneralEvents[0].GetRules()[0].Conditions.Resolve(config))
 }
 
+func Test_ResolveTimerFalse(t *testing.T) {
+	filename := "../../../resources/testing/test_resolveFalse.json"
+	config := ReadFile(filename)
+	assert.True(t, config.GeneralEvents[0].GetRules()[0].Conditions.Resolve(config))
+}
+
 func Test_ReadTimer(t *testing.T) {
 	filename := "../../../resources/testing/test_config.json"
 	config := ReadFile(filename)
