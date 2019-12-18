@@ -56,7 +56,7 @@ func TestTimer_GetTimeLeft_Active(t *testing.T) {
 	}
 	timer.Start(nil)
 	left, state := timer.GetTimeLeft()
-	assert.Equal(t, left, timer.Duration-time.Now().Sub(timer.StartedAt))
+	assert.Equal(t, left.Seconds(), (timer.Duration - time.Now().Sub(timer.StartedAt)).Seconds())
 	assert.Equal(t, state, "stateActive")
 }
 

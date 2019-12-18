@@ -362,7 +362,7 @@ func (handler *Handler) SetTimer(timerID string, instructions config.ComponentIn
 	case "stop":
 		handler.Config.Timers[timerID].Stop()
 	default:
-		logrus.Warn("error occurred while reading timer instruction message: %v", instructions.Instruction)
+		logrus.Warnf("error occurred while reading timer instruction message: %v", instructions.Instruction)
 	}
 	handler.SendStatus(timerID)
 
