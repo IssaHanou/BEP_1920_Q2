@@ -314,7 +314,19 @@ func (constraint Constraint) checkConstraints(condition Condition, config Workin
 			}
 		}
 	case "timer":
-		return nil // todo timer
+		if _, ok := config.Timers[condition.TypeID]; ok {
+			valueType := reflect.TypeOf(constraint.Value).Kind()
+			comparision := constraint.Comparison
+			if valueType != reflect.Bool {
+				return fmt.Errorf("input type boolean expected but %s found as type of value %v", valueType.String(), constraint.Value)
+			}
+			if comparision != "eq" {
+				return fmt.Errorf("comparision %s not allowed on a boolean", comparision)
+			}
+
+		} else {
+			return fmt.Errorf("timer with id %s not found in map", condition.TypeID)
+		}
 	case "rule":
 		if _, ok := config.RuleMap[condition.TypeID]; ok { // checks if rule can be found in the map, if so, it is stored in variable device
 			valueType := reflect.TypeOf(constraint.Value).Kind()

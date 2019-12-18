@@ -64,6 +64,32 @@
       }
     }
   ],
+  "timers": [
+    {
+      "id": "timer1",
+      "duration": "10s"
+    },
+    {
+      "id": "timer2",
+      "duration": "5s"
+    },
+    {
+      "id": "timer3",
+      "duration": "1m"
+    },
+    {
+      "id": "timer4",
+      "duration": "1h"
+    },
+    {
+      "id": "timer5",
+      "duration": "20s"
+    },
+    {
+      "id": "timer6",
+      "duration": "5s"
+    }
+  ],
   "puzzles": [],
   "general_events": [
     {
