@@ -14,9 +14,7 @@ class Display(Device):
         self.hint = ""
 
     def get_status(self):
-        return {
-            'hint': self.hint
-        }
+        return {"hint": self.hint}
 
     def perform_instruction(self, action):
         instruction = action.get("instruction")
