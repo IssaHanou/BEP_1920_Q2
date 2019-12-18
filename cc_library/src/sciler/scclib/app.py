@@ -23,12 +23,12 @@ class SccLib:
         self.labels = self.config.get("labels")
         if not os.path.exists("logs"):
             os.mkdir("logs")
-        filename = (
-                "logs/log-"
-                + datetime.now().strftime("%d-%m-%YT--%H-%M-%S")
-                + ".txt"
+        filename = "logs/log-" + datetime.now().strftime("%d-%m-%YT--%H-%M-%S") + ".txt"
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(asctime)s [%(levelname)-5.5s]  %(message)s",
+            handlers=[logging.FileHandler(filename=filename), logging.StreamHandler()],
         )
-        logging.basicConfig(level=logging.INFO)
         msg = "Start of log for device: " + self.name
         logging.info(msg=msg)
 
@@ -89,6 +89,7 @@ class SccLib:
         self.__send_message("back-end", msg)
         logging.info("cleanly exited ControlBoard program and client")
         self.client.disconnect()
+        logging.shutdown()
 
     def __send_message(self, topic, json_message):
         # TODO what to do when publish fails
@@ -108,9 +109,9 @@ class SccLib:
             self.client.connect(self.host, self.port, keepalive=10)
             logging.info("connected to broker")
         except ConnectionRefusedError:
-            logging.error("ERROR: connection was refused")
+            logging.error("connection was refused")
         except TimeoutError:
-            logging.error("ERROR: connecting failed, socket timed out")
+            logging.error("connecting failed, socket timed out")
 
     def __on_connect(self, client, userdata, flags, rc):
         """
