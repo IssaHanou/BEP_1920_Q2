@@ -95,19 +95,19 @@ class ControlBoard(Device):
         Return status of switches, LEDs and sliders of device.
         """
         return {
-            'redSwitch': self.status_binair_to_bool(GPIO.input(self.redSwitch)),
-            'orangeSwitch': self.status_binair_to_bool(GPIO.input(self.orangeSwitch)),
-            'greenSwitch': self.status_binair_to_bool(GPIO.input(self.greenSwitch)),
-            'mainSwitch': self.status_binair_to_bool(GPIO.input(self.mainSwitch)),
-            'greenLight1': self.status_binair_to_sting(GPIO.input(self.greenLight1)),
-            'greenLight2': self.status_binair_to_sting(GPIO.input(self.greenLight2)),
-            'greenLight3': self.status_binair_to_sting(GPIO.input(self.greenLight3)),
-            'redLight1': self.status_binair_to_sting(GPIO.input(self.redLight1)),
-            'redLight2': self.status_binair_to_sting(GPIO.input(self.redLight2)),
-            'redLight3': self.status_binair_to_sting(GPIO.input(self.redLight3)),
-            'slider1': self.get_sliders_analog_reading()[0],
-            'slider2': self.get_sliders_analog_reading()[1],
-            'slider3': self.get_sliders_analog_reading()[2]
+            "redSwitch": self.status_binair_to_bool(GPIO.input(self.redSwitch)),
+            "orangeSwitch": self.status_binair_to_bool(GPIO.input(self.orangeSwitch)),
+            "greenSwitch": self.status_binair_to_bool(GPIO.input(self.greenSwitch)),
+            "mainSwitch": self.status_binair_to_bool(GPIO.input(self.mainSwitch)),
+            "greenLight1": self.status_binair_to_sting(GPIO.input(self.greenLight1)),
+            "greenLight2": self.status_binair_to_sting(GPIO.input(self.greenLight2)),
+            "greenLight3": self.status_binair_to_sting(GPIO.input(self.greenLight3)),
+            "redLight1": self.status_binair_to_sting(GPIO.input(self.redLight1)),
+            "redLight2": self.status_binair_to_sting(GPIO.input(self.redLight2)),
+            "redLight3": self.status_binair_to_sting(GPIO.input(self.redLight3)),
+            "slider1": self.get_sliders_analog_reading()[0],
+            "slider2": self.get_sliders_analog_reading()[1],
+            "slider3": self.get_sliders_analog_reading()[2],
         }
 
     def perform_instruction(self, action):
