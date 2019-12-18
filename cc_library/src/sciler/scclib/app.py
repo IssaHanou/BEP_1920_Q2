@@ -55,6 +55,9 @@ class SccLib:
         msg = self.name, ", broker log: ", level, ", ", buf
         logging.info(msg)
 
+    def log(self, level, msg):
+        logging.log(level=level, msg=msg)
+
     def start(self, loop=None, stop=None):
         """
         Starting method to call from the starting script.

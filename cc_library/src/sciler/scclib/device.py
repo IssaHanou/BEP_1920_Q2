@@ -1,3 +1,4 @@
+import logging
 from abc import ABC, abstractmethod
 from cc_library.src.sciler.scclib.app import SccLib
 
@@ -51,6 +52,9 @@ class Device(ABC):
 
     def start(self, loop=None, stop=None):
         self.scclib.start(loop, stop)
+
+    def log(self, msg, level=logging.INFO):
+        self.scclib.log(level, msg)
 
     @abstractmethod
     def main(self):
