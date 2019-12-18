@@ -6,7 +6,6 @@ import { MatSnackBar, MatSnackBarConfig } from "@angular/material";
 import { Subscription } from "rxjs";
 import { Devices } from "./components/device/devices";
 
-
 @Component({
   selector: "app-root",
   templateUrl: "./app.component.html",
