@@ -4,6 +4,7 @@ package config
 type ReadConfig struct {
 	General       General            `json:"general"`
 	Devices       []ReadDevice       `json:"devices"`
+	Timers        []ReadTimer        `json:"timers"`
 	Puzzles       []ReadPuzzle       `json:"puzzles"`
 	GeneralEvents []ReadGeneralEvent `json:"general_events"`
 }
@@ -22,6 +23,12 @@ type ReadDevice struct {
 	Description string                  `json:"description"`
 	Input       map[string]string       `json:"input"`
 	Output      map[string]OutputObject `json:"output"`
+}
+
+// ReadTimer is a struct that describes time and id of timers
+type ReadTimer struct {
+	ID       string `json:"id"`
+	Duration string `json:"duration"`
 }
 
 // ReadPuzzle is a struct that describes contents of a puzzle.
@@ -103,7 +110,10 @@ func (action Action) Execute(handler InstructionSender) {
 		{
 			handler.SendInstruction(action.TypeID, action.Message)
 		}
-	case "timer": // todo implement timer
+	case "timer":
+		{
+			handler.SetTimer(action.TypeID, action.Message[0])
+		}
 	}
 }
 

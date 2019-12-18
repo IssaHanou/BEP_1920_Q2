@@ -205,17 +205,31 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 // SendStatus sends all status and connection data of a device to the front-end.
 // Information retrieved from config.
 func (handler *Handler) SendStatus(deviceID string) {
-	message := Message{
-		DeviceID: "back-end",
-		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "status",
-		Contents: map[string]interface{}{
-			"id":         handler.Config.Devices[deviceID].ID,
-			"status":     handler.Config.Devices[deviceID].Status,
-			"connection": handler.Config.Devices[deviceID].Connection,
-		},
+	var message Message
+	if _, ok := handler.Config.Devices[deviceID]; ok {
+		message = Message{
+			DeviceID: "back-end",
+			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+			Type:     "status",
+			Contents: map[string]interface{}{
+				"id":         handler.Config.Devices[deviceID].ID,
+				"status":     handler.Config.Devices[deviceID].Status,
+				"connection": handler.Config.Devices[deviceID].Connection,
+			},
+		}
+	} else if _, ok2 := handler.Config.Timers[deviceID]; ok2 {
+		status, _ := handler.Config.Timers[deviceID].GetTimeLeft()
+		message = Message{
+			DeviceID: "back-end",
+			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+			Type:     "time",
+			Contents: map[string]interface{}{
+				"id":     handler.Config.Timers[deviceID].ID,
+				"status": status.Milliseconds(),
+				"state":  handler.Config.Timers[deviceID].State,
+			},
+		}
 	}
-
 	jsonMessage, err := json.Marshal(&message)
 	if err != nil {
 		logrus.Errorf("error occurred while constructing message to publish: %v", err)
@@ -334,4 +348,22 @@ func (handler *Handler) GetStatus(deviceID string) {
 		logrus.Info("sending status request to client computer: ", deviceID, fmt.Sprint(message.Contents))
 		handler.Communicator.Publish(deviceID, string(jsonMessage), 3)
 	}
+}
+
+// SetTimer starts given timer
+func (handler *Handler) SetTimer(timerID string, instructions config.ComponentInstruction) {
+	switch instructions.Instruction {
+	case "start":
+		handler.Config.Timers[timerID].Start(handler)
+	case "pause":
+		handler.Config.Timers[timerID].Pause()
+	case "add": // TODO: implement timer Add
+	case "subtract": // TODO: implement timer subtract
+	case "stop":
+		handler.Config.Timers[timerID].Stop()
+	default:
+		logrus.Warnf("error occurred while reading timer instruction message: %v", instructions.Instruction)
+	}
+	handler.SendStatus(timerID)
+
 }

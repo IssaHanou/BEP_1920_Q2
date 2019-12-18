@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"reflect"
+	"time"
 )
 
 // ReadFile reads filename and call readJSON on contents.
@@ -37,6 +38,7 @@ func ReadJSON(input []byte) WorkingConfig {
 func generateDataStructures(readConfig ReadConfig) (WorkingConfig, error) {
 	var config WorkingConfig
 	// Copy information from read config to working config.
+
 	config.General = readConfig.General
 	config.Puzzles = generatePuzzles(readConfig.Puzzles, &config)
 	config.GeneralEvents = generateGeneralEvents(readConfig.GeneralEvents, &config)
@@ -45,6 +47,15 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, error) {
 		config.Devices[readDevice.ID] = &(Device{readDevice.ID, readDevice.Description, readDevice.Input,
 			readDevice.Output, make(map[string]interface{}), false})
 	}
+	config.Timers = make(map[string]*Timer)
+	for _, readTimer := range readConfig.Timers {
+		duration, ok := time.ParseDuration(readTimer.Duration)
+		if ok == nil {
+			config.Timers[readTimer.ID] = newTimer(readTimer.ID, duration)
+		}
+	}
+	duration, _ := time.ParseDuration(config.General.Duration)
+	config.Timers["general"] = newTimer("general", duration)
 	config.StatusMap = generateStatusMap(&config)
 	config.RuleMap = generateRuleMap(&config)
 
@@ -134,9 +145,29 @@ func checkActions(actions []Action, config WorkingConfig) error {
 				}
 			}
 		case "timer":
+			if err := checkActionTimer(action, config); err != nil {
+				return err
+			}
+
 		default:
 			return fmt.Errorf("only device and timer are accepted as type for an action, however type was specified as: %s", action.Type)
 		}
+	}
+	return nil
+}
+
+func checkActionTimer(action Action, config WorkingConfig) error {
+	if _, ok := config.Timers[action.TypeID]; ok { // checks if timer can be found in the map, if so, it is stored in variable device
+		for _, actionMessage := range action.Message {
+			if actionMessage.Instruction == "add" || actionMessage.Instruction == "subtract" {
+				valueType := reflect.TypeOf(actionMessage.Value).Kind()
+				if valueType != reflect.String {
+					return fmt.Errorf("input type string expected but %s found as type of value %v", valueType.String(), actionMessage.Value)
+				}
+			}
+		}
+	} else {
+		return fmt.Errorf("timer with id %s not found in map", action.TypeID)
 	}
 	return nil
 }

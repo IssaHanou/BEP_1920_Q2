@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"reflect"
+	"time"
 )
 
 // WorkingConfig has additional fields to ReadConfig, with lists of conditions, constraints and actions.
@@ -12,8 +13,92 @@ type WorkingConfig struct {
 	Puzzles       []*Puzzle
 	GeneralEvents []*GeneralEvent
 	Devices       map[string]*Device
+	Timers        map[string]*Timer
 	StatusMap     map[string][]*Rule
 	RuleMap       map[string]*Rule
+}
+
+// Timer is a timer in the escape game
+type Timer struct {
+	ID        string
+	Duration  time.Duration
+	StartedAt time.Time
+	T         *time.Timer
+	State     string
+	Ending    func()
+	Finish    bool
+}
+
+// newTimer create a new timer
+func newTimer(id string, d time.Duration) *Timer {
+	t := new(Timer)
+	t.ID = id
+	t.Duration = d
+	t.Finish = false
+	t.State = "stateIdle"
+	t.Ending = func() {
+		t.State = "stateExpired"
+		t.Finish = true
+	}
+	return t
+}
+
+// GetTimeLeft gets time left of timer
+func (t *Timer) GetTimeLeft() (time.Duration, string) {
+	left := 0 * time.Second
+	if t.State == "stateActive" {
+		dif := time.Now().Sub(t.StartedAt)
+		left = t.Duration - dif
+	} else {
+		left = t.Duration
+	}
+	return left, t.State
+}
+
+// Start starts Timer that will send the current time on its channel after at least duration d.
+func (t *Timer) Start(handler InstructionSender) bool {
+	if t.State != "stateIdle" {
+		return false
+	}
+	t.StartedAt = time.Now()
+	t.State = "stateActive"
+	t.Ending = func() {
+		t.State = "stateExpired"
+		t.Finish = true
+		logrus.Info("timer finished", t.ID)
+		handler.HandleEvent(t.ID)
+	}
+	t.T = time.AfterFunc(t.Duration, t.Ending)
+	logrus.Info("timer started for ", t.Duration)
+	return true
+}
+
+// Pause make a timer pause
+func (t *Timer) Pause() bool {
+	if t.State != "stateActive" {
+		return false
+	}
+	if !t.T.Stop() {
+		t.State = "stateExpired"
+		return false
+	}
+	t.State = "stateIdle"
+	dur := time.Now().Sub(t.StartedAt)
+	t.Duration = t.Duration - dur
+	logrus.Info("timer paused with ", t.Duration, " left")
+	return true
+}
+
+// Stop make a timer stop
+func (t *Timer) Stop() bool {
+	if t.State != "stateActive" {
+		return false
+	}
+	t.StartedAt = time.Now()
+	t.State = "stateExpired"
+	t.T.Stop()
+	logrus.Info("timer stopped")
+	return true
 }
 
 // Rule is a struct that describes how action flow is handled in the escape room.
@@ -29,6 +114,7 @@ type Rule struct {
 // InstructionSender is an interface needed for preventing cyclic imports
 type InstructionSender interface {
 	SendInstruction(string, []ComponentInstruction)
+	SetTimer(string, ComponentInstruction)
 	HandleEvent(string)
 }
 
@@ -228,7 +314,19 @@ func (constraint Constraint) checkConstraints(condition Condition, config Workin
 			}
 		}
 	case "timer":
-		return nil // todo timer
+		if _, ok := config.Timers[condition.TypeID]; ok {
+			valueType := reflect.TypeOf(constraint.Value).Kind()
+			comparision := constraint.Comparison
+			if valueType != reflect.Bool {
+				return fmt.Errorf("input type boolean expected but %s found as type of value %v", valueType.String(), constraint.Value)
+			}
+			if comparision != "eq" {
+				return fmt.Errorf("comparision %s not allowed on a boolean", comparision)
+			}
+
+		} else {
+			return fmt.Errorf("timer with id %s not found in map", condition.TypeID)
+		}
 	case "rule":
 		if _, ok := config.RuleMap[condition.TypeID]; ok { // checks if rule can be found in the map, if so, it is stored in variable device
 			valueType := reflect.TypeOf(constraint.Value).Kind()
@@ -262,8 +360,12 @@ func (constraint Constraint) Resolve(condition Condition, config WorkingConfig) 
 			rule := config.RuleMap[condition.TypeID]
 			return compare(rule.Executed, constraint.Value, constraint.Comparison)
 		}
-	case "timer": //todo timer
-		panic(fmt.Sprintf("cannot resolve constraint %v because condition.type is an timer type, which is not implemented yet", constraint))
+	case "timer":
+		{
+			timer := config.Timers[condition.TypeID]
+			return compare(timer.Finish, constraint.Value, constraint.Comparison)
+
+		}
 	default:
 		panic(fmt.Sprintf("cannot resolve constraint %v because condition.type is an unknown type, this should already be checked when reading in the JSON", constraint))
 	}
