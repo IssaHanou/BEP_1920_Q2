@@ -34,11 +34,14 @@ class Keypad(Device):
         """
         Defines test sequence for device.
         """
+        self.log("test")
 
     def reset(self):
         """
         Defines a reset sequence for device.
         """
+        self.currentValue = ""
+        self.log("reset")
 
     def __init__(self):
         two_up = os.path.abspath(os.path.join(__file__, ".."))

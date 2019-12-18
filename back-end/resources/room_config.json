@@ -324,21 +324,11 @@
             "list": [
               {
                 "type": "device",
-                "type_id": "controlBoard",
+                "type_id": "front-end",
                 "constraints": {
-                  "operator": "OR",
-                  "list": [
-                    {
-                      "component_id": "mainSwitch",
-                      "comparison": "eq",
-                      "value": true
-                    },
-                    {
-                      "component_id": "mainSwitch",
-                      "comparison": "eq",
-                      "value": false
-                    }
-                  ]
+                  "component_id": "start",
+                  "comparison": "gte",
+                  "value": 1
                 }
               }
             ]
@@ -362,6 +352,68 @@
                   "component_id": "redLight3",
                   "instruction": "turnOnOff",
                   "value": true
+                },
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "greenLight2",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "greenLight3",
+                  "instruction": "turnOnOff",
+                  "value": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stop",
+      "rules": [
+        {
+          "id": "stop",
+          "description": "Als het spel stopt, moeten alle lichten uitgaan",
+          "limit": 100,
+          "conditions": {
+            "operator": "OR",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "front-end",
+                "constraints": {
+                  "component_id": "stop",
+                  "comparison": "gte",
+                  "value": 1
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "controlBoard",
+              "message": [
+                {
+                  "component_id": "redLight1",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "redLight2",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "redLight3",
+                  "instruction": "turnOnOff",
+                  "value": false
                 },
                 {
                   "component_id": "greenLight1",

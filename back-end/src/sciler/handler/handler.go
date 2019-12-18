@@ -254,40 +254,69 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 	}
 
 	for _, instruction := range instructions {
-		if instruction["instruction"] == "test all" && raw.DeviceID == "front-end" { // TODO maybe switch again
-			message := Message{
-				DeviceID: raw.DeviceID,
-				TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-				Type:     "instruction",
-				Contents: []map[string]interface{}{
-					{"instruction": "test"},
-				},
+		if raw.DeviceID == "front-end" {
+			switch instruction["instruction"] {
+
+			case "test all":
+				{
+					message := Message{
+						DeviceID: raw.DeviceID,
+						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+						Type:     "instruction",
+						Contents: []map[string]interface{}{
+							{"instruction": "test"},
+						},
+					}
+					jsonMessage, err := json.Marshal(&message)
+					if err != nil {
+						logrus.Errorf("error occurred while constructing message to publish: %v", err)
+					} else {
+						handler.Communicator.Publish("client-computers", string(jsonMessage), 3)
+					}
+				}
+			case "reset all":
+				//todo reset config
+				{
+					message := Message{
+						DeviceID: raw.DeviceID,
+						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+						Type:     "instruction",
+						Contents: []map[string]interface{}{
+							{"instruction": "reset"},
+						},
+					}
+					jsonMessage, err := json.Marshal(&message)
+					if err != nil {
+						logrus.Errorf("error occurred while constructing message to publish: %v", err)
+					} else {
+						handler.Communicator.Publish("client-computers", string(jsonMessage), 3)
+						handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+					}
+				}
+			case "send status":
+				{
+					for _, value := range handler.Config.Devices {
+						handler.SendStatus(value.ID)
+					}
+				}
+			case "hint":
+				{
+					message := Message{
+						DeviceID: raw.DeviceID,
+						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+						Type:     "instruction",
+						Contents: raw.Contents,
+					}
+					jsonMessage, err := json.Marshal(&message)
+					if err != nil {
+						logrus.Errorf("error occurred while constructing message to publish: %v", err)
+					} else {
+						handler.Communicator.Publish("hint", string(jsonMessage), 3)
+					}
+				}
 			}
-			jsonMessage, err := json.Marshal(&message)
-			if err != nil {
-				logrus.Errorf("error occurred while constructing message to publish: %v", err)
-			} else {
-				handler.Communicator.Publish("client-computers", string(jsonMessage), 3)
-			}
-		}
-		if instruction["instruction"] == "send status" && raw.DeviceID == "front-end" {
-			for _, value := range handler.Config.Devices {
-				handler.SendStatus(value.ID)
-			}
-		}
-		if instruction["instruction"] == "hint" && raw.DeviceID == "front-end" {
-			message := Message{
-				DeviceID: raw.DeviceID,
-				TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-				Type:     "instruction",
-				Contents: raw.Contents,
-			}
-			jsonMessage, err := json.Marshal(&message)
-			if err != nil {
-				logrus.Errorf("error occurred while constructing message to publish: %v", err)
-			} else {
-				handler.Communicator.Publish("hint", string(jsonMessage), 3)
-			}
+		} else {
+			logrus.Warnf("%s, tried to instruct the back-end, only the front-end is allowed to instruct the back-end", raw.DeviceID)
 		}
 	}
 }
