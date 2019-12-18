@@ -110,7 +110,7 @@ func (action Action) Execute(handler InstructionSender) {
 		{
 			handler.SendInstruction(action.TypeID, action.Message)
 		}
-	case "timer": // todo implement timer
+	case "timer":
 		{
 			handler.SetTimer(action.TypeID, action.Message[0])
 		}
