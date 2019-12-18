@@ -158,7 +158,10 @@ class SccLib:
         }
         msg = json.dumps(msg_dict)
         self.__send_message("back-end", msg)
-        logging.info(("disconnecting, reason  " + str(rc)))
+        if rc == 0:
+            logging.info(("disconnecting, reason  " + str(rc)))
+        else:
+            logging.warning("disconnecting, reason " + str(rc))
         client.connected_flag = False
         client.disconnect_flag = True
 
