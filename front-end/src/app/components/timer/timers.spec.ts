@@ -15,7 +15,7 @@ describe("TimerComponent", () => {
     expect(timers.getTimer("timer1")).toBeNull();
     const jsonData = {
       id: "timer1",
-      duration: 10000,
+      status: 10000,
       state: "stateIdle"
     };
     timers.setTimer(jsonData);
@@ -26,14 +26,14 @@ describe("TimerComponent", () => {
     expect(timers.getTimer("timer1")).toBeNull();
     const jsonData = {
       id: "timer1",
-      duration: 10000,
+      status: 10000,
       state: "stateIdle"
     };
     timers.setTimer(jsonData);
     expect(timers.getTimer("timer1").getState()).toBe("stateIdle");
     const jsonData2 = {
       id: "timer1",
-      duration: 200,
+      status: 200,
       state: "stateActive"
     };
     timers.setTimer(jsonData2);

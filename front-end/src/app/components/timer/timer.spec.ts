@@ -7,7 +7,7 @@ describe("TimerComponent", () => {
   beforeEach(() => {
     const jsonData = {
       id: "timer1",
-      duration: 10000,
+      status: 10000,
       state: "stateIdle"
     };
     timer = new Timer(jsonData);
