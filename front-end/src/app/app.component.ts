@@ -173,7 +173,6 @@ export class AppComponent implements OnInit, OnDestroy {
       const timeleft = jsonData.status;
       this.remainingTime = timeleft;
       this.timeState = jsonData.state;
-      console.log(timeleft);
     }
   }
   /**

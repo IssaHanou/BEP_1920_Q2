@@ -17,6 +17,7 @@ export class ManageComponent implements OnInit {
 
   onClickResetButton() {
     this.app.sendInstruction([{ instruction: "reset all" }]);
+    this.app.sendConnection(true);
   }
 
   onClickStartButton() {
