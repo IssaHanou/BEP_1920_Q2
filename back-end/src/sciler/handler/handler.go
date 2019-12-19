@@ -309,7 +309,6 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 
 					handler.Config = config.ReadFile(handler.ConfigFile)
 					handler.SendStatus("general")
-					fmt.Println(handler.Config)
 				}
 			case "send status":
 				{
