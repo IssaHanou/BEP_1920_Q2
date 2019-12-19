@@ -1,5 +1,4 @@
 import { Component, OnInit } from "@angular/core";
-import * as moment from "moment";
 import { Subscription, Observable, timer } from "rxjs";
 import { AppComponent } from "../../app.component";
 
@@ -20,6 +19,9 @@ export class TimerComponent implements OnInit {
       if (this.app.timeState === "stateActive") {
         this.app.remainingTime = this.app.remainingTime - 1000;
         this.displayTime = formatMS(this.app.remainingTime);
+        if (this.app.remainingTime <= 0) {
+          this.app.timeState = "stateIdle"
+        }
       } else if (this.app.timeState === "stateIdle") {
         this.displayTime = formatMS(this.app.remainingTime);
       }
