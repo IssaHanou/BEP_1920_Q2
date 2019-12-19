@@ -1,7 +1,7 @@
 {
   "general": {
     "name": "Escape X",
-    "duration": "00:30:00",
+    "duration": "30m",
     "host": "localhost",
     "port": 1883
   },
@@ -24,7 +24,7 @@
           "instructions": {
             "interval": "numeric",
             "delay": "numeric",
-            "state": "boolean"
+            "state": "string"
           }
         },
         "greenLight2": {
@@ -95,7 +95,7 @@
       "description": "device that has all types of input",
       "input": {
         "numeric": "numeric",
-        "boolean":"boolean",
+        "boolean": "boolean",
         "string": "string",
         "array": "array",
         "custom": "custom"
@@ -219,6 +219,14 @@
                     }
                   ]
                 }
+              },
+              {
+                "type": "rule",
+                "type_id": "correctSequence",
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 2
+                }
               }
             ]
           },
@@ -297,7 +305,7 @@
                   "list": [
                     {
                       "comparison": "eq",
-                      "value": "00:01:01"
+                      "value": true
                     }
                   ]
                 }
@@ -339,12 +347,10 @@
           "actions": [
             {
               "type": "timer",
-              "type_id": "timer1",
+              "type_id": "TestTimer",
               "message": [
                 {
-                  "component_id": "timer1",
-                  "instruction": "instruction",
-                  "value": "stop"
+                  "instruction": "stop"
                 }
               ]
             }

@@ -31,7 +31,18 @@ func getTestHandler() *Handler {
 			Host:     "localhost",
 			Port:     1883,
 		},
-		Puzzles:       nil,
+		Puzzles: nil,
+		Timers: map[string]*config.Timer{
+			"TestTimer": &(config.Timer{
+				ID:        "TestTimer",
+				Duration:  5 * time.Second,
+				StartedAt: time.Now(),
+				T:         nil,
+				State:     "stateIdle",
+				Ending:    nil,
+				Finish:    false,
+			}),
+		},
 		GeneralEvents: nil,
 		Devices: map[string]*config.Device{
 			"TestDevice": &(config.Device{
@@ -71,6 +82,33 @@ func TestOnConnectionMsg(t *testing.T) {
 	handler.onConnectionMsg(msg)
 	assert.Equal(t, true, handler.Config.Devices["TestDevice"].Connection,
 		"Device should set connection to true on connection message")
+}
+
+func TestHandler_SetTimer_Start(t *testing.T) {
+	handler := getTestHandler()
+	content := config.ComponentInstruction{Instruction: "start"}
+	assert.Equal(t, "stateIdle", handler.Config.Timers["TestTimer"].State)
+	handler.SetTimer("TestTimer", content)
+	assert.Equal(t, "stateActive", handler.Config.Timers["TestTimer"].State)
+
+}
+
+func TestHandler_SetTimer_Stop(t *testing.T) {
+	handler := getTestHandler()
+	content := config.ComponentInstruction{Instruction: "stop"}
+	handler.Config.Timers["TestTimer"].Start(nil)
+	assert.Equal(t, "stateActive", handler.Config.Timers["TestTimer"].State)
+	handler.SetTimer("TestTimer", content)
+	assert.Equal(t, "stateExpired", handler.Config.Timers["TestTimer"].State)
+}
+
+func TestHandler_SetTimer_Pause(t *testing.T) {
+	handler := getTestHandler()
+	content := config.ComponentInstruction{Instruction: "pause"}
+	handler.Config.Timers["TestTimer"].Start(nil)
+	assert.Equal(t, "stateActive", handler.Config.Timers["TestTimer"].State)
+	handler.SetTimer("TestTimer", content)
+	assert.Equal(t, "stateIdle", handler.Config.Timers["TestTimer"].State)
 }
 
 func TestOnConnectionMsgFalse(t *testing.T) {

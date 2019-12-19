@@ -19,10 +19,14 @@ export class AppComponent implements OnInit, OnDestroy {
   subscription: Subscription;
   topics = ["front-end"];
   deviceList: Devices;
+  remainingTime: number;
+  timeState: string;
 
   constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
     this.jsonConvert = new JsonConvert();
     this.deviceList = new Devices();
+    this.remainingTime = 0;
+    this.timeState = "stateIdle";
   }
 
   ngOnInit(): void {
@@ -112,6 +116,7 @@ export class AppComponent implements OnInit, OnDestroy {
    */
   public processMessage(jsonMessage: string) {
     const msg: Message = Message.deserialize(jsonMessage);
+
     switch (msg.type) {
       case "confirmation": {
         const keys = ["instructed", "contents", "instruction"];
@@ -149,12 +154,28 @@ export class AppComponent implements OnInit, OnDestroy {
         this.deviceList.setDevice(msg.contents);
         break;
       }
+      case "time": {
+        this.processTimeStatus(msg.contents);
+        break;
+      }
       default:
         console.log("log: received invalid message type " + msg.type);
         break;
     }
   }
 
+  /**
+   * Timers send their status to the front-end but we only care about the general time.
+   * @param jsonData with id, status and state
+   */
+  public processTimeStatus(jsonData) {
+    if (jsonData.id === "general") {
+      const timeleft = jsonData.status;
+      this.remainingTime = timeleft;
+      this.timeState = jsonData.state;
+      console.log(timeleft);
+    }
+  }
   /**
    * Opens snackbar with duration of 2 seconds.
    * @param message displays this message

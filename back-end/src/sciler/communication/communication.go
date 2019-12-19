@@ -20,6 +20,7 @@ func NewCommunicator(host string, port int, topicsOfInterest []string) *Communic
 	opts.AddBroker(fmt.Sprintf("%s://%s:%d", "tcp", host, port))
 	opts.SetClientID("back-end")
 	opts.SetConnectionLostHandler(onConnectionLost)
+	opts.SetKeepAlive(20)
 	client := mqtt.NewClient(opts)
 	return &Communicator{client, topicsOfInterest}
 }
