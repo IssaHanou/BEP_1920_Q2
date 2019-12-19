@@ -8,23 +8,25 @@ import { AppComponent } from "../../app.component";
   styleUrls: ["./timer.component.css", "../../../assets/css/main.css"]
 })
 export class TimerComponent implements OnInit {
+  constructor(private app: AppComponent) {}
+
   private subscription: Subscription;
   displayTime: string;
   everySecond: Observable<number> = timer(0, 1000);
 
-  constructor(private app: AppComponent) {}
-
   ngOnInit() {
     this.subscription = this.everySecond.subscribe(seconds => {
-      if (this.app.timeState === "stateActive") {
-        this.app.remainingTime = this.app.remainingTime - 1000;
-        this.displayTime = formatMS(this.app.remainingTime);
-        if (this.app.remainingTime <= 0) {
-          this.app.timeState = "stateIdle"
+      for (const t of this.app.timerList.getAll().values()) {
+        if (t.state === "stateActive") {
+          t.tick();
         }
-      } else if (this.app.timeState === "stateIdle") {
-        this.displayTime = formatMS(this.app.remainingTime);
+        if (t.duration <= 0) {
+          t.state = "stateIdle";
+        }
       }
+      this.displayTime = formatMS(
+        this.app.timerList.getTimer("general").getTimeLeft()
+      );
     });
   }
 }
