@@ -1,6 +1,7 @@
 package communication
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -21,12 +22,23 @@ func NewCommunicator(host string, port int, topicsOfInterest []string) *Communic
 	opts.SetClientID("back-end")
 	opts.SetConnectionLostHandler(onConnectionLost)
 	opts.SetKeepAlive(20)
+	will, _ := json.Marshal(map[string]interface{}{
+		"device_id": "back-end",
+		"time_sent": time.Now().Format("02-01-2006 15:04:05"),
+		"type":      "status",
+		"contents": map[string]interface{}{
+			"id":         "front-end",
+			"status":     map[string]interface{}{},
+			"connection": false,
+		},
+	})
+	opts.SetWill("front-end", string(will), 0, false)
 	client := mqtt.NewClient(opts)
 	return &Communicator{client, topicsOfInterest}
 }
 
 // Start is a function that will start the communication by connecting to the broker and subscribing to all topics of interest
-func (communicator *Communicator) Start(handler mqtt.MessageHandler) {
+func (communicator *Communicator) Start(handler mqtt.MessageHandler, onStart func()) {
 	_ = action(communicator.client.Connect, "connect", -1)
 	topics := make(map[string]byte)
 	for _, topic := range communicator.topicsOfInterest {
@@ -35,6 +47,8 @@ func (communicator *Communicator) Start(handler mqtt.MessageHandler) {
 	_ = action(func() mqtt.Token {
 		return communicator.client.SubscribeMultiple(topics, handler)
 	}, "subscribing", -1)
+
+	onStart()
 }
 
 func onConnectionLost(client mqtt.Client, e error) {

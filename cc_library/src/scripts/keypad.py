@@ -17,8 +17,10 @@ class Keypad(Device):
         """
         Returns status of all custom components, in json format.
         """
+        if self.currentValue == "":
+            return {}
 
-        return {"code": self.currentValue}
+        return {"code": int(self.currentValue)}
 
     def perform_instruction(self, contents):
         """
@@ -34,11 +36,14 @@ class Keypad(Device):
         """
         Defines test sequence for device.
         """
+        self.log("test")
 
     def reset(self):
         """
         Defines a reset sequence for device.
         """
+        self.currentValue = ""
+        self.log("reset")
 
     def __init__(self):
         two_up = os.path.abspath(os.path.join(__file__, ".."))
@@ -108,7 +113,7 @@ class NumpadReader:
                 return
 
             self.word = self.word + str(number)
-            self.statusChange(self.word)
+            # self.statusChange(self.word)
             return
 
         # Could be something for the config

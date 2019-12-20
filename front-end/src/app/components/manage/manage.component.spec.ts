@@ -60,7 +60,7 @@ describe("ManageComponent", () => {
     expect(component.onClickTestButton).toHaveBeenCalled();
   });
 
-  it("should send start message on test button click", () => {
+  it("should send start message on start button click", () => {
     spyOn(component, "onClickStartButton");
     const testButton = fixture.debugElement.nativeElement
       .getElementsByClassName("start")
@@ -69,5 +69,27 @@ describe("ManageComponent", () => {
     fixture.detectChanges();
 
     expect(component.onClickStartButton).toHaveBeenCalled();
+  });
+
+  it("should send reset message on reset button click", () => {
+    spyOn(component, "onClickResetButton");
+    const testButton = fixture.debugElement.nativeElement
+      .getElementsByClassName("reset")
+      .item(0);
+    testButton.click();
+    fixture.detectChanges();
+
+    expect(component.onClickResetButton).toHaveBeenCalled();
+  });
+
+  it("should send stop message on stop button click", () => {
+    spyOn(component, "onClickStopButton");
+    const testButton = fixture.debugElement.nativeElement
+      .getElementsByClassName("stop")
+      .item(0);
+    testButton.click();
+    fixture.detectChanges();
+
+    expect(component.onClickStopButton).toHaveBeenCalled();
   });
 });

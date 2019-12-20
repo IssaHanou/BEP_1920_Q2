@@ -93,7 +93,7 @@
       "id": "keypad",
       "description": "Keypad with input 4 numbers",
       "input": {
-        "code": "string"
+        "code": "numeric"
       },
       "output": {}
     }
@@ -363,27 +363,22 @@
   ],
   "general_events": [
     {
-      "name": "Start",
+      "name": "Start knop",
       "rules": [
         {
           "id": "start",
           "description": "Als het spel start, moeten alle rode leds aan gaan en de groene uit",
-          "limit": 3,
+          "limit": 1,
           "conditions": {
             "operator": "OR",
             "list": [
               {
                 "type": "device",
-                "type_id": "controlBoard",
+                "type_id": "front-end",
                 "constraints": {
-                  "operator": "OR",
-                  "list": [
-                    {
-                      "component_id": "mainSwitch",
-                      "comparison": "eq",
-                      "value": false
-                    }
-                  ]
+                  "component_id": "start",
+                  "comparison": "gte",
+                  "value": 1
                 }
               }
             ]
@@ -470,7 +465,7 @@
                 {
                   "component_id": "hint",
                   "instruction": "hint",
-                  "value": "na 5 seconde hint"
+                  "value": "je bent al 5 seconde bezig, misschien moet je naar het blaadje kijken :)"
                 }
               ]
             }
@@ -559,7 +554,7 @@
                 "type": "rule",
                 "type_id": "rood",
                 "constraints": {
-                  "comparison": "gte",
+                  "comparison": "eq",
                   "value": 1
                 }
               },
@@ -567,7 +562,7 @@
                 "type": "rule",
                 "type_id": "groen",
                 "constraints": {
-                  "comparison": "gte",
+                  "comparison": "eq",
                   "value": 1
                 }
               },
@@ -575,7 +570,7 @@
                 "type": "rule",
                 "type_id": "oranje",
                 "constraints": {
-                  "comparison": "gte",
+                  "comparison": "eq",
                   "value": 1
                 }
               }
@@ -635,6 +630,68 @@
               "message": [
                 {
                   "instruction": "pause"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stop knop",
+      "rules": [
+        {
+          "id": "stop",
+          "description": "Als het spel stopt, moeten alle lichten uitgaan",
+          "limit": 1,
+          "conditions": {
+            "operator": "OR",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "front-end",
+                "constraints": {
+                  "component_id": "stop",
+                  "comparison": "eq",
+                  "value": 1
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "controlBoard",
+              "message": [
+                {
+                  "component_id": "redLight1",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "redLight2",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "redLight3",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "greenLight2",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "greenLight3",
+                  "instruction": "turnOnOff",
+                  "value": false
                 }
               ]
             }

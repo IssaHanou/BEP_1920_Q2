@@ -1,5 +1,4 @@
 import { Component, OnInit } from "@angular/core";
-import { Message } from "../../message";
 import { AppComponent } from "../../app.component";
 
 @Component({
@@ -16,20 +15,24 @@ export class ManageComponent implements OnInit {
     this.app.sendInstruction([{ instruction: "test all" }]);
   }
 
-  /**
-   * Test for the processing of messages, for now just a placeholder for confirming start instruction.
-   */
+  onClickResetButton() {
+    this.app.sendInstruction([{ instruction: "reset all" }]);
+    this.app.sendConnection(true);
+  }
+
   onClickStartButton() {
-    const msg = new Message("front-end", "confirmation", new Date(), {
-      completed: true,
-      instructed: {
-        device_id: "door",
-        time_sent: "10-05-2019 15:09:14",
-        type: "instruction",
-        contents: [{ instruction: "start" }]
-      }
-    });
-    const res = this.app.jsonConvert.serialize(msg);
-    this.app.processMessage(JSON.stringify(res));
+    const device = this.app.deviceList.getDevice("front-end");
+    if (device != null) {
+      const status = device.status;
+      this.app.sendStatus(status.get("start") + 1, status.get("stop"));
+    }
+  }
+
+  onClickStopButton() {
+    const device = this.app.deviceList.getDevice("front-end");
+    if (device != null) {
+      const status = device.status;
+      this.app.sendStatus(status.get("start"), status.get("stop") + 1);
+    }
   }
 }

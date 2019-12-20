@@ -35,6 +35,7 @@ export class AppComponent implements OnInit, OnDestroy {
       this.subscribeNewTopic(topic);
     }
     this.sendInstruction([{ instruction: "send status" }]);
+    this.sendConnection(true);
   }
 
   /**
@@ -42,6 +43,7 @@ export class AppComponent implements OnInit, OnDestroy {
    * and close the connection with the broker
    */
   ngOnDestroy(): void {
+    this.sendConnection(false);
     this.mqttService.disconnect();
   }
 
@@ -64,7 +66,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Send an instruction to the broker, over instruction topic.
+   * Send an instruction to the broker, over back-end topic.
    * @param instruction instruction to be sent.
    */
   public sendInstruction(instruction: any[]) {
@@ -79,6 +81,34 @@ export class AppComponent implements OnInit, OnDestroy {
     console.log(
       "log: sent instruction message: " + JSON.stringify(jsonMessage)
     );
+  }
+
+  /**
+   * Send an status to the broker, over back-end topic.
+   * @param start start status to be sent.
+   * @param stop stop status to be sent.
+   */
+  public sendStatus(start, stop) {
+    const msg = new Message("front-end", "status", new Date(), {
+      start,
+      stop
+    });
+    const jsonMessage: string = this.jsonConvert.serialize(msg);
+    this.mqttService.unsafePublish("back-end", JSON.stringify(jsonMessage));
+    console.log("log: sent status message: " + JSON.stringify(jsonMessage));
+  }
+
+  /**
+   * Send an connection update to the broker, over back-end topic.
+   * @param connected connection status to be sent.
+   */
+  public sendConnection(connected: boolean) {
+    const msg = new Message("front-end", "connection", new Date(), {
+      connection: connected
+    });
+    const jsonMessage: string = this.jsonConvert.serialize(msg);
+    this.mqttService.unsafePublish("back-end", JSON.stringify(jsonMessage));
+    console.log("log: sent connection message: " + JSON.stringify(jsonMessage));
   }
 
   /**
@@ -107,7 +137,25 @@ export class AppComponent implements OnInit, OnDestroy {
         break;
       }
       case "instruction": {
-        // TODO instructions to front-end? e.g. ask for hint
+        for (const action of msg.contents) {
+          switch (action.instruction) {
+            case "reset":
+              {
+                this.deviceList.setDevice({
+                  id: "front-end",
+                  connection: true,
+                  status: {
+                    start: 0,
+                    stop: 0
+                  }
+                });
+              }
+              break;
+            case "status update": {
+              this.sendConnection(true);
+            }
+          }
+        }
         break;
       }
       case "status": {
