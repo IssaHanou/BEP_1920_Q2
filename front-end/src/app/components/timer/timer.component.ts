@@ -1,5 +1,4 @@
 import { Component, OnInit } from "@angular/core";
-import * as moment from "moment";
 import { Subscription, Observable, timer } from "rxjs";
 import { AppComponent } from "../../app.component";
 
@@ -9,20 +8,25 @@ import { AppComponent } from "../../app.component";
   styleUrls: ["./timer.component.css", "../../../assets/css/main.css"]
 })
 export class TimerComponent implements OnInit {
+  constructor(private app: AppComponent) {}
+
   private subscription: Subscription;
   displayTime: string;
   everySecond: Observable<number> = timer(0, 1000);
 
-  constructor(private app: AppComponent) {}
-
   ngOnInit() {
     this.subscription = this.everySecond.subscribe(seconds => {
-      if (this.app.timeState === "stateActive") {
-        this.app.remainingTime = this.app.remainingTime - 1000;
-        this.displayTime = formatMS(this.app.remainingTime);
-      } else if (this.app.timeState === "stateIdle") {
-        this.displayTime = formatMS(this.app.remainingTime);
+      for (const aTimer of this.app.timerList.getAll().values()) {
+        if (aTimer.state === "stateActive") {
+          aTimer.tick();
+        }
+        if (aTimer.duration <= 0) {
+          aTimer.state = "stateIdle";
+        }
       }
+      this.displayTime = formatMS(
+        this.app.timerList.getTimer("general").getTimeLeft()
+      );
     });
   }
 }

@@ -70,20 +70,6 @@ func getTestHandler() *Handler {
 	return &Handler{workingConfig, "fake file name", communicator}
 }
 
-func TestOnConnectionMsg(t *testing.T) {
-	handler := getTestHandler()
-	msg := Message{
-		DeviceID: "TestDevice",
-		TimeSent: "05-12-2019 09:42:10",
-		Type:     "connection",
-		Contents: map[string]interface{}{
-			"connection": true},
-	}
-	handler.onConnectionMsg(msg)
-	assert.Equal(t, true, handler.Config.Devices["TestDevice"].Connection,
-		"Device should set connection to true on connection message")
-}
-
 func TestHandler_SetTimer_Start(t *testing.T) {
 	handler := getTestHandler()
 	content := config.ComponentInstruction{Instruction: "start"}
@@ -378,23 +364,33 @@ func TestMsgMapperStatus(t *testing.T) {
 }
 
 func TestOnConfirmationMsgTrue(t *testing.T) {
-	handler := getTestHandler()
+	communicatorMock := new(CommunicatorMock)
+	workingConfig := config.ReadFile("../../../resources/testing/test_config.json")
+	handler := Handler{
+		Config:       workingConfig,
+		ConfigFile:   "../../../resources/testing/test_config.json",
+		Communicator: communicatorMock,
+	}
 	msg := Message{
-		DeviceID: "TestDevice",
+		DeviceID: "controlBoard",
 		TimeSent: "05-12-2019 09:42:10",
 		Type:     "confirmation",
 		Contents: map[string]interface{}{
 			"completed": true,
 			"instructed": map[string]interface{}{
-				"device_id": "back-end",
+				"device_id": "front-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]interface{}{"instructions": "test"},
-				"type":      "instructions",
+				"contents": []map[string]interface{}{
+					{"instruction": "test"},
+				},
+				"type": "instruction",
 			},
 		},
 	}
-	assert.NotPanics(t, func() { handler.onConfirmationMsg(msg) },
-		"Device should return valid confirmation message")
+	jsonMsg, _ := json.Marshal(&msg)
+	communicatorMock.On("Publish", "front-end", string(jsonMsg), 3)
+	assert.Nil(t, handler.onConfirmationMsg(msg))
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
 }
 
 func TestOnConfirmationMsgFalse(t *testing.T) {
@@ -408,13 +404,12 @@ func TestOnConfirmationMsgFalse(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]interface{}{"instructions": "test"},
-				"type":      "instructions",
+				"contents":  []map[string]interface{}{{"instruction": "test"}},
+				"type":      "instruction",
 			},
 		},
 	}
-	assert.NotPanics(t, func() { handler.onConfirmationMsg(msg) },
-		"Device should return valid confirmation message")
+	assert.Nil(t, handler.onConfirmationMsg(msg))
 }
 
 func TestOnConfirmationMsgIncorrect1(t *testing.T) {
@@ -428,13 +423,12 @@ func TestOnConfirmationMsgIncorrect1(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]interface{}{"instructions": "test"},
-				"type":      "instructions",
+				"contents":  []map[string]interface{}{{"instruction": "test"}},
+				"type":      "instruction",
 			},
 		},
 	}
-	assert.NotPanics(t, func() { handler.onConfirmationMsg(msg) },
-		"Device should not panic on incorrect json with no completed key")
+	assert.NotNil(t, handler.onConfirmationMsg(msg))
 }
 
 func TestOnConfirmationMsgIncorrect2(t *testing.T) {
@@ -453,8 +447,7 @@ func TestOnConfirmationMsgIncorrect2(t *testing.T) {
 			},
 		},
 	}
-	assert.NotPanics(t, func() { handler.onConfirmationMsg(msg) },
-		"Device should not panic on incorrect json with no instructed key")
+	assert.NotNil(t, handler.onConfirmationMsg(msg))
 }
 
 func TestOnConfirmationMsgIncorrect3(t *testing.T) {
@@ -468,13 +461,12 @@ func TestOnConfirmationMsgIncorrect3(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]interface{}{"instructions": "test"},
-				"type":      "instructions",
+				"contents":  []map[string]interface{}{{"instruction": "test"}},
+				"type":      "instruction",
 			},
 		},
 	}
-	assert.NotPanics(t, func() { handler.onConfirmationMsg(msg) },
-		"Device should not panic on json with no boolean completed value")
+	assert.NotNil(t, handler.onConfirmationMsg(msg))
 }
 
 func TestMsgMapperConfirmation(t *testing.T) {
@@ -488,8 +480,8 @@ func TestMsgMapperConfirmation(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]interface{}{"instructions": "test"},
-				"type":      "instructions",
+				"contents":  []map[string]interface{}{{"instruction": "test"}},
+				"type":      "instruction",
 			},
 		},
 	}
@@ -497,7 +489,6 @@ func TestMsgMapperConfirmation(t *testing.T) {
 	handler.msgMapper(msg)
 	assert.Equal(t, before, handler.Config,
 		"Device should not config with confirmation message")
-
 }
 
 func TestOnInstructionMsg(t *testing.T) {
@@ -723,4 +714,218 @@ func TestLimitRule(t *testing.T) {
 	communicatorMock.On("Publish", "controlBoard", mock.Anything, 3)
 	handler.msgMapper(msg)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 1) // Only publish to front-end for status should be done, no action should be performed
+}
+
+func TestInstructionTestAll(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	workingConfig := config.ReadFile("../../../resources/testing/test_config.json")
+	handler := Handler{
+		Config:       workingConfig,
+		Communicator: communicatorMock,
+	}
+	instructionMsg := Message{
+		DeviceID: "front-end",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{"instruction": "test all"},
+		},
+	}
+	responseMsg := Message{
+		DeviceID: "front-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{"instruction": "test"},
+		},
+	}
+	jsonMessage, _ := json.Marshal(&responseMsg)
+
+	communicatorMock.On("Publish", "client-computers", string(jsonMessage), 3)
+	handler.msgMapper(instructionMsg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+}
+
+func TestInstructionResetAll(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	workingConfig := config.ReadFile("../../../resources/testing/test_config.json")
+	handler := Handler{
+		Config:       workingConfig,
+		ConfigFile:   "../../../resources/testing/test_config.json",
+		Communicator: communicatorMock,
+	}
+	instructionMsg := Message{
+		DeviceID: "front-end",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{"instruction": "reset all"},
+		},
+	}
+	responseMsg := Message{
+		DeviceID: "front-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{"instruction": "reset"},
+		},
+	}
+	statusMsg := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "time",
+		Contents: map[string]interface{}{
+			"id":       "general",
+			"duration": 1800000,
+			"state":    "stateIdle",
+		},
+	}
+
+	jsonInstructionMsg, _ := json.Marshal(&responseMsg)
+	jsonStatusMsg, _ := json.Marshal(&statusMsg)
+
+	communicatorMock.On("Publish", "client-computers", string(jsonInstructionMsg), 3)
+	communicatorMock.On("Publish", "front-end", string(jsonInstructionMsg), 3)
+	communicatorMock.On("Publish", "front-end", string(jsonStatusMsg), 3)
+	handler.msgMapper(instructionMsg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
+}
+
+func TestInstructionSendStatus(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	workingConfig := config.ReadFile("../../../resources/testing/test_config.json")
+	handler := Handler{
+		Config:       workingConfig,
+		ConfigFile:   "../../../resources/testing/test_config.json",
+		Communicator: communicatorMock,
+	}
+	instructionMsg := Message{
+		DeviceID: "front-end",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{"instruction": "send status"},
+		},
+	}
+
+	communicatorMock.On("Publish", "front-end", mock.AnythingOfType("string"), 3)
+	handler.msgMapper(instructionMsg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 4)
+}
+
+func TestInstructionHint(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	workingConfig := config.ReadFile("../../../resources/testing/test_config.json")
+	handler := Handler{
+		Config:       workingConfig,
+		ConfigFile:   "../../../resources/testing/test_config.json",
+		Communicator: communicatorMock,
+	}
+	instructionMsg := Message{
+		DeviceID: "front-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{
+				"instruction": "hint",
+				"value":       "some useful hint",
+			},
+		},
+	}
+	jsonHintMessage, _ := json.Marshal(&instructionMsg)
+	communicatorMock.On("Publish", "hint", string(jsonHintMessage), 3)
+	handler.msgMapper(instructionMsg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+}
+
+func TestInstructionNotFromWrongDevice(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	workingConfig := config.ReadFile("../../../resources/testing/test_config.json")
+	handler := Handler{
+		Config:       workingConfig,
+		ConfigFile:   "../../../resources/testing/test_config.json",
+		Communicator: communicatorMock,
+	}
+	instructionMsg := Message{
+		DeviceID: "not front-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{
+				"instruction": "hint",
+				"value":       "some useful hint",
+			},
+		},
+	}
+	jsonHintMessage, _ := json.Marshal(&instructionMsg)
+	communicatorMock.On("Publish", "hint", string(jsonHintMessage), 3)
+	handler.msgMapper(instructionMsg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 0)
+}
+
+func TestOnConnectionMsg(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	workingConfig := config.ReadFile("../../../resources/testing/test_config.json")
+	handler := Handler{
+		Config:       workingConfig,
+		ConfigFile:   "../../../resources/testing/test_config.json",
+		Communicator: communicatorMock,
+	}
+	msg := Message{
+		DeviceID: "controlBoard",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "connection",
+		Contents: map[string]interface{}{
+			"connection": true},
+	}
+
+	statusMsg := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "status",
+		Contents: map[string]interface{}{
+			"id":         "controlBoard",
+			"connection": true,
+			"status":     map[string]interface{}{},
+		},
+	}
+
+	jsonStatusMsg, _ := json.Marshal(&statusMsg)
+
+	communicatorMock.On("Publish", "front-end", string(jsonStatusMsg), 3)
+	assert.False(t, handler.Config.Devices["controlBoard"].Connection,
+		"Device connection should be false on default")
+	handler.onConnectionMsg(msg)
+	assert.True(t, handler.Config.Devices["controlBoard"].Connection,
+		"Device should set connection to true on connection message")
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+}
+
+func TestGetStatus(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	workingConfig := config.ReadFile("../../../resources/testing/test_config.json")
+	handler := Handler{
+		Config:       workingConfig,
+		ConfigFile:   "../../../resources/testing/test_config.json",
+		Communicator: communicatorMock,
+	}
+	message := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{"instruction": "status update"},
+		},
+	}
+
+	jsonMsg, _ := json.Marshal(&message)
+
+	communicatorMock.On("Publish", "controlBoard", string(jsonMsg), 3)
+	handler.GetStatus("controlBoard")
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+}
+
+func TestSendStatusUnknownDevice(t *testing.T) {
+	handler := getTestHandler()
+	assert.NotNil(t, handler.SendStatus("Unknown device or timer"))
 }

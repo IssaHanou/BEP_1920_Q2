@@ -5,6 +5,7 @@ import { JsonConvert } from "json2typescript";
 import { MatSnackBar, MatSnackBarConfig } from "@angular/material";
 import { Subscription } from "rxjs";
 import { Devices } from "./components/device/devices";
+import { Timers } from "./components/timer/timers";
 
 @Component({
   selector: "app-root",
@@ -19,14 +20,14 @@ export class AppComponent implements OnInit, OnDestroy {
   subscription: Subscription;
   topics = ["front-end"];
   deviceList: Devices;
-  remainingTime: number;
-  timeState: string;
+  timerList: Timers;
 
   constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
     this.jsonConvert = new JsonConvert();
     this.deviceList = new Devices();
-    this.remainingTime = 0;
-    this.timeState = "stateIdle";
+    this.timerList = new Timers();
+    const generaltimer = { id: "general", duration: 0, state: "stateIdle" };
+    this.timerList.setTimer(generaltimer);
   }
 
   ngOnInit(): void {
@@ -176,11 +177,7 @@ export class AppComponent implements OnInit, OnDestroy {
    * @param jsonData with id, status and state
    */
   public processTimeStatus(jsonData) {
-    if (jsonData.id === "general") {
-      const timeleft = jsonData.status;
-      this.remainingTime = timeleft;
-      this.timeState = jsonData.state;
-    }
+    this.timerList.setTimer(jsonData);
   }
   /**
    * Opens snackbar with duration of 2 seconds.
