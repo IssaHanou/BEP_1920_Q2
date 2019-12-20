@@ -26,7 +26,7 @@ func NewCommunicator(host string, port int, topicsOfInterest []string) *Communic
 }
 
 // Start is a function that will start the communication by connecting to the broker and subscribing to all topics of interest
-func (communicator *Communicator) Start(handler mqtt.MessageHandler) {
+func (communicator *Communicator) Start(handler mqtt.MessageHandler, onStart func()) {
 	_ = action(communicator.client.Connect, "connect", -1)
 	topics := make(map[string]byte)
 	for _, topic := range communicator.topicsOfInterest {
@@ -35,6 +35,8 @@ func (communicator *Communicator) Start(handler mqtt.MessageHandler) {
 	_ = action(func() mqtt.Token {
 		return communicator.client.SubscribeMultiple(topics, handler)
 	}, "subscribing", -1)
+
+	onStart()
 }
 
 func onConnectionLost(client mqtt.Client, e error) {

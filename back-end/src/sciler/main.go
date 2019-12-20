@@ -38,16 +38,13 @@ func main() {
 	communicator := communication.NewCommunicator(host, port, topics)
 
 	messageHandler := handler.Handler{Config: configurations, ConfigFile: filename, Communicator: communicator}
-	go communicator.Start(messageHandler.NewHandler)
-
-	// todo move code below to better location
-	//Set up front-end
-	time.Sleep(5 * time.Second)
-	messageHandler.SendStatus("general")
-	for _, value := range messageHandler.Config.Devices {
-		messageHandler.SendStatus(value.ID)
-		messageHandler.GetStatus(value.ID)
-	}
+	go communicator.Start(messageHandler.NewHandler, func() {
+		messageHandler.SendStatus("general")
+		for _, value := range messageHandler.Config.Devices {
+			messageHandler.SendStatus(value.ID)
+			messageHandler.GetStatus(value.ID)
+		}
+	})
 
 	// prevent exit
 	select {}

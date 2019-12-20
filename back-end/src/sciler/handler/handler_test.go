@@ -15,7 +15,7 @@ type CommunicatorMock struct {
 	mock.Mock
 }
 
-func (communicatorMock *CommunicatorMock) Start(handler mqtt.MessageHandler) {
+func (communicatorMock *CommunicatorMock) Start(handler mqtt.MessageHandler, onStart func()) {
 	// do nothing
 }
 
@@ -810,7 +810,7 @@ func TestInstructionSendStatus(t *testing.T) {
 
 	communicatorMock.On("Publish", "front-end", mock.AnythingOfType("string"), 3)
 	handler.msgMapper(instructionMsg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 4)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 11)
 }
 
 func TestInstructionHint(t *testing.T) {
