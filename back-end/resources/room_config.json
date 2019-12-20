@@ -93,7 +93,7 @@
       "id": "keypad",
       "description": "Keypad with input 4 numbers",
       "input": {
-        "code": "string"
+        "code": "numeric"
       },
       "output": {}
     }
