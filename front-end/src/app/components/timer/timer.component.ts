@@ -16,12 +16,12 @@ export class TimerComponent implements OnInit {
 
   ngOnInit() {
     this.subscription = this.everySecond.subscribe(seconds => {
-      for (const t of this.app.timerList.getAll().values()) {
-        if (t.state === "stateActive") {
-          t.tick();
+      for (const aTimer of this.app.timerList.getAll().values()) {
+        if (aTimer.state === "stateActive") {
+          aTimer.tick();
         }
-        if (t.duration <= 0) {
-          t.state = "stateIdle";
+        if (aTimer.duration <= 0) {
+          aTimer.state = "stateIdle";
         }
       }
       this.displayTime = formatMS(
