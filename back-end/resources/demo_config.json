@@ -176,7 +176,7 @@
               },
               {
                 "type": "rule",
-                "type_id": "codepuzzel",
+                "type_id": "codedeur",
                 "constraints": {
                   "comparison": "gte",
                   "value": 1
@@ -400,8 +400,8 @@
                 }
               },
               {
-                "type": "codedeur",
-                "type_id": "start",
+                "type": "rule",
+                "type_id": "codedeur",
                 "constraints": {
                   "comparison": "lte",
                   "value": 2
@@ -453,8 +453,8 @@
                 }
               },
               {
-                "type": "codedeur",
-                "type_id": "start",
+                "type": "rule",
+                "type_id": "codedeur",
                 "constraints": {
                   "comparison": "lte",
                   "value": 2
