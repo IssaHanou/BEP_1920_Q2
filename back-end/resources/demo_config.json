@@ -93,7 +93,7 @@
       "id": "keypad",
       "description": "Keypad with input 4 numbers",
       "input": {
-        "code": "string"
+        "code": "numeric"
       },
       "output": {}
     }
@@ -129,7 +129,7 @@
       "name": "puzzel drank",
       "rules": [
         {
-          "id": "rood",
+          "id": "drank",
           "description": "Wanneer de rode switch op true staat en de slider 100, dan sturen we een hint met 'puzzle rood opgelost'",
           "limit": 1,
           "conditions": {
@@ -223,7 +223,7 @@
       "name": "puzzel keypad to door",
       "rules": [
         {
-          "id": "codepuzzel",
+          "id": "codedeur",
           "description": "er moet een code gestuurd worden, dan gaat de magneet open",
           "limit": 1,
           "conditions": {
@@ -238,7 +238,7 @@
                     {
                       "component_id": "code",
                       "comparison": "eq",
-                      "value": "1234"
+                      "value": 45
                     }
                   ]
                 }
@@ -359,7 +359,7 @@
                 {
                   "component_id": "hint",
                   "instruction": "hint",
-                  "value": "Hoeveel kerstballen hangen er in de boom"
+                  "value": "Hoeveel kerstballen hangen er ongeveer in de boom?"
                 }
               ]
             }
@@ -368,19 +368,46 @@
       ]
     },
     {
-      "name": "late hint",
+      "name": "hints",
       "rules": [
         {
-          "id": "hint",
-          "description": "5 seconde na de start wordt er een hint verstuurd",
-          "limit": 1,
+          "id": "hint1",
+          "description": "te laag hint",
+          "limit": 100,
           "conditions": {
-            "type": "timer",
-            "type_id": "timer2",
-            "constraints": {
-              "comparison": "eq",
-              "value": true
-            }
+            "operator": "AND",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "keypad",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "component_id": "code",
+                      "comparison": "lte",
+                      "value": 44
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "start",
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                }
+              },
+              {
+                "type": "codedeur",
+                "type_id": "start",
+                "constraints": {
+                  "comparison": "lte",
+                  "value": 2
+                }
+              }
+            ]
           },
           "actions": [
             {
@@ -390,7 +417,60 @@
                 {
                   "component_id": "hint",
                   "instruction": "hint",
-                  "value": "je bent al 5 seconde bezig, misschien moet je naar het blaadje kijken :)"
+                  "value": "dat is te laag"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hint2",
+          "description": "te hoog hint",
+          "limit": 100,
+          "conditions": {
+            "operator": "AND",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "keypad",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "component_id": "code",
+                      "comparison": "gte",
+                      "value": 46
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "start",
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                }
+              },
+              {
+                "type": "codedeur",
+                "type_id": "start",
+                "constraints": {
+                  "comparison": "lte",
+                  "value": 2
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "display",
+              "message": [
+                {
+                  "component_id": "hint",
+                  "instruction": "hint",
+                  "value": "dat is te hoog"
                 }
               ]
             }
@@ -477,7 +557,7 @@
             "list": [
               {
                 "type": "rule",
-                "type_id": "rood",
+                "type_id": "drank",
                 "constraints": {
                   "comparison": "gte",
                   "value": 1
@@ -485,17 +565,9 @@
               },
               {
                 "type": "rule",
-                "type_id": "groen",
+                "type_id": "codedeur",
                 "constraints": {
                   "comparison": "gte",
-                  "value": 1
-                }
-              },
-              {
-                "type": "rule",
-                "type_id": "oranje",
-                "constraints": {
-                  "comparison": "eq",
                   "value": 1
                 }
               }
@@ -510,42 +582,6 @@
                   "component_id": "hint",
                   "instruction": "hint",
                   "value": "Puzzle opgelost!"
-                }
-              ]
-            },
-            {
-              "type": "device",
-              "type_id": "controlBoard",
-              "message": [
-                {
-                  "component_id": "redLight1",
-                  "instruction": "turnOnOff",
-                  "value": true
-                },
-                {
-                  "component_id": "redLight2",
-                  "instruction": "turnOnOff",
-                  "value": true
-                },
-                {
-                  "component_id": "redLight3",
-                  "instruction": "turnOnOff",
-                  "value": true
-                },
-                {
-                  "component_id": "greenLight1",
-                  "instruction": "turnOnOff",
-                  "value": true
-                },
-                {
-                  "component_id": "greenLight2",
-                  "instruction": "turnOnOff",
-                  "value": true
-                },
-                {
-                  "component_id": "greenLight3",
-                  "instruction": "turnOnOff",
-                  "value": true
                 }
               ]
             },
