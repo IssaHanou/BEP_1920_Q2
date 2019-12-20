@@ -15,13 +15,8 @@ The mosquitto.conf part of the command should be replaced by a path to this file
 mosquitto -c <mosquitto.conf>
 ```
 
-When there is a mosquitto broker already running, this will not work. Then, first run `net stop mosquitto`.
-
-### Running
-```
-mosquitto -t <topic>
-mosquitto -h <ip.ad.dr.ess>
-```
+When there is a mosquitto broker already running, this will not work. 
+Then, first run `net stop mosquitto` or `sudo service mosquitto stop`.
 
 ### Topics
 
