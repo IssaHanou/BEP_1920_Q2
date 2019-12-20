@@ -178,6 +178,9 @@ type Event interface {
 func compare(param1 interface{}, param2 interface{}, comparision string) bool {
 	switch comparision {
 	case "eq":
+		if reflect.TypeOf(param1).Kind() == reflect.Int || reflect.TypeOf(param2).Kind() == reflect.Int {
+			return numericToFloat64(param1) == numericToFloat64(param2)
+		}
 		return reflect.DeepEqual(param1, param2)
 	case "lt":
 		return numericToFloat64(param1) < numericToFloat64(param2)

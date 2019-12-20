@@ -217,6 +217,14 @@ func Test_compare(t *testing.T) {
 			},
 			want: true,
 		}, {
+			name: "equal true int 2 == float62(2)",
+			args: args{
+				param1:      2, // int
+				param2:      float64(2),
+				comparision: "eq",
+			},
+			want: true,
+		}, {
 			name: "less then false",
 			args: args{
 				param1:      float64(1),
