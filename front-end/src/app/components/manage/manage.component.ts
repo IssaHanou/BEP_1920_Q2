@@ -21,12 +21,18 @@ export class ManageComponent implements OnInit {
   }
 
   onClickStartButton() {
-    const status = this.app.deviceList.getDevice("front-end").status;
-    this.app.sendStatus(status.get("start") + 1, status.get("stop"));
+    const device = this.app.deviceList.getDevice("front-end");
+    if (device != null) {
+      const status = device.status;
+      this.app.sendStatus(status.get("start") + 1, status.get("stop"));
+    }
   }
 
   onClickStopButton() {
-    const status = this.app.deviceList.getDevice("front-end").status;
-    this.app.sendStatus(status.get("start"), status.get("stop") + 1);
+    const device = this.app.deviceList.getDevice("front-end");
+    if (device != null) {
+      const status = device.status;
+      this.app.sendStatus(status.get("start"), status.get("stop") + 1);
+    }
   }
 }

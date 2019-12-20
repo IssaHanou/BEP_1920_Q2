@@ -33,8 +33,8 @@ export class AppComponent implements OnInit, OnDestroy {
     for (const topic of this.topics) {
       this.subscribeNewTopic(topic);
     }
-    this.sendConnection(true);
     this.sendInstruction([{ instruction: "send status" }]);
+    this.sendConnection(true);
   }
 
   /**
@@ -137,15 +137,22 @@ export class AppComponent implements OnInit, OnDestroy {
       }
       case "instruction": {
         for (const action of msg.contents) {
-          if (action.instruction === "reset") {
-            this.deviceList.setDevice({
-              id: "front-end",
-              connection: true,
-              status: {
-                start: 0,
-                stop: 0
+          switch (action.instruction) {
+            case "reset":
+              {
+                this.deviceList.setDevice({
+                  id: "front-end",
+                  connection: true,
+                  status: {
+                    start: 0,
+                    stop: 0
+                  }
+                });
               }
-            });
+              break;
+            case "send status": {
+              this.sendConnection(true);
+            }
           }
         }
         break;
