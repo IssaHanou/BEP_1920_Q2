@@ -41,13 +41,14 @@ are specific defined depending on the sender and receiver.
     - `instruction`
 - `contents`:
     - If type is `instruction`, then the then the message contents have
-        - `instruction`: one of following instructions: `test all`, `send status`, `hint`, `start`, `stop`, `reset`.
+        - `instruction`: one of following instructions: `test all`, `send status`, `hint`, `start`, `stop`, `reset all`.
      
 ### Back-end to Front-end
 - `type`: the type of the message, this can be:
     - `confirmation`
     - `status`
     - `time`
+    - `instruction`
 - `contents`:
     - If type is `confirmation`, then the then the message contents have
         - `instructed` 
@@ -61,4 +62,7 @@ are specific defined depending on the sender and receiver.
         - `id` of timer
         - `duration` has a number of the duration left in milliseconds
         - `state` sting of the timer state
+    - If type is `instruction`, then the then the message contents have
+        - `instrucion` with value `reset` or `status update`
+
         
