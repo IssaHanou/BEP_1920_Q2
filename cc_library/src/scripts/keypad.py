@@ -111,11 +111,9 @@ class NumpadReader:
                 return
 
             self.word = self.word + str(number)
-            self.statusChange(self.word)
             return
 
         # Could be something for the config
-
         self.handler(self.word)
 
         self.count = 0
