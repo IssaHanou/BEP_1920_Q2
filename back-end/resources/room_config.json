@@ -554,7 +554,7 @@
                 "type": "rule",
                 "type_id": "rood",
                 "constraints": {
-                  "comparison": "gte",
+                  "comparison": "eq",
                   "value": 1
                 }
               },
@@ -562,7 +562,7 @@
                 "type": "rule",
                 "type_id": "groen",
                 "constraints": {
-                  "comparison": "gte",
+                  "comparison": "eq",
                   "value": 1
                 }
               },
