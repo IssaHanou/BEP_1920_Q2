@@ -90,4 +90,4 @@ This can be displayed in the front-end, so should be readable and in Dutch.
         - `value`: this is the value for the instruction of the type specified for this device and component
     - `message` in case of type `timer`:   
         - `instruction`: one of the instructions for timer, e.g. `start`, `stop`, `pause`(, `add`, `subtract`)
-        - `value`: optional, in case of `add` and `subtract` a time should be given in format XhXmXs 
+        - TODO `value`: optional, in case of `add` and `subtract` a time should be given in format XhXmXs 

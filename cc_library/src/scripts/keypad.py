@@ -17,8 +17,10 @@ class Keypad(Device):
         """
         Returns status of all custom components, in json format.
         """
+        if self.currentValue == "":
+            return {}
 
-        return {"code": self.currentValue}
+        return {"code": int(self.currentValue)}
 
     def perform_instruction(self, contents):
         """
