@@ -151,7 +151,7 @@ export class AppComponent implements OnInit, OnDestroy {
                 });
               }
               break;
-            case "send status": {
+            case "status update": {
               this.sendConnection(true);
             }
           }

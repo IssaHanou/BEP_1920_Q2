@@ -308,6 +308,9 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 					for _, device := range handler.Config.Devices {
 						handler.SendStatus(device.ID)
 					}
+					for _, timer := range handler.Config.Timers {
+						handler.SendStatus(timer.ID)
+					}
 				}
 			case "hint":
 				{
