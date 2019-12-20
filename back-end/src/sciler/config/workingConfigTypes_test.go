@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 func TestGeneralEvent_GetName(t *testing.T) {
@@ -26,6 +27,128 @@ func TestGeneralEvent_GetRules(t *testing.T) {
 	}
 
 	assert.Equal(t, generalEvent.GetRules(), []*Rule{rule})
+}
+
+func TestTimer_GetTimeLeft(t *testing.T) {
+	timer := Timer{
+		ID:        "testTimer",
+		Duration:  10 * time.Second,
+		StartedAt: time.Time{},
+		T:         nil,
+		State:     "stateIdle",
+		Ending:    nil,
+		Finish:    false,
+	}
+	left, state := timer.GetTimeLeft()
+	assert.Equal(t, left, 10*time.Second)
+	assert.Equal(t, state, "stateIdle")
+}
+
+func TestTimer_GetTimeLeft_Active(t *testing.T) {
+	timer := Timer{
+		ID:        "testTimer",
+		Duration:  10 * time.Second,
+		StartedAt: time.Time{},
+		T:         nil,
+		State:     "stateIdle",
+		Ending:    nil,
+		Finish:    false,
+	}
+	timer.Start(nil)
+	left, state := timer.GetTimeLeft()
+	assert.GreaterOrEqual(t, left.Seconds(), (timer.Duration - time.Now().Sub(timer.StartedAt)).Seconds())
+	assert.Equal(t, state, "stateActive")
+}
+
+func TestTimer_Start(t *testing.T) {
+	timer := Timer{
+		ID:        "testTimer",
+		Duration:  10 * time.Second,
+		StartedAt: time.Time{},
+		T:         nil,
+		State:     "stateIdle",
+		Ending:    nil,
+		Finish:    false,
+	}
+	timer.Start(nil)
+	assert.Equal(t, timer.State, "stateActive")
+}
+
+func TestTimer_Start_False(t *testing.T) {
+	timer := Timer{
+		ID:        "testTimer",
+		Duration:  10 * time.Second,
+		StartedAt: time.Time{},
+		T:         nil,
+		State:     "stateIdle",
+		Ending:    nil,
+		Finish:    false,
+	}
+	ok := timer.Start(nil)
+	assert.Equal(t, ok, true)
+	ok2 := timer.Start(nil)
+	assert.Equal(t, ok2, false)
+}
+
+func TestTimer_Pause(t *testing.T) {
+	timer := Timer{
+		ID:        "testTimer",
+		Duration:  10 * time.Second,
+		StartedAt: time.Time{},
+		T:         nil,
+		State:     "stateIdle",
+		Ending:    nil,
+		Finish:    false,
+	}
+	timer.Start(nil)
+	assert.Equal(t, timer.State, "stateActive")
+	timer.Pause()
+	assert.Equal(t, timer.State, "stateIdle")
+}
+
+func TestTimer_Pause_False(t *testing.T) {
+	timer := Timer{
+		ID:        "testTimer",
+		Duration:  10 * time.Second,
+		StartedAt: time.Time{},
+		T:         nil,
+		State:     "stateIdle",
+		Ending:    nil,
+		Finish:    false,
+	}
+	ok := timer.Pause()
+	assert.Equal(t, timer.State, "stateIdle")
+	assert.Equal(t, ok, false)
+}
+
+func TestTimer_Stop(t *testing.T) {
+	timer := Timer{
+		ID:        "testTimer",
+		Duration:  10 * time.Second,
+		StartedAt: time.Time{},
+		T:         nil,
+		State:     "stateIdle",
+		Ending:    nil,
+		Finish:    false,
+	}
+	timer.Start(nil)
+	assert.Equal(t, timer.State, "stateActive")
+	timer.Stop()
+	assert.Equal(t, timer.State, "stateExpired")
+}
+
+func TestTimer_Stop_False(t *testing.T) {
+	timer := Timer{
+		ID:        "testTimer",
+		Duration:  10 * time.Second,
+		StartedAt: time.Time{},
+		T:         nil,
+		State:     "stateIdle",
+		Ending:    nil,
+		Finish:    false,
+	}
+	ok := timer.Stop()
+	assert.Equal(t, ok, false)
 }
 
 func TestPuzzle_GetName(t *testing.T) {
@@ -89,6 +212,14 @@ func Test_compare(t *testing.T) {
 			name: "equal true",
 			args: args{
 				param1:      float64(2),
+				param2:      float64(2),
+				comparision: "eq",
+			},
+			want: true,
+		}, {
+			name: "equal true int 2 == float62(2)",
+			args: args{
+				param1:      2, // int
 				param2:      float64(2),
 				comparision: "eq",
 			},
@@ -328,14 +459,23 @@ func Test_ResolveDeviceTrue(t *testing.T) {
 	assert.True(t, config.Puzzles[1].GetRules()[0].Conditions.Resolve(config))
 }
 
-func Test_ResolveTimer(t *testing.T) {
+func Test_ResolveTimerTrue(t *testing.T) {
+	filename := "../../../resources/testing/test_resolveTrue.json"
+	config := ReadFile(filename)
+	config.Timers["timer1"].Finish = true
+	assert.True(t, config.GeneralEvents[0].GetRules()[0].Conditions.Resolve(config))
+}
+
+func Test_ResolveTimerFalse(t *testing.T) {
+	filename := "../../../resources/testing/test_resolveFalse.json"
+	config := ReadFile(filename)
+	assert.True(t, config.GeneralEvents[0].GetRules()[0].Conditions.Resolve(config))
+}
+
+func Test_ReadTimer(t *testing.T) {
 	filename := "../../../resources/testing/test_config.json"
 	config := ReadFile(filename)
-	assert.PanicsWithValue(t,
-		"cannot resolve constraint {eq  00:01:01} because condition.type is an timer type, which is not implemented yet",
-		func() { config.GeneralEvents[0].GetRules()[0].Conditions.Resolve(config) },
-		"Timers are not supported yet")
-
+	assert.Equal(t, config.Timers["general"].Duration, time.Minute*30)
 }
 
 func Test_CheckRuleValue(t *testing.T) {
@@ -347,6 +487,15 @@ func Test_CheckRuleValue(t *testing.T) {
 
 }
 
+func Test_CheckTimerValue(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckTimerValue.json"
+	assert.PanicsWithValue(t,
+		"input type boolean expected but string found as type of value testString",
+		func() { ReadFile(filename) },
+		"The value in a constraint on a condition of type rule may only be of type bool")
+
+}
+
 func Test_CheckRuleComparison(t *testing.T) {
 	filename := "../../../resources/testing/wrong-types/testCheckRuleComparison.json"
 	assert.PanicsWithValue(t,
@@ -355,10 +504,26 @@ func Test_CheckRuleComparison(t *testing.T) {
 		"The comparison in a constraint on a condition of type rule may only be a numeric comparator")
 }
 
+func Test_CheckTimerComparison(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckTimerComparison.json"
+	assert.PanicsWithValue(t,
+		"comparision gte not allowed on a boolean",
+		func() { ReadFile(filename) },
+		"The comparison in a constraint on a condition of type rule may only be a numeric comparator")
+}
+
 func Test_CheckRuleID(t *testing.T) {
 	filename := "../../../resources/testing/wrong-types/testCheckRuleID.json"
 	assert.PanicsWithValue(t,
 		"rule with id non existing not found in map",
+		func() { ReadFile(filename) },
+		"The rule id is unknown")
+}
+
+func Test_CheckTimerID(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckTimerID.json"
+	assert.PanicsWithValue(t,
+		"timer with id timerTest not found in map",
 		func() { ReadFile(filename) },
 		"The rule id is unknown")
 }

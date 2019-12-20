@@ -146,7 +146,7 @@ func TestCommunicator_Start(t *testing.T) {
 	}
 
 	client.On("Connect").Return(new(TokenMockSuccess)).Once()
-	communicator.Start(func(client mqtt.Client, message mqtt.Message) {})
+	communicator.Start(func(client mqtt.Client, message mqtt.Message) {}, func() {})
 	client.AssertExpectations(t)
 }
 

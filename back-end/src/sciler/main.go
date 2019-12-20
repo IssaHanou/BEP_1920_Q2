@@ -36,13 +36,15 @@ func main() {
 	port := configurations.General.Port
 
 	communicator := communication.NewCommunicator(host, port, topics)
-	messageHandler := handler.Handler{Config: configurations, Communicator: communicator}
-	go communicator.Start(messageHandler.NewHandler)
 
-	for _, value := range messageHandler.Config.Devices {
-		messageHandler.SendStatus(value.ID)
-		messageHandler.GetStatus(value.ID)
-	}
+	messageHandler := handler.Handler{Config: configurations, ConfigFile: filename, Communicator: communicator}
+	go communicator.Start(messageHandler.NewHandler, func() {
+		messageHandler.SendStatus("general")
+		for _, value := range messageHandler.Config.Devices {
+			messageHandler.SendStatus(value.ID)
+			messageHandler.GetStatus(value.ID)
+		}
+	})
 
 	// prevent exit
 	select {}

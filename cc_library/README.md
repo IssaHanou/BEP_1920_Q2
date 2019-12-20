@@ -9,4 +9,4 @@ To make sure all dependencies are loaded, run `pip install -r cc_library/require
 - To check the codestyle, run `flake8 cc_library`.
 
 ### Raspberry Pi Set up
-For setting up a Pi, read the `README.md` in the sciler package. 
+For setting up a Pi, [a read the `README.md`](src/sciler/README.md) in the sciler package. 

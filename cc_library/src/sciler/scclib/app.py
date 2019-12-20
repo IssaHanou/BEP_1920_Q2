@@ -1,9 +1,8 @@
 from datetime import datetime
+import os
 import json
-
 import paho.mqtt.client as mqtt
-
-from cc_library.src.sciler.scclib.logger import Logger
+import logging
 
 
 class SccLib:
@@ -22,11 +21,17 @@ class SccLib:
         self.host = self.config.get("host")
         self.port = self.config.get("port")
         self.labels = self.config.get("labels")
-        self.logger = Logger()
-        self.logger.log("Start of log for device: " + self.name)
+        if not os.path.exists("logs"):
+            os.mkdir("logs")
+        filename = "logs/log-" + datetime.now().strftime("%d-%m-%YT--%H-%M-%S") + ".txt"
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(asctime)s [%(levelname)-5.5s]  %(message)s",
+            handlers=[logging.FileHandler(filename=filename), logging.StreamHandler()],
+        )
+        msg = "Start of log for device: " + self.name
+        logging.info(msg=msg)
 
-        self.statusChanged = self.status_changed
-        self.statusChangedOnChannel = self.status_changed_on_channel
         self.client = mqtt.Client(self.name)
         self.client.on_message = self.__on_message
         self.client.on_log = self.__on_log
@@ -46,15 +51,34 @@ class SccLib:
         MQTT Client method.
         Broker logger that logs everything happening with the mqtt client.
         """
-        print(self.name, ", broker log: ", buf)
 
-    def start(self):
+        msg = self.name, ", broker log: ", level, ", ", buf
+        logging.info(msg)
+
+    def log(self, level, msg):
+        logging.log(level=level, msg=msg)
+
+    def start(self, loop=None, stop=None):
         """
         Starting method to call from the starting script.
         """
         self.__connect()
+        try:
+            if loop:
+                self.client.loop_start()
+                loop()
+            else:
+                self.client.loop_forever()
+        except KeyboardInterrupt:
+            logging.info("program was terminated from keyboard input")
+        finally:
+            if stop:
+                stop()
+            if loop:
+                self.client.loop_stop()
+            self.__stop()
 
-    def stop(self):
+    def __stop(self):
         """
         Stop method to call from the starting script.
         """
@@ -66,13 +90,15 @@ class SccLib:
         }
         msg = json.dumps(msg_dict)
         self.__send_message("back-end", msg)
+        logging.info("cleanly exited ControlBoard program and client")
         self.client.disconnect()
+        logging.shutdown()
 
     def __send_message(self, topic, json_message):
         # TODO what to do when publish fails
         self.client.publish(topic, json_message, 1)
         message_type = topic + " message published"
-        self.logger.log((message_type, json_message))
+        logging.info((message_type, json_message))
 
     def __connect(self):
         """
@@ -82,18 +108,13 @@ class SccLib:
         subscribes to topic "test"
         starts loop_forever
         """
-        while True:
-            try:
-                self.client.connect(self.host, self.port, keepalive=10)
-                self.logger.log("connected to broker")
-                for label in self.labels:
-                    self.__subscribe_topic(label)
-                self.__subscribe_topic("client-computers")
-                self.__subscribe_topic(self.name)
-                self.client.loop_forever()
-                break
-            except ConnectionRefusedError:
-                self.logger.log("ERROR: connection was refused")
+        try:
+            self.client.connect(self.host, self.port, keepalive=10)
+            logging.info("connected to broker")
+        except ConnectionRefusedError:
+            logging.error("connection was refused")
+        except TimeoutError:
+            logging.error("connecting failed, socket timed out")
 
     def __on_connect(self, client, userdata, flags, rc):
         """
@@ -106,7 +127,10 @@ class SccLib:
         """
         if rc == 0:
             client.connected_flag = True  # set flag
-            self.logger.log("connected OK")
+            for label in self.labels:
+                self.__subscribe_topic(label)
+            self.__subscribe_topic("client-computers")
+            self.__subscribe_topic(self.name)
             msg_dict = {
                 "device_id": self.name,
                 "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
@@ -115,8 +139,10 @@ class SccLib:
             }
             msg = json.dumps(msg_dict)
             self.__send_message("back-end", msg)
+            self.status_changed()
+            logging.info("connected OK")
         else:
-            self.logger.log(("bad connection, returned code=", rc))
+            logging.error(("bad connection, returned code=", rc))
             client.bad_connection_flag = True
 
     def __on_disconnect(self, client, userdata, rc):
@@ -132,17 +158,12 @@ class SccLib:
         }
         msg = json.dumps(msg_dict)
         self.__send_message("back-end", msg)
-        self.logger.log(("disconnecting, reason  " + str(rc)))
+        if rc == 0:
+            logging.info(("disconnecting, reason  " + str(rc)))
+        else:
+            logging.warning("disconnecting, reason " + str(rc))
         client.connected_flag = False
         client.disconnect_flag = True
-        self.logger.close()
-
-    def status_changed_on_channel(self, channel):
-        """
-        This is called from the client computer to message a status update.
-        """
-        self.logger.log("status changed of pin " + str(channel))
-        self.__send_status_message(self.device.get_status())
 
     def status_changed(self):
         """
@@ -160,7 +181,7 @@ class SccLib:
             "device_id": self.name,
             "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
             "type": "status",
-            "contents": eval(msg),
+            "contents": msg,
         }
         res_msg = json.dumps(json_msg)
         self.__send_message("back-end", res_msg)
@@ -172,7 +193,7 @@ class SccLib:
          a message from the broken for a subscribed topic.
         The message is printed and send through to the handler.
         """
-        self.logger.log(
+        logging.info(
             (
                 "message received: topic",
                 message.topic,
@@ -191,7 +212,7 @@ class SccLib:
         message = message.payload.decode("utf-8")
         message = json.loads(message)
         if message.get("type") != "instruction":
-            self.logger.log(
+            logging.info(
                 ("received non-instruction message of type", message.get("type"))
             )
         else:
@@ -208,12 +229,10 @@ class SccLib:
     def __check_message(self, contents):
         for action in contents:
             instruction = action.get("instruction")
-            self.logger.log(("status?", instruction))
             if instruction == "test":
                 self.device.test()
-                self.logger.log(("instruction performed", action))
-                return True
-            if instruction == "status update":
+                logging.info(("instruction performed", action))
+            elif instruction == "status update":
                 msg_dict = {
                     "device_id": self.name,
                     "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
@@ -223,13 +242,16 @@ class SccLib:
                 msg = json.dumps(msg_dict)
                 self.__send_message("back-end", msg)
                 self.status_changed()
-                self.logger.log(("instruction performed", action))
+                logging.info(("instruction performed", action))
+            elif instruction == "reset":
+                self.device.reset()
+                logging.info("instruction performed", action)
             else:
                 (success, failed_action) = self.device.perform_instruction(action)
                 if success:
-                    self.logger.log(("instruction performed", action))
+                    logging.info(("instruction performed", action))
                 else:
-                    self.logger.log(
+                    logging.warning(
                         (
                             "instruction: " + failed_action + " could not be performed",
                             action,
@@ -244,4 +266,4 @@ class SccLib:
         sciler system wants to receive from the broker.
         """
         self.client.subscribe(topic=topic)
-        self.logger.log(("subscribed to topic", topic))
+        logging.info(("subscribed to topic", topic))

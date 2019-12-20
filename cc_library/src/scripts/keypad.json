@@ -1,0 +1,11 @@
+{
+  "id": "keypad",
+  "description": "Keypad with input 4 numbers",
+  "host": "192.168.178.82",
+  "port": 1883,
+  "labels": [],
+  "input": {
+    "code": "numeric"
+  },
+  "output": { }
+}

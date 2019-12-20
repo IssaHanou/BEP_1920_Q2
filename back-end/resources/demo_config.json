@@ -1,7 +1,7 @@
 {
   "general": {
-    "name": "Escape X",
-    "duration": "30m",
+    "name": "Demo week 6",
+    "duration": "5m",
     "host": "192.168.178.82",
     "port": 1883
   },
@@ -126,10 +126,10 @@
   ],
   "puzzles": [
     {
-      "name": "puzzel rood",
+      "name": "puzzel drank",
       "rules": [
         {
-          "id": "rood",
+          "id": "drank",
           "description": "Wanneer de rode switch op true staat en de slider 100, dan sturen we een hint met 'puzzle rood opgelost'",
           "limit": 1,
           "conditions": {
@@ -142,21 +142,41 @@
                   "operator": "AND",
                   "list": [
                     {
-                      "component_id": "redSwitch",
-                      "comparison": "eq",
-                      "value": true
+                      "component_id": "slider1",
+                      "comparison": "lte",
+                      "value": 80
                     },
                     {
                       "component_id": "slider1",
-                      "comparison": "eq",
+                      "comparison": "gte",
+                      "value": 10
+                    },
+                    {
+                      "component_id": "slider2",
+                      "comparison": "lte",
+                      "value": 10
+                    },
+                    {
+                      "component_id": "slider2",
+                      "comparison": "gte",
+                      "value": 0
+                    },
+                    {
+                      "component_id": "slider3",
+                      "comparison": "lte",
                       "value": 100
+                    },
+                    {
+                      "component_id": "slider3",
+                      "comparison": "gte",
+                      "value": 80
                     }
                   ]
                 }
               },
               {
                 "type": "rule",
-                "type_id": "start",
+                "type_id": "codedeur",
                 "constraints": {
                   "comparison": "gte",
                   "value": 1
@@ -178,76 +198,7 @@
                   "component_id": "greenLight1",
                   "instruction": "turnOnOff",
                   "value": true
-                }
-              ]
-            },
-            {
-              "type": "device",
-              "type_id": "display",
-              "message": [
-                {
-                  "component_id": "hint",
-                  "instruction": "hint",
-                  "value": "puzzle rood opgelost!"
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "hints": [
-        "Zet de schuiven nauwkeurig"
-      ]
-    },
-    {
-      "name": "puzzel oranje",
-      "rules": [
-        {
-          "id": "oranje",
-          "description": "Wanneer de rode oranje op true staat en de slider tussen 50 en 80, dan sturen we een hint met 'puzzle oranje opgelost'",
-          "limit": 1,
-          "conditions": {
-            "operator": "AND",
-            "list": [
-              {
-                "type": "device",
-                "type_id": "controlBoard",
-                "constraints": {
-                  "operator": "AND",
-                  "list": [
-                    {
-                      "component_id": "orangeSwitch",
-                      "comparison": "eq",
-                      "value": true
-                    },
-                    {
-                      "component_id": "slider2",
-                      "comparison": "lte",
-                      "value": 80
-                    },
-                    {
-                      "component_id": "slider2",
-                      "comparison": "gte",
-                      "value": 50
-                    }
-                  ]
-                }
-              },
-              {
-                "type": "rule",
-                "type_id": "start",
-                "constraints": {
-                  "comparison": "gte",
-                  "value": 1
-                }
-              }
-            ]
-          },
-          "actions": [
-            {
-              "type": "device",
-              "type_id": "controlBoard",
-              "message": [
+                },
                 {
                   "component_id": "redLight2",
                   "instruction": "turnOnOff",
@@ -257,79 +208,7 @@
                   "component_id": "greenLight2",
                   "instruction": "turnOnOff",
                   "value": true
-                }
-              ]
-            },
-            {
-              "type": "device",
-              "type_id": "display",
-              "message": [
-                {
-                  "component_id": "hint",
-                  "instruction": "hint",
-                  "value": "puzzle oranje opgelost!"
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "hints": [
-        "Zet de schuiven nauwkeurig"
-      ]
-    },
-    {
-      "name": "puzzel groen",
-      "rules": [
-        {
-          "id": "groen",
-          "description": "Wanneer de groen switch op true staat en de slider 100, en rule rood is al opgelost, dan sturen we een hint met 'puzzle groen opgelost'",
-          "limit": 1,
-          "conditions": {
-            "operator": "AND",
-            "list": [
-              {
-                "type": "device",
-                "type_id": "controlBoard",
-                "constraints": {
-                  "operator": "AND",
-                  "list": [
-                    {
-                      "component_id": "greenSwitch",
-                      "comparison": "eq",
-                      "value": true
-                    },
-                    {
-                      "component_id": "slider3",
-                      "comparison": "eq",
-                      "value": 100
-                    }
-                  ]
-                }
-              },
-              {
-                "type": "rule",
-                "type_id": "rood",
-                "constraints": {
-                  "comparison": "gte",
-                  "value": 1
-                }
-              },
-              {
-                "type": "rule",
-                "type_id": "start",
-                "constraints": {
-                  "comparison": "gte",
-                  "value": 1
-                }
-              }
-            ]
-          },
-          "actions": [
-            {
-              "type": "device",
-              "type_id": "controlBoard",
-              "message": [
+                },
                 {
                   "component_id": "redLight3",
                   "instruction": "turnOnOff",
@@ -349,7 +228,71 @@
                 {
                   "component_id": "hint",
                   "instruction": "hint",
-                  "value": "puzzle groen opgelost!"
+                  "value": "We kunnen nu gaan zuipon!"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "hints": [
+        "Zet de schuiven nauwkeurig"
+      ]
+    },
+    {
+      "name": "puzzel keypad to door",
+      "rules": [
+        {
+          "id": "codedeur",
+          "description": "er moet een code gestuurd worden, dan gaat de magneet open",
+          "limit": 1,
+          "conditions": {
+            "operator": "AND",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "keypad",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "component_id": "code",
+                      "comparison": "eq",
+                      "value": 45
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "start",
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "door",
+              "message": [
+                {
+                  "component_id": "door",
+                  "instruction": "open",
+                  "value": false
+                }
+              ]
+            },
+            {
+              "type": "device",
+              "type_id": "display",
+              "message": [
+                {
+                  "component_id": "hint",
+                  "instruction": "hint",
+                  "value": "hoorde ik daar een klik?"
                 }
               ]
             }
@@ -422,7 +365,7 @@
             },
             {
               "type": "timer",
-              "type_id": "timer2",
+              "type_id": "general",
               "message": [
                 {
                   "instruction": "start"
@@ -430,11 +373,24 @@
               ]
             },
             {
-              "type": "timer",
-              "type_id": "general",
+              "type": "device",
+              "type_id": "display",
               "message": [
                 {
-                  "instruction": "start"
+                  "component_id": "hint",
+                  "instruction": "hint",
+                  "value": "Hoeveel kerstballen hangen er ongeveer in de boom?"
+                }
+              ]
+            },
+            {
+              "type": "device",
+              "type_id": "door",
+              "message": [
+                {
+                  "component_id": "door",
+                  "instruction": "open",
+                  "value": true
                 }
               ]
             }
@@ -443,19 +399,46 @@
       ]
     },
     {
-      "name": "late hint",
+      "name": "hints",
       "rules": [
         {
-          "id": "hint",
-          "description": "5 seconde na de start wordt er een hint verstuurd",
-          "limit": 1,
+          "id": "hint1",
+          "description": "te laag hint",
+          "limit": 100,
           "conditions": {
-            "type": "timer",
-            "type_id": "timer2",
-            "constraints": {
-              "comparison": "eq",
-              "value": true
-            }
+            "operator": "AND",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "keypad",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "component_id": "code",
+                      "comparison": "lte",
+                      "value": 44
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "start",
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "codedeur",
+                "constraints": {
+                  "comparison": "lte",
+                  "value": 2
+                }
+              }
+            ]
           },
           "actions": [
             {
@@ -465,7 +448,60 @@
                 {
                   "component_id": "hint",
                   "instruction": "hint",
-                  "value": "je bent al 5 seconde bezig, misschien moet je naar het blaadje kijken :)"
+                  "value": "dat is te laag"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hint2",
+          "description": "te hoog hint",
+          "limit": 100,
+          "conditions": {
+            "operator": "AND",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "keypad",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "component_id": "code",
+                      "comparison": "gte",
+                      "value": 46
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "start",
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "codedeur",
+                "constraints": {
+                  "comparison": "lte",
+                  "value": 2
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "display",
+              "message": [
+                {
+                  "component_id": "hint",
+                  "instruction": "hint",
+                  "value": "dat is te hoog"
                 }
               ]
             }
@@ -552,25 +588,17 @@
             "list": [
               {
                 "type": "rule",
-                "type_id": "rood",
+                "type_id": "drank",
                 "constraints": {
-                  "comparison": "eq",
+                  "comparison": "gte",
                   "value": 1
                 }
               },
               {
                 "type": "rule",
-                "type_id": "groen",
+                "type_id": "codedeur",
                 "constraints": {
-                  "comparison": "eq",
-                  "value": 1
-                }
-              },
-              {
-                "type": "rule",
-                "type_id": "oranje",
-                "constraints": {
-                  "comparison": "eq",
+                  "comparison": "gte",
                   "value": 1
                 }
               }
@@ -585,42 +613,6 @@
                   "component_id": "hint",
                   "instruction": "hint",
                   "value": "Puzzle opgelost!"
-                }
-              ]
-            },
-            {
-              "type": "device",
-              "type_id": "controlBoard",
-              "message": [
-                {
-                  "component_id": "redLight1",
-                  "instruction": "turnOnOff",
-                  "value": true
-                },
-                {
-                  "component_id": "redLight2",
-                  "instruction": "turnOnOff",
-                  "value": true
-                },
-                {
-                  "component_id": "redLight3",
-                  "instruction": "turnOnOff",
-                  "value": true
-                },
-                {
-                  "component_id": "greenLight1",
-                  "instruction": "turnOnOff",
-                  "value": true
-                },
-                {
-                  "component_id": "greenLight2",
-                  "instruction": "turnOnOff",
-                  "value": true
-                },
-                {
-                  "component_id": "greenLight3",
-                  "instruction": "turnOnOff",
-                  "value": true
                 }
               ]
             },
@@ -691,6 +683,17 @@
                 {
                   "component_id": "greenLight3",
                   "instruction": "turnOnOff",
+                  "value": false
+                }
+              ]
+            },
+            {
+              "type": "device",
+              "type_id": "door",
+              "message": [
+                {
+                  "component_id": "door",
+                  "instruction": "open",
                   "value": false
                 }
               ]

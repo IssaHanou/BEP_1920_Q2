@@ -115,6 +115,14 @@ func Test_CheckActionWrongDevice(t *testing.T) {
 		"Cannot perform an action on an unknown device")
 }
 
+func Test_CheckActionWrongTimer(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckActionWrongTimer.json"
+	assert.PanicsWithValue(t,
+		"timer with id TestTimer not found in map",
+		func() { ReadFile(filename) },
+		"Cannot perform an action on an unknown timer")
+}
+
 func Test_CheckActionWrongComponent(t *testing.T) {
 	filename := "../../../resources/testing/wrong-types/testCheckActionWrongComponent.json"
 	assert.PanicsWithValue(t,
@@ -127,6 +135,14 @@ func Test_CheckActionWrongInstruction(t *testing.T) {
 	filename := "../../../resources/testing/wrong-types/testCheckActionWrongInstruction.json"
 	assert.PanicsWithValue(t,
 		"instruction non existing not found in map",
+		func() { ReadFile(filename) },
+		"Cannot perform an action with an unknown instruction")
+}
+
+func Test_CheckActionWrongTimerInstruction(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckActionWrongTimerInstruction.json"
+	assert.PanicsWithValue(t,
+		"input type string expected but float64 found as type of value 30",
 		func() { ReadFile(filename) },
 		"Cannot perform an action with an unknown instruction")
 }
