@@ -117,7 +117,7 @@ class NumpadReader:
             return
 
         # Could be something for the config
-        
+
         self.handler(self.word)
 
         self.count = 0
