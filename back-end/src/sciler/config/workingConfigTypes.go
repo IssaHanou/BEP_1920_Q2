@@ -174,8 +174,10 @@ type Event interface {
 	GetRules() []*Rule
 }
 
-// todo make sure all numeric are saved as float64 on reading in / status received
 func compare(param1 interface{}, param2 interface{}, comparision string) bool {
+	if param1 == nil {
+		return false
+	}
 	switch comparision {
 	case "eq":
 		if reflect.TypeOf(param1).Kind() == reflect.Int || reflect.TypeOf(param2).Kind() == reflect.Int {
