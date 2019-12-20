@@ -218,15 +218,15 @@ func (handler *Handler) SendStatus(deviceID string) {
 			},
 		}
 	} else if _, ok2 := handler.Config.Timers[deviceID]; ok2 {
-		status, _ := handler.Config.Timers[deviceID].GetTimeLeft()
+		duration, _ := handler.Config.Timers[deviceID].GetTimeLeft()
 		message = Message{
 			DeviceID: "back-end",
 			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 			Type:     "time",
 			Contents: map[string]interface{}{
-				"id":     handler.Config.Timers[deviceID].ID,
-				"status": status.Milliseconds(),
-				"state":  handler.Config.Timers[deviceID].State,
+				"id":       handler.Config.Timers[deviceID].ID,
+				"duration": duration.Milliseconds(),
+				"state":    handler.Config.Timers[deviceID].State,
 			},
 		}
 	}
