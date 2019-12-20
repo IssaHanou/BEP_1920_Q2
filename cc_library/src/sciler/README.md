@@ -19,19 +19,13 @@ This mainly consists of:
 ## Set-up testing device (full cc_library)
 - create custom device script, which should inherit from `Device`, add it to `cc_library/src/scripts`
 - write configuration for the the device, according to `device_manual.md`, in the same file as the script
-- `ssh pi@<ip-address>`
-- `python3 cc_library/src/scripts/<custom-device>.py` to start device
-- start broker for device to connect with. run `mosquitto -c <conf>`
+- start broker for device to connect with. 
+- move the cc_library directory onto the Pi
+- run `pip3 install paho-mqtt` on Pi
+- run `python3 cc_library/src/scripts/<custom-device>.py` on Pi to start device
 
-## Set-up library
-To run this library on a client computer:
+## Set-up Pi (TODO)
 
-- `pip install sciler`
-- create custom device script, which should inherit from `Device`, add it to `/scclib`
-- write configuration for the the device, according to `device_manual.md`
-- `ssh pi@<ip-address>`
-- `python3 sclier/scclib/<custom-device>.py` to start device
-- start broker for device to connect with. run `mosquitto -c <conf>`
 
 ## License
 This library is licensed with GNU GPL v3, see `LICENSE.md`.
