@@ -9,7 +9,7 @@ export class Timers {
 
   setTimer(jsonData) {
     if (this.all.has(jsonData.id)) {
-      this.all.get(jsonData.id).update(jsonData.status, jsonData.state);
+      this.all.get(jsonData.id).update(jsonData.duration, jsonData.state);
     } else {
       this.all.set(jsonData.id, new Timer(jsonData));
     }

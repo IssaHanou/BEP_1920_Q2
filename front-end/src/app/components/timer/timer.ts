@@ -5,7 +5,7 @@ export class Timer {
 
   constructor(jsonData) {
     this.id = jsonData.id;
-    this.duration = jsonData.status;
+    this.duration = jsonData.duration;
     this.state = jsonData.state;
   }
 

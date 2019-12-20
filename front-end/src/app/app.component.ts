@@ -26,7 +26,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.jsonConvert = new JsonConvert();
     this.deviceList = new Devices();
     this.timerList = new Timers();
-    const generaltimer = { id: "general", status: 0, state: "stateIdle" };
+    const generaltimer = { id: "general", duration: 0, state: "stateIdle" };
     this.timerList.setTimer(generaltimer);
   }
 
