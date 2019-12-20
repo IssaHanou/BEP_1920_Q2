@@ -570,7 +570,7 @@
                 "type": "rule",
                 "type_id": "oranje",
                 "constraints": {
-                  "comparison": "gte",
+                  "comparison": "eq",
                   "value": 1
                 }
               }

@@ -198,6 +198,26 @@
                   "component_id": "greenLight1",
                   "instruction": "turnOnOff",
                   "value": true
+                },
+                {
+                  "component_id": "redLight2",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "greenLight2",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "redLight3",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "greenLight3",
+                  "instruction": "turnOnOff",
+                  "value": true
                 }
               ]
             },
@@ -261,7 +281,7 @@
                 {
                   "component_id": "door",
                   "instruction": "open",
-                  "value": true
+                  "value": false
                 }
               ]
             },
@@ -360,6 +380,17 @@
                   "component_id": "hint",
                   "instruction": "hint",
                   "value": "Hoeveel kerstballen hangen er ongeveer in de boom?"
+                }
+              ]
+            },
+            {
+              "type": "device",
+              "type_id": "door",
+              "message": [
+                {
+                  "component_id": "door",
+                  "instruction": "open",
+                  "value": true
                 }
               ]
             }
@@ -652,6 +683,17 @@
                 {
                   "component_id": "greenLight3",
                   "instruction": "turnOnOff",
+                  "value": false
+                }
+              ]
+            },
+            {
+              "type": "device",
+              "type_id": "door",
+              "message": [
+                {
+                  "component_id": "door",
+                  "instruction": "open",
                   "value": false
                 }
               ]
