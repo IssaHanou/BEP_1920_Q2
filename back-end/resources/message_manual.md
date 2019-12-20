@@ -27,7 +27,7 @@ are specific defined depending on the sender and receiver.
     - `confirmation`
     - `connection`
 - `contents`:
-    - If type is `status`, then the message contents is list of status's 
+    - If type is `status`, then the message contents is map of status's 
     that have a `key` with a `value`. where `key` is a component_id, and `value` it's status in 
     a format defined in the configurations of the device. e.g. `{redSwitch: true, redSlider: 40, redLed: "aan"}`
     - If type is `confirmation`,  then the message contents has te following:
@@ -56,7 +56,7 @@ are specific defined depending on the sender and receiver.
         - `instruction`
     - If type is `status`, then the then the message contents have
         - `id` of device
-        - `status` has a list of `component_id` keys and `status` values
+        - `status` has a map of `component_id` keys and `status` values
         - `connection` boolean
     - If type is `time`, then the then the message contents have
         - `id` of timer
