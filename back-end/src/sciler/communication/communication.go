@@ -1,6 +1,7 @@
 package communication
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -21,6 +22,17 @@ func NewCommunicator(host string, port int, topicsOfInterest []string) *Communic
 	opts.SetClientID("back-end")
 	opts.SetConnectionLostHandler(onConnectionLost)
 	opts.SetKeepAlive(20)
+	will, _ := json.Marshal(map[string]interface{}{
+		"device_id": "back-end",
+		"time_sent": time.Now().Format("02-01-2006 15:04:05"),
+		"type":      "status",
+		"contents": map[string]interface{}{
+			"id":         "front-end",
+			"status":     map[string]interface{}{},
+			"connection": false,
+		},
+	})
+	opts.SetWill("front-end", string(will), 0, false)
 	client := mqtt.NewClient(opts)
 	return &Communicator{client, topicsOfInterest}
 }
