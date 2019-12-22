@@ -25,12 +25,16 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
   text-align: center;
 }
+.title-box, .subtitle-box {
+  display: inline-block;
+  margin: 0px 10px 0px 10px;
+}
 
 
 /*Boxes on home page*/
 .home-box {
   font-family: Roboto, "Helvetica Neue", sans-serif;
-  margin: 30px;
+  margin: 0 30px 0;
   max-width: 100%;
 }
 .home-box .header {
