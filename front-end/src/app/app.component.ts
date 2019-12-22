@@ -20,12 +20,14 @@ export class AppComponent implements OnInit, OnDestroy {
   subscription: Subscription;
   topics = ["front-end"];
   deviceList: Devices;
+  puzzleList: Puzzles;
   remainingTime: number;
   timeState: string;
 
   constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
     this.jsonConvert = new JsonConvert();
     this.deviceList = new Devices();
+    this.puzzleList = new Puzzles();
     this.remainingTime = 0;
     this.timeState = "stateIdle";
   }
@@ -107,6 +109,10 @@ export class AppComponent implements OnInit, OnDestroy {
         }
         break;
       }
+      case "event-status": {
+        this.puzzleList.updatePuzzles(msg.contents);
+        break;
+      }
       case "status": {
         this.deviceList.setDevice(msg.contents);
         break;
@@ -131,10 +137,9 @@ export class AppComponent implements OnInit, OnDestroy {
    */
   public processTimeStatus(jsonData) {
     if (jsonData.id === "general") {
-      const timeleft = jsonData.status;
-      this.remainingTime = timeleft;
+      const timeLeft = jsonData.status;
+      this.remainingTime = timeLeft;
       this.timeState = jsonData.state;
-      console.log(timeleft);
     }
   }
   /**

@@ -52,6 +52,7 @@ func (handler *Handler) msgMapper(raw Message) {
 			handler.onStatusMsg(raw)
 			handler.SendStatus(raw.DeviceID)
 			handler.HandleEvent(raw.DeviceID)
+			handler.SendEventStatus()
 		}
 	case "confirmation":
 		{
@@ -239,6 +240,41 @@ func (handler *Handler) SendStatus(deviceID string) {
 	}
 }
 
+// SendEventStatus sends the status of events to the front-end
+func (handler *Handler) SendEventStatus() {
+	status := handler.getEventStatus()
+	message := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "event-status",
+		Contents: status,
+	}
+
+	jsonMessage, err := json.Marshal(&message)
+	if err != nil {
+		logrus.Errorf("error occurred while constructing message to publish: %v", err)
+	} else {
+		logrus.Infof("sending event status to front-end: %s", fmt.Sprint(message.Contents))
+		handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+	}
+}
+
+// returns json list with json objects with keys ["id", "status"]
+// status is json object with key ruleName and value true (if executed == limit) or false
+func (handler *Handler) getEventStatus() []map[string]interface{} {
+	var list []map[string]interface{}
+	fmt.Print(handler.Config.Puzzles)
+	for _, rule := range handler.Config.RuleMap {
+		var status = make(map[string]interface{})
+		status["id"] = rule.ID
+		// TODO when is puzzle finished
+		status["status"] = rule.Executed == rule.Limit
+		status["description"] = rule.Description
+		list = append(list, status)
+	}
+	return list
+}
+
 // SendInstruction sends a list of instructions to a client
 func (handler *Handler) SendInstruction(clientID string, instructions []config.ComponentInstruction) {
 	message := Message{
@@ -288,9 +324,10 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 			for _, value := range handler.Config.Devices {
 				handler.SendStatus(value.ID)
 			}
+			handler.SendEventStatus()
 		}
 		if instruction["instruction"] == "name" && raw.DeviceID == "front-end" {
-			handler.sendName()
+			handler.SendName()
 		}
 		if instruction["instruction"] == "hint" && raw.DeviceID == "front-end" {
 			message := Message{
@@ -320,8 +357,8 @@ func (handler *Handler) HandleEvent(id string) {
 	}
 }
 
-// sendName sends name of escape room to front-end
-func (handler *Handler) sendName() {
+// SendName sends name of escape room to front-end
+func (handler *Handler) SendName() {
 	message := Message{
 		DeviceID: "front-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),

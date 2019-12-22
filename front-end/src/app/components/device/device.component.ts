@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { Device } from "./device";
 import { AppComponent } from "../../app.component";
-import { MatPaginator, MatSort, MatTableDataSource } from "@angular/material";
+import { MatSort, MatTableDataSource } from "@angular/material";
 
 @Component({
   selector: "app-device",
@@ -18,7 +18,7 @@ export class DeviceComponent implements OnInit {
   ngOnInit() {}
 
   /**
-   * Returns list of Device object with their current status and connection.
+   * Returns list of Device objects with their current status and connection.
    * Return in the form of map table data source, with sorting enabled.
    */
   public getDeviceStatus(): MatTableDataSource<Device> {
