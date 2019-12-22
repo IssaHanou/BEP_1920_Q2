@@ -96,7 +96,7 @@ func compareType(valueType reflect.Kind, inputType string) error {
 	case "string":
 		{
 			if valueType != reflect.String {
-				return fmt.Errorf("status type string expected but %sfound as type", valueType.String())
+				return fmt.Errorf("status type string expected but %s found as type", valueType.String())
 			}
 		}
 	case "boolean":
@@ -289,6 +289,9 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 				handler.SendStatus(value.ID)
 			}
 		}
+		if instruction["instruction"] == "name" && raw.DeviceID == "front-end" {
+			handler.sendName()
+		}
 		if instruction["instruction"] == "hint" && raw.DeviceID == "front-end" {
 			message := Message{
 				DeviceID: raw.DeviceID,
@@ -314,6 +317,25 @@ func (handler *Handler) HandleEvent(id string) {
 				rule.Execute(handler)
 			}
 		}
+	}
+}
+
+// sendName sends name of escape room to front-end
+func (handler *Handler) sendName() {
+	message := Message{
+		DeviceID: "front-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "name",
+		Contents: map[string]string{
+			"name": handler.Config.General.Name,
+		},
+	}
+	jsonMessage, err := json.Marshal(&message)
+	if err != nil {
+		logrus.Errorf("error occurred while constructing message to publish: %v", err)
+	} else {
+		logrus.Infof("sending name data to front-end: %s", fmt.Sprint(message.Contents))
+		handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 	}
 }
 
@@ -365,5 +387,4 @@ func (handler *Handler) SetTimer(timerID string, instructions config.ComponentIn
 		logrus.Warnf("error occurred while reading timer instruction message: %v", instructions.Instruction)
 	}
 	handler.SendStatus(timerID)
-
 }

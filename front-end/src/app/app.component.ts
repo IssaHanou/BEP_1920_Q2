@@ -5,6 +5,7 @@ import { JsonConvert } from "json2typescript";
 import { MatSnackBar, MatSnackBarConfig } from "@angular/material";
 import { Subscription } from "rxjs";
 import { Devices } from "./components/device/devices";
+import { Puzzles } from "./components/puzzle/puzzles";
 
 @Component({
   selector: "app-root",
@@ -33,6 +34,7 @@ export class AppComponent implements OnInit, OnDestroy {
     for (const topic of this.topics) {
       this.subscribeNewTopic(topic);
     }
+    this.sendInstruction([{ instruction: "name" }]);
     this.sendInstruction([{ instruction: "send status" }]);
   }
 
@@ -105,16 +107,16 @@ export class AppComponent implements OnInit, OnDestroy {
         }
         break;
       }
-      case "instruction": {
-        // TODO instructions to front-end? e.g. ask for hint
-        break;
-      }
       case "status": {
         this.deviceList.setDevice(msg.contents);
         break;
       }
       case "time": {
         this.processTimeStatus(msg.contents);
+        break;
+      }
+      case "name": {
+        this.nameOfRoom = msg.contents["name"];
         break;
       }
       default:
