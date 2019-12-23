@@ -65,6 +65,10 @@ body {
   .subtitle, .title {
     font-size: 24px
   }
+  .rule-id {
+    white-space: normal;
+    width: 100px;
+  }
 }
 @media only screen and (min-width: 650px) and (max-width: 700px) {
   .home-box {
@@ -101,6 +105,19 @@ body {
 .custom-md-table-page {
   background-color: #EEEEEE;
 }
+.boolean-column {
+  width: 70px;
+  text-align: center;
+}
+
+.rule-id {
+  white-space: nowrap;
+  min-width: 20%;
+}
+.rule-status {
+  width: 70px;
+}
+
 
 
 /*Other components*/
