@@ -62,6 +62,9 @@ body {
   .home-box {
     margin: 5px;
   }
+  .subtitle, .title {
+    font-size: 24px
+  }
 }
 @media only screen and (min-width: 650px) and (max-width: 700px) {
   .home-box {
