@@ -232,7 +232,7 @@ func (handler *Handler) SendStatus(deviceID string) {
 		}
 	}
 	jsonMessage, err := json.Marshal(&message)
-	if err != nil {
+	if err != nil { // This cannot be tested
 		logrus.Errorf("error occurred while constructing message to publish: %v", err)
 	} else {
 		logrus.Info("sending status data to front-end: " + fmt.Sprint(message.Contents))
@@ -251,7 +251,7 @@ func (handler *Handler) SendEventStatus() {
 	}
 
 	jsonMessage, err := json.Marshal(&message)
-	if err != nil {
+	if err != nil { // This cannot be tested
 		logrus.Errorf("error occurred while constructing message to publish: %v", err)
 	} else {
 		logrus.Infof("sending event status to front-end: %s", fmt.Sprint(message.Contents))
@@ -263,7 +263,6 @@ func (handler *Handler) SendEventStatus() {
 // status is json object with key ruleName and value true (if executed == limit) or false
 func (handler *Handler) getEventStatus() []map[string]interface{} {
 	var list []map[string]interface{}
-	fmt.Print(handler.Config.Puzzles)
 	for _, rule := range handler.Config.RuleMap {
 		var status = make(map[string]interface{})
 		status["id"] = rule.ID
@@ -285,7 +284,7 @@ func (handler *Handler) SendInstruction(clientID string, instructions []config.C
 	}
 
 	jsonMessage, err := json.Marshal(&message)
-	if err != nil {
+	if err != nil { // This cannot be tested
 		logrus.Errorf("error occurred while constructing message to publish: %v", err)
 	} else {
 		logrus.Infof("sending instruction data to %s: %s", clientID, fmt.Sprint(message.Contents))
@@ -314,7 +313,7 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 				},
 			}
 			jsonMessage, err := json.Marshal(&message)
-			if err != nil {
+			if err != nil { // This cannot be tested
 				logrus.Errorf("error occurred while constructing message to publish: %v", err)
 			} else {
 				handler.Communicator.Publish("client-computers", string(jsonMessage), 3)
@@ -337,7 +336,7 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 				Contents: raw.Contents,
 			}
 			jsonMessage, err := json.Marshal(&message)
-			if err != nil {
+			if err != nil { // This cannot be tested
 				logrus.Errorf("error occurred while constructing message to publish: %v", err)
 			} else {
 				handler.Communicator.Publish("hint", string(jsonMessage), 3)
@@ -360,7 +359,7 @@ func (handler *Handler) HandleEvent(id string) {
 // SendName sends name of escape room to front-end
 func (handler *Handler) SendName() {
 	message := Message{
-		DeviceID: "front-end",
+		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "name",
 		Contents: map[string]string{
@@ -368,7 +367,7 @@ func (handler *Handler) SendName() {
 		},
 	}
 	jsonMessage, err := json.Marshal(&message)
-	if err != nil {
+	if err != nil { // This cannot be tested
 		logrus.Errorf("error occurred while constructing message to publish: %v", err)
 	} else {
 		logrus.Infof("sending name data to front-end: %s", fmt.Sprint(message.Contents))
@@ -401,7 +400,7 @@ func (handler *Handler) GetStatus(deviceID string) {
 	}
 
 	jsonMessage, err := json.Marshal(&message)
-	if err != nil {
+	if err != nil { // This cannot be tested
 		logrus.Errorf("error occurred while constructing message to publish: %v", err)
 	} else {
 		logrus.Info("sending status request to client computer: ", deviceID, fmt.Sprint(message.Contents))
