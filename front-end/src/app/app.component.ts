@@ -124,18 +124,17 @@ export class AppComponent implements OnInit, OnDestroy {
 
     switch (msg.type) {
       case "confirmation": {
-        const keys = ["instructed", "contents", "instruction"];
         /**
          * When the front-end receives confirmation message from client computer
          * that instruction was completed, show the message to the user.
          */
 
-        for (const instruction of msg.contents[keys[0]][keys[1]]) {
+        for (const instruction of msg.contents.instructed.contents) {
           const display =
             "received confirmation from " +
             msg.deviceId +
             " for instruction: " +
-            instruction[keys[2]];
+            instruction.instruction;
           this.openSnackbar(display, "");
         }
         break;
@@ -175,7 +174,7 @@ export class AppComponent implements OnInit, OnDestroy {
         break;
       }
       case "name": {
-        this.nameOfRoom = msg.contents[msg.type];
+        this.nameOfRoom = msg.contents.name;
         break;
       }
       default:

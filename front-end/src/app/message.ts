@@ -6,8 +6,6 @@ import * as moment from "moment";
  */
 @JsonObject
 export class Message {
-  static keys = ["device_id", "type", "time_sent", "contents"];
-
   @JsonProperty("device_id")
   deviceId: string;
   @JsonProperty("type")
@@ -39,8 +37,8 @@ export class Message {
    */
   public static deserialize(jsonMessage: string): Message {
     const msg = JSON.parse(jsonMessage);
-    const deviceId = msg[this.keys[0]];
-    const timeSent = msg[this.keys[2]];
+    const deviceId = msg.device_id;
+    const timeSent = msg.time_sent;
     const dateTime = timeSent.split(" ");
     const date = dateTime[0].split("-");
     const time = dateTime[1].split(":");
@@ -52,8 +50,8 @@ export class Message {
       time[1],
       time[2]
     );
-    const type = msg[this.keys[1]];
-    const contents = msg[this.keys[3]];
+    const type = msg.type;
+    const contents = msg.contents;
     return new Message(deviceId, type, newDate, contents);
   }
 }

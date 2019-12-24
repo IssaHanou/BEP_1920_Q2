@@ -254,7 +254,7 @@ func (handler *Handler) SendEventStatus() {
 		Contents: status,
 	}
 	jsonMessage, _ := json.Marshal(&message)
-	logrus.Infof("sending event status to front-end: %s", fmt.Sprint(message.Contents))
+	logrus.Info("sending event status to front-end")
 	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 }
 
