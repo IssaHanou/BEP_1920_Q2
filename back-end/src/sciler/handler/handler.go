@@ -20,19 +20,19 @@ type Message struct {
 
 // Communicator interface is an interface for mqtt communication
 type Communicator interface {
-	Start(handler mqtt.MessageHandler)
+	Start(handler mqtt.MessageHandler, onStart func())
 	Publish(topic string, message string, retrials int)
 }
 
 // Handler is a type that mqqt handlers have
 type Handler struct {
 	Config       config.WorkingConfig
+	ConfigFile   string
 	Communicator Communicator
 }
 
 // NewHandler is the actual MessageHandler
 func (handler *Handler) NewHandler(client mqtt.Client, message mqtt.Message) {
-	// TODO: Make advanced message handler which acts according to the events / configuration
 	var raw Message
 	if err := json.Unmarshal(message.Payload(), &raw); err != nil {
 		logrus.Errorf("invalid JSON received: %v", err)
@@ -165,79 +165,83 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 	contents := raw.Contents.(map[string]interface{})
 	value, ok := contents["completed"]
 	if !ok || reflect.TypeOf(value).Kind() != reflect.Bool {
-		logrus.Error("received improperly structured confirmation message from device " + raw.DeviceID)
-	} else {
-		original, ok := contents["instructed"]
-		if !ok {
-			logrus.Error("received improperly structured confirmation message from device " + raw.DeviceID)
-		} else {
-			msg := original.(map[string]interface{})
-			contents, err := getMapSlice(msg["contents"])
-			if err != nil {
-				logrus.Error(err)
-				return
-			}
-
-			var instructionString string
-			for _, instruction := range contents {
-				instructionString += fmt.Sprintf("%s", instruction["instruction"])
-			}
-
-			if !value.(bool) {
-				logrus.Error("device " + raw.DeviceID + " did not complete instructions: " +
-					instructionString + "at " + raw.TimeSent)
-			} else {
-				logrus.Info("device " + raw.DeviceID + " completed instructions: " +
-					instructionString + "at " + raw.TimeSent)
-			}
-			// If original message to which device responded with confirmation was sent by front-end,
-			// pass confirmation through
-			if msg["device_id"] == "front-end" {
-				jsonMessage, _ := json.Marshal(raw)
-				handler.Communicator.Publish("front-end", string(jsonMessage), 3)
-			}
-		}
+		logrus.Errorf("received improperly structured confirmation message from device " + raw.DeviceID)
+		return
 	}
-	con := handler.Config.Devices[raw.DeviceID]
-	con.Connection = true
-	handler.Config.Devices[raw.DeviceID] = con
+	original, ok := contents["instructed"]
+	if !ok {
+		logrus.Errorf("received improperly structured confirmation message from device " + raw.DeviceID)
+		return
+	}
+	msg := original.(map[string]interface{})
+	innerContents, err := getMapSlice(msg["contents"])
+	if err != nil {
+		logrus.Errorf(err.Error())
+		return
+	}
+
+	var instructionString string
+	for _, instruction := range innerContents {
+		instructionString += fmt.Sprintf("%s", instruction["instruction"])
+	}
+
+	if !value.(bool) {
+		logrus.Warn("device " + raw.DeviceID + " did not complete instructions: " +
+			instructionString + " at " + raw.TimeSent)
+	} else {
+		logrus.Info("device " + raw.DeviceID + " completed instructions: " +
+			instructionString + " at " + raw.TimeSent)
+	}
+	// If original message to which device responded with confirmation was sent by front-end,
+	// pass confirmation through
+	if msg["device_id"] == "front-end" {
+		jsonMessage, _ := json.Marshal(raw)
+		handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+	}
+
+	con, ok := handler.Config.Devices[raw.DeviceID]
+	if !ok {
+		logrus.Errorf("device %s was not found in config", raw.DeviceID)
+	} else {
+		con.Connection = true
+		handler.Config.Devices[raw.DeviceID] = con
+	}
 }
 
 // SendStatus sends all status and connection data of a device to the front-end.
 // Information retrieved from config.
 func (handler *Handler) SendStatus(deviceID string) {
 	var message Message
-	if _, ok := handler.Config.Devices[deviceID]; ok {
+	if device, ok := handler.Config.Devices[deviceID]; ok {
 		message = Message{
 			DeviceID: "back-end",
 			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 			Type:     "status",
 			Contents: map[string]interface{}{
-				"id":         handler.Config.Devices[deviceID].ID,
-				"status":     handler.Config.Devices[deviceID].Status,
-				"connection": handler.Config.Devices[deviceID].Connection,
+				"id":         device.ID,
+				"status":     device.Status,
+				"connection": device.Connection,
 			},
 		}
-	} else if _, ok2 := handler.Config.Timers[deviceID]; ok2 {
-		status, _ := handler.Config.Timers[deviceID].GetTimeLeft()
+	} else if timer, ok2 := handler.Config.Timers[deviceID]; ok2 {
+		duration, _ := timer.GetTimeLeft()
 		message = Message{
 			DeviceID: "back-end",
 			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 			Type:     "time",
 			Contents: map[string]interface{}{
-				"id":     handler.Config.Timers[deviceID].ID,
-				"status": status.Milliseconds(),
-				"state":  handler.Config.Timers[deviceID].State,
+				"id":       timer.ID,
+				"duration": duration.Milliseconds(),
+				"state":    timer.State,
 			},
 		}
-	}
-	jsonMessage, err := json.Marshal(&message)
-	if err != nil { // This cannot be tested
-		logrus.Errorf("error occurred while constructing message to publish: %v", err)
 	} else {
-		logrus.Info("sending status data to front-end: " + fmt.Sprint(message.Contents))
-		handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+		logrus.Errorf("error occurred while sending status of %s, since it is not recognised as a device or timer", deviceID)
+		return
 	}
+	jsonMessage, _ := json.Marshal(&message)
+	logrus.Info("sending status data to front-end: " + fmt.Sprint(message.Contents))
+	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 }
 
 // SendEventStatus sends the status of events to the front-end
@@ -249,14 +253,9 @@ func (handler *Handler) SendEventStatus() {
 		Type:     "event-status",
 		Contents: status,
 	}
-
-	jsonMessage, err := json.Marshal(&message)
-	if err != nil { // This cannot be tested
-		logrus.Errorf("error occurred while constructing message to publish: %v", err)
-	} else {
-		logrus.Infof("sending event status to front-end: %s", fmt.Sprint(message.Contents))
-		handler.Communicator.Publish("front-end", string(jsonMessage), 3)
-	}
+	jsonMessage, _ := json.Marshal(&message)
+	logrus.Infof("sending event status to front-end: %s", fmt.Sprint(message.Contents))
+	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 }
 
 // returns json list with json objects with keys ["id", "status"]
@@ -282,14 +281,9 @@ func (handler *Handler) SendInstruction(clientID string, instructions []config.C
 		Type:     "instruction",
 		Contents: instructions,
 	}
-
-	jsonMessage, err := json.Marshal(&message)
-	if err != nil { // This cannot be tested
-		logrus.Errorf("error occurred while constructing message to publish: %v", err)
-	} else {
-		logrus.Infof("sending instruction data to %s: %s", clientID, fmt.Sprint(message.Contents))
-		handler.Communicator.Publish(clientID, string(jsonMessage), 3)
-	}
+	jsonMessage, _ := json.Marshal(&message)
+	logrus.Infof("sending instruction data to %s: %s", clientID, fmt.Sprint(message.Contents))
+	handler.Communicator.Publish(clientID, string(jsonMessage), 3)
 }
 
 // onInstructionMsg is the function to process instruction messages.
@@ -303,44 +297,76 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 	}
 
 	for _, instruction := range instructions {
-		if instruction["instruction"] == "test all" && raw.DeviceID == "front-end" { // TODO maybe switch again
-			message := Message{
-				DeviceID: raw.DeviceID,
-				TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-				Type:     "instruction",
-				Contents: []map[string]interface{}{
-					{"instruction": "test"},
-				},
+		if raw.DeviceID == "front-end" {
+			switch instruction["instruction"] {
+
+			case "test all":
+				{
+					message := Message{
+						DeviceID: raw.DeviceID,
+						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+						Type:     "instruction",
+						Contents: []map[string]interface{}{
+							{"instruction": "test"},
+						},
+					}
+					jsonMessage, _ := json.Marshal(&message)
+					handler.Communicator.Publish("client-computers", string(jsonMessage), 3)
+				}
+			case "reset all":
+				{
+					message := Message{
+						DeviceID: raw.DeviceID,
+						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+						Type:     "instruction",
+						Contents: []map[string]interface{}{
+							{"instruction": "reset"},
+						},
+					}
+					jsonMessage, _ := json.Marshal(&message)
+					handler.Communicator.Publish("client-computers", string(jsonMessage), 3)
+					handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+
+					handler.Config = config.ReadFile(handler.ConfigFile)
+					handler.SendStatus("general")
+				}
+			case "send status":
+				{
+					for _, device := range handler.Config.Devices {
+						handler.SendStatus(device.ID)
+					}
+					for _, timer := range handler.Config.Timers {
+						handler.SendStatus(timer.ID)
+					}
+					handler.SendEventStatus()
+				}
+			case "name":
+				{
+					message := Message{
+						DeviceID: "back-end",
+						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+						Type:     "name",
+						Contents: map[string]string{
+							"name": handler.Config.General.Name,
+						},
+					}
+					jsonMessage, _ := json.Marshal(&message)
+					handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+				}
+			case "hint":
+				{
+					message := Message{
+						DeviceID: raw.DeviceID,
+						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+						Type:     "instruction",
+						Contents: raw.Contents,
+					}
+					jsonMessage, _ := json.Marshal(&message)
+					handler.Communicator.Publish("hint", string(jsonMessage), 3)
+				}
 			}
-			jsonMessage, err := json.Marshal(&message)
-			if err != nil { // This cannot be tested
-				logrus.Errorf("error occurred while constructing message to publish: %v", err)
-			} else {
-				handler.Communicator.Publish("client-computers", string(jsonMessage), 3)
-			}
-		}
-		if instruction["instruction"] == "send status" && raw.DeviceID == "front-end" {
-			for _, value := range handler.Config.Devices {
-				handler.SendStatus(value.ID)
-			}
-			handler.SendEventStatus()
-		}
-		if instruction["instruction"] == "name" && raw.DeviceID == "front-end" {
-			handler.SendName()
-		}
-		if instruction["instruction"] == "hint" && raw.DeviceID == "front-end" {
-			message := Message{
-				DeviceID: raw.DeviceID,
-				TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-				Type:     "instruction",
-				Contents: raw.Contents,
-			}
-			jsonMessage, err := json.Marshal(&message)
-			if err != nil { // This cannot be tested
-				logrus.Errorf("error occurred while constructing message to publish: %v", err)
-			} else {
-				handler.Communicator.Publish("hint", string(jsonMessage), 3)
-			}
+		} else {
+			logrus.Warnf("%s, tried to instruct the back-end, only the front-end is allowed to instruct the back-end", raw.DeviceID)
 		}
 	}
 }
@@ -356,32 +382,10 @@ func (handler *Handler) HandleEvent(id string) {
 	}
 }
 
-// SendName sends name of escape room to front-end
-func (handler *Handler) SendName() {
-	message := Message{
-		DeviceID: "back-end",
-		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "name",
-		Contents: map[string]string{
-			"name": handler.Config.General.Name,
-		},
-	}
-	jsonMessage, err := json.Marshal(&message)
-	if err != nil { // This cannot be tested
-		logrus.Errorf("error occurred while constructing message to publish: %v", err)
-	} else {
-		logrus.Infof("sending name data to front-end: %s", fmt.Sprint(message.Contents))
-		handler.Communicator.Publish("front-end", string(jsonMessage), 3)
-	}
-}
-
 func getMapSlice(input interface{}) ([]map[string]interface{}, error) {
-	bytes, err := json.Marshal(input)
-	if err != nil {
-		return nil, err
-	}
+	bytes, _ := json.Marshal(input)
 	var output []map[string]interface{} // dirty trick to go from interface{} to []map[string]interface{}
-	err = json.Unmarshal(bytes, &output)
+	err := json.Unmarshal(bytes, &output)
 	if err != nil {
 		return nil, err
 	}
@@ -398,14 +402,9 @@ func (handler *Handler) GetStatus(deviceID string) {
 			{"instruction": "status update"},
 		},
 	}
-
-	jsonMessage, err := json.Marshal(&message)
-	if err != nil { // This cannot be tested
-		logrus.Errorf("error occurred while constructing message to publish: %v", err)
-	} else {
-		logrus.Info("sending status request to client computer: ", deviceID, fmt.Sprint(message.Contents))
-		handler.Communicator.Publish(deviceID, string(jsonMessage), 3)
-	}
+	jsonMessage, _ := json.Marshal(&message)
+	logrus.Info("sending status request to client computer: ", deviceID, fmt.Sprint(message.Contents))
+	handler.Communicator.Publish(deviceID, string(jsonMessage), 3)
 }
 
 // SetTimer starts given timer

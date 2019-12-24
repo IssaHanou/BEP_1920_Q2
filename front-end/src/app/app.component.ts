@@ -6,6 +6,7 @@ import { MatSnackBar, MatSnackBarConfig } from "@angular/material";
 import { Subscription } from "rxjs";
 import { Devices } from "./components/device/devices";
 import { Puzzles } from "./components/puzzle/puzzles";
+import { Timers } from "./components/timer/timers";
 
 @Component({
   selector: "app-root",
@@ -21,15 +22,15 @@ export class AppComponent implements OnInit, OnDestroy {
   topics = ["front-end"];
   deviceList: Devices;
   puzzleList: Puzzles;
-  remainingTime: number;
-  timeState: string;
+  timerList: Timers;
 
   constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
     this.jsonConvert = new JsonConvert();
     this.deviceList = new Devices();
     this.puzzleList = new Puzzles();
-    this.remainingTime = 0;
-    this.timeState = "stateIdle";
+    this.timerList = new Timers();
+    const generalTimer = { id: "general", duration: 0, state: "stateIdle" };
+    this.timerList.setTimer(generalTimer);
   }
 
   ngOnInit(): void {
@@ -38,6 +39,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     this.sendInstruction([{ instruction: "name" }]);
     this.sendInstruction([{ instruction: "send status" }]);
+    this.sendConnection(true);
   }
 
   /**
@@ -45,6 +47,7 @@ export class AppComponent implements OnInit, OnDestroy {
    * and close the connection with the broker
    */
   ngOnDestroy(): void {
+    this.sendConnection(false);
     this.mqttService.disconnect();
   }
 
@@ -67,7 +70,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Send an instruction to the broker, over instruction topic.
+   * Send an instruction to the broker, over back-end topic.
    * @param instruction instruction to be sent.
    */
   public sendInstruction(instruction: any[]) {
@@ -82,6 +85,34 @@ export class AppComponent implements OnInit, OnDestroy {
     console.log(
       "log: sent instruction message: " + JSON.stringify(jsonMessage)
     );
+  }
+
+  /**
+   * Send an status to the broker, over back-end topic.
+   * @param start start status to be sent.
+   * @param stop stop status to be sent.
+   */
+  public sendStatus(start, stop) {
+    const msg = new Message("front-end", "status", new Date(), {
+      start,
+      stop
+    });
+    const jsonMessage: string = this.jsonConvert.serialize(msg);
+    this.mqttService.unsafePublish("back-end", JSON.stringify(jsonMessage));
+    console.log("log: sent status message: " + JSON.stringify(jsonMessage));
+  }
+
+  /**
+   * Send an connection update to the broker, over back-end topic.
+   * @param connected connection status to be sent.
+   */
+  public sendConnection(connected: boolean) {
+    const msg = new Message("front-end", "connection", new Date(), {
+      connection: connected
+    });
+    const jsonMessage: string = this.jsonConvert.serialize(msg);
+    this.mqttService.unsafePublish("back-end", JSON.stringify(jsonMessage));
+    console.log("log: sent connection message: " + JSON.stringify(jsonMessage));
   }
 
   /**
@@ -113,6 +144,28 @@ export class AppComponent implements OnInit, OnDestroy {
         this.puzzleList.updatePuzzles(msg.contents);
         break;
       }
+      case "instruction": {
+        for (const action of msg.contents) {
+          switch (action.instruction) {
+            case "reset":
+              {
+                this.deviceList.setDevice({
+                  id: "front-end",
+                  connection: true,
+                  status: {
+                    start: 0,
+                    stop: 0
+                  }
+                });
+              }
+              break;
+            case "status update": {
+              this.sendConnection(true);
+            }
+          }
+        }
+        break;
+      }
       case "status": {
         this.deviceList.setDevice(msg.contents);
         break;
@@ -136,10 +189,7 @@ export class AppComponent implements OnInit, OnDestroy {
    * @param jsonData with id, status and state
    */
   public processTimeStatus(jsonData) {
-    if (jsonData.id === "general") {
-      this.remainingTime = jsonData.status;
-      this.timeState = jsonData.state;
-    }
+    this.timerList.setTimer(jsonData);
   }
   /**
    * Opens snackbar with duration of 2 seconds.

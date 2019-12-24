@@ -47,6 +47,14 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, error) {
 		config.Devices[readDevice.ID] = &(Device{readDevice.ID, readDevice.Description, readDevice.Input,
 			readDevice.Output, make(map[string]interface{}), false})
 	}
+	config.Devices["front-end"] = &(Device{
+		ID:          "front-end",
+		Description: "The operator webapp for managing a escape room",
+		Input:       map[string]string{"start": "numeric", "stop": "numeric"},
+		Output:      nil,
+		Status:      map[string]interface{}{"start": 0, "stop": 0},
+		Connection:  false,
+	})
 	config.Timers = make(map[string]*Timer)
 	for _, readTimer := range readConfig.Timers {
 		duration, ok := time.ParseDuration(readTimer.Duration)

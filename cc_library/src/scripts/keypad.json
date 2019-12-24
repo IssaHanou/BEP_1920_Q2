@@ -5,7 +5,7 @@
   "port": 1883,
   "labels": [],
   "input": {
-    "code": "string"
+    "code": "numeric"
   },
   "output": { }
 }
