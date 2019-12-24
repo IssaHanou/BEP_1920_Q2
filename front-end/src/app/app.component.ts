@@ -122,7 +122,7 @@ export class AppComponent implements OnInit, OnDestroy {
         break;
       }
       case "name": {
-        this.nameOfRoom = msg.contents["name"];
+        this.nameOfRoom = msg.contents[msg.type];
         break;
       }
       default:

@@ -54,28 +54,13 @@ describe("AppComponent", () => {
   it("should have as title 'S.C.I.L.E.R'", () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual("S.C.I.L.E.R");
-  });
-
-  it(`should have as subtitle 'Super awesome escape'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app.nameOfRoom).toEqual("Super awesome escape");
+    expect(app.title).toEqual("S.C.I.L.E.R :");
   });
 
   it("should render title", () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector("h1").textContent).toContain("S.C.I.L.E.R");
-  });
-
-  it("should render subtitle", () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector("h2").textContent).toContain(
-      "Super awesome escape"
-    );
+    expect(compiled.querySelector("h1").textContent).toContain("S.C.I.L.E.R :");
   });
 });

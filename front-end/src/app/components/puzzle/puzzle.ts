@@ -1,13 +1,14 @@
 export class Puzzle {
   id: string;
-  status: Map<string, boolean>;
+  status: boolean;
   description: string;
+  keys = ["id", "status", "description"];
 
   constructor(jsonData) {
-    this.id = jsonData["id"];
-    this.description = jsonData["description"]
+    this.id = jsonData[this.keys[0]];
+    this.description = jsonData[this.keys[2]];
     // TODO currently shows status per rule not puzzle
-    this.status = jsonData["status"];
+    this.status = jsonData[this.keys[1]];
   }
 
   /**
