@@ -10,6 +10,7 @@ import (
 // WorkingConfig has additional fields to ReadConfig, with lists of conditions, constraints and actions.
 type WorkingConfig struct {
 	General       General
+	Cameras       []Camera
 	Puzzles       []*Puzzle
 	GeneralEvents []*GeneralEvent
 	Devices       map[string]*Device

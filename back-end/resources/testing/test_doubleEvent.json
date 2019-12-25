@@ -3,8 +3,7 @@
     "name": "Escape X",
     "duration": "00:30:00",
     "host": "localhost",
-    "port": 1883,
-    "cameras": []
+    "port": 1883
   },
   "devices": [
     {

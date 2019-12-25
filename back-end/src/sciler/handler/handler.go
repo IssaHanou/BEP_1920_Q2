@@ -329,7 +329,7 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 						DeviceID: "back-end",
 						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 						Type:     "cameras",
-						Contents: map[string][]string{"cameras": handler.Config.General.Cameras},
+						Contents: handler.getCameras(),
 					}
 					jsonMessage, _ := json.Marshal(&message)
 					handler.Communicator.Publish("front-end", string(jsonMessage), 3)
@@ -339,6 +339,17 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 			logrus.Warnf("%s, tried to instruct the back-end, only the front-end is allowed to instruct the back-end", raw.DeviceID)
 		}
 	}
+}
+
+func (handler *Handler) getCameras() []map[string]string {
+	var cameras []map[string]string
+	for _, camera := range handler.Config.Cameras {
+		result := make(map[string]string)
+		result["name"] = camera.Name
+		result["link"] = camera.Link
+		cameras = append(cameras, result)
+	}
+	return cameras
 }
 
 // HandleEvent is a function that checks and possible executes all rules according to the given (device/rule/timer) id

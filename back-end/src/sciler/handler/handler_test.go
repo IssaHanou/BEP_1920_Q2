@@ -858,8 +858,9 @@ func TestInstructionCameras(t *testing.T) {
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "cameras",
-		Contents: map[string][]string{
-			"cameras": []string{"https://raccoon.games"},
+		Contents: []map[string]string{
+			{"link": "https://raccoon.games", "name": "camera1"},
+			{"link": "https://debrouwerij.io", "name": "camera2"},
 		},
 	}
 	jsonHintMessage, _ := json.Marshal(&returnMsg)
