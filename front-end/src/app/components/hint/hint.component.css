@@ -7,8 +7,18 @@
   margin: 10px;
   width: calc(90% - 90px);
 }
+/**For narrow hint boxes, the buttons should be below the fields**/
 @media only screen and (min-width: 650px) and (max-width: 1000px) {
   .mat-form-field {
     width: 90%;
   }
+}
+/*Long predefined hints should be multiple lines with some white space between hints*/
+::ng-deep .mat-select-panel mat-option.mat-option {
+  height: unset;
+  line-height: normal;
+  margin-block: 10px;
+}
+::ng-deep .mat-option-text.mat-option-text {
+  white-space: normal;
 }
