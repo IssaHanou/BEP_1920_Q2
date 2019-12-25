@@ -838,6 +838,36 @@ func TestInstructionHint(t *testing.T) {
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
 }
 
+func TestInstructionCameras(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	workingConfig := config.ReadFile("../../../resources/testing/test_config.json")
+	handler := Handler{
+		Config:       workingConfig,
+		ConfigFile:   "../../../resources/testing/test_config.json",
+		Communicator: communicatorMock,
+	}
+	instructionMsg := Message{
+		DeviceID: "front-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{"instruction": "cameras"},
+		},
+	}
+	returnMsg := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "cameras",
+		Contents: map[string][]string{
+			"cameras": []string{"https://raccoon.games"},
+		},
+	}
+	jsonHintMessage, _ := json.Marshal(&returnMsg)
+	communicatorMock.On("Publish", "front-end", string(jsonHintMessage), 3)
+	handler.msgMapper(instructionMsg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+}
+
 func TestInstructionNotFromWrongDevice(t *testing.T) {
 	communicatorMock := new(CommunicatorMock)
 	workingConfig := config.ReadFile("../../../resources/testing/test_config.json")

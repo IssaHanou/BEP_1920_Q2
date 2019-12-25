@@ -323,6 +323,17 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 					jsonMessage, _ := json.Marshal(&message)
 					handler.Communicator.Publish("hint", string(jsonMessage), 3)
 				}
+			case "cameras":
+				{
+					message := Message{
+						DeviceID: "back-end",
+						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+						Type:     "cameras",
+						Contents: map[string][]string{"cameras": handler.Config.General.Cameras},
+					}
+					jsonMessage, _ := json.Marshal(&message)
+					handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+				}
 			}
 		} else {
 			logrus.Warnf("%s, tried to instruct the back-end, only the front-end is allowed to instruct the back-end", raw.DeviceID)

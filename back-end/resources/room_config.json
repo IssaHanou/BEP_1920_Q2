@@ -3,7 +3,8 @@
     "name": "Escape X",
     "duration": "30m",
     "host": "192.168.178.82",
-    "port": 1883
+    "port": 1883,
+    "cameras": ["https://raccoon.games", "https:debrouwerij.io"]
   },
   "devices": [
     {

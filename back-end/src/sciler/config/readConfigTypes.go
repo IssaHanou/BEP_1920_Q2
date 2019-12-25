@@ -11,10 +11,11 @@ type ReadConfig struct {
 
 // General is a struct that describes the configurations of an escape room.
 type General struct {
-	Name     string `json:"name"`
-	Duration string `json:"duration"`
-	Host     string `json:"host"`
-	Port     int    `json:"port"`
+	Name     string   `json:"name"`
+	Duration string   `json:"duration"`
+	Host     string   `json:"host"`
+	Port     int      `json:"port"`
+	Cameras  []string `json:"cameras"`
 }
 
 // ReadDevice is a struct that describes the configurations of a device in the room.
