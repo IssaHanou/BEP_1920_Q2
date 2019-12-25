@@ -1,4 +1,4 @@
-import {Component, Input, ViewChild} from "@angular/core";
+import { Component } from "@angular/core";
 import { AppComponent } from "../../app.component";
 import { Hint } from "./hint";
 
@@ -24,7 +24,7 @@ export class HintComponent {
   getHintList(puzzle: string): string[] {
     const list = [];
     for (const obj of this.app.hintList) {
-      if (obj.puzzle == puzzle) {
+      if (obj.puzzle === puzzle) {
         for (const hint of obj.hints) {
           list.push(hint);
         }
