@@ -6,6 +6,7 @@ import { MatSnackBar, MatSnackBarConfig } from "@angular/material";
 import { Subscription } from "rxjs";
 import { Devices } from "./components/device/devices";
 import { Timers } from "./components/timer/timers";
+import { Hint } from "./components/hint/hint";
 
 @Component({
   selector: "app-root",
@@ -21,11 +22,13 @@ export class AppComponent implements OnInit, OnDestroy {
   topics = ["front-end"];
   deviceList: Devices;
   timerList: Timers;
+  hintList: Hint[];
 
   constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
     this.jsonConvert = new JsonConvert();
     this.deviceList = new Devices();
     this.timerList = new Timers();
+    this.hintList = [];
     const generaltimer = { id: "general", duration: 0, state: "stateIdle" };
     this.timerList.setTimer(generaltimer);
   }
@@ -36,6 +39,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     this.sendInstruction([{ instruction: "send status" }]);
     this.sendConnection(true);
+    this.sendInstruction([{instruction: "all hints"}]);
   }
 
   /**
@@ -164,6 +168,20 @@ export class AppComponent implements OnInit, OnDestroy {
       }
       case "time": {
         this.processTimeStatus(msg.contents);
+        break;
+      }
+      case "all hints": {
+        for (const puzzle in msg.contents) {
+          if (msg.contents.hasOwnProperty(puzzle)) {
+            const hints = [];
+            for (const index in msg.contents[puzzle]) {
+              if (msg.contents[puzzle].hasOwnProperty(index)) {
+                hints.push(msg.contents[puzzle][index]);
+              }
+            }
+            this.hintList.push(new Hint(puzzle, hints));
+          }
+        }
         break;
       }
       default:

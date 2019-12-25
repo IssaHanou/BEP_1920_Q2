@@ -20,8 +20,8 @@ import {
   MatButtonModule,
   MATERIAL_SANITY_CHECKS,
   MatFormFieldModule,
-  MatInputModule,
-  MatPaginatorModule,
+  MatInputModule, MatOptionModule,
+  MatPaginatorModule, MatSelectModule,
   MatSortModule,
   MatTableModule
 } from "@angular/material";
@@ -65,7 +65,8 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     ManageComponent,
     PuzzleComponent,
     MatFormFieldModule,
-    MatSortModule
+    MatSortModule,
+    MatSelectModule
   ],
   imports: [
     BrowserModule,
@@ -79,6 +80,8 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     MatInputModule,
     MatPaginatorModule,
     MatSortModule,
+    MatSelectModule,
+    MatOptionModule,
     CdkTableModule
   ],
   providers: [

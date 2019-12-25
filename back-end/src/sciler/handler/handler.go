@@ -178,7 +178,7 @@ func (handler *Handler) onConfirmationMsg(raw Message) error {
 		return fmt.Errorf("received improperly structured confirmation message from device " + raw.DeviceID)
 	}
 	msg := original.(map[string]interface{})
-	innerContents, err := getMapSlice(msg["innerContents"])
+	innerContents, err := getMapSlice(msg["contents"])
 	if err != nil {
 		return err
 	}
@@ -312,6 +312,17 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 						handler.SendStatus(timer.ID)
 					}
 				}
+			case "all hints":
+				{
+					message := Message{
+						DeviceID: "back-end",
+						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+						Type:     "all hints",
+						Contents: handler.GetHints(),
+					}
+					jsonMessage, _ := json.Marshal(&message)
+					handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+				}
 			case "hint":
 				{
 					message := Message{
@@ -328,6 +339,16 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 			logrus.Warnf("%s, tried to instruct the back-end, only the front-end is allowed to instruct the back-end", raw.DeviceID)
 		}
 	}
+}
+
+// GetHints returns map of hints with puzzle name as key and list of hints for that puzzle as value
+func (handler *Handler) GetHints() map[string][]string {
+	hints := make(map[string][]string)
+	for _, puzzle := range handler.Config.Puzzles {
+		hints[puzzle.Event.Name] = puzzle.Hints
+	}
+	logrus.Info(hints)
+	return hints
 }
 
 // HandleEvent is a function that checks and possible executes all rules according to the given (device/rule/timer) id

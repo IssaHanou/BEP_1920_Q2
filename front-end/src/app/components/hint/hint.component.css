@@ -1,4 +1,4 @@
-.hint-field {
+.hint-field, .hint-select {
   font-size: 16px;
-  max-width: 100%;
+  width: 100%;
 }

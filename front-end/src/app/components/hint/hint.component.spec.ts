@@ -6,7 +6,7 @@ import { MQTT_SERVICE_OPTIONS } from "../../app.module";
 import { AppComponent } from "../../app.component";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Overlay } from "@angular/cdk/overlay";
-import { MatFormFieldModule, MatInputModule } from "@angular/material";
+import {MatFormFieldModule, MatInputModule, MatOptionModule, MatSelectModule} from "@angular/material";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
 describe("HintComponent", () => {
@@ -20,6 +20,8 @@ describe("HintComponent", () => {
         MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
         MatFormFieldModule,
         MatInputModule,
+        MatSelectModule,
+        MatOptionModule,
         BrowserAnimationsModule
       ],
       declarations: [HintComponent],

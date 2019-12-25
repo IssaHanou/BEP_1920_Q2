@@ -1,9 +1,20 @@
 <div class="home-box hint-box">
   <h3 class="header">Hints</h3>
   <div class="contents">
-    <form (ngSubmit)="onSubmit()">
+    <form (ngSubmit)="onPredefinedHint()">
       <mat-form-field>
-        <input matInput type="text" name="hint" [(ngModel)]="hint" placeholder="Type your hint..." class="hint-field">
+        <mat-select [(ngModel)]="predefinedHint" name="predefinedHint"
+                    class="hint-select" placeholder="Kies bestaande hint">
+          <mat-optgroup *ngFor="let obj of getPuzzleList()" [label]="obj.puzzle">
+            <mat-option *ngFor="let hint of getHintList(obj.puzzle)" [value]="hint"> {{ hint }} </mat-option>
+          </mat-optgroup>
+        </mat-select>
+      </mat-form-field>
+      <input type="submit" value="Send" class="mat-raised-button mat-primary custom-md-button">
+    </form>
+    <form (ngSubmit)="onCustomHint()">
+      <mat-form-field>
+        <input matInput type="text" name="customHint" [(ngModel)]="customHint" placeholder="Type een eigen hint" class="hint-field">
       </mat-form-field>
       <input type="submit" value="Submit" class="mat-raised-button mat-primary custom-md-button">
     </form>
