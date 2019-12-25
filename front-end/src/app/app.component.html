@@ -1,4 +1,4 @@
-<div class="home">
+<div class="main">
   <mat-toolbar color="primary" class="toolbar">
     <button mat-icon-button (click)="nav.toggle()"><mat-icon aria-label="menu">menu</mat-icon></button>
     <div class="home-header">
@@ -10,24 +10,16 @@
       </div>
     </div>
   </mat-toolbar>
-  <mat-sidenav-container class="home-content">
+  <mat-sidenav-container>
     <mat-sidenav #nav mode="over" class="menu">
-      Sidenav content
+      <mat-nav-list class="menu-list">
+        <a mat-list-item class="nav-item" routerLink="/" (click)="nav.toggle()"><mat-icon>home</mat-icon> Operator overzicht</a>
+        <a mat-list-item class="nav-item" routerLink="/camera" (click)="nav.toggle()"><mat-icon>videocam</mat-icon> Camera overzicht</a>
+        <a mat-list-item class="nav-item" routerLink="/config" (click)="nav.toggle()"><mat-icon>build</mat-icon> Configuratie</a>
+      </mat-nav-list>
     </mat-sidenav>
-    <mat-sidenav-content class="home-content">
-      <div class="home-page">
-        <div class="home-content">
-          <div class="left">
-            <app-timer></app-timer>
-            <app-manage></app-manage>
-            <app-hint></app-hint>
-          </div>
-          <div class="right">
-            <app-device></app-device>
-            <app-puzzle></app-puzzle>
-          </div>
-        </div>
-      </div>
+    <mat-sidenav-content class="main-content">
+      <router-outlet></router-outlet>
     </mat-sidenav-content>
   </mat-sidenav-container>
 </div>

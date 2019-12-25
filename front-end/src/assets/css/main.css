@@ -11,18 +11,51 @@ body {
   max-height: 100%;
   min-width: 350px;
 }
-.home{
+.main{
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
   justify-content: center;
 }
-.home-content {
-  background-color: #3f51b5;
-}
 .menu {
   background-color: #EEEEEE;
+  height: 155px;
 }
+.menu-list {
+  height: 145px;
+}
+.main-content {
+  background-color: #3f51b5;
+  height: 80%;
+}
+.nav-item {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+
+
+/*Tables for devices and events*/
+.custom-md-table {
+  width: 100%;
+  background-color: #EEEEEE;
+  text-align: left;
+  max-height: 100px;
+}
+.custom-md-table-header {
+  font-weight: bold;
+}
+.custom-md-table-page {
+  background-color: #EEEEEE;
+}
+
+
+/*Other components*/
+.custom-md-button, button {
+  margin: 5px;
+  font-size: 16px;
+  border-radius: 4px;
+}
+
 
 
 /*Boxes on home page*/
@@ -71,30 +104,6 @@ body {
     display: grid;
     grid-template-columns: 40% 60%;
   }
-}
-
-
-
-/*Tables for devices and events*/
-.custom-md-table {
-  width: 100%;
-  background-color: #EEEEEE;
-  text-align: left;
-  max-height: 100px;
-}
-.custom-md-table-header {
-  font-weight: bold;
-}
-.custom-md-table-page {
-  background-color: #EEEEEE;
-}
-
-
-/*Other components*/
-.custom-md-button, button {
-  margin: 5px;
-  font-size: 16px;
-  border-radius: 4px;
 }
 
 
