@@ -1,4 +1,14 @@
-.hint-field, .hint-select {
-  font-size: 16px;
-  width: 100%;
+/**Have both buttons of same width**/
+.hint-button {
+  width: 80px;
+}
+/**Distance between hint box and button**/
+.mat-form-field {
+  margin: 10px;
+  width: calc(90% - 90px);
+}
+@media only screen and (min-width: 650px) and (max-width: 1000px) {
+  .mat-form-field {
+    width: 90%;
+  }
 }

@@ -54,7 +54,7 @@ body {
 
 
 /*Small screens should have small margin*/
-@media only screen and (max-width: 400px) {
+@media only screen and (max-width: 500px) {
   .home-box {
     margin: 5px;
   }
@@ -93,6 +93,12 @@ body {
 }
 .custom-md-table-page {
   background-color: #EEEEEE;
+}
+.boolean-header {
+  max-width: 70px;
+}
+.boolean-column {
+  text-align: center;
 }
 
 
