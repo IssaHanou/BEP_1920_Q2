@@ -1,20 +1,33 @@
 <div class="home">
-  <div class="menu"></div>
-  <div class="home-page">
+  <mat-toolbar color="primary" class="toolbar">
+    <button mat-icon-button (click)="nav.toggle()"><mat-icon aria-label="menu">menu</mat-icon></button>
     <div class="home-header">
-      <h1 class="title">{{ title }}</h1>
-      <h2 class="subtitle">{{ nameOfRoom }}</h2>
-    </div>
-    <div class="home-content">
-      <div class="left">
-        <app-timer></app-timer>
-        <app-manage></app-manage>
-        <app-hint></app-hint>
+      <div class="title-box">
+        <p class="title">{{ title }}</p>
       </div>
-      <div class="right">
-        <app-device></app-device>
-        <app-puzzle></app-puzzle>
+      <div class="subtitle-box">
+        <p class="subtitle">{{ nameOfRoom }}</p>
       </div>
     </div>
-  </div>
+  </mat-toolbar>
+  <mat-sidenav-container class="home-content">
+    <mat-sidenav #nav mode="over" class="menu">
+      Sidenav content
+    </mat-sidenav>
+    <mat-sidenav-content class="home-content">
+      <div class="home-page">
+        <div class="home-content">
+          <div class="left">
+            <app-timer></app-timer>
+            <app-manage></app-manage>
+            <app-hint></app-hint>
+          </div>
+          <div class="right">
+            <app-device></app-device>
+            <app-puzzle></app-puzzle>
+          </div>
+        </div>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
 </div>

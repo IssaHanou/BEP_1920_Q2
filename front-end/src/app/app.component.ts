@@ -14,7 +14,7 @@ import { Timers } from "./components/timer/timers";
   encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = "S.C.I.L.E.R";
+  title = "S.C.I.L.E.R :";
   nameOfRoom = "Super awesome escape";
   jsonConvert: JsonConvert;
   subscription: Subscription;

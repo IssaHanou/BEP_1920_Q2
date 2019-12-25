@@ -21,9 +21,12 @@ import {
   MATERIAL_SANITY_CHECKS,
   MatFormFieldModule,
   MatInputModule,
+  MatIconModule,
   MatPaginatorModule,
   MatSortModule,
-  MatTableModule
+  MatTableModule,
+  MatToolbarModule,
+  MatSidenavModule
 } from "@angular/material";
 import { CdkTableModule } from "@angular/cdk/table";
 import { JsonConvert } from "json2typescript";
@@ -79,6 +82,9 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     MatInputModule,
     MatPaginatorModule,
     MatSortModule,
+    MatSidenavModule,
+    MatToolbarModule,
+    MatIconModule,
     CdkTableModule
   ],
   providers: [

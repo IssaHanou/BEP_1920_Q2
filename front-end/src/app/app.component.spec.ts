@@ -11,11 +11,11 @@ import { TimerComponent } from "./components/timer/timer.component";
 import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import { Overlay } from "@angular/cdk/overlay";
 import {
-  MatFormFieldModule,
+  MatFormFieldModule, MatIconModule,
   MatInputModule,
-  MatPaginatorModule,
+  MatPaginatorModule, MatSidenavModule,
   MatSortModule,
-  MatTableModule
+  MatTableModule, MatToolbarModule
 } from "@angular/material";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
@@ -31,6 +31,9 @@ describe("AppComponent", () => {
         MatFormFieldModule,
         MatInputModule,
         MatSnackBarModule,
+        MatSidenavModule,
+        MatToolbarModule,
+        MatIconModule,
         BrowserAnimationsModule
       ],
       declarations: [
@@ -54,7 +57,7 @@ describe("AppComponent", () => {
   it("should have as title 'S.C.I.L.E.R'", () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual("S.C.I.L.E.R");
+    expect(app.title).toEqual("S.C.I.L.E.R :");
   });
 
   it(`should have as subtitle 'Super awesome escape'`, () => {
@@ -67,14 +70,14 @@ describe("AppComponent", () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector("h1").textContent).toContain("S.C.I.L.E.R");
+    expect(compiled.querySelectorAll("p").item(0).textContent).toContain("S.C.I.L.E.R :");
   });
 
   it("should render subtitle", () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector("h2").textContent).toContain(
+    expect(compiled.querySelectorAll("p").item(1).textContent).toContain(
       "Super awesome escape"
     );
   });

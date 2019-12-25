@@ -17,13 +17,11 @@ body {
   flex-wrap: wrap;
   justify-content: center;
 }
+.home-content {
+  background-color: #3f51b5;
+}
 .menu {
   background-color: #EEEEEE;
-}
-.home-header {
-  max-width: 100%;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
-  text-align: center;
 }
 
 
@@ -39,9 +37,6 @@ body {
   background-color: #EEEEEE;
   margin-bottom: 5px;
   padding: 5px;
-}
-.subtitle, .title {
-  color: #EEEEEE;
 }
 .home-box .contents {
   background-color: #EEEEEE;
@@ -66,7 +61,6 @@ body {
 }
 /*Define grid home page for large screens*/
 @media only screen and (min-width: 650px) {
-
   .timer-box {grid-area: timer; row-span: 2}
   .manage-box {grid-area: manage; row-span: 2}
   .hint-box {grid-area: hint; row-span: 2}
