@@ -82,6 +82,8 @@ export const APP_ROUTES: Routes = [
     ManageComponent,
     PuzzleComponent,
     HomeComponent,
+    CameraComponent,
+    ConfigComponent,
     MatFormFieldModule,
     MatSortModule
   ],

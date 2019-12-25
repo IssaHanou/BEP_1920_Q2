@@ -6,6 +6,7 @@ import { MatSnackBar, MatSnackBarConfig } from "@angular/material";
 import { Subscription } from "rxjs";
 import { Devices } from "./components/device/devices";
 import { Timers } from "./components/timer/timers";
+import { Camera } from "./camera/camera";
 
 @Component({
   selector: "app-root",
@@ -21,11 +22,13 @@ export class AppComponent implements OnInit, OnDestroy {
   topics = ["front-end"];
   deviceList: Devices;
   timerList: Timers;
+  cameras: Camera[];
 
   constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
     this.jsonConvert = new JsonConvert();
     this.deviceList = new Devices();
     this.timerList = new Timers();
+    this.cameras = [];
     const generaltimer = { id: "general", duration: 0, state: "stateIdle" };
     this.timerList.setTimer(generaltimer);
   }
@@ -35,6 +38,7 @@ export class AppComponent implements OnInit, OnDestroy {
       this.subscribeNewTopic(topic);
     }
     this.sendInstruction([{ instruction: "send status" }]);
+    this.sendInstruction([{instruction: "cameras"}]);
     this.sendConnection(true);
   }
 
@@ -164,6 +168,12 @@ export class AppComponent implements OnInit, OnDestroy {
       }
       case "time": {
         this.processTimeStatus(msg.contents);
+        break;
+      }
+      case "cameras": {
+        for (const obj of msg.contents) {
+          this.cameras.push(new Camera(obj));
+        }
         break;
       }
       default:
