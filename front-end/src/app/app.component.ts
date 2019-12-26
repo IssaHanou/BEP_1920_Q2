@@ -25,6 +25,7 @@ export class AppComponent implements OnInit, OnDestroy {
   timerList: Timers;
   cameras: Camera[];
   selectedCamera: string;
+  configErrorList: string[];
 
   constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
     this.jsonConvert = new JsonConvert();
@@ -160,6 +161,7 @@ export class AppComponent implements OnInit, OnDestroy {
             case "status update": {
               this.sendConnection(true);
             }
+
           }
         }
         break;
@@ -176,6 +178,10 @@ export class AppComponent implements OnInit, OnDestroy {
         for (const obj of msg.contents) {
           this.cameras.push(new Camera(obj));
         }
+        break;
+      }
+      case "config": {
+        this.configErrorList = msg.contents.errors;
         break;
       }
       default:

@@ -1,0 +1,14 @@
+/**'Hide' the actual input and style the label as button**/
+.original-config-button {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  padding: 5px;
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+.config-button {
+  margin-right: 10px;
+}

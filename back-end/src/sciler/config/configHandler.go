@@ -15,22 +15,26 @@ func ReadFile(filename string) WorkingConfig {
 	if err != nil {
 		panic(errors.New("Could not read file " + filename).Error())
 	}
-	config := ReadJSON(dat)
+	config, errorList := ReadJSON(dat)
+	if len(errorList) > 0 {
+		panic(errors.New(errorList[0]))
+	}
 	return config
 }
 
 // ReadJSON transforms json file into config object.
-func ReadJSON(input []byte) WorkingConfig {
+func ReadJSON(input []byte) (WorkingConfig, []string) {
 	var config ReadConfig
+	errorList := make([]string, 0)
 	jsonErr := json.Unmarshal(input, &config)
 	if jsonErr != nil {
-		panic(jsonErr.Error())
+		errorList = append(errorList, jsonErr.Error())
 	}
 	newConfig, configErr := generateDataStructures(config)
 	if configErr != nil {
-		panic(configErr.Error())
+		errorList = append(errorList, configErr.Error())
 	}
-	return newConfig
+	return newConfig, errorList
 }
 
 // Creates additional structures: forms device and rule maps;

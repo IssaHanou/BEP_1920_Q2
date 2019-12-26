@@ -1,6 +1,18 @@
 <div class="home-box">
   <h3 class="header">Configuratie</h3>
   <div class="contents">
-    <p>config works!</p>
+    <div class="file-input">
+      <label class="mat-raised-button mat-primary custom-md-button config-button" for="inputFile">Upload configuratie</label>
+      <input id="inputFile" class="original-config-button" type="file" accept="application/json"
+             (change)="checkFile($event.target.files)" >
+    </div>
+    <p class="uploadString">{{ uploaded }}</p>
+    <div *ngIf="uploaded != ''" class="file-output">
+      <p>Errors:</p>
+      <p *ngIf="getErrors().length == 0">No errors found!</p>
+      <mat-list class="error-list">
+        <mat-list-item *ngFor="let error of getErrors()">{{ error }}</mat-list-item>
+      </mat-list>
+    </div>
   </div>
 </div>

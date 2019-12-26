@@ -2,9 +2,11 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"io/ioutil"
 	"sciler/communication"
 	"sciler/config"
 	"testing"
@@ -861,6 +863,41 @@ func TestInstructionCameras(t *testing.T) {
 		Contents: []map[string]string{
 			{"link": "https://raccoon.games", "name": "camera1"},
 			{"link": "https://debrouwerij.io", "name": "camera2"},
+		},
+	}
+	jsonHintMessage, _ := json.Marshal(&returnMsg)
+	communicatorMock.On("Publish", "front-end", string(jsonHintMessage), 3)
+	handler.msgMapper(instructionMsg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+}
+
+func TestInstructionCheckConfigNoErrors(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	fileName := "../../../resources/testing/test_config.json"
+	workingConfig := config.ReadFile(fileName)
+	handler := Handler{
+		Config:       workingConfig,
+		ConfigFile:   fileName,
+		Communicator: communicatorMock,
+	}
+	jsonFile, _ := ioutil.ReadFile(fileName)
+	print(fmt.Sprintln(jsonFile))
+	jsonData, _ := json.Marshal(jsonFile)
+	print(fmt.Sprintln(jsonData))
+	instructionMsg := Message{
+		DeviceID: "front-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{"instruction": "check config", "config": jsonFile},
+		},
+	}
+	returnMsg := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "cameras",
+		Contents: map[string][]error{
+			"errors": {},
 		},
 	}
 	jsonHintMessage, _ := json.Marshal(&returnMsg)
