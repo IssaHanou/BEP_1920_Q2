@@ -838,6 +838,39 @@ func TestInstructionHint(t *testing.T) {
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
 }
 
+func TestInstructionAllHints(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	workingConfig := config.ReadFile("../../../resources/testing/test_config.json")
+	handler := Handler{
+		Config:       workingConfig,
+		ConfigFile:   "../../../resources/testing/test_config.json",
+		Communicator: communicatorMock,
+	}
+	instructionMsg := Message{
+		DeviceID: "front-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{
+				"instruction": "all hints",
+			},
+		},
+	}
+	returnMessage := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "all hints",
+		Contents: map[string][]string{
+			"Telefoon puzzels": {"De knop verzend jouw volgorde", "Heb je al even gewacht?"},
+			"Control puzzel":   {"Zet de schuiven nauwkeurig"},
+		},
+	}
+	jsonHintMessage, _ := json.Marshal(&returnMessage)
+	communicatorMock.On("Publish", "front-end", string(jsonHintMessage), 3)
+	handler.msgMapper(instructionMsg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+}
+
 func TestInstructionNotFromWrongDevice(t *testing.T) {
 	communicatorMock := new(CommunicatorMock)
 	workingConfig := config.ReadFile("../../../resources/testing/test_config.json")
