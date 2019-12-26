@@ -7,6 +7,7 @@ import { Subscription } from "rxjs";
 import { Devices } from "./components/device/devices";
 import { Timers } from "./components/timer/timers";
 import { Camera } from "./camera/camera";
+import {CameraComponent} from "./camera/camera.component";
 
 @Component({
   selector: "app-root",
@@ -38,7 +39,7 @@ export class AppComponent implements OnInit, OnDestroy {
       this.subscribeNewTopic(topic);
     }
     this.sendInstruction([{ instruction: "send status" }]);
-    this.sendInstruction([{instruction: "cameras"}]);
+    this.sendInstruction([{ instruction: "cameras" }]);
     this.sendConnection(true);
   }
 

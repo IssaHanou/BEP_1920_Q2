@@ -1,5 +1,15 @@
-<div class="home-box">
-  <h3 class="header">Camera</h3>
+<div class="home-box camera-box">
+  <div class="header">
+    <h3 class="camera-title">Camera</h3>
+    <form (ngSubmit)="setSrc()">
+      <mat-form-field  class="camera-title">
+        <mat-select [(ngModel)]="camera" name="camera" placeholder="Choose camera to see feed">
+          <mat-option *ngFor="let camera of allCameras()" [value]="camera.name">{{ camera.name }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <input type="submit" value="Choose" class="mat-raised-button mat-primary custom-md-button camera-title">
+    </form>
+  </div>
   <div class="contents">
     <iframe [src]="cameraFeedSrc" class="camera-feed"></iframe>
   </div>

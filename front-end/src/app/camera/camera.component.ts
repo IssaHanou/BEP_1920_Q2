@@ -11,19 +11,28 @@ import { DomSanitizer } from "@angular/platform-browser";
 export class CameraComponent implements OnInit {
 
   cameraFeedSrc: any;
+  camera: string;
 
   constructor(private app: AppComponent, private sanitizer: DomSanitizer) {
   }
 
   ngOnInit() {
-    this.setSrc();
-  }
-
-  setSrc() {
-    this.cameraFeedSrc = this.sanitizer.bypassSecurityTrustResourceUrl("https://raccoon.games");
+    this.cameraFeedSrc = this.sanitizer.bypassSecurityTrustResourceUrl("about:blank");
   }
 
   allCameras(): Camera[] {
     return this.app.cameras;
+  }
+
+  /**
+   * Set the src of the iframe with parameter from dropdown.
+   * Dom sanitizer used to make sure link from config is 'safe'.
+   */
+  setSrc() {
+    for (const cam of this.allCameras()) {
+      if (this.camera === cam.name) {
+        this.cameraFeedSrc = this.sanitizer.bypassSecurityTrustResourceUrl(cam.link);
+      }
+    }
   }
 }

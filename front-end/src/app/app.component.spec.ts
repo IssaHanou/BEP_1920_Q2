@@ -14,7 +14,7 @@ import {
   MatFormFieldModule, MatIconModule,
   MatInputModule,
   MatPaginatorModule, MatSidenavModule,
-  MatSortModule,
+  MatSortModule, MatSelectModule,
   MatTableModule, MatToolbarModule
 } from "@angular/material";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
@@ -34,6 +34,7 @@ describe("AppComponent", () => {
         MatSidenavModule,
         MatToolbarModule,
         MatIconModule,
+        MatSelectModule,
         BrowserAnimationsModule
       ],
       declarations: [
