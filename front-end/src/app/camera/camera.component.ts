@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { AppComponent } from "../app.component";
 import { Camera } from "./camera";
 import { DomSanitizer } from "@angular/platform-browser";
+import {FormControl} from "@angular/forms";
 
 @Component({
   selector: "app-camera",
@@ -10,14 +11,22 @@ import { DomSanitizer } from "@angular/platform-browser";
 })
 export class CameraComponent implements OnInit {
 
+  selectedCameraControl = new FormControl();
   cameraFeedSrc: any;
-  camera: string;
 
   constructor(private app: AppComponent, private sanitizer: DomSanitizer) {
   }
 
   ngOnInit() {
-    this.cameraFeedSrc = this.sanitizer.bypassSecurityTrustResourceUrl("about:blank");
+    if (this.app.selectedCamera !== undefined) {
+      this.selectedCameraControl.setValue(this.app.selectedCamera);
+      this.setSrc();
+    } else if (this.allCameras().length > 1) {
+      this.selectedCameraControl.setValue(this.allCameras()[0].name);
+      this.setSrc();
+    } else {
+      this.cameraFeedSrc = this.sanitizer.bypassSecurityTrustResourceUrl("about:blank");
+    }
   }
 
   allCameras(): Camera[] {
@@ -30,8 +39,9 @@ export class CameraComponent implements OnInit {
    */
   setSrc() {
     for (const cam of this.allCameras()) {
-      if (this.camera === cam.name) {
+      if (this.selectedCameraControl.value === cam.name) {
         this.cameraFeedSrc = this.sanitizer.bypassSecurityTrustResourceUrl(cam.link);
+        this.app.selectedCamera = this.selectedCameraControl.value;
       }
     }
   }

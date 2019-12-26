@@ -24,6 +24,7 @@ export class AppComponent implements OnInit, OnDestroy {
   deviceList: Devices;
   timerList: Timers;
   cameras: Camera[];
+  selectedCamera: string;
 
   constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
     this.jsonConvert = new JsonConvert();
