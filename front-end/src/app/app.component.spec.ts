@@ -1,9 +1,9 @@
 import { TestBed, async } from "@angular/core/testing";
 import { AppComponent } from "./app.component";
 import { HintComponent } from "./components/hint/hint.component";
-import { FormsModule } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MqttModule, MqttService } from "ngx-mqtt";
-import { MQTT_SERVICE_OPTIONS } from "./app.module";
+import { APP_ROUTES, MQTT_SERVICE_OPTIONS } from "./app.module";
 import { DeviceComponent } from "./components/device/device.component";
 import { ManageComponent } from "./components/manage/manage.component";
 import { PuzzleComponent } from "./components/puzzle/puzzle.component";
@@ -13,32 +13,46 @@ import { Overlay } from "@angular/cdk/overlay";
 import {
   MatFormFieldModule, MatIconModule,
   MatInputModule,
-  MatPaginatorModule, MatSidenavModule,
+  MatSidenavModule,
   MatSortModule, MatSelectModule,
-  MatTableModule, MatToolbarModule
+  MatTableModule, MatToolbarModule, MatListModule, MatButtonModule
 } from "@angular/material";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { BrowserModule } from "@angular/platform-browser";
+import { CdkTableModule } from "@angular/cdk/table";
+import { RouterModule } from "@angular/router";
+import { CameraComponent } from "./camera/camera.component";
+import { HomeComponent } from "./home/home.component";
+import { ConfigComponent } from "./config/config.component";
 
 describe("AppComponent", () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
+        BrowserModule,
         FormsModule,
         MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
+        BrowserAnimationsModule,
+        MatSnackBarModule,
         MatTableModule,
-        MatSortModule,
-        MatPaginatorModule,
+        MatButtonModule,
         MatFormFieldModule,
         MatInputModule,
-        MatSnackBarModule,
+        MatSortModule,
         MatSidenavModule,
         MatToolbarModule,
         MatIconModule,
         MatSelectModule,
-        BrowserAnimationsModule
+        MatListModule,
+        CdkTableModule,
+        RouterModule.forRoot(APP_ROUTES),
+        ReactiveFormsModule
       ],
       declarations: [
         AppComponent,
+        CameraComponent,
+        HomeComponent,
+        ConfigComponent,
         HintComponent,
         DeviceComponent,
         ManageComponent,

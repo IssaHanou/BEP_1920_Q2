@@ -1,6 +1,17 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
-
 import { CameraComponent } from "./camera.component";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import { MqttModule, MqttService } from "ngx-mqtt";
+import { MQTT_SERVICE_OPTIONS } from "../app.module";
+import {
+  MatFormFieldModule,
+  MatSelectModule,
+  MatSnackBar,
+  MatSnackBarModule
+} from "@angular/material";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { AppComponent } from "../app.component";
+import { Overlay } from "@angular/cdk/overlay";
 
 describe("CameraComponent", () => {
   let component: CameraComponent;
@@ -8,18 +19,24 @@ describe("CameraComponent", () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CameraComponent ]
-    })
-    .compileComponents();
+      imports: [
+        FormsModule,
+        MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
+        MatFormFieldModule,
+        MatSelectModule,
+        MatSnackBarModule,
+        BrowserAnimationsModule,
+        ReactiveFormsModule
+      ],
+      declarations: [CameraComponent],
+      providers: [MqttService, AppComponent, MatSnackBar, Overlay]
+    }).compileComponents();
   }));
 
-  beforeEach(() => {
+  it("should create", () => {
     fixture = TestBed.createComponent(CameraComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  });
-
-  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

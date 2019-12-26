@@ -6,7 +6,7 @@ import { DeviceComponent } from "./components/device/device.component";
 import { TimerComponent } from "./components/timer/timer.component";
 import { ManageComponent } from "./components/manage/manage.component";
 import { PuzzleComponent } from "./components/puzzle/puzzle.component";
-import { FormsModule } from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 import { MqttModule, MqttService, IMqttServiceOptions } from "ngx-mqtt";
 import {
@@ -22,7 +22,6 @@ import {
   MatFormFieldModule,
   MatInputModule,
   MatIconModule,
-  MatPaginatorModule,
   MatSortModule,
   MatTableModule,
   MatToolbarModule,
@@ -98,7 +97,6 @@ export const APP_ROUTES: Routes = [
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
-    MatPaginatorModule,
     MatSortModule,
     MatSidenavModule,
     MatToolbarModule,
@@ -106,13 +104,13 @@ export const APP_ROUTES: Routes = [
     MatSelectModule,
     MatListModule,
     CdkTableModule,
-    RouterModule.forRoot(APP_ROUTES)
+    RouterModule.forRoot(APP_ROUTES),
+    ReactiveFormsModule
   ],
   providers: [
     MqttService,
     MatSnackBar,
     Overlay,
-    DeviceComponent,
     {
       provide: HAMMER_LOADER,
       useValue: () => new Promise(() => {})
