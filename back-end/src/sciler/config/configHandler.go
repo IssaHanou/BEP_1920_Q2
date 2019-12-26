@@ -12,37 +12,33 @@ import (
 // ReadFile reads filename and call readJSON on contents.
 func ReadFile(filename string) WorkingConfig {
 	dat, err := ioutil.ReadFile(filename)
+	errorList := make([]string, 0)
 	if err != nil {
-		panic(errors.New("Could not read file " + filename).Error())
+		errorList = append(errorList, errors.New("Could not read file "+filename).Error())
 	}
-	config, errorList := ReadJSON(dat)
-	if len(errorList) > 0 {
-		panic(errors.New(errorList[0]))
-	}
+	config, jsonErrors := ReadJSON(dat)
+	errorList = append(errorList, jsonErrors...)
+	// TODO return config, errorList
 	return config
 }
 
 // ReadJSON transforms json file into config object.
 func ReadJSON(input []byte) (WorkingConfig, []string) {
 	var config ReadConfig
-	errorList := make([]string, 0)
 	jsonErr := json.Unmarshal(input, &config)
 	if jsonErr != nil {
-		errorList = append(errorList, jsonErr.Error())
+		return WorkingConfig{}, []string{jsonErr.Error()}
 	}
 	newConfig, configErr := generateDataStructures(config)
-	if configErr != nil {
-		errorList = append(errorList, configErr.Error())
-	}
-	return newConfig, errorList
+	return newConfig, configErr
 }
 
 // Creates additional structures: forms device and rule maps;
 // and maps for actions and constraints (retrieved from puzzles and general events), with condition pointer as key
-func generateDataStructures(readConfig ReadConfig) (WorkingConfig, error) {
+func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 	var config WorkingConfig
+	errorList := make([]string, 0)
 	// Copy information from read config to working config.
-
 	config.General = readConfig.General
 	config.Cameras = readConfig.Cameras
 	config.Puzzles = generatePuzzles(readConfig.Puzzles, &config)
@@ -65,6 +61,8 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, error) {
 		duration, ok := time.ParseDuration(readTimer.Duration)
 		if ok == nil {
 			config.Timers[readTimer.ID] = newTimer(readTimer.ID, duration)
+		} else {
+			errorList = append(errorList, errors.New("Could not parse duration of timer: "+readTimer.ID).Error())
 		}
 	}
 	duration, _ := time.ParseDuration(config.General.Duration)
@@ -72,7 +70,7 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, error) {
 	config.StatusMap = generateStatusMap(&config)
 	config.RuleMap = generateRuleMap(&config)
 
-	return config, checkConfig(config)
+	return config, append(errorList, checkConfig(config)...)
 }
 
 func getAllRules(config *WorkingConfig) []*Rule {
@@ -121,14 +119,15 @@ func appendWhenUnique(rules []*Rule, rule *Rule) []*Rule {
 }
 
 // checkConfig is a method that will return an error if the constraints value type is not equal to the device input type specified, the actions type is not equal to the device output type, or some other not allowed json configuration
-func checkConfig(config WorkingConfig) error {
+func checkConfig(config WorkingConfig) []string {
+	errList := make([]string, 0)
 	for _, puzzle := range config.Puzzles {
 		for _, rule := range puzzle.Event.Rules {
 			if err := rule.Conditions.checkConstraints(config); err != nil {
-				return err
+				errList = append(errList, err.Error())
 			}
 			if err := checkActions(rule.Actions, config); err != nil {
-				return err
+				errList = append(errList, err.Error())
 			}
 		}
 	}
@@ -136,15 +135,15 @@ func checkConfig(config WorkingConfig) error {
 	for _, generalEvent := range config.GeneralEvents {
 		for _, rule := range generalEvent.Rules {
 			if err := rule.Conditions.checkConstraints(config); err != nil {
-				return err
+				errList = append(errList, err.Error())
 			}
 			if err := checkActions(rule.Actions, config); err != nil {
-				return err
+				errList = append(errList, err.Error())
 			}
 		}
 	}
 	// todo check uniqueness of all device_id, timer_id and rule_id
-	return nil
+	return errList
 }
 
 // checkAction is a method that will return an error is the actions value types and instructions are not equal to the device output specifications

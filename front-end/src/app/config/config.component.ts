@@ -16,6 +16,7 @@ export class ConfigComponent implements OnInit {
 
   /**
    * Define listeners for the file reader.
+   * First resets the errors.
    * On reading file, it should check config on back-end.
    * On error, it should add to error list and log the error.
    */
@@ -24,12 +25,15 @@ export class ConfigComponent implements OnInit {
     this.reader = new FileReader();
     this.reader.addEventListener("load", (e) => {
       this.data = e.target["result"];
-      this.app.sendInstruction([{ instruction: "check config", config: JSON.parse(this.data)}]);
+      this.errors = [];
+      this.app.configErrorList = [];
+      this.app.sendInstruction([{ instruction: "check config", config: this.data}]);
     });
     this.reader.addEventListener("error", (e) => {
       this.errors.push(e.target["result"]);
-      logger.error("log: error while reading file")
-    })
+      logger.error("log: error while reading file");
+      this.uploaded = "Error during uploading: " + e.target["result"];
+    });
   }
 
   ngOnInit() {
@@ -46,8 +50,11 @@ export class ConfigComponent implements OnInit {
 
   getErrors(): string[] {
     const list = [];
-    for (const err of this.errors) {
+    for (const err of this.app.configErrorList) {
       list.push(err);
+    }
+    for (const err of this.errors) {
+      list.push(err)
     }
     return list;
   }
