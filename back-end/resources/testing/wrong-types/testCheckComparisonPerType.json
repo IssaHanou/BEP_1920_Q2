@@ -36,13 +36,10 @@
       "id": "controlBoard",
       "description": "Control board with three switches, three slides with lights and one main switch.",
       "input": {
-        "redSwitch": "boolean",
-        "orangeSwitch": "boolean",
-        "greenSwitch": "boolean",
-        "slider1": "numeric",
-        "slider2": "numeric",
-        "slider3": "numeric",
-        "mainSwitch": "boolean"
+        "array": "array",
+        "numeric": "numeric",
+        "string": "string",
+        "boolean": "boolean"
       },
       "output": {
         "greenLight1": {
@@ -121,7 +118,7 @@
       "description": "device that has all types of input",
       "input": {
         "numeric": "numeric",
-        "boolean":"boolean",
+        "boolean": "boolean",
         "string": "string",
         "array": "array",
         "custom": "custom"
@@ -159,7 +156,7 @@
                 {
                   "component_id": "greenLight1",
                   "instruction": "interval",
-                  "value": [true, true, false, "string"]
+                  "value": 0.5
                 },
                 {
                   "component_id": "greenLight1",
@@ -198,26 +195,34 @@
                   "operator": "OR",
                   "list": [
                     {
-                      "component_id": "mainSwitch",
-                      "comparison": "eq",
+                      "component_id": "boolean",
+                      "comparison": "unknown",
                       "value": true
                     },
                     {
-                      "component_id": "greenSwitch",
-                      "comparison": "eq",
-                      "value": true
+                      "component_id": "string",
+                      "comparison": "unknown",
+                      "value": "test"
                     },
                     {
-                      "component_id": "redSwitch",
-                      "comparison": "eq",
-                      "value": true
+                      "component_id": "numeric",
+                      "comparison": "unknown",
+                      "value": 10
                     },
                     {
-                      "component_id": "slider2",
-                      "comparison": "lt",
-                      "value": 20
+                      "component_id": "array",
+                      "comparison": "unknown",
+                      "value": [20]
                     }
                   ]
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "correctSequence",
+                "constraints": {
+                  "comparison": "unknown",
+                  "value": 2
                 }
               }
             ]
@@ -296,8 +301,8 @@
                   "operator": "AND",
                   "list": [
                     {
-                      "comparison": "eq",
-                      "value": "00:01:01"
+                      "comparison": "unknown",
+                      "value": true
                     }
                   ]
                 }

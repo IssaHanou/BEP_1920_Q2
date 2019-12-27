@@ -111,6 +111,7 @@ type Action struct {
 }
 
 // Execute is a method that performs the action
+// TODO test this
 func (action Action) Execute(handler InstructionSender) {
 	switch action.Type { // this cannot be any other Type than device or timer, (checked in checkActions function)
 	case "device":

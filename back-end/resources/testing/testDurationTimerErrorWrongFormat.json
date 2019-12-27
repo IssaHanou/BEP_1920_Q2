@@ -8,7 +8,7 @@
   "timers": [
     {
       "id": "timer1",
-      "duration": "10s"
+      "duration": "10x"
     },
     {
       "id": "timer2",
@@ -29,19 +29,6 @@
     {
       "id": "timer6",
       "duration": "5s"
-    }
-  ],
-  "devices": [
-    {
-      "id": "telephone",
-      "description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
-      "input": {
-        "turningWheel": 0
-      },
-      "output": {
-        "audio": "audio1",
-        "ringTone": "string"
-      }
     }
   ]
 }
