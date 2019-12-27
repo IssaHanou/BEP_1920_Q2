@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { AppComponent } from "../app.component";
-import {logger} from "codelyzer/util/logger";
+import { logger } from "codelyzer/util/logger";
 
 @Component({
   selector: "app-config",
@@ -32,7 +32,7 @@ export class ConfigComponent implements OnInit {
     this.reader.addEventListener("error", (e) => {
       this.errors.push(e.target["result"]);
       logger.error("log: error while reading file");
-      this.uploaded = "Error during uploading: " + e.target["result"];
+      this.uploaded = "Error tijdens uploaden: " + e.target["result"];
     });
   }
 
@@ -44,7 +44,7 @@ export class ConfigComponent implements OnInit {
    */
   checkFile(files: FileList) {
     const file = files.item(0);
-    this.uploaded = "Succesfully uploaded file: " + file.name + "!";
+    this.uploaded = "Uploaden gelukt: " + file.name + "!";
     this.reader.readAsText(file, "UTF-8");
   }
 

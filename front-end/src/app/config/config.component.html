@@ -8,9 +8,10 @@
     </div>
     <p class="uploadString">{{ uploaded }}</p>
     <div *ngIf="uploaded != ''" class="file-output">
-      <mat-list class="error-list">
+      <mat-list class="error-list"
+                [ngStyle]="{'background-color' : (getErrors().length == 0)? '#87D37C' :'#E68364'}">
         <mat-list-item class="error-list-title">Errors</mat-list-item>
-        <mat-list-item *ngIf="getErrors().length == 0">No errors found!</mat-list-item>
+        <mat-list-item *ngIf="getErrors().length == 0">Geen errors gevonden!</mat-list-item>
         <mat-list-item *ngFor="let error of getErrors()">{{ error }}</mat-list-item>
       </mat-list>
     </div>
