@@ -57,6 +57,7 @@ export class ConfigComponent implements OnInit {
     this.newConfig = "Configuratie uit: " + this.currentFile.name + " wordt nu gebruikt";
   }
 
+  // All JSON errors will be shown per one - json unmarshal
   getErrors(): string[] {
     const list = [];
     for (const err of this.app.configErrorList) {

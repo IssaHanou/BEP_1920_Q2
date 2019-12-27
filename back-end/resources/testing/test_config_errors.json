@@ -1,7 +1,7 @@
 {
   "general": {
     "name": "Escape X",
-    "duration": 30,
+    "duration": "30",
     "host": "localhost",
     "port": 1883
   },
@@ -110,7 +110,7 @@
   "timers": [
     {
       "id": "timer1",
-      "duration": "10s"
+      "duration": "10x"
     },
     {
       "id": "timer2",
@@ -140,10 +140,10 @@
         {
           "id": "correctSequence",
           "description": "De juiste volgorde van cijfers moet gedraaid worden.",
-          "limit": 1,
+          "limit": 7,
           "conditions": {
             "type": "device",
-            "type_id": "telephone",
+            "type_id": "testDevice",
             "constraints": {
               "comparison": "eq",
               "component_id": "turningWheel",
