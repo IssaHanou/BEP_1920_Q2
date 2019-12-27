@@ -10,10 +10,9 @@ export class ConfigComponent implements OnInit {
 
   uploaded: string = "";
   data: string = "";
-  errors: string[];
   reader: FileReader;
-  noErrors: boolean;
-  newConfig: string;
+  newConfig: string = "";
+  errors: string[];
   currentFile: File;
 
   /**
@@ -48,14 +47,13 @@ export class ConfigComponent implements OnInit {
     this.currentFile = files.item(0);
     this.uploaded = "Uploaden gelukt: " + this.currentFile.name + "!";
     this.reader.readAsText(this.currentFile, "UTF-8");
-    this.noErrors = this.getErrors().length === 0;
   }
 
   /**
    * Use the config entered as new configuration for app.
    */
   sendConfig() {
-    this.app.sendInstruction([{instruction: "use config", config: this.data}])
+    this.app.sendInstruction([{instruction: "use config", config: this.data}]);
     this.newConfig = "Configuratie uit: " + this.currentFile.name + " wordt nu gebruikt";
   }
 
@@ -68,5 +66,9 @@ export class ConfigComponent implements OnInit {
       list.push(err)
     }
     return list;
+  }
+
+  noErrors(): boolean {
+    return this.errors.length == 0 && this.app.configErrorList.length == 0;
   }
 }
