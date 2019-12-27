@@ -7,13 +7,19 @@
              (change)="checkFile($event.target.files)" >
     </div>
     <p class="uploadString">{{ uploaded }}</p>
-    <div *ngIf="uploaded != ''" class="file-output">
-      <mat-list class="error-list"
-                [ngStyle]="{'background-color' : (getErrors().length == 0)? '#87D37C' :'#E68364'}">
+    <div *ngIf="uploaded != '' && !noErrors" class="file-output-errors">
+      <mat-list class="error-list">
         <mat-list-item class="error-list-title">Errors</mat-list-item>
-        <mat-list-item *ngIf="getErrors().length == 0">Geen errors gevonden!</mat-list-item>
         <mat-list-item *ngFor="let error of getErrors()">{{ error }}</mat-list-item>
       </mat-list>
+    </div>
+    <div *ngIf="noErrors" class="file-output-no-errors">
+      <mat-list class="error-list">
+        <mat-list-item class="error-list-title">Errors</mat-list-item>
+        <mat-list-item>Geen errors gevonden!</mat-list-item>
+      </mat-list>
+      <button class="mat-raised-button mat-primary custom-md-button config-button" (click)="sendConfig()">Gebruik configuratie</button>
+      <p>{{ newConfig }}</p>
     </div>
   </div>
 </div>

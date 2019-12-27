@@ -28,15 +28,20 @@ export class AppComponent implements OnInit, OnDestroy {
   configErrorList: string[];
 
   constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
+  }
+
+  /**
+   * Initialize app, also called upon loading new config file.
+   */
+  ngOnInit(): void {
     this.jsonConvert = new JsonConvert();
     this.deviceList = new Devices();
     this.timerList = new Timers();
     this.cameras = [];
+    this.configErrorList = [];
     const generaltimer = { id: "general", duration: 0, state: "stateIdle" };
     this.timerList.setTimer(generaltimer);
-  }
 
-  ngOnInit(): void {
     for (const topic of this.topics) {
       this.subscribeNewTopic(topic);
     }
@@ -77,16 +82,22 @@ export class AppComponent implements OnInit, OnDestroy {
    * @param instruction instruction to be sent.
    */
   public sendInstruction(instruction: any[]) {
-    const msg = new Message(
+    let msg = new Message(
       "front-end",
       "instruction",
       new Date(),
       instruction
     );
-    const jsonMessage: string = this.jsonConvert.serialize(msg);
-    this.mqttService.unsafePublish("back-end", JSON.stringify(jsonMessage));
+    let jsonMessage: string = JSON.stringify(this.jsonConvert.serialize(msg));
+    this.mqttService.unsafePublish("back-end", jsonMessage);
+    for (const inst of instruction) {
+      if ("config" in inst) {
+        msg.contents = {config: "contents to long to print"};
+        jsonMessage = JSON.stringify(this.jsonConvert.serialize(msg));
+      }
+    }
     console.log(
-      "log: sent instruction message: " + JSON.stringify(jsonMessage)
+      "log: sent instruction message: " + jsonMessage
     );
   }
 
@@ -124,46 +135,13 @@ export class AppComponent implements OnInit, OnDestroy {
    */
   public processMessage(jsonMessage: string) {
     const msg: Message = Message.deserialize(jsonMessage);
-
     switch (msg.type) {
       case "confirmation": {
-        const keys = ["instructed", "contents", "instruction"];
-        /**
-         * When the front-end receives confirmation message from client computer
-         * that instruction was completed, show the message to the user.
-         */
-
-        for (const instruction of msg.contents[keys[0]][keys[1]]) {
-          const display =
-            "received confirmation from " +
-            msg.deviceId +
-            " for instruction: " +
-            instruction[keys[2]];
-          this.openSnackbar(display, "");
-        }
+        this.processConfirmation(jsonMessage);
         break;
       }
       case "instruction": {
-        for (const action of msg.contents) {
-          switch (action.instruction) {
-            case "reset":
-              {
-                this.deviceList.setDevice({
-                  id: "front-end",
-                  connection: true,
-                  status: {
-                    start: 0,
-                    stop: 0
-                  }
-                });
-              }
-              break;
-            case "status update": {
-              this.sendConnection(true);
-            }
-
-          }
-        }
+        this.processInstruction(msg);
         break;
       }
       case "status": {
@@ -171,7 +149,7 @@ export class AppComponent implements OnInit, OnDestroy {
         break;
       }
       case "time": {
-        this.processTimeStatus(msg.contents);
+        this.timerList.setTimer(msg.contents);
         break;
       }
       case "cameras": {
@@ -184,6 +162,10 @@ export class AppComponent implements OnInit, OnDestroy {
         this.configErrorList = msg.contents.errors;
         break;
       }
+      case "new config": {
+        this.ngOnInit();
+        break;
+      }
       default:
         console.log("log: received invalid message type " + msg.type);
         break;
@@ -191,12 +173,46 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Timers send their status to the front-end but we only care about the general time.
-   * @param jsonData with id, status and state
+   * When the front-end receives confirmation message from client computer
+   * that instruction was completed, show the message to the user.
    */
-  public processTimeStatus(jsonData) {
-    this.timerList.setTimer(jsonData);
+  public processConfirmation(jsonData) {
+    const keys = ["instructed", "contents", "instruction"];
+    for (const instruction of jsonData.contents[keys[0]][keys[1]]) {
+      const display =
+        "received confirmation from " +
+        jsonData.deviceId +
+        " for instruction: " +
+        instruction[keys[2]];
+      this.openSnackbar(display, "");
+    }
   }
+
+  /**
+   * Process instruction messages. Two types exist: reset and status update.
+   */
+  public processInstruction(jsonData) {
+    for (const action of jsonData) {
+      switch (action.instruction) {
+        case "reset":
+        {
+          this.deviceList.setDevice({
+            id: "front-end",
+            connection: true,
+            status: {
+              start: 0,
+              stop: 0
+            }
+          });
+        }
+          break;
+        case "status update": {
+          this.sendConnection(true);
+        }
+      }
+    }
+  }
+
   /**
    * Opens snackbar with duration of 2 seconds.
    * @param message displays this message

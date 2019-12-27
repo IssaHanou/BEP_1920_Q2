@@ -1,6 +1,5 @@
 import { Component, OnInit } from "@angular/core";
 import { AppComponent } from "../app.component";
-import { logger } from "codelyzer/util/logger";
 
 @Component({
   selector: "app-config",
@@ -13,6 +12,9 @@ export class ConfigComponent implements OnInit {
   data: string = "";
   errors: string[];
   reader: FileReader;
+  noErrors: boolean;
+  newConfig: string;
+  currentFile: File;
 
   /**
    * Define listeners for the file reader.
@@ -31,7 +33,7 @@ export class ConfigComponent implements OnInit {
     });
     this.reader.addEventListener("error", (e) => {
       this.errors.push(e.target["result"]);
-      logger.error("log: error while reading file");
+      console.log("log: error while reading file");
       this.uploaded = "Error tijdens uploaden: " + e.target["result"];
     });
   }
@@ -43,9 +45,18 @@ export class ConfigComponent implements OnInit {
    * When file is submitted, call file reader.
    */
   checkFile(files: FileList) {
-    const file = files.item(0);
-    this.uploaded = "Uploaden gelukt: " + file.name + "!";
-    this.reader.readAsText(file, "UTF-8");
+    this.currentFile = files.item(0);
+    this.uploaded = "Uploaden gelukt: " + this.currentFile.name + "!";
+    this.reader.readAsText(this.currentFile, "UTF-8");
+    this.noErrors = this.getErrors().length === 0;
+  }
+
+  /**
+   * Use the config entered as new configuration for app.
+   */
+  sendConfig() {
+    this.app.sendInstruction([{instruction: "use config", config: this.data}])
+    this.newConfig = "Configuratie uit: " + this.currentFile.name + " wordt nu gebruikt";
   }
 
   getErrors(): string[] {

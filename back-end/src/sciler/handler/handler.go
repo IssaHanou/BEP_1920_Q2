@@ -346,6 +346,18 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 					jsonMessage, _ := json.Marshal(&message)
 					handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 				}
+			case "use config":
+				{
+					handler.Config, _ = config.ReadJSON([]byte(fmt.Sprintf("%v", instruction["config"])))
+					message := Message{
+						DeviceID: "back-end",
+						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+						Type:     "new config",
+						Contents: map[string]interface{}{},
+					}
+					jsonMessage, _ := json.Marshal(&message)
+					handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+				}
 			}
 		} else {
 			logrus.Warnf("%s, tried to instruct the back-end, only the front-end is allowed to instruct the back-end", raw.DeviceID)
