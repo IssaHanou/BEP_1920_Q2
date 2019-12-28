@@ -265,8 +265,7 @@ func (handler *Handler) getEventStatus() []map[string]interface{} {
 	for _, rule := range handler.Config.RuleMap {
 		var status = make(map[string]interface{})
 		status["id"] = rule.ID
-		// TODO when is puzzle finished
-		status["status"] = rule.Executed == rule.Limit
+		status["status"] = rule.Finished
 		status["description"] = rule.Description
 		list = append(list, status)
 	}

@@ -265,6 +265,7 @@ func generateRules(readRules []ReadRule, config *WorkingConfig) []*Rule {
 			Executed:    0,
 			Conditions:  nil,
 			Actions:     readRule.Actions,
+			Finished:    false,
 		}
 		rule.Conditions = generateLogicalCondition(readRule.Conditions)
 		rules = append(rules, &rule)

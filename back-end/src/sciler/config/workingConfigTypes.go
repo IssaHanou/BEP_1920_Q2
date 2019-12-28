@@ -109,6 +109,7 @@ type Rule struct {
 	Executed    int
 	Conditions  LogicalCondition
 	Actions     []Action
+	Finished    bool
 }
 
 // InstructionSender is an interface needed for preventing cyclic imports
@@ -124,6 +125,10 @@ func (r *Rule) Execute(handler InstructionSender) {
 		action.Execute(handler)
 	}
 	r.Executed++
+	// TODO when is puzzle finished
+	if r.Executed == r.Limit {
+		r.Finished = true
+	}
 	logrus.Infof("Executed rule %s", r.ID)
 	handler.HandleEvent(r.ID)
 }
