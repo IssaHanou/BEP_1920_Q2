@@ -9,7 +9,7 @@ import { Puzzle } from "./puzzle";
   styleUrls: ["./puzzle.component.css", "../../../assets/css/main.css"]
 })
 export class PuzzleComponent implements OnInit {
-  puzzleColumns: string[] = ["id", "status", "description"];
+  puzzleColumns: string[] = ["id", "status", "description", "done"];
 
   @ViewChild("PuzzleTableSort", { static: true }) sort: MatSort;
 
@@ -31,5 +31,9 @@ export class PuzzleComponent implements OnInit {
     const dataSource = new MatTableDataSource<Puzzle>(puzzles);
     dataSource.sort = this.sort;
     return dataSource;
+  }
+
+  finishRule(ruleId: string) {
+    this.app.sendInstruction([{instruction: "finish rule", rule: ruleId}])
   }
 }

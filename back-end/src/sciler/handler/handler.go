@@ -363,6 +363,16 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 					jsonMessage, _ := json.Marshal(&message)
 					handler.Communicator.Publish("hint", string(jsonMessage), 3)
 				}
+			case "finish rule":
+				{
+					ruleToFinish := instruction["rule"].(string)
+					rule, ok := handler.Config.RuleMap[ruleToFinish]
+					if !ok {
+						logrus.Errorf("could not find rule with id %s in map", ruleToFinish)
+					}
+					rule.Finished = true
+					handler.SendEventStatus()
+				}
 			}
 		} else {
 			logrus.Warnf("%s, tried to instruct the back-end, only the front-end is allowed to instruct the back-end", raw.DeviceID)
