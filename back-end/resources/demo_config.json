@@ -3,9 +3,9 @@
     "name": "Demo week 6",
     "duration": "5m",
     "host": "192.168.178.82",
-    "port": 1883,
-    "cameras": []
+    "port": 1883
   },
+  "cameras": [],
   "devices": [
     {
       "id": "controlBoard",
