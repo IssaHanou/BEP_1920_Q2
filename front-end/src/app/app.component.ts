@@ -139,7 +139,7 @@ export class AppComponent implements OnInit, OnDestroy {
         }
         break;
       }
-      case "event-status": {
+      case "event status": {
         this.puzzleList.updatePuzzles(msg.contents);
         break;
       }
