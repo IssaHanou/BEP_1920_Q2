@@ -312,6 +312,19 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 					jsonMessage, _ := json.Marshal(&message)
 					handler.Communicator.Publish("client-computers", string(jsonMessage), 3)
 				}
+			case "test device":
+				{
+					message := Message{
+						DeviceID: raw.DeviceID,
+						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+						Type:     "instruction",
+						Contents: []map[string]interface{}{
+							{"instruction": "test"},
+						},
+					}
+					jsonMessage, _ := json.Marshal(&message)
+					handler.Communicator.Publish(instruction["device"].(string), string(jsonMessage), 3)
+				}
 			case "reset all":
 				{
 					message := Message{

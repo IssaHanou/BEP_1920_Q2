@@ -19,8 +19,8 @@
       </ng-container>
       <ng-container matColumnDef="done">
         <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header"> Puzzel klaar </th>
-        <td mat-cell *matCellDef="let element" class="rule-done">
-          <button mat-button color=primary class="reset" (click)="finishRule(element.id)">Finish</button>
+        <td mat-cell *matCellDef="let element">
+          <button mat-button color=primary (click)="finishRule(element.id)">Finish</button>
         </td>
       </ng-container>
 
