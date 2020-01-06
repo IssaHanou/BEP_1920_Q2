@@ -317,7 +317,7 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 			case "test device":
 				{
 					message := Message{
-						DeviceID: raw.DeviceID,
+						DeviceID: "back-end",
 						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 						Type:     "instruction",
 						Contents: []map[string]interface{}{{
