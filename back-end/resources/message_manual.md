@@ -18,6 +18,7 @@ are specific defined depending on the sender and receiver.
         - `instruction`: one of the instructions specified for this device or 
         component or one of following instructions: `test`, `status update`, `reset`
         - `value`: this is the value (argument) for the instruction (optional)
+        - `instructed_by`: this is the id of the device which originally send this instruction (usually front-end)
         - `component_id`: this will be the id of a component in a timer or device, 
                 (optional)
    
@@ -32,7 +33,7 @@ are specific defined depending on the sender and receiver.
     a format defined in the configurations of the device. e.g. `{redSwitch: true, redSlider: 40, redLed: "aan"}`
     - If type is `confirmation`,  then the message contents has te following:
         - `completed` is a boolean.
-        - `instructed` is the original instruction message for the device
+        - `instructed` is the original instruction message for the device, including the `instructed_by` tag
     - If type is `connection`, then the message contents has te following:
         - `connection` is a boolean defining the connection status of the device.
         
@@ -51,9 +52,10 @@ are specific defined depending on the sender and receiver.
     - `instruction`
 - `contents`:
     - If type is `confirmation`, then the then the message contents have
-        - `instructed` 
-        - `contents`
-        - `instruction`
+        - `completed`
+        - `instructed`, which contains the original instruction with in the `contents`:
+            - `instruction`
+            - `instructed_by`
     - If type is `status`, then the then the message contents have
         - `id` of device
         - `status` has a map of `component_id` keys and `status` values

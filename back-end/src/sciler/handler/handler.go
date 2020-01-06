@@ -178,14 +178,21 @@ func (handler *Handler) onConfirmationMsg(raw Message) error {
 		return fmt.Errorf("received improperly structured confirmation message from device " + raw.DeviceID)
 	}
 	msg := original.(map[string]interface{})
-	innerContents, err := getMapSlice(msg["innerContents"])
+	instructionContents, err := getMapSlice(msg["contents"])
 	if err != nil {
 		return err
 	}
 
 	var instructionString string
-	for _, instruction := range innerContents {
+	for _, instruction := range instructionContents {
 		instructionString += fmt.Sprintf("%s", instruction["instruction"])
+		// If original message to which device responded with confirmation was sent by front-end,
+		// pass confirmation through
+		if instruction["instructed_by"] == "front-end" {
+			jsonMessage, _ := json.Marshal(raw)
+			handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+			logrus.Infof("sending confirmation to front-end for instruction %v", instruction["instruction"])
+		}
 	}
 
 	if !value.(bool) {
@@ -195,13 +202,6 @@ func (handler *Handler) onConfirmationMsg(raw Message) error {
 		logrus.Info("device " + raw.DeviceID + " completed instructions: " +
 			instructionString + " at " + raw.TimeSent)
 	}
-	// If original message to which device responded with confirmation was sent by front-end,
-	// pass confirmation through
-	if msg["device_id"] == "front-end" {
-		jsonMessage, _ := json.Marshal(raw)
-		handler.Communicator.Publish("front-end", string(jsonMessage), 3)
-	}
-
 	con := handler.Config.Devices[raw.DeviceID]
 	con.Connection = true
 	handler.Config.Devices[raw.DeviceID] = con
@@ -276,11 +276,12 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 			case "test all":
 				{
 					message := Message{
-						DeviceID: raw.DeviceID,
+						DeviceID: "back-end",
 						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 						Type:     "instruction",
-						Contents: []map[string]interface{}{
-							{"instruction": "test"},
+						Contents: []map[string]interface{}{{
+							"instruction":   "test",
+							"instructed_by": raw.DeviceID},
 						},
 					}
 					jsonMessage, _ := json.Marshal(&message)
@@ -289,11 +290,12 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 			case "reset all":
 				{
 					message := Message{
-						DeviceID: raw.DeviceID,
+						DeviceID: "back-end",
 						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 						Type:     "instruction",
-						Contents: []map[string]interface{}{
-							{"instruction": "reset"},
+						Contents: []map[string]interface{}{{
+							"instruction":   "reset",
+							"instructed_by": raw.DeviceID},
 						},
 					}
 					jsonMessage, _ := json.Marshal(&message)
@@ -315,10 +317,14 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 			case "hint":
 				{
 					message := Message{
-						DeviceID: raw.DeviceID,
+						DeviceID: "back-end",
 						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 						Type:     "instruction",
-						Contents: raw.Contents,
+						Contents: []map[string]interface{}{{
+							"instruction":   "hint",
+							"value":         instruction["value"],
+							"instructed_by": raw.DeviceID},
+						},
 					}
 					jsonMessage, _ := json.Marshal(&message)
 					handler.Communicator.Publish("hint", string(jsonMessage), 3)

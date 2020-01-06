@@ -378,10 +378,11 @@ func TestOnConfirmationMsgTrue(t *testing.T) {
 		Contents: map[string]interface{}{
 			"completed": true,
 			"instructed": map[string]interface{}{
-				"device_id": "front-end",
+				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents": []map[string]interface{}{
-					{"instruction": "test"},
+				"contents": []map[string]interface{}{{
+					"instruction":   "test",
+					"instructed_by": "front-end"},
 				},
 				"type": "instruction",
 			},
@@ -404,8 +405,10 @@ func TestOnConfirmationMsgFalse(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  []map[string]interface{}{{"instruction": "test"}},
-				"type":      "instruction",
+				"contents": []map[string]interface{}{{
+					"instruction":   "test",
+					"instructed_by": "front-end"}},
+				"type": "instruction",
 			},
 		},
 	}
@@ -423,8 +426,10 @@ func TestOnConfirmationMsgIncorrect1(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  []map[string]interface{}{{"instruction": "test"}},
-				"type":      "instruction",
+				"contents": []map[string]interface{}{{
+					"instruction":   "test",
+					"instructed_by": "front-end"}},
+				"type": "instruction",
 			},
 		},
 	}
@@ -442,8 +447,10 @@ func TestOnConfirmationMsgIncorrect2(t *testing.T) {
 			"instructions": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  map[string]interface{}{"instructions": "test"},
-				"type":      "instructions",
+				"contents": map[string]interface{}{
+					"instructions":  "test",
+					"instructed_by": "front-end"},
+				"type": "instructions",
 			},
 		},
 	}
@@ -461,8 +468,10 @@ func TestOnConfirmationMsgIncorrect3(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  []map[string]interface{}{{"instruction": "test"}},
-				"type":      "instruction",
+				"contents": []map[string]interface{}{{
+					"instruction":   "test",
+					"instructed_by": "front-end"}},
+				"type": "instruction",
 			},
 		},
 	}
@@ -480,8 +489,10 @@ func TestMsgMapperConfirmation(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  []map[string]interface{}{{"instruction": "test"}},
-				"type":      "instruction",
+				"contents": []map[string]interface{}{{
+					"instruction":   "test",
+					"instructed_by": "front-end"}},
+				"type": "instruction",
 			},
 		},
 	}
@@ -732,11 +743,12 @@ func TestInstructionTestAll(t *testing.T) {
 		},
 	}
 	responseMsg := Message{
-		DeviceID: "front-end",
+		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "instruction",
-		Contents: []map[string]interface{}{
-			{"instruction": "test"},
+		Contents: []map[string]interface{}{{
+			"instruction":   "test",
+			"instructed_by": "front-end"},
 		},
 	}
 	jsonMessage, _ := json.Marshal(&responseMsg)
@@ -763,11 +775,12 @@ func TestInstructionResetAll(t *testing.T) {
 		},
 	}
 	responseMsg := Message{
-		DeviceID: "front-end",
+		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "instruction",
-		Contents: []map[string]interface{}{
-			{"instruction": "reset"},
+		Contents: []map[string]interface{}{{
+			"instruction":   "reset",
+			"instructed_by": "front-end"},
 		},
 	}
 	statusMsg := Message{
@@ -832,7 +845,20 @@ func TestInstructionHint(t *testing.T) {
 			},
 		},
 	}
-	jsonHintMessage, _ := json.Marshal(&instructionMsg)
+	responseMessage := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{
+				"instruction":   "hint",
+				"value":         "some useful hint",
+				"instructed_by": "front-end",
+			},
+		},
+	}
+
+	jsonHintMessage, _ := json.Marshal(&responseMessage)
 	communicatorMock.On("Publish", "hint", string(jsonHintMessage), 3)
 	handler.msgMapper(instructionMsg)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
@@ -857,7 +883,19 @@ func TestInstructionNotFromWrongDevice(t *testing.T) {
 			},
 		},
 	}
-	jsonHintMessage, _ := json.Marshal(&instructionMsg)
+	responseMessage := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{
+				"instruction":   "hint",
+				"value":         "some useful hint",
+				"instructed_by": "front-end",
+			},
+		},
+	}
+	jsonHintMessage, _ := json.Marshal(&responseMessage)
 	communicatorMock.On("Publish", "hint", string(jsonHintMessage), 3)
 	handler.msgMapper(instructionMsg)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 0)
