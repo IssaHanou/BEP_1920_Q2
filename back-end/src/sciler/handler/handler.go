@@ -178,13 +178,13 @@ func (handler *Handler) onConfirmationMsg(raw Message) error {
 		return fmt.Errorf("received improperly structured confirmation message from device " + raw.DeviceID)
 	}
 	msg := original.(map[string]interface{})
-	innerContents, err := getMapSlice(msg["contents"])
+	instructionContents, err := getMapSlice(msg["contents"])
 	if err != nil {
 		return err
 	}
 
 	var instructionString string
-	for _, instruction := range innerContents {
+	for _, instruction := range instructionContents {
 		instructionString += fmt.Sprintf("%s", instruction["instruction"])
 		// If original message to which device responded with confirmation was sent by front-end,
 		// pass confirmation through
