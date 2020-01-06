@@ -49,7 +49,7 @@ func (handler *Handler) msgMapper(raw Message) {
 		}
 	case "status":
 		{
-			handler.onStatusMsg(raw)
+			handler.updateStatus(raw)
 			handler.SendStatus(raw.DeviceID)
 			handler.HandleEvent(raw.DeviceID)
 			handler.SendEventStatus()
@@ -142,8 +142,8 @@ func (handler *Handler) checkStatusType(device config.Device, status interface{}
 	return nil
 }
 
-//onStatusMsg is the function to process status messages.
-func (handler *Handler) onStatusMsg(raw Message) {
+//updateStatus is the function to process status messages.
+func (handler *Handler) updateStatus(raw Message) {
 	contents := raw.Contents.(map[string]interface{})
 	if device, ok := handler.Config.Devices[raw.DeviceID]; ok {
 		logrus.Info("status message received from: " + raw.DeviceID + ", status: " + fmt.Sprint(raw.Contents))
@@ -266,7 +266,7 @@ func (handler *Handler) getEventStatus() []map[string]interface{} {
 	for _, rule := range handler.Config.RuleMap {
 		var status = make(map[string]interface{})
 		status["id"] = rule.ID
-		status["status"] = rule.Finished
+		status["status"] = rule.Finished()
 		status["description"] = rule.Description
 		list = append(list, status)
 	}

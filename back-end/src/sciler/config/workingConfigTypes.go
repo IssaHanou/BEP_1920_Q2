@@ -109,7 +109,6 @@ type Rule struct {
 	Executed    int
 	Conditions  LogicalCondition
 	Actions     []Action
-	Finished    bool
 }
 
 // InstructionSender is an interface needed for preventing cyclic imports
@@ -119,16 +118,17 @@ type InstructionSender interface {
 	HandleEvent(string)
 }
 
+// Finished is a method that checks is the a rule have been finished, meaning if it reached its maximum number of executions
+func (r *Rule) Finished() bool {
+	return r.Executed == r.Limit
+}
+
 // Execute performs all actions of a rule
 func (r *Rule) Execute(handler InstructionSender) {
 	for _, action := range r.Actions {
 		action.Execute(handler)
 	}
 	r.Executed++
-	// TODO when is puzzle finished
-	if r.Executed == r.Limit {
-		r.Finished = true
-	}
 	logrus.Infof("Executed rule %s", r.ID)
 	handler.HandleEvent(r.ID)
 }

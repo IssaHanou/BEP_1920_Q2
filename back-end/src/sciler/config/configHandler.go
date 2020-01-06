@@ -265,8 +265,6 @@ func generateRules(readRules []ReadRule, config *WorkingConfig) []*Rule {
 			Executed:    0,
 			Conditions:  nil,
 			Actions:     readRule.Actions,
-			// TODO finished still limit == executed
-			Finished: readRule.Limit == 0,
 		}
 		rule.Conditions = generateLogicalCondition(readRule.Conditions)
 		rules = append(rules, &rule)

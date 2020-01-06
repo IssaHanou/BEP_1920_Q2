@@ -37,6 +37,6 @@ export class PuzzleComponent implements OnInit {
    * When button is pressed, manually override the finished status of rule in back-end.
    */
   finishRule(ruleId: string) {
-    this.app.sendInstruction([{instruction: "finish rule", rule: ruleId}])
+    this.app.sendInstruction([{ instruction: "finish rule", rule: ruleId }]);
   }
 }

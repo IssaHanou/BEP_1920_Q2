@@ -78,6 +78,8 @@ export class DeviceComponent implements OnInit {
    * When button is pressed, test a single device.
    */
   testDevice(deviceId: string) {
-    this.app.sendInstruction([{instruction: "test device", device: deviceId}])
+    this.app.sendInstruction([
+      { instruction: "test device", device: deviceId }
+    ]);
   }
 }
