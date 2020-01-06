@@ -1145,6 +1145,7 @@ func TestLimitRule(t *testing.T) {
 	communicatorMock := new(CommunicatorMock)
 	workingConfig := config.ReadFile("../../../resources/testing/test_singleEvent.json")
 	workingConfig.RuleMap["mainSwitch flipped"].Executed = 1
+	workingConfig.RuleMap["mainSwitch flipped"].Finished = true
 	handler := Handler{
 		Config:       workingConfig,
 		Communicator: communicatorMock,
