@@ -231,7 +231,7 @@ class SccLib:
             instruction = action.get("instruction")
             if instruction == "test":
                 self.device.test()
-                logging.info(("instruction performed", action))
+                logging.info(("instruction performed", instruction))
             elif instruction == "status update":
                 msg_dict = {
                     "device_id": self.name,
@@ -242,14 +242,14 @@ class SccLib:
                 msg = json.dumps(msg_dict)
                 self.__send_message("back-end", msg)
                 self.status_changed()
-                logging.info(("instruction performed", action))
+                logging.info(("instruction performed", instruction))
             elif instruction == "reset":
                 self.device.reset()
-                logging.info("instruction performed", action)
+                logging.info(("instruction performed", instruction))
             else:
                 (success, failed_action) = self.device.perform_instruction(action)
                 if success:
-                    logging.info(("instruction performed", action))
+                    logging.info(("instruction performed", instruction))
                 else:
                     logging.warning(
                         (
