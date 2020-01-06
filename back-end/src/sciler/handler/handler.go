@@ -50,19 +50,13 @@ func (handler *Handler) msgMapper(raw Message) {
 	case "status":
 		{
 			handler.onStatusMsg(raw)
-			err := handler.SendStatus(raw.DeviceID)
-			if err != nil {
-				logrus.Error(err)
-			}
-
+			handler.SendStatus(raw.DeviceID)
 			handler.HandleEvent(raw.DeviceID)
+			handler.SendEventStatus()
 		}
 	case "confirmation":
 		{
-			err := handler.onConfirmationMsg(raw)
-			if err != nil {
-				logrus.Error(err)
-			}
+			handler.onConfirmationMsg(raw)
 		}
 	case "connection":
 		{
@@ -103,7 +97,7 @@ func compareType(valueType reflect.Kind, inputType string) error {
 	case "string":
 		{
 			if valueType != reflect.String {
-				return fmt.Errorf("status type string expected but %sfound as type", valueType.String())
+				return fmt.Errorf("status type string expected but %s found as type", valueType.String())
 			}
 		}
 	case "boolean":
@@ -167,20 +161,23 @@ func (handler *Handler) onStatusMsg(raw Message) {
 }
 
 //onConfirmationMsg is the function to process confirmation messages.
-func (handler *Handler) onConfirmationMsg(raw Message) error {
+func (handler *Handler) onConfirmationMsg(raw Message) {
 	contents := raw.Contents.(map[string]interface{})
 	value, ok := contents["completed"]
 	if !ok || reflect.TypeOf(value).Kind() != reflect.Bool {
-		return fmt.Errorf("received improperly structured confirmation message from device " + raw.DeviceID)
+		logrus.Errorf("received improperly structured confirmation message from device " + raw.DeviceID)
+		return
 	}
 	original, ok := contents["instructed"]
 	if !ok {
-		return fmt.Errorf("received improperly structured confirmation message from device " + raw.DeviceID)
+		logrus.Errorf("received improperly structured confirmation message from device " + raw.DeviceID)
+		return
 	}
 	msg := original.(map[string]interface{})
 	instructionContents, err := getMapSlice(msg["contents"])
 	if err != nil {
-		return err
+		logrus.Errorf(err.Error())
+		return
 	}
 
 	var instructionString string
@@ -202,15 +199,19 @@ func (handler *Handler) onConfirmationMsg(raw Message) error {
 		logrus.Info("device " + raw.DeviceID + " completed instructions: " +
 			instructionString + " at " + raw.TimeSent)
 	}
-	con := handler.Config.Devices[raw.DeviceID]
-	con.Connection = true
-	handler.Config.Devices[raw.DeviceID] = con
-	return nil
+
+	con, ok := handler.Config.Devices[raw.DeviceID]
+	if !ok {
+		logrus.Errorf("device %s was not found in config", raw.DeviceID)
+	} else {
+		con.Connection = true
+		handler.Config.Devices[raw.DeviceID] = con
+	}
 }
 
 // SendStatus sends all status and connection data of a device to the front-end.
 // Information retrieved from config.
-func (handler *Handler) SendStatus(deviceID string) error {
+func (handler *Handler) SendStatus(deviceID string) {
 	var message Message
 	if device, ok := handler.Config.Devices[deviceID]; ok {
 		message = Message{
@@ -236,13 +237,41 @@ func (handler *Handler) SendStatus(deviceID string) error {
 			},
 		}
 	} else {
-		return fmt.Errorf("error occurred while sending status of %s, since it is not recognised as a device or timer", deviceID)
+		logrus.Errorf("error occurred while sending status of %s, since it is not recognised as a device or timer", deviceID)
+		return
 	}
-
 	jsonMessage, _ := json.Marshal(&message)
 	logrus.Info("sending status data to front-end: " + fmt.Sprint(message.Contents))
 	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
-	return nil
+}
+
+// SendEventStatus sends the status of events to the front-end
+func (handler *Handler) SendEventStatus() {
+	status := handler.getEventStatus()
+	message := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "event status",
+		Contents: status,
+	}
+	jsonMessage, _ := json.Marshal(&message)
+	logrus.Info("sending event status to front-end")
+	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+}
+
+// returns json list with json objects with keys ["id", "status"]
+// status is json object with key ruleName and value true (if executed == limit) or false
+func (handler *Handler) getEventStatus() []map[string]interface{} {
+	var list []map[string]interface{}
+	for _, rule := range handler.Config.RuleMap {
+		var status = make(map[string]interface{})
+		status["id"] = rule.ID
+		// TODO when is puzzle finished
+		status["status"] = rule.Executed == rule.Limit
+		status["description"] = rule.Description
+		list = append(list, status)
+	}
+	return list
 }
 
 // SendInstruction sends a list of instructions to a client
@@ -253,7 +282,6 @@ func (handler *Handler) SendInstruction(clientID string, instructions []config.C
 		Type:     "instruction",
 		Contents: instructions,
 	}
-
 	jsonMessage, _ := json.Marshal(&message)
 	logrus.Infof("sending instruction data to %s: %s", clientID, fmt.Sprint(message.Contents))
 	handler.Communicator.Publish(clientID, string(jsonMessage), 3)
@@ -313,6 +341,20 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 					for _, timer := range handler.Config.Timers {
 						handler.SendStatus(timer.ID)
 					}
+					handler.SendEventStatus()
+				}
+			case "send name":
+				{
+					message := Message{
+						DeviceID: "back-end",
+						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+						Type:     "name",
+						Contents: map[string]string{
+							"name": handler.Config.General.Name,
+						},
+					}
+					jsonMessage, _ := json.Marshal(&message)
+					handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 				}
 			case "hint":
 				{
@@ -348,12 +390,9 @@ func (handler *Handler) HandleEvent(id string) {
 }
 
 func getMapSlice(input interface{}) ([]map[string]interface{}, error) {
-	bytes, err := json.Marshal(input)
-	if err != nil {
-		return nil, err
-	}
+	bytes, _ := json.Marshal(input)
 	var output []map[string]interface{} // dirty trick to go from interface{} to []map[string]interface{}
-	err = json.Unmarshal(bytes, &output)
+	err := json.Unmarshal(bytes, &output)
 	if err != nil {
 		return nil, err
 	}
@@ -370,11 +409,9 @@ func (handler *Handler) GetStatus(deviceID string) {
 			{"instruction": "status update"},
 		},
 	}
-
 	jsonMessage, _ := json.Marshal(&message)
 	logrus.Info("sending status request to client computer: ", deviceID, fmt.Sprint(message.Contents))
 	handler.Communicator.Publish(deviceID, string(jsonMessage), 3)
-
 }
 
 // SetTimer starts given timer
@@ -392,5 +429,4 @@ func (handler *Handler) SetTimer(timerID string, instructions config.ComponentIn
 		logrus.Warnf("error occurred while reading timer instruction message: %v", instructions.Instruction)
 	}
 	handler.SendStatus(timerID)
-
 }

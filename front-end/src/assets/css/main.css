@@ -25,12 +25,16 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
   text-align: center;
 }
+.title-box, .subtitle-box {
+  display: inline-block;
+  margin: 0px 10px 0px 10px;
+}
 
 
 /*Boxes on home page*/
 .home-box {
   font-family: Roboto, "Helvetica Neue", sans-serif;
-  margin: 30px;
+  margin: 0 30px 0;
   max-width: 100%;
 }
 .home-box .header {
@@ -57,6 +61,13 @@ body {
 @media only screen and (max-width: 400px) {
   .home-box {
     margin: 5px;
+  }
+  .subtitle, .title {
+    font-size: 24px
+  }
+  .rule-id {
+    white-space: normal;
+    width: 100px;
   }
 }
 @media only screen and (min-width: 650px) and (max-width: 700px) {
@@ -94,6 +105,19 @@ body {
 .custom-md-table-page {
   background-color: #EEEEEE;
 }
+.boolean-column {
+  width: 70px;
+  text-align: center;
+}
+
+.rule-id {
+  white-space: nowrap;
+  min-width: 20%;
+}
+.rule-status {
+  width: 70px;
+}
+
 
 
 /*Other components*/
