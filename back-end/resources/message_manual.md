@@ -42,7 +42,8 @@ are specific defined depending on the sender and receiver.
     - `instruction`
 - `contents`:
     - If type is `instruction`, then the then the message contents have
-        - `instruction`: one of following instructions: `test all`, `send status`, `hint`, `start`, `stop`, `reset all`.
+        - `instruction`: one of following instructions: `test all`, `send status`, `hint`, `start`, `stop`, `reset all`,
+        `test device`, `event status`, `finish rule`
      
 ### Back-end to Front-end
 - `type`: the type of the message, this can be:
