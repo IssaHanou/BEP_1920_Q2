@@ -998,7 +998,7 @@ func TestHandleSingleEvent(t *testing.T) {
 	messageEventStatus, _ := json.Marshal(Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "event-status",
+		Type:     "event status",
 		Contents: []map[string]interface{}{
 			{"description": "Als de mainSwitch true is, moet greenLight1 aangaan",
 				"id":     "mainSwitch flipped",
@@ -1006,8 +1006,8 @@ func TestHandleSingleEvent(t *testing.T) {
 		},
 	})
 
-	communicatorMock.On("Publish", "front-end", string(messageStatus), 3)
 	communicatorMock.On("Publish", "front-end", string(messageEventStatus), 3)
+	communicatorMock.On("Publish", "front-end", string(messageStatus), 3)
 	communicatorMock.On("Publish", "controlBoard", string(messageInstruction), 3)
 	handler.msgMapper(msg)
 	communicatorMock.AssertExpectations(t) // if this test becomes flaky (only when this test takes longer then 1 second),
