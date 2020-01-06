@@ -682,7 +682,7 @@ func TestOnInstructionMsgName(t *testing.T) {
 		TimeSent: "05-12-2019 09:42:10",
 		Type:     "instruction",
 		Contents: []map[string]interface{}{
-			{"instruction": "name"},
+			{"instruction": "send name"},
 		},
 	}
 	communicatorMock := new(CommunicatorMock)
