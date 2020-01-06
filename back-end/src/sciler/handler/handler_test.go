@@ -552,7 +552,7 @@ func TestOnConfirmationMsgIncorrect1(t *testing.T) {
 	before := handler.Config
 	handler.onConfirmationMsg(msg)
 	assert.Equal(t, before, handler.Config,
-		"Device should alter not config upon invalid confirmation message with no completed value")
+		"Device should not alter config upon invalid confirmation message with no completed value")
 }
 
 func TestOnConfirmationMsgIncorrect2(t *testing.T) {
@@ -576,7 +576,7 @@ func TestOnConfirmationMsgIncorrect2(t *testing.T) {
 	before := handler.Config
 	handler.onConfirmationMsg(msg)
 	assert.Equal(t, before, handler.Config,
-		"Device should alter not config upon invalid confirmation message with no instructed object")
+		"Device should not alter config upon invalid confirmation message with no instructed object")
 }
 
 func TestOnConfirmationMsgIncorrect3(t *testing.T) {
@@ -600,7 +600,7 @@ func TestOnConfirmationMsgIncorrect3(t *testing.T) {
 	before := handler.Config
 	handler.onConfirmationMsg(msg)
 	assert.Equal(t, before, handler.Config,
-		"Device should alter not config upon invalid confirmation message with no boolean completed")
+		"Device should not alter config upon invalid confirmation message with no boolean completed")
 }
 
 func TestOnConfirmationMsgIncorrect4(t *testing.T) {
@@ -624,7 +624,7 @@ func TestOnConfirmationMsgIncorrect4(t *testing.T) {
 	before := handler.Config
 	handler.onConfirmationMsg(msg)
 	assert.Equal(t, before, handler.Config,
-		"Device should alter not config upon invalid confirmation message with no instructions list")
+		"Device should not alter config upon invalid confirmation message with no instructions list")
 }
 
 func TestOnConfirmationMsgIncorrect5(t *testing.T) {
@@ -648,7 +648,7 @@ func TestOnConfirmationMsgIncorrect5(t *testing.T) {
 	before := handler.Config
 	handler.onConfirmationMsg(msg)
 	assert.Equal(t, before, handler.Config,
-		"Device should alter not config upon invalid confirmation message with device id not in config")
+		"Device should not alter config upon invalid confirmation message with device id not in config")
 }
 
 func TestMsgMapperConfirmation(t *testing.T) {
@@ -672,7 +672,7 @@ func TestMsgMapperConfirmation(t *testing.T) {
 	before := handler.Config
 	handler.msgMapper(msg)
 	assert.Equal(t, before, handler.Config,
-		"Device should alter not config upon confirmation message")
+		"Device should not alter config upon confirmation message")
 }
 
 ////////////////////////////// Instruction tests //////////////////////////////

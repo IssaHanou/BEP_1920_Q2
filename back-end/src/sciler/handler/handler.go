@@ -343,7 +343,7 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 					}
 					handler.SendEventStatus()
 				}
-			case "name":
+			case "send name":
 				{
 					message := Message{
 						DeviceID: "back-end",

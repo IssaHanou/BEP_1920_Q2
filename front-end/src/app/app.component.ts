@@ -15,7 +15,7 @@ import { Timers } from "./components/timer/timers";
   encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = "S.C.I.L.E.R :";
+  title = "S.C.I.L.E.R";
   nameOfRoom = "Super awesome escape";
   jsonConvert: JsonConvert;
   subscription: Subscription;
@@ -37,7 +37,7 @@ export class AppComponent implements OnInit, OnDestroy {
     for (const topic of this.topics) {
       this.subscribeNewTopic(topic);
     }
-    this.sendInstruction([{ instruction: "name" }]);
+    this.sendInstruction([{ instruction: "send name" }]);
     this.sendInstruction([{ instruction: "send status" }]);
     this.sendConnection(true);
   }
