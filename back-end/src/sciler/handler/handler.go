@@ -392,6 +392,7 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 						logrus.Errorf("could not find rule with id %s in map", ruleToFinish)
 					}
 					rule.Finished = true
+					rule.Execute(handler)
 					handler.SendEventStatus()
 				}
 			}
