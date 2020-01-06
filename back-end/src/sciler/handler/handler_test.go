@@ -880,8 +880,9 @@ func TestOnInstructionMsgFinishRule(t *testing.T) {
 		DeviceID: "front-end",
 		TimeSent: "05-12-2019 09:42:10",
 		Type:     "instruction",
-		Contents: []map[string]interface{}{
-			{"instruction": "finish rule", "rule": "rule"},
+		Contents: []map[string]interface{}{{
+			"instruction": "finish rule",
+			"rule":        "rule"},
 		},
 	}
 	communicatorMock := new(CommunicatorMock)
@@ -907,8 +908,9 @@ func TestOnInstructionMsgTestDevice(t *testing.T) {
 		DeviceID: "front-end",
 		TimeSent: "05-12-2019 09:42:10",
 		Type:     "instruction",
-		Contents: []map[string]interface{}{
-			{"instruction": "test device", "device": "display"},
+		Contents: []map[string]interface{}{{
+			"instruction": "test device",
+			"device":      "display"},
 		},
 	}
 	communicatorMock := new(CommunicatorMock)
@@ -917,11 +919,12 @@ func TestOnInstructionMsgTestDevice(t *testing.T) {
 		Communicator: communicatorMock,
 	}
 	returnMessage, _ := json.Marshal(Message{
-		DeviceID: "front-end",
+		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "instruction",
-		Contents: []map[string]interface{}{
-			{"instruction": "test"},
+		Contents: []map[string]interface{}{{
+			"instruction":   "test",
+			"instructed_by": "front-end"},
 		},
 	})
 	communicatorMock.On("Publish", "display", string(returnMessage), 3)
