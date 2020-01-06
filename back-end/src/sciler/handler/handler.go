@@ -320,8 +320,9 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 						DeviceID: raw.DeviceID,
 						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 						Type:     "instruction",
-						Contents: []map[string]interface{}{
-							{"instruction": "test"},
+						Contents: []map[string]interface{}{{
+							"instruction":   "test",
+							"instructed_by": raw.DeviceID},
 						},
 					}
 					jsonMessage, _ := json.Marshal(&message)
