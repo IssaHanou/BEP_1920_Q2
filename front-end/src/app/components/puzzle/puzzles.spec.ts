@@ -12,7 +12,7 @@ describe("PuzzleComponent", () => {
            "description": "The door opens"
         }]
     `);
-    puzzles = new Puzzles;
+    puzzles = new Puzzles();
   });
 
   it("should create", () => {

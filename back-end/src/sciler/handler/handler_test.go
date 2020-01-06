@@ -471,11 +471,12 @@ func TestOnConfirmationMsgFrontEnd(t *testing.T) {
 		Contents: map[string]interface{}{
 			"completed": true,
 			"instructed": map[string]interface{}{
-				"device_id": "front-end",
+				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
 				"type":      "instruction",
-				"contents": []map[string]interface{}{
-					{"instruction": "test"},
+				"contents": []map[string]interface{}{{
+					"instruction":   "test",
+					"instructed_by": "front-end"},
 				},
 			},
 		},
@@ -518,8 +519,10 @@ func TestOnConfirmationMsgFalse(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "front-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  []map[string]interface{}{{"instruction": "test"}},
-				"type":      "instruction",
+				"contents": []map[string]interface{}{{
+					"instruction":   "test",
+					"instructed_by": "front-end"}},
+				"type": "instruction",
 			},
 		},
 	}
@@ -539,15 +542,17 @@ func TestOnConfirmationMsgIncorrect1(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  []map[string]interface{}{{"instruction": "test"}},
-				"type":      "instruction",
+				"contents": []map[string]interface{}{{
+					"instruction":   "test",
+					"instructed_by": "front-end"}},
+				"type": "instruction",
 			},
 		},
 	}
 	before := handler.Config
 	handler.onConfirmationMsg(msg)
 	assert.Equal(t, before, handler.Config,
-		"Device should alter not config upon invalid confirmation message with no completed value")
+		"Device should not alter config upon invalid confirmation message with no completed value")
 }
 
 func TestOnConfirmationMsgIncorrect2(t *testing.T) {
@@ -561,15 +566,17 @@ func TestOnConfirmationMsgIncorrect2(t *testing.T) {
 			"instruction": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  []map[string]interface{}{{"instruction": "test"}},
 				"type":      "instruction",
+				"contents": map[string]interface{}{
+					"instructions":  "test",
+					"instructed_by": "front-end"},
 			},
 		},
 	}
 	before := handler.Config
 	handler.onConfirmationMsg(msg)
 	assert.Equal(t, before, handler.Config,
-		"Device should alter not config upon invalid confirmation message with no instructed object")
+		"Device should not alter config upon invalid confirmation message with no instructed object")
 }
 
 func TestOnConfirmationMsgIncorrect3(t *testing.T) {
@@ -583,15 +590,17 @@ func TestOnConfirmationMsgIncorrect3(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  []map[string]interface{}{{"instruction": "test"}},
-				"type":      "instruction",
+				"contents": []map[string]interface{}{{
+					"instruction":   "test",
+					"instructed_by": "front-end"}},
+				"type": "instruction",
 			},
 		},
 	}
 	before := handler.Config
 	handler.onConfirmationMsg(msg)
 	assert.Equal(t, before, handler.Config,
-		"Device should alter not config upon invalid confirmation message with no boolean completed")
+		"Device should not alter config upon invalid confirmation message with no boolean completed")
 }
 
 func TestOnConfirmationMsgIncorrect4(t *testing.T) {
@@ -615,7 +624,7 @@ func TestOnConfirmationMsgIncorrect4(t *testing.T) {
 	before := handler.Config
 	handler.onConfirmationMsg(msg)
 	assert.Equal(t, before, handler.Config,
-		"Device should alter not config upon invalid confirmation message with no instructions list")
+		"Device should not alter config upon invalid confirmation message with no instructions list")
 }
 
 func TestOnConfirmationMsgIncorrect5(t *testing.T) {
@@ -639,7 +648,7 @@ func TestOnConfirmationMsgIncorrect5(t *testing.T) {
 	before := handler.Config
 	handler.onConfirmationMsg(msg)
 	assert.Equal(t, before, handler.Config,
-		"Device should alter not config upon invalid confirmation message with device id not in config")
+		"Device should not alter config upon invalid confirmation message with device id not in config")
 }
 
 func TestMsgMapperConfirmation(t *testing.T) {
@@ -653,15 +662,17 @@ func TestMsgMapperConfirmation(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "back-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  []map[string]interface{}{{"instruction": "test"}},
-				"type":      "instruction",
+				"contents": []map[string]interface{}{{
+					"instruction":   "test",
+					"instructed_by": "front-end"}},
+				"type": "instruction",
 			},
 		},
 	}
 	before := handler.Config
 	handler.msgMapper(msg)
 	assert.Equal(t, before, handler.Config,
-		"Device should alter not config upon confirmation message")
+		"Device should not alter config upon confirmation message")
 }
 
 ////////////////////////////// Instruction tests //////////////////////////////
@@ -671,7 +682,7 @@ func TestOnInstructionMsgName(t *testing.T) {
 		TimeSent: "05-12-2019 09:42:10",
 		Type:     "instruction",
 		Contents: []map[string]interface{}{
-			{"instruction": "name"},
+			{"instruction": "send name"},
 		},
 	}
 	communicatorMock := new(CommunicatorMock)
@@ -693,7 +704,13 @@ func TestOnInstructionMsgName(t *testing.T) {
 }
 
 func TestOnInstructionMsgTestAll(t *testing.T) {
-	msg := Message{
+	communicatorMock := new(CommunicatorMock)
+	workingConfig := config.ReadFile("../../../resources/testing/test_config.json")
+	handler := Handler{
+		Config:       workingConfig,
+		Communicator: communicatorMock,
+	}
+	instructionMsg := Message{
 		DeviceID: "front-end",
 		TimeSent: "05-12-2019 09:42:10",
 		Type:     "instruction",
@@ -701,21 +718,17 @@ func TestOnInstructionMsgTestAll(t *testing.T) {
 			{"instruction": "test all"},
 		},
 	}
-	communicatorMock := new(CommunicatorMock)
-	handler := Handler{
-		Config:       config.ReadFile("../../../resources/testing/test_instruction.json"),
-		Communicator: communicatorMock,
-	}
-	returnMessage, _ := json.Marshal(Message{
-		DeviceID: "front-end",
+	responseMsg, _ := json.Marshal(Message{
+		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "instruction",
-		Contents: []map[string]interface{}{
-			{"instruction": "test"},
+		Contents: []map[string]interface{}{{
+			"instruction":   "test",
+			"instructed_by": "front-end"},
 		},
 	})
-	communicatorMock.On("Publish", "client-computers", string(returnMessage), 3)
-	handler.onInstructionMsg(msg)
+	communicatorMock.On("Publish", "client-computers", string(string(responseMsg)), 3)
+	handler.onInstructionMsg(instructionMsg)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
 }
 
@@ -803,11 +816,12 @@ func TestOnInstructionMsgResetAll(t *testing.T) {
 		},
 	}
 	responseMsg := Message{
-		DeviceID: "front-end",
+		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "instruction",
-		Contents: []map[string]interface{}{
-			{"instruction": "reset"},
+		Contents: []map[string]interface{}{{
+			"instruction":   "reset",
+			"instructed_by": "front-end"},
 		},
 	}
 	statusMsg := Message{
@@ -836,8 +850,9 @@ func TestOnInstructionMsgHint(t *testing.T) {
 		DeviceID: "front-end",
 		TimeSent: "05-12-2019 09:42:10",
 		Type:     "instruction",
-		Contents: []map[string]interface{}{
-			{"instruction": "hint", "hint": "This is my hint"},
+		Contents: []map[string]interface{}{{
+			"instruction": "hint",
+			"value":       "This is my hint"},
 		},
 	}
 	communicatorMock := new(CommunicatorMock)
@@ -846,11 +861,13 @@ func TestOnInstructionMsgHint(t *testing.T) {
 		Communicator: communicatorMock,
 	}
 	returnMessage, _ := json.Marshal(Message{
-		DeviceID: "front-end",
+		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "instruction",
-		Contents: []map[string]interface{}{
-			{"instruction": "hint", "hint": "This is my hint"},
+		Contents: []map[string]interface{}{{
+			"instruction":   "hint",
+			"value":         "This is my hint",
+			"instructed_by": "front-end"},
 		},
 	})
 	communicatorMock.On("Publish", "hint", string(returnMessage), 3)
@@ -1010,7 +1027,8 @@ func TestHandleSingleEvent(t *testing.T) {
 	communicatorMock.On("Publish", "front-end", string(messageStatus), 3)
 	communicatorMock.On("Publish", "controlBoard", string(messageInstruction), 3)
 	handler.msgMapper(msg)
-	communicatorMock.AssertExpectations(t) // if this test becomes flaky (only when this test takes longer then 1 second),
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
+	// if this test becomes flaky (only when this test takes longer then 1 second),
 	// (message expected includes time...), replace the messages with 'mock.Anything'
 }
 
@@ -1082,7 +1100,7 @@ func TestHandleDoubleEvent(t *testing.T) {
 	messageEventStatus, _ := json.Marshal(Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "event-status",
+		Type:     "event status",
 		Contents: []map[string]interface{}{
 			{"description": "Als de mainSwitch true is, gebeurt er niks",
 				"id":     "mainSwitch flipped",
@@ -1092,12 +1110,12 @@ func TestHandleDoubleEvent(t *testing.T) {
 				"status": true},
 		},
 	})
-
 	communicatorMock.On("Publish", "front-end", string(messageEventStatus), 3)
 	communicatorMock.On("Publish", "front-end", string(messageStatus), 3)
 	communicatorMock.On("Publish", "controlBoard", string(messageInstruction), 3)
 	handler.msgMapper(msg)
-	communicatorMock.AssertExpectations(t) // if this test becomes flaky (only when this test takes longer then 1 second),
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
+	// if this test becomes flaky (only when this test takes longer then 1 second),
 	// (message expected includes time...), replace the messages with 'mock.Anything'
 }
 
@@ -1148,7 +1166,6 @@ func TestLimitRule(t *testing.T) {
 			"redLight3":    "off",
 		},
 	}
-
 	messageStatus, _ := json.Marshal(Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
@@ -1173,23 +1190,22 @@ func TestLimitRule(t *testing.T) {
 			"connection": false,
 		},
 	})
-
 	messageEventStatus, _ := json.Marshal(Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "event-status",
+		Type:     "event status",
 		Contents: []map[string]interface{}{
 			{"description": "Als de mainSwitch true is, moet greenLight1 aangaan",
 				"id":     "mainSwitch flipped",
 				"status": true},
 		},
 	})
-
 	communicatorMock.On("Publish", "front-end", string(messageEventStatus), 3)
 	communicatorMock.On("Publish", "front-end", string(messageStatus), 3)
 	communicatorMock.On("Publish", "controlBoard", mock.Anything, 3)
 	handler.msgMapper(msg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 2) // Only publish to front-end for status should be done, no action should be performed
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
+	// Only publish to front-end for status should be done, no action should be performed
 }
 
 func TestGetMapSliceInvalidConfirmation(t *testing.T) {
@@ -1242,7 +1258,19 @@ func TestInstructionFromWrongDevice(t *testing.T) {
 			},
 		},
 	}
-	jsonHintMessage, _ := json.Marshal(&instructionMsg)
+	responseMessage := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{
+				"instruction":   "hint",
+				"value":         "some useful hint",
+				"instructed_by": "front-end",
+			},
+		},
+	}
+	jsonHintMessage, _ := json.Marshal(&responseMessage)
 	communicatorMock.On("Publish", "hint", string(jsonHintMessage), 3)
 	handler.msgMapper(instructionMsg)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 0)
