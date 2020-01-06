@@ -31,6 +31,10 @@ body {
 .nav-item {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
+.title-box, .subtitle-box {
+  display: inline-block;
+  margin: 0px 10px 0px 10px;
+}
 
 
 
@@ -61,7 +65,7 @@ body {
 /*Boxes on home page*/
 .home-box {
   font-family: Roboto, "Helvetica Neue", sans-serif;
-  margin: 30px;
+  margin: 0 30px 0;
   max-width: 100%;
 }
 .home-box .header {
@@ -86,6 +90,13 @@ body {
   .home-box {
     margin: 5px;
   }
+  .subtitle, .title {
+    font-size: 24px
+  }
+  .rule-id {
+    white-space: normal;
+    width: 100px;
+  }
 }
 @media only screen and (min-width: 650px) and (max-width: 700px) {
   .home-box {
@@ -107,3 +118,39 @@ body {
 }
 
 
+
+
+/*Tables for devices and events*/
+.custom-md-table {
+  width: 100%;
+  background-color: #EEEEEE;
+  text-align: left;
+  max-height: 100px;
+}
+.custom-md-table-header {
+  font-weight: bold;
+}
+.custom-md-table-page {
+  background-color: #EEEEEE;
+}
+.boolean-column {
+  width: 70px;
+  text-align: center;
+}
+
+.rule-id {
+  white-space: nowrap;
+  min-width: 20%;
+}
+.rule-status {
+  width: 70px;
+}
+
+
+
+/*Other components*/
+.custom-md-button, button {
+  margin: 5px;
+  font-size: 16px;
+  border-radius: 4px;
+}

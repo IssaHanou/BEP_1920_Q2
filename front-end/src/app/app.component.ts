@@ -5,9 +5,9 @@ import { JsonConvert } from "json2typescript";
 import { MatSnackBar, MatSnackBarConfig } from "@angular/material";
 import { Subscription } from "rxjs";
 import { Devices } from "./components/device/devices";
+import { Puzzles } from "./components/puzzle/puzzles";
 import { Timers } from "./components/timer/timers";
 import { Camera } from "./camera/camera";
-import {CameraComponent} from "./camera/camera.component";
 
 @Component({
   selector: "app-root",
@@ -16,12 +16,13 @@ import {CameraComponent} from "./camera/camera.component";
   encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = "S.C.I.L.E.R :";
+  title = "S.C.I.L.E.R";
   nameOfRoom = "Super awesome escape";
   jsonConvert: JsonConvert;
   subscription: Subscription;
   topics = ["front-end"];
   deviceList: Devices;
+  puzzleList: Puzzles;
   timerList: Timers;
   cameras: Camera[];
   selectedCamera: string;
@@ -29,18 +30,20 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
     this.jsonConvert = new JsonConvert();
     this.deviceList = new Devices();
+    this.puzzleList = new Puzzles();
     this.timerList = new Timers();
     this.cameras = [];
-    const generaltimer = { id: "general", duration: 0, state: "stateIdle" };
-    this.timerList.setTimer(generaltimer);
+    const generalTimer = { id: "general", duration: 0, state: "stateIdle" };
+    this.timerList.setTimer(generalTimer);
   }
 
   ngOnInit(): void {
     for (const topic of this.topics) {
       this.subscribeNewTopic(topic);
     }
+    this.sendInstruction([{ instruction: "send name" }]);
     this.sendInstruction([{ instruction: "send status" }]);
-    this.sendInstruction([{ instruction: "cameras" }]);
+    this.sendInstruction([{ instruction: "send cameras" }]);
     this.sendConnection(true);
   }
 
@@ -126,20 +129,23 @@ export class AppComponent implements OnInit, OnDestroy {
 
     switch (msg.type) {
       case "confirmation": {
-        const keys = ["instructed", "contents", "instruction"];
         /**
          * When the front-end receives confirmation message from client computer
          * that instruction was completed, show the message to the user.
          */
 
-        for (const instruction of msg.contents[keys[0]][keys[1]]) {
+        for (const instruction of msg.contents.instructed.contents) {
           const display =
             "received confirmation from " +
             msg.deviceId +
             " for instruction: " +
-            instruction[keys[2]];
+            instruction.instruction;
           this.openSnackbar(display, "");
         }
+        break;
+      }
+      case "event status": {
+        this.puzzleList.updatePuzzles(msg.contents);
         break;
       }
       case "instruction": {
@@ -176,6 +182,10 @@ export class AppComponent implements OnInit, OnDestroy {
         for (const obj of msg.contents) {
           this.cameras.push(new Camera(obj));
         }
+        break;
+      }
+      case "name": {
+        this.nameOfRoom = msg.contents.name;
         break;
       }
       default:
