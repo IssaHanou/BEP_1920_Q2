@@ -660,6 +660,15 @@
           },
           "actions": [
             {
+              "type": "timer",
+              "type_id": "general",
+              "message": [
+                {
+                  "instruction": "pause"
+                }
+              ]
+            },
+            {
               "type": "device",
               "type_id": "controlBoard",
               "message": [
