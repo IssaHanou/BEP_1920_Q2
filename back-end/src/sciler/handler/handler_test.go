@@ -973,8 +973,8 @@ func TestHandleSingleEvent(t *testing.T) {
 	communicatorMock.On("Publish", "front-end", string(messageEventStatus), 3)
 	communicatorMock.On("Publish", "controlBoard", string(messageInstruction), 3)
 	handler.msgMapper(msg)
-	communicatorMock.AssertExpectations(t) // if this test becomes flaky (only when this test takes longer then 1 second),
-	// (message expected includes time...), replace the messages with 'mock.Anything'
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
+
 }
 
 func TestHandleDoubleEvent(t *testing.T) {
@@ -1055,13 +1055,11 @@ func TestHandleDoubleEvent(t *testing.T) {
 				"status": true},
 		},
 	})
-
 	communicatorMock.On("Publish", "front-end", string(messageEventStatus), 3)
 	communicatorMock.On("Publish", "front-end", string(messageStatus), 3)
 	communicatorMock.On("Publish", "controlBoard", string(messageInstruction), 3)
 	handler.msgMapper(msg)
-	communicatorMock.AssertExpectations(t) // if this test becomes flaky (only when this test takes longer then 1 second),
-	// (message expected includes time...), replace the messages with 'mock.Anything'
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
 }
 
 ////////////////////////////// Error/irregular behavior tests //////////////////////////////
