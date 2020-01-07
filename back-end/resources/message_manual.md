@@ -70,5 +70,3 @@ are specific defined depending on the sender and receiver.
     - If type is `name`, the contents contains a `name` parameter carrying the name of the escape room
     - If type is `event status`, the contents contains the id, description and status of each rule
     - If type is `all hints`, the contents is a map with the name of puzzle as key and list of hints as value
-
-        

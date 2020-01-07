@@ -6,3 +6,13 @@
 .onderdeel-header {
   min-width: 65px;
 }
+@media only screen and (max-width: 470px) {
+  .test-column{
+    display: none;
+  }
+}
+@media only screen and (min-width: 650px) and (max-width: 765px) {
+  .test-column {
+    display: none;
+  }
+}

@@ -49,7 +49,7 @@ func (handler *Handler) msgMapper(raw Message) {
 		}
 	case "status":
 		{
-			handler.onStatusMsg(raw)
+			handler.updateStatus(raw)
 			handler.SendStatus(raw.DeviceID)
 			handler.HandleEvent(raw.DeviceID)
 			handler.SendEventStatus()
@@ -142,8 +142,8 @@ func (handler *Handler) checkStatusType(device config.Device, status interface{}
 	return nil
 }
 
-//onStatusMsg is the function to process status messages.
-func (handler *Handler) onStatusMsg(raw Message) {
+//updateStatus is the function to process status messages.
+func (handler *Handler) updateStatus(raw Message) {
 	contents := raw.Contents.(map[string]interface{})
 	if device, ok := handler.Config.Devices[raw.DeviceID]; ok {
 		logrus.Info("status message received from: " + raw.DeviceID + ", status: " + fmt.Sprint(raw.Contents))
@@ -266,8 +266,7 @@ func (handler *Handler) getEventStatus() []map[string]interface{} {
 	for _, rule := range handler.Config.RuleMap {
 		var status = make(map[string]interface{})
 		status["id"] = rule.ID
-		// TODO when is puzzle finished
-		status["status"] = rule.Executed == rule.Limit
+		status["status"] = rule.Finished()
 		status["description"] = rule.Description
 		list = append(list, status)
 	}
@@ -314,6 +313,20 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 					}
 					jsonMessage, _ := json.Marshal(&message)
 					handler.Communicator.Publish("client-computers", string(jsonMessage), 3)
+				}
+			case "test device":
+				{
+					message := Message{
+						DeviceID: "back-end",
+						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+						Type:     "instruction",
+						Contents: []map[string]interface{}{{
+							"instruction":   "test",
+							"instructed_by": raw.DeviceID},
+						},
+					}
+					jsonMessage, _ := json.Marshal(&message)
+					handler.Communicator.Publish(instruction["device"].(string), string(jsonMessage), 3)
 				}
 			case "reset all":
 				{
@@ -381,6 +394,16 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 					}
 					jsonMessage, _ := json.Marshal(&message)
 					handler.Communicator.Publish("hint", string(jsonMessage), 3)
+				}
+			case "finish rule":
+				{
+					ruleToFinish := instruction["rule"].(string)
+					rule, ok := handler.Config.RuleMap[ruleToFinish]
+					if !ok {
+						logrus.Errorf("could not find rule with id %s in map", ruleToFinish)
+					}
+					rule.Execute(handler)
+					handler.SendEventStatus()
 				}
 			}
 		} else {
