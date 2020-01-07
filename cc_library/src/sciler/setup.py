@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="scclib",
-    version="0.0.1",
+    version="0.0.4",
     author="Raccoon Serious Games",
     author_email="BEP@raccoon.games",
     description="Client library for S.C.I.L.E.R.",
@@ -15,8 +15,8 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: GNU GPL-3 License",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: OS Independent",
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.5",
 )
