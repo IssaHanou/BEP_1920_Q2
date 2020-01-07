@@ -19,7 +19,7 @@ type Communicator struct {
 func NewCommunicator(host string, port int, topicsOfInterest []string) *Communicator {
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("%s://%s:%d", "tcp", host, port))
-	opts.SetClientID("back-end-issa")
+	opts.SetClientID("back-end")
 	opts.SetConnectionLostHandler(onConnectionLost)
 	opts.SetKeepAlive(20)
 	will, _ := json.Marshal(map[string]interface{}{
