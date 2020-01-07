@@ -1075,51 +1075,55 @@ func TestHandleDoubleEvent(t *testing.T) {
 		},
 	})
 
-	messageStatus, _ := json.Marshal(Message{
-		DeviceID: "back-end",
-		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "status",
-		Contents: map[string]interface{}{
-			"id": "controlBoard",
-			"status": map[string]interface{}{
-				"greenLight1":  "off",
-				"greenLight2":  "off",
-				"greenLight3":  "off",
-				"greenSwitch":  false,
-				"mainSwitch":   true,
-				"orangeSwitch": false,
-				"redLight1":    "off",
-				"redLight2":    "off",
-				"redLight3":    "off",
-				"redSwitch":    false,
-				"slider1":      0,
-				"slider2":      0,
-				"slider3":      0,
-			},
-			"connection": false,
-		},
-	})
+	//messageStatus, _ := json.Marshal(Message{
+	//	DeviceID: "back-end",
+	//	TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+	//	Type:     "status",
+	//	Contents: map[string]interface{}{
+	//		"id": "controlBoard",
+	//		"status": map[string]interface{}{
+	//			"greenLight1":  "off",
+	//			"greenLight2":  "off",
+	//			"greenLight3":  "off",
+	//			"greenSwitch":  false,
+	//			"mainSwitch":   true,
+	//			"orangeSwitch": false,
+	//			"redLight1":    "off",
+	//			"redLight2":    "off",
+	//			"redLight3":    "off",
+	//			"redSwitch":    false,
+	//			"slider1":      0,
+	//			"slider2":      0,
+	//			"slider3":      0,
+	//		},
+	//		"connection": false,
+	//	},
+	//})
 
-	messageEventStatus, _ := json.Marshal(Message{
-		DeviceID: "back-end",
-		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "event status",
-		Contents: []map[string]interface{}{
-			{"description": "Als de mainSwitch true is, gebeurt er niks",
-				"id":     "mainSwitch flipped",
-				"status": true},
-			{"description": "Als rule 'mainSwitch flipped' is gedaan, dan moet greenLight1 aangaan",
-				"id":     "weldoen",
-				"status": true},
-		},
-	})
-	communicatorMock.On("Publish", "front-end", string(messageStatus), 3)
-	communicatorMock.On("Publish", "front-end", string(messageEventStatus), 3)
+	//messageEventStatus, _ := json.Marshal(Message{
+	//	DeviceID: "back-end",
+	//	TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+	//	Type:     "event status",
+	//	Contents: []map[string]interface{}{
+	//		{"description": "Als de mainSwitch true is, gebeurt er niks",
+	//			"id":     "mainSwitch flipped",
+	//			"status": true},
+	//		{"description": "Als rule 'mainSwitch flipped' is gedaan, dan moet greenLight1 aangaan",
+	//			"id":     "weldoen",
+	//			"status": true},
+	//	},
+	//})
+	//communicatorMock.On("Publish", "front-end", mock.Anything, 3)
+	communicatorMock.On("Publish", "front-end", mock.Anything, 3)
 	communicatorMock.On("Publish", "controlBoard", string(messageInstruction), 3)
 	handler.msgMapper(msg)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
 	// if this test becomes flaky (only when this test takes longer then 1 second),
 	// (message expected includes time...), replace the messages with 'mock.Anything'
+
+	// to restore test so that the message are checked again,
+	// duplicate the publish front-end line,
+	// and replace 'mock.Anything' with the correct messages
 }
 
 ////////////////////////////// Error/irregular behavior tests //////////////////////////////
