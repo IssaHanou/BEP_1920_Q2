@@ -562,6 +562,6 @@ func TestSendStatusUnknownDevice(t *testing.T) {
 	})
 
 	communicatorMock.On("Publish", "hint", string(msg), 3)
-	handler.SendStatus("Unknown device or timer")
+	handler.sendStatus("Unknown device or timer")
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 0)
 }

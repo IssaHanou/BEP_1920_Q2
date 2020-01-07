@@ -49,10 +49,10 @@ func (handler *Handler) msgMapper(raw Message) {
 		}
 	case "status":
 		{
-			handler.UpdateStatus(raw)
-			handler.SendStatus(raw.DeviceID)
+			handler.updateStatus(raw)
+			handler.sendStatus(raw.DeviceID)
 			handler.HandleEvent(raw.DeviceID)
-			handler.SendEventStatus()
+			handler.sendEventStatus()
 		}
 	case "confirmation":
 		{
@@ -86,7 +86,7 @@ func (handler *Handler) onConnectionMsg(raw Message) {
 			device.Connection = value.(bool)
 			handler.Config.Devices[raw.DeviceID] = device
 			logrus.Info("setting connection status of ", raw.DeviceID, " to ", value)
-			handler.SendStatus(raw.DeviceID)
+			handler.sendStatus(raw.DeviceID)
 		}
 	}
 }
@@ -155,17 +155,17 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 			switch instruction["instruction"] {
 			case "send setup":
 				{
-					handler.SendSetUp()
+					handler.SendSetup()
 				}
 			case "send status":
 				{
 					for _, device := range handler.Config.Devices {
-						handler.SendStatus(device.ID)
+						handler.sendStatus(device.ID)
 					}
 					for _, timer := range handler.Config.Timers {
-						handler.SendStatus(timer.ID)
+						handler.sendStatus(timer.ID)
 					}
-					handler.SendEventStatus()
+					handler.sendEventStatus()
 				}
 			case "reset all":
 				{
@@ -183,7 +183,7 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 					handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 
 					handler.Config = config.ReadFile(handler.ConfigFile)
-					handler.SendStatus("general")
+					handler.sendStatus("general")
 				}
 			case "test all":
 				{
@@ -221,7 +221,7 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 						logrus.Errorf("could not find rule with id %s in map", ruleToFinish)
 					}
 					rule.Execute(handler)
-					handler.SendEventStatus()
+					handler.sendEventStatus()
 				}
 			case "hint":
 				{

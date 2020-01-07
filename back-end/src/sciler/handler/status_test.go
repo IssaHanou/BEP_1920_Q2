@@ -25,7 +25,7 @@ func TestOnStatusMsg(t *testing.T) {
 			"testComponent9": "custom",
 		},
 	}
-	handler.UpdateStatus(msg)
+	handler.updateStatus(msg)
 
 	tests := []struct {
 		name      string
@@ -103,7 +103,7 @@ func TestOnStatusMsgOtherDevice(t *testing.T) {
 			"testComponent1": true,
 			"testComponent2": false},
 	}
-	handler.UpdateStatus(msg)
+	handler.updateStatus(msg)
 
 	_, ok := handler.Config.Devices["WrongDevice"]
 	assert.Equal(t, false, ok,
@@ -119,7 +119,7 @@ func TestOnStatusMsgWrongComponent(t *testing.T) {
 		Contents: map[string]interface{}{
 			"wrongComponent": true},
 	}
-	handler.UpdateStatus(msg)
+	handler.updateStatus(msg)
 
 	_, ok := handler.Config.Devices["TestDevice"].Status["wrongComponent"]
 	assert.Equal(t, false, ok,
@@ -142,7 +142,7 @@ func TestOnStatusMsgWrongType(t *testing.T) {
 			"testComponent7": "blue",
 			"testComponent4": []int{1, 2, 3}},
 	}
-	handler.UpdateStatus(msg)
+	handler.updateStatus(msg)
 
 	tests := []struct {
 		name      string

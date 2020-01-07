@@ -9,29 +9,29 @@ import (
 	"time"
 )
 
-// SendSetUp sends the general set-up information to the front-end.
+// SendSetup sends the general set-up information to the front-end.
 // This includes the name, all hints and event descriptions
 // Statuses are also sent
-func (handler *Handler) SendSetUp() {
+func (handler *Handler) SendSetup() {
 	message := Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "setup",
 		Contents: map[string]interface{}{
 			"name":   handler.Config.General.Name,
-			"hints":  handler.GetHints(),
-			"events": handler.GetEventDescriptions(),
+			"hints":  handler.getHints(),
+			"events": handler.getEventDescriptions(),
 		},
 	}
 	jsonMessage, _ := json.Marshal(&message)
 	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 	logrus.Info("published setup data to front-end")
-	handler.SendStatus("general")
+	handler.sendStatus("general")
 	for _, value := range handler.Config.Devices {
-		handler.SendStatus(value.ID)
+		handler.sendStatus(value.ID)
 		handler.GetStatus(value.ID)
 	}
-	handler.SendEventStatus()
+	handler.sendEventStatus()
 }
 
 // SendInstruction sends a list of instructions to a client
@@ -47,8 +47,8 @@ func (handler *Handler) SendInstruction(clientID string, instructions []config.C
 	handler.Communicator.Publish(clientID, string(jsonMessage), 3)
 }
 
-// UpdateStatus is the function to process status messages.
-func (handler *Handler) UpdateStatus(raw Message) {
+// updateStatus is the function to process status messages.
+func (handler *Handler) updateStatus(raw Message) {
 	contents := raw.Contents.(map[string]interface{})
 	if device, ok := handler.Config.Devices[raw.DeviceID]; ok {
 		logrus.Info("status message received from: " + raw.DeviceID + ", status: " + fmt.Sprint(raw.Contents))
@@ -65,9 +65,9 @@ func (handler *Handler) UpdateStatus(raw Message) {
 	}
 }
 
-// SendStatus sends all status and connection data of a device to the front-end.
+// sendStatus sends all status and connection data of a device to the front-end.
 // Information retrieved from config.
-func (handler *Handler) SendStatus(deviceID string) {
+func (handler *Handler) sendStatus(deviceID string) {
 	var message Message
 	if device, ok := handler.Config.Devices[deviceID]; ok {
 		message = Message{
@@ -112,9 +112,9 @@ func (handler *Handler) HandleEvent(id string) {
 	}
 }
 
-// SendEventStatus sends the status of events to the front-end
-func (handler *Handler) SendEventStatus() {
-	status := handler.GetEventStatus()
+// sendEventStatus sends the status of events to the front-end
+func (handler *Handler) sendEventStatus() {
+	status := handler.getEventStatus()
 	message := Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
@@ -126,9 +126,9 @@ func (handler *Handler) SendEventStatus() {
 	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 }
 
-// GetEventStatus returns json list with json objects with keys ["id", "status"]
+// getEventStatus returns json list with json objects with keys ["id", "status"]
 // status is json object with key ruleName and value true (if executed == limit) or false
-func (handler *Handler) GetEventStatus() []map[string]interface{} {
+func (handler *Handler) getEventStatus() []map[string]interface{} {
 	var list []map[string]interface{}
 	for _, rule := range handler.Config.RuleMap {
 		var status = make(map[string]interface{})
@@ -139,8 +139,8 @@ func (handler *Handler) GetEventStatus() []map[string]interface{} {
 	return list
 }
 
-// GetHints returns map of hints with puzzle name as key and list of hints for that puzzle as value
-func (handler *Handler) GetHints() map[string][]string {
+// getHints returns map of hints with puzzle name as key and list of hints for that puzzle as value
+func (handler *Handler) getHints() map[string][]string {
 	hints := make(map[string][]string)
 	for _, puzzle := range handler.Config.Puzzles {
 		hints[puzzle.Event.Name] = puzzle.Hints
@@ -148,8 +148,8 @@ func (handler *Handler) GetHints() map[string][]string {
 	return hints
 }
 
-// GetEventDescriptions returns map of hints with puzzle name as key and list of hints for that puzzle as value
-func (handler *Handler) GetEventDescriptions() map[string]string {
+// getEventDescriptions returns map of hints with puzzle name as key and list of hints for that puzzle as value
+func (handler *Handler) getEventDescriptions() map[string]string {
 	events := make(map[string]string)
 	for _, rule := range handler.Config.RuleMap {
 		events[rule.ID] = rule.Description
@@ -186,7 +186,7 @@ func (handler *Handler) SetTimer(timerID string, instructions config.ComponentIn
 	default:
 		logrus.Warnf("error occurred while reading timer instruction message: %v", instructions.Instruction)
 	}
-	handler.SendStatus(timerID)
+	handler.sendStatus(timerID)
 }
 
 // compareType compares a reflect.Kind and a string type and returns an error if not the same

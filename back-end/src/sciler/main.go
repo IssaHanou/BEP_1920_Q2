@@ -39,7 +39,7 @@ func main() {
 
 	messageHandler := handler.Handler{Config: configurations, ConfigFile: filename, Communicator: communicator}
 	go communicator.Start(messageHandler.NewHandler, func() {
-		messageHandler.SendSetUp()
+		messageHandler.SendSetup()
 	})
 
 	// prevent exit
