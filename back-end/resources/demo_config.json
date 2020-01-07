@@ -697,6 +697,15 @@
                   "value": false
                 }
               ]
+            },
+            {
+              "type": "timer",
+              "type_id": "general",
+              "message": [
+                {
+                  "instruction": "pause"
+                }
+              ]
             }
           ]
         }
