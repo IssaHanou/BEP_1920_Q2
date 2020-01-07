@@ -2,13 +2,9 @@ import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { PuzzleComponent } from "./puzzle.component";
 import {
-  MatPaginator,
   MatPaginatorModule,
   MatSnackBar,
-  MatSort,
   MatSortModule,
-  MatTable,
-  MatTableDataSource,
   MatTableModule
 } from "@angular/material";
 import { MqttModule, MqttService } from "ngx-mqtt";

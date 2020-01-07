@@ -42,8 +42,8 @@ are specific defined depending on the sender and receiver.
     - `instruction`
 - `contents`:
     - If type is `instruction`, then the then the message contents have
-        - `instruction`: one of following instructions: `test all`, `send status`, `hint`, `start`, `stop`, `reset all`,
-        `test device`, `event status`, `finish rule`, `send cameras`, `send name`
+        - `instruction`: one of following instructions: 
+        `send setup`, `send status`, `reset all`, `test all`, `test device`, `finish rule`, `hint`
      
 ### Back-end to Front-end
 - `type`: the type of the message, this can be:
@@ -57,18 +57,22 @@ are specific defined depending on the sender and receiver.
         - `instructed`, which contains the original instruction with in the `contents`:
             - `instruction`
             - `instructed_by`
-    - If type is `status`, then the then the message contents have
+    - If type is `instruction`, then the then the message contents have
+             - `instruction` with value `reset` or `status update` or `test`
+    - If type is `status`, then the message contents has
         - `id` of device
         - `status` has a map of `component_id` keys and `status` values
         - `connection` boolean
+    - If type is `event status`, then the message contents has objects with
+        - `id` of rule
+        - `description` of rule
+        - `status` of rule describes whether rule is finished or not
     - If type is `time`, then the then the message contents have
         - `id` of timer
         - `duration` has a number of the duration left in milliseconds
         - `state` sting of the timer state
-    - If type is `instruction`, then the then the message contents have
-         - `instruction` with value `reset` or `status update` or `test`
-    - If type is `name`, the contents contains a `name` parameter carrying the name of the escape room
-    - If type is `event status`, the contents contains the id, description and status of each rule
-    - If type is `cameras`, the contents is a map with the name of a camera key and camera url as value
-
-        
+    - If type is `setup`, the contents:
+        - a `name` parameter carrying the name of the escape room 
+        - a `hints` parameter carrying a map with the name of puzzle as key and list of hints as value
+        - an `events` parameter carrying a map with the name of the rule as key and the description as value
+        - a `cameras` parameter carrying a a list with camera objects with a `name` and `link` tag

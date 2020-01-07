@@ -84,7 +84,6 @@ func action(action func() mqtt.Token, actionType string, retrials int) error {
 			err = errors.New("action eventually successful")
 			continue
 		} else {
-			logger.Infof("back-end: %s successful!", actionType)
 			return err
 		}
 	}

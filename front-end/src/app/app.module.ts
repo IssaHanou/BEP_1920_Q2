@@ -103,9 +103,9 @@ export const APP_ROUTES: Routes = [
     MatIconModule,
     MatSelectModule,
     MatListModule,
-    CdkTableModule,
     RouterModule.forRoot(APP_ROUTES),
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    CdkTableModule
   ],
   providers: [
     MqttService,

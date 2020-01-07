@@ -55,7 +55,7 @@
         {
           "id": "rule",
           "description": "My rule",
-          "limit": 0,
+          "limit": 1,
           "conditions": {
             "type": "device",
             "type_id": "display",

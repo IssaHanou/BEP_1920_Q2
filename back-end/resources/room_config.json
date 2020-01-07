@@ -280,7 +280,9 @@
         }
       ],
       "hints": [
-        "Zet de schuiven nauwkeurig"
+        "Zet de schuiven nauwkeurig",
+        "Probeer het nog eens",
+        "dat kan sneller"
       ]
     },
     {
@@ -362,7 +364,8 @@
         }
       ],
       "hints": [
-        "Zet de schuiven nauwkeurig"
+        "Zet de schuiven nauwkeurig",
+        "Dit is dus echt best wel een superlange hint die je helemaal moet kunnen lezen"
       ]
     }
   ],
@@ -664,6 +667,15 @@
             ]
           },
           "actions": [
+            {
+              "type": "timer",
+              "type_id": "general",
+              "message": [
+                {
+                  "instruction": "pause"
+                }
+              ]
+            },
             {
               "type": "device",
               "type_id": "controlBoard",

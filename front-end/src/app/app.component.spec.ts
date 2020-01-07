@@ -11,11 +11,16 @@ import { TimerComponent } from "./components/timer/timer.component";
 import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import { Overlay } from "@angular/cdk/overlay";
 import {
-  MatFormFieldModule, MatIconModule,
+  MatFormFieldModule,
+  MatIconModule,
   MatInputModule,
   MatSidenavModule,
-  MatSortModule, MatSelectModule,
-  MatTableModule, MatToolbarModule, MatListModule, MatButtonModule
+  MatTableModule,
+  MatToolbarModule,
+  MatListModule,
+  MatButtonModule,
+  MatSelectModule,
+  MatSortModule
 } from "@angular/material";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { BrowserModule } from "@angular/platform-browser";
@@ -37,6 +42,7 @@ describe("AppComponent", () => {
         MatTableModule,
         MatButtonModule,
         MatFormFieldModule,
+        MatSelectModule,
         MatInputModule,
         MatSortModule,
         MatSidenavModule,
