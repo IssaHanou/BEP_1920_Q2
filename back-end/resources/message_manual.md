@@ -42,7 +42,8 @@ are specific defined depending on the sender and receiver.
     - `instruction`
 - `contents`:
     - If type is `instruction`, then the then the message contents have
-        - `instruction`: one of following instructions: `test all`, `send status`, `hint`, `start`, `stop`, `reset all`.
+        - `instruction`: one of following instructions: `test all`, `send status`, `hint`, `start`, `stop`, `reset all`,
+        `test device`, `event status`, `finish rule`
      
 ### Back-end to Front-end
 - `type`: the type of the message, this can be:
@@ -65,8 +66,9 @@ are specific defined depending on the sender and receiver.
         - `duration` has a number of the duration left in milliseconds
         - `state` sting of the timer state
     - If type is `instruction`, then the then the message contents have
-        - `instruction` with value `reset` or `status update`
+        - `instruction` with value `reset` or `status update` or `test`
     - If type is `name`, the contents contains a `name` parameter carrying the name of the escape room
+    - If type is `event status`, the contents contains the id, description and status of each rule
     
 
         

@@ -160,6 +160,11 @@ export class AppComponent implements OnInit, OnDestroy {
               break;
             case "status update": {
               this.sendConnection(true);
+              break;
+            }
+            case "test": {
+              this.openSnackbar("performing instruction test", "");
+              break;
             }
           }
         }
