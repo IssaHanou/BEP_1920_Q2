@@ -1208,14 +1208,7 @@ func TestLimitRule(t *testing.T) {
 	communicatorMock.On("Publish", "front-end", string(messageStatus), 3)
 	communicatorMock.On("Publish", "front-end", string(messageEventStatus), 3)
 	communicatorMock.On("Publish", "controlBoard", mock.Anything, 3)
-	for _, expectedCall := range communicatorMock.ExpectedCalls {
-		fmt.Println("exp:" + fmt.Sprint(expectedCall))
-	}
-	handler.msgMapper(msg)
-	for _, call := range communicatorMock.Calls {
-		fmt.Println("cal:" + fmt.Sprint(call))
-	}
-	//communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
 	// Only publish to front-end for status should be done, no action should be performed
 }
 
