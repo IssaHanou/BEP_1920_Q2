@@ -1,5 +1,4 @@
 import { Puzzles } from "./puzzles";
-import { PuzzleComponent } from "./puzzle.component";
 
 describe("Puzzles", () => {
   let puzzles: Puzzles;

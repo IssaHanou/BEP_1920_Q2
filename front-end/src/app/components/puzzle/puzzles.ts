@@ -21,13 +21,10 @@ export class Puzzles {
 
   /**
    * Set the puzzles in the list with their id and description
-   * @param id map with id keys and description values
-   * @param description
+   * @param id of new puzzle
+   * @param description of new puzzle
    */
   addPuzzle(id: string, description: string) {
     this.all.set(id, new Puzzle(id, description));
-    // events.forEach((key: string, value: string) => {
-    //   this.all.set(key, new Puzzle(key, value));
-    // });
   }
 }
