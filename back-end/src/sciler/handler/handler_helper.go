@@ -10,15 +10,17 @@ import (
 )
 
 // SendSetUp sends the general set-up information to the front-end.
-// This includes the name, general timer, all hints
+// This includes the name, all hints and event descriptions
+// Statuses are also sent
 func (handler *Handler) SendSetUp() {
 	message := Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "setup",
 		Contents: map[string]interface{}{
-			"name":  handler.Config.General.Name,
-			"hints": handler.GetHints(),
+			"name":   handler.Config.General.Name,
+			"hints":  handler.GetHints(),
+			"events": handler.GetEventDescriptions(),
 		},
 	}
 	jsonMessage, _ := json.Marshal(&message)
@@ -131,7 +133,6 @@ func (handler *Handler) GetEventStatus() []map[string]interface{} {
 		var status = make(map[string]interface{})
 		status["id"] = rule.ID
 		status["status"] = rule.Finished()
-		status["description"] = rule.Description
 		list = append(list, status)
 	}
 	return list
@@ -143,8 +144,16 @@ func (handler *Handler) GetHints() map[string][]string {
 	for _, puzzle := range handler.Config.Puzzles {
 		hints[puzzle.Event.Name] = puzzle.Hints
 	}
-	logrus.Info(hints)
 	return hints
+}
+
+// GetHints returns map of hints with puzzle name as key and list of hints for that puzzle as value
+func (handler *Handler) GetEventDescriptions() map[string]string {
+	events := make(map[string]string)
+	for _, rule := range handler.Config.RuleMap {
+		events[rule.ID] = rule.Description
+	}
+	return events
 }
 
 // GetStatus asks devices to send status

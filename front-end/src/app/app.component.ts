@@ -177,23 +177,11 @@ export class AppComponent implements OnInit, OnDestroy {
         break;
       }
       case "time": {
-        this.processTimeStatus(msg.contents);
+        this.timerList.setTimer(msg.contents);
         break;
       }
       case "setup": {
-        const allHints = msg.contents.hints;
-        for (const puzzle in allHints) {
-          if (allHints.hasOwnProperty(puzzle)) {
-            const hints = [];
-            for (const index in allHints[puzzle]) {
-              if (allHints[puzzle].hasOwnProperty(index)) {
-                hints.push(allHints[puzzle][index]);
-              }
-            }
-            this.hintList.push(new Hint(puzzle, hints));
-          }
-        }
-        this.nameOfRoom = msg.contents.name;
+        this.processSetUp(msg.contents);
         break;
       }
       default:
@@ -203,11 +191,24 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Timers send their status to the front-end but we only care about the general time.
-   * @param jsonData with id, status and state
+   * The setup contains the name of the room, the map with hints per puzzle and the rule descriptions.
+   * @param jsonData with name, hints, events
    */
-  public processTimeStatus(jsonData) {
-    this.timerList.setTimer(jsonData);
+  public processSetUp(jsonData) {
+    this.nameOfRoom = jsonData.name;
+    this.puzzleList.setPuzzles(jsonData.events);
+    const allHints = jsonData.hints;
+    for (const puzzle in allHints) {
+      if (allHints.hasOwnProperty(puzzle)) {
+        const hints = [];
+        for (const index in allHints[puzzle]) {
+          if (allHints[puzzle].hasOwnProperty(index)) {
+            hints.push(allHints[puzzle][index]);
+          }
+        }
+        this.hintList.push(new Hint(puzzle, hints));
+      }
+    }
   }
   /**
    * Opens snackbar with duration of 2 seconds.

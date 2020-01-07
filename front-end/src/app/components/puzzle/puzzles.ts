@@ -15,7 +15,19 @@ export class Puzzles {
       if (this.all.has(object.id)) {
         this.all.get(object.id).updateStatus(object.status);
       } else {
-        this.all.set(object.id, new Puzzle(object));
+        this.all.set(object.id, new Puzzle(object.id, object.description));
+      }
+    }
+  }
+
+  /**
+   * Set the puzzles in the list with their id and description
+   * @param events map with id keys and description values
+   */
+  setPuzzles(events: Map<string, string>){
+    for (const rule in events) {
+      if (events.hasOwnProperty(rule)) {
+        this.all.set(rule, new Puzzle(rule, events[rule]));
       }
     }
   }
