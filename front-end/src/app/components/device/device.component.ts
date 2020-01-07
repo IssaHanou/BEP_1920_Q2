@@ -9,7 +9,7 @@ import { MatSort, MatTableDataSource } from "@angular/material";
   styleUrls: ["./device.component.css", "../../../assets/css/main.css"]
 })
 export class DeviceComponent implements OnInit {
-  deviceColumns: string[] = ["id", "connection", "component", "status"];
+  deviceColumns: string[] = ["id", "connection", "component", "status", "test"];
 
   @ViewChild("DeviceTableSort", { static: true }) sort: MatSort;
 
@@ -72,5 +72,14 @@ export class DeviceComponent implements OnInit {
       result += key + "\n";
     });
     return result;
+  }
+
+  /**
+   * When button is pressed, test a single device.
+   */
+  testDevice(deviceId: string) {
+    this.app.sendInstruction([
+      { instruction: "test device", device: deviceId }
+    ]);
   }
 }
