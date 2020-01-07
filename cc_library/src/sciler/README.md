@@ -25,7 +25,11 @@ This mainly consists of:
 - run `python3 cc_library/src/scripts/<custom-device>.py` on Pi to start device
 
 ## Set-up Pi (TODO)
-
+- run `pip install -i https://test.pypi.org/simple/ scclib`
+- create custom device script, which should inherit from Device
+- write configuration for the the device, according to device_manual.md, in the same folder as the script
+- start broker for device to connect with
+- run `python3 <custom-device>.py`
 
 ## License
 This library is licensed with GNU GPL v3, see `LICENSE.md`.
