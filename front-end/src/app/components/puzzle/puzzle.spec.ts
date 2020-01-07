@@ -1,7 +1,7 @@
 import { Puzzle } from "./puzzle";
 import { PuzzleComponent } from "./puzzle.component";
 
-describe("PuzzleComponent", () => {
+describe("Puzzle", () => {
   let puzzle: Puzzle;
 
   beforeEach(() => {

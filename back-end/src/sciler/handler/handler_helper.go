@@ -25,6 +25,7 @@ func (handler *Handler) SendSetUp() {
 	}
 	jsonMessage, _ := json.Marshal(&message)
 	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+	logrus.Info("published setup data to front-end")
 	handler.SendStatus("general")
 	for _, value := range handler.Config.Devices {
 		handler.SendStatus(value.ID)
@@ -147,7 +148,7 @@ func (handler *Handler) GetHints() map[string][]string {
 	return hints
 }
 
-// GetHints returns map of hints with puzzle name as key and list of hints for that puzzle as value
+// GetEventDescriptions returns map of hints with puzzle name as key and list of hints for that puzzle as value
 func (handler *Handler) GetEventDescriptions() map[string]string {
 	events := make(map[string]string)
 	for _, rule := range handler.Config.RuleMap {

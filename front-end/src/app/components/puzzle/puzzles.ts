@@ -12,11 +12,10 @@ export class Puzzles {
    */
   updatePuzzles(jsonData) {
     for (const object of jsonData) {
-      if (this.all.has(object.id)) {
-        this.all.get(object.id).updateStatus(object.status);
-      } else {
+      if (!this.all.has(object.id)) {
         this.all.set(object.id, new Puzzle(object.id, object.description));
       }
+      this.all.get(object.id).updateStatus(object.status);
     }
   }
 
@@ -24,9 +23,12 @@ export class Puzzles {
    * Set the puzzles in the list with their id and description
    * @param events map with id keys and description values
    */
-  setPuzzles(events: Map<string, string>) {
-    for (const rule of events) {
-      this.all.set(rule[0], new Puzzle(rule[0], rule[1]));
+  setPuzzles(events) {
+    for (const rule in events) {
+      this.all.set(rule, new Puzzle(rule, events[rule]));
     }
+    // events.forEach((key: string, value: string) => {
+    //   this.all.set(key, new Puzzle(key, value));
+    // });
   }
 }
