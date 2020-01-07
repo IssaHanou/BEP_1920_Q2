@@ -30,9 +30,8 @@ describe("Puzzles", () => {
 
   it("should add puzzle", () => {
     const newMap = new Map<string, string>();
-    newMap.set("my rule", "this my rule");
     expect(puzzles.all.size).toBe(0);
-    puzzles.setPuzzles(newMap);
+    puzzles.addPuzzle("my rule", "this my rule");
     // puzzles.all.set("my rule", new Puzzle("my rule", "y"));
     expect(puzzles.all.size).toBe(1);
     expect(puzzles.all.get("my rule").status).toBe(false);
