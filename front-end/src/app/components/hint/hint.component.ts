@@ -34,9 +34,13 @@ export class HintComponent {
   }
 
   onPredefinedHint() {
-    if (this.predefinedHint !== undefined && this.predefinedHint !== "" && this.predefinedHint !== "---") {
+    if (
+      this.predefinedHint !== undefined &&
+      this.predefinedHint !== "" &&
+      this.predefinedHint !== "---"
+    ) {
       this.app.sendInstruction([
-        {instruction: "hint", value: this.predefinedHint}
+        { instruction: "hint", value: this.predefinedHint }
       ]);
       this.predefinedHint = "---";
     }

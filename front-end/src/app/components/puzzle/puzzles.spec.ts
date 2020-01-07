@@ -26,7 +26,6 @@ describe("Puzzles", () => {
     expect(puzzles.all.get("Door open").status).toBe(true);
   });
 
-
   it("should add puzzle", () => {
     const newMap = new Map<string, string>();
     expect(puzzles.all.size).toBe(0);
