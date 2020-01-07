@@ -7,5 +7,6 @@
   },
   "devDependencies": {
     "prettier": "1.19.1"
-  }
+  },
+  "preserveSymlinks": true
 }
