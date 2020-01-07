@@ -3,10 +3,10 @@ export class Puzzle {
   status: boolean;
   description: string;
 
-  constructor(jsonData) {
-    this.id = jsonData.id;
-    this.status = jsonData.status;
-    this.description = jsonData.description;
+  constructor(id, description) {
+    this.id = id;
+    this.status = false;
+    this.description = description;
   }
 
   /**

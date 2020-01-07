@@ -14,6 +14,7 @@ import {
   MatFormFieldModule,
   MatInputModule,
   MatPaginatorModule,
+  MatSelectModule,
   MatSortModule,
   MatTableModule
 } from "@angular/material";
@@ -29,6 +30,7 @@ describe("AppComponent", () => {
         MatSortModule,
         MatPaginatorModule,
         MatFormFieldModule,
+        MatSelectModule,
         MatInputModule,
         MatSnackBarModule,
         BrowserAnimationsModule

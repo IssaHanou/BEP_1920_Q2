@@ -1,0 +1,74 @@
+{
+  "general": {
+    "name": "Escape X",
+    "duration": "1m",
+    "host": "localhost",
+    "port": 1883
+  },
+  "devices": [
+    {
+      "id": "telephone",
+      "description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
+      "input": {
+        "turningWheel": "array"
+      },
+      "output": {
+        "audio": {
+          "type": "string",
+          "instructions": {
+            "play": "string"
+          }
+        },
+        "ringTone": {
+          "type": "string",
+          "instructions": {
+            "play": "string"
+          }
+        }
+      }
+    }
+  ],
+  "timers": [],
+  "puzzles": [
+    {
+      "name": "Telefoon puzzels",
+      "rules": [
+        {
+          "id": "correctSequence",
+          "description": "De juiste volgorde van cijfers moet gedraaid worden.",
+          "limit": 1,
+          "conditions": {
+            "type": "device",
+            "type_id": "telephone",
+            "constraints": {
+              "comparison": "eq",
+              "component_id": "turningWheel",
+              "value": [
+                0,
+                1,
+                2,
+                7
+              ]
+            }
+          },
+          "actions": [
+          ]
+        }
+      ],
+      "hints": [
+        "De knop verzend jouw volgorde",
+        "Heb je al even gewacht?"
+      ]
+    },
+    {
+      "name": "Control puzzel",
+      "rules": [
+      ],
+      "hints": [
+        "Zet de schuiven nauwkeurig"
+      ]
+    }
+  ],
+  "general_events": [
+  ]
+}

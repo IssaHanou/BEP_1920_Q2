@@ -7,6 +7,7 @@ import { Subscription } from "rxjs";
 import { Devices } from "./components/device/devices";
 import { Puzzles } from "./components/puzzle/puzzles";
 import { Timers } from "./components/timer/timers";
+import { Hint } from "./components/hint/hint";
 
 @Component({
   selector: "app-root",
@@ -23,12 +24,14 @@ export class AppComponent implements OnInit, OnDestroy {
   deviceList: Devices;
   puzzleList: Puzzles;
   timerList: Timers;
+  hintList: Hint[];
 
   constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
     this.jsonConvert = new JsonConvert();
     this.deviceList = new Devices();
     this.puzzleList = new Puzzles();
     this.timerList = new Timers();
+    this.hintList = [];
     const generalTimer = { id: "general", duration: 0, state: "stateIdle" };
     this.timerList.setTimer(generalTimer);
   }
@@ -37,8 +40,7 @@ export class AppComponent implements OnInit, OnDestroy {
     for (const topic of this.topics) {
       this.subscribeNewTopic(topic);
     }
-    this.sendInstruction([{ instruction: "send name" }]);
-    this.sendInstruction([{ instruction: "send status" }]);
+    this.sendInstruction([{ instruction: "send setup" }]);
     this.sendConnection(true);
   }
 
@@ -139,10 +141,6 @@ export class AppComponent implements OnInit, OnDestroy {
         }
         break;
       }
-      case "event status": {
-        this.puzzleList.updatePuzzles(msg.contents);
-        break;
-      }
       case "instruction": {
         for (const action of msg.contents) {
           switch (action.instruction) {
@@ -174,12 +172,16 @@ export class AppComponent implements OnInit, OnDestroy {
         this.deviceList.setDevice(msg.contents);
         break;
       }
-      case "time": {
-        this.processTimeStatus(msg.contents);
+      case "event status": {
+        this.puzzleList.updatePuzzles(msg.contents);
         break;
       }
-      case "name": {
-        this.nameOfRoom = msg.contents.name;
+      case "time": {
+        this.timerList.setTimer(msg.contents);
+        break;
+      }
+      case "setup": {
+        this.processSetUp(msg.contents);
         break;
       }
       default:
@@ -189,11 +191,32 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Timers send their status to the front-end but we only care about the general time.
-   * @param jsonData with id, status and state
+   * The setup contains the name of the room, the map with hints per puzzle and the rule descriptions.
+   * @param jsonData with name, hints, events
    */
-  public processTimeStatus(jsonData) {
-    this.timerList.setTimer(jsonData);
+  public processSetUp(jsonData) {
+    this.nameOfRoom = jsonData.name;
+
+    const rules = jsonData.events;
+    for (const rule in rules) {
+      if (rules.hasOwnProperty(rule)) {
+        this.puzzleList.addPuzzle(rule, rules[rule]);
+      }
+    }
+
+    const allHints = jsonData.hints;
+    this.hintList = [];
+    for (const puzzle in allHints) {
+      if (allHints.hasOwnProperty(puzzle)) {
+        const hints = [];
+        for (const index in allHints[puzzle]) {
+          if (allHints[puzzle].hasOwnProperty(index)) {
+            hints.push(allHints[puzzle][index]);
+          }
+        }
+        this.hintList.push(new Hint(puzzle, hints));
+      }
+    }
   }
   /**
    * Opens snackbar with duration of 2 seconds.

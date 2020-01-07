@@ -22,6 +22,7 @@ import {
   MatFormFieldModule,
   MatInputModule,
   MatPaginatorModule,
+  MatSelectModule,
   MatSortModule,
   MatTableModule
 } from "@angular/material";
@@ -79,6 +80,7 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     MatInputModule,
     MatPaginatorModule,
     MatSortModule,
+    MatSelectModule,
     CdkTableModule
   ],
   providers: [
