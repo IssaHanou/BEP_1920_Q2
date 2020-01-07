@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -1208,6 +1207,7 @@ func TestLimitRule(t *testing.T) {
 	communicatorMock.On("Publish", "front-end", string(messageStatus), 3)
 	communicatorMock.On("Publish", "front-end", string(messageEventStatus), 3)
 	communicatorMock.On("Publish", "controlBoard", mock.Anything, 3)
+	handler.msgMapper(msg)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
 	// Only publish to front-end for status should be done, no action should be performed
 }
