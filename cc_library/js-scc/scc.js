@@ -30,13 +30,19 @@
 //   console.log("TEST!!!")
 // }
 //
-var SCC = (function SCC() {
-  return function SCCConstruction() {
-    var _this = this;
-    _this.test = function () {
-      console.log("TEST!!!")
-    };
-  };
-}());
+class SccLib {
+  constructor(config, device) {
+    this.device = device;
+    // config = JSON.parse(config);
+    this.name = config.id;
+    this.info = config.description;
+    this.host = config.host;
+    this.port = config.port;
+    this.labels = config.labels
+  }
 
-var scc = new SCC();
+  test() {
+    console.log("name: " + this.name + " " + this.info);
+  }
+}
+export { SccLib };
