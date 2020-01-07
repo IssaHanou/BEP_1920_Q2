@@ -1,0 +1,8 @@
+{
+  "name": "js-scc",
+  "version": "0.0.3",
+  "license": "GNU General Public License v3 (GPL)",
+  "dependencies": {
+    "mqtt": "^3.0.0"
+  }
+}
