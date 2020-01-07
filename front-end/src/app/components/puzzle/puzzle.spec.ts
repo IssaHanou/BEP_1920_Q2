@@ -5,13 +5,7 @@ describe("PuzzleComponent", () => {
   let puzzle: Puzzle;
 
   beforeEach(() => {
-    const jsonData = JSON.parse(`{
-          "id": "Door open",
-          "status": false,
-           "description": "The door opens"
-        }
-    `);
-    puzzle = new Puzzle(jsonData);
+    puzzle = new Puzzle("Door open", "this is my rule");
   });
 
   it("should create", () => {

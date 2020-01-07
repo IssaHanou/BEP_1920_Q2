@@ -23,6 +23,18 @@ describe("PuzzleComponent", () => {
     expect(puzzles.all.size).toBe(0);
     puzzles.updatePuzzles(jsonData);
     expect(puzzles.all.size).toBe(1);
+    expect(puzzles.all.get("Door open").status).toBe(false);
+    puzzles.updatePuzzles(jsonData);
     expect(puzzles.all.get("Door open").status).toBe(true);
+  });
+
+
+  it("should add puzzle", () => {
+    const newMap = new Map<string, string>();
+    newMap.set("my rule", "this my rule");
+    expect(puzzles.all.size).toBe(0);
+    puzzles.setPuzzles(newMap);
+    expect(puzzles.all.size).toBe(1);
+    expect(puzzles.all.get("my rule").status).toBe(false);
   });
 });

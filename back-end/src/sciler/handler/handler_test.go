@@ -319,10 +319,9 @@ func TestHandleSingleEvent(t *testing.T) {
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "event status",
-		Contents: []map[string]interface{}{
-			{"description": "Als de mainSwitch true is, moet greenLight1 aangaan",
-				"id":     "mainSwitch flipped",
-				"status": true},
+		Contents: []map[string]interface{}{{
+			"id":     "mainSwitch flipped",
+			"status": true},
 		},
 	})
 
@@ -462,10 +461,9 @@ func TestLimitRule(t *testing.T) {
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "event status",
-		Contents: []map[string]interface{}{
-			{"description": "Als de mainSwitch true is, moet greenLight1 aangaan",
-				"id":     "mainSwitch flipped",
-				"status": true},
+		Contents: []map[string]interface{}{{
+			"id":     "mainSwitch flipped",
+			"status": true},
 		},
 	})
 

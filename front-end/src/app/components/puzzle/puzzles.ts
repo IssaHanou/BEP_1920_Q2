@@ -24,11 +24,9 @@ export class Puzzles {
    * Set the puzzles in the list with their id and description
    * @param events map with id keys and description values
    */
-  setPuzzles(events: Map<string, string>){
-    for (const rule in events) {
-      if (events.hasOwnProperty(rule)) {
-        this.all.set(rule, new Puzzle(rule, events[rule]));
-      }
+  setPuzzles(events: Map<string, string>) {
+    for (const rule of events) {
+      this.all.set(rule[0], new Puzzle(rule[0], rule[1]));
     }
   }
 }

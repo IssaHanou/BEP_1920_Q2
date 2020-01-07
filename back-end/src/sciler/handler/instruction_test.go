@@ -67,6 +67,9 @@ func TestInstructionSetUp(t *testing.T) {
 				"Telefoon puzzels": {"De knop verzend jouw volgorde", "Heb je al even gewacht?"},
 				"Control puzzel":   {"Zet de schuiven nauwkeurig"},
 			},
+			"events": map[string]string{
+				"correctSequence": "De juiste volgorde van cijfers moet gedraaid worden.",
+			},
 		},
 	})
 	statusMessageFrontEnd, _ := json.Marshal(Message{
@@ -85,10 +88,9 @@ func TestInstructionSetUp(t *testing.T) {
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "event status",
-		Contents: []map[string]interface{}{
-			{"description": "De juiste volgorde van cijfers moet gedraaid worden.",
-				"id":     "correctSequence",
-				"status": false},
+		Contents: []map[string]interface{}{{
+			"id":     "correctSequence",
+			"status": false},
 		},
 	})
 	communicatorMock.On("Publish", "front-end", string(messageEventStatus), 3)
@@ -163,9 +165,8 @@ func TestOnInstructionMsgSendStatus(t *testing.T) {
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "event status",
 		Contents: []map[string]interface{}{{
-			"id":          "rule",
-			"status":      true,
-			"description": "My rule"},
+			"id":     "rule",
+			"status": true},
 		},
 	})
 	communicatorMock.On("Publish", "front-end", string(eventMessage), 3)
@@ -301,9 +302,8 @@ func TestOnInstructionMsgFinishRule(t *testing.T) {
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "event status",
 		Contents: []map[string]interface{}{{
-			"id":          "rule",
-			"description": "My rule",
-			"status":      true},
+			"id":     "rule",
+			"status": true},
 		},
 	})
 	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)

@@ -198,6 +198,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.nameOfRoom = jsonData.name;
     this.puzzleList.setPuzzles(jsonData.events);
     const allHints = jsonData.hints;
+    this.hintList = [];
     for (const puzzle in allHints) {
       if (allHints.hasOwnProperty(puzzle)) {
         const hints = [];
