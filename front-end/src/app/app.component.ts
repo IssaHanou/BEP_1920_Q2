@@ -40,10 +40,8 @@ export class AppComponent implements OnInit, OnDestroy {
     for (const topic of this.topics) {
       this.subscribeNewTopic(topic);
     }
-    this.sendInstruction([{ instruction: "send name" }]);
-    this.sendInstruction([{ instruction: "send status" }]);
+    this.sendInstruction([{ instruction: "send setup" }]);
     this.sendConnection(true);
-    this.sendInstruction([{instruction: "all hints"}]);
   }
 
   /**
@@ -143,10 +141,6 @@ export class AppComponent implements OnInit, OnDestroy {
         }
         break;
       }
-      case "event status": {
-        this.puzzleList.updatePuzzles(msg.contents);
-        break;
-      }
       case "instruction": {
         for (const action of msg.contents) {
           switch (action.instruction) {
@@ -178,25 +172,27 @@ export class AppComponent implements OnInit, OnDestroy {
         this.deviceList.setDevice(msg.contents);
         break;
       }
+      case "event status": {
+        this.puzzleList.updatePuzzles(msg.contents);
+        break;
+      }
       case "time": {
         this.processTimeStatus(msg.contents);
         break;
       }
-      case "all hints": {
-        for (const puzzle in msg.contents) {
-          if (msg.contents.hasOwnProperty(puzzle)) {
+      case "setup": {
+        const allHints = msg.contents.hints;
+        for (const puzzle in allHints) {
+          if (allHints.hasOwnProperty(puzzle)) {
             const hints = [];
-            for (const index in msg.contents[puzzle]) {
-              if (msg.contents[puzzle].hasOwnProperty(index)) {
-                hints.push(msg.contents[puzzle][index]);
+            for (const index in allHints[puzzle]) {
+              if (allHints[puzzle].hasOwnProperty(index)) {
+                hints.push(allHints[puzzle][index]);
               }
             }
             this.hintList.push(new Hint(puzzle, hints));
           }
         }
-        break;
-      }
-      case "name": {
         this.nameOfRoom = msg.contents.name;
         break;
       }
