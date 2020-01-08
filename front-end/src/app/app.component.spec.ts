@@ -78,13 +78,13 @@ describe("AppComponent", () => {
   it("should have as title 'S.C.I.L.E.R'", () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual("S.C.I.L.E.R");
+    expect(app.title).toEqual("SCILER");
   });
 
   it("should render title", () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelectorAll("p").item(0).textContent).toContain("S.C.I.L.E.R");
+    expect(compiled.querySelectorAll("p").item(0).textContent).toContain("SCILER");
   });
 });
