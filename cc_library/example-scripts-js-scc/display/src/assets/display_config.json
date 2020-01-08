@@ -1,7 +1,7 @@
 {
-  "id": "display",
+  "id": "fancy-display",
   "description": "Display can print hints",
-  "host": "192.168.178.82",
+  "host": "localhost",
   "labels": ["hint"],
   "port": 8083,
   "input": {},
