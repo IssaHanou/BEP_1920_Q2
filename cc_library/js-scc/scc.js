@@ -1,4 +1,4 @@
-const mqtt = require("mqtt")
+const Paho = require("paho-mqtt")
 
 class SccLib {
   constructor(config, device, logger) {
@@ -13,37 +13,29 @@ class SccLib {
     };
     this.log("info", "Start of log for device: " + this.name);
 
-    this._onConnect = function() {
-      var client = this;
-      client.subscribe("test", function(err) {
-        if (!err) {
-          console.log("started");
-          client.publish("test", "I'm alive");
-        } else {
-          console.log(err);
-        }
-      });
-    };
+    this.client = new Paho.Client(this.host, 8083, this.name);
+    console.log(this.client);
+    this.client.connect({onSuccess:_onConnect, onFailure: _onConnectFailure});
 
-    this._onMessage = function(topic, message) {
-      console.log(topic + " : " + message.toString());
-      this.end();
-    };
 
-    this.publish = function (topic, message) {
-      this.client.publish(topic, message);
-      console.log("published! cl");
-      this.log("debug", "published ll");
-    };
+    function _onConnect() {
+      this.client.subscribe("test");
+      var message = new Paho.Message("KAAAAAS!!!");
+      message.destinationName = "test";
+      this.client.send(message);
+      this.log("info", "Connected!");
+    }
 
-    // MQTT
+    function _onConnectFailure(err) {
+      this.log("error", err.errorMessage)
+    }
 
-    this.client = mqtt.connect("ws://" + this.host, {
-      port: this.port,
-      clientId: this.name
-    });
-    this.client.on("connect", this._onConnect);
-    this.client.on("message", this._onMessage);
+    this.log("debug", "TEST!")
+
+    // this._onMessage = function(topic, message) {
+    //   console.log(topic + " : " + message.toString());
+    //   this.end();
+    // };
   }
 }
 export { SccLib };
