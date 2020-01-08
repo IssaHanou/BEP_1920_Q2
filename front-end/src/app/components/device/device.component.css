@@ -6,6 +6,9 @@
 .onderdeel-header {
   min-width: 65px;
 }
+.mat-row:hover {
+  background-color: #DBDBDB;
+}
 @media only screen and (max-width: 470px) {
   .test-column{
     display: none;

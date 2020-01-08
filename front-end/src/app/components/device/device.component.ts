@@ -10,10 +10,13 @@ import { MatSort, MatTableDataSource } from "@angular/material";
 })
 export class DeviceComponent implements OnInit {
   deviceColumns: string[] = ["id", "connection", "component", "status", "test"];
+  collapsed: Map<string, boolean>;
 
   @ViewChild("DeviceTableSort", { static: true }) sort: MatSort;
 
-  constructor(private app: AppComponent) {}
+  constructor(private app: AppComponent) {
+    this.collapsed = new Map<string, boolean>();
+  }
 
   ngOnInit() {}
 
@@ -25,6 +28,9 @@ export class DeviceComponent implements OnInit {
     const devices: Device[] = [];
     for (const device of this.app.deviceList.all.values()) {
       devices.push(device);
+      if (!this.collapsed.has(device.id)) {
+        this.collapsed.set(device.id, false);
+      }
     }
     devices.sort((a: Device, b: Device) => a.id.localeCompare(b.id));
 
@@ -35,43 +41,56 @@ export class DeviceComponent implements OnInit {
 
   /**
    * Creates list of components (keys of status maps), in alphabetical order.
-   * Returns string with each component's value on new line.
+   * Returns string with each component on new line.
+   * If components are collapsed, return default.
    */
-  formatStatus(status: Map<string, any>) {
-    const keys = Array.from(status.keys());
-    keys.sort();
+  getComponents(status: Map<string, any>, deviceId: string): string {
+    if (!this.collapsed.get(deviceId)) {
+      return "click to see components";
+    } else if (status.size == 0) {
+      return "nothing to show";
+    } else {
+      const keys = Array.from(status.keys());
 
-    let result = "";
-    keys.forEach((key: string) => {
-      const value = status.get(key);
-      if (Array.isArray(value)) {
-        result += "[";
-        for (let i = 0; i < value.length; i++) {
-          result += value[i];
-          if (i < value.length - 1) {
-            result += ",";
-          }
-        }
-        result += "]\n";
-      } else {
-        result += value + "\n";
-      }
-    });
-    return result;
+      keys.sort();
+      let result = "";
+      keys.forEach((key: string) => {
+        result += key + "\n";
+      });
+      return result;
+    }
   }
 
   /**
    * Creates list of components (keys of status maps), in alphabetical order.
-   * Returns string with each component on new line.
+   * Returns string with each component's value on new line.
+   * If components are collapse, return nothing.
    */
-  getComponents(status: Map<string, any>) {
-    const keys = Array.from(status.keys());
-    keys.sort();
-    let result = "";
-    keys.forEach((key: string) => {
-      result += key + "\n";
-    });
-    return result;
+  formatStatus(status: Map<string, any>, deviceId: string): string {
+    if (!this.collapsed.get(deviceId)) {
+      return "";
+    } else {
+      const keys = Array.from(status.keys());
+      keys.sort();
+
+      let result = "";
+      keys.forEach((key: string) => {
+        const value = status.get(key);
+        if (Array.isArray(value)) {
+          result += "[";
+          for (let i = 0; i < value.length; i++) {
+            result += value[i];
+            if (i < value.length - 1) {
+              result += ",";
+            }
+          }
+          result += "]\n";
+        } else {
+          result += value + "\n";
+        }
+      });
+      return result;
+    }
   }
 
   /**
@@ -81,5 +100,16 @@ export class DeviceComponent implements OnInit {
     this.app.sendInstruction([
       { instruction: "test device", device: deviceId }
     ]);
+  }
+
+  /**
+   * Clicking a row should collapse the components and their statuses.
+   * Clicking again should unfold.
+   * @param row the row to collapse with full device data
+   */
+  collapseComponents(row) {
+    // document.getElementById(row.id + "-status").style;
+    const oldValue = this.collapsed.get(row.id);
+    this.collapsed.set(row.id, !oldValue);
   }
 }

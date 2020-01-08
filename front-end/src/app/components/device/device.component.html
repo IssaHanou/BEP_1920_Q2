@@ -15,11 +15,15 @@
       </ng-container>
       <ng-container matColumnDef="component">
         <th mat-header-cell *matHeaderCellDef class="custom-md-table-header onderdeel-header"> Onderdeel </th>
-        <td mat-cell *matCellDef="let element" class="component-cell"> {{ getComponents(element.status) }} </td>
+        <td mat-cell id="{{element.id}}-component" *matCellDef="let element" class="component-cell">
+          {{ getComponents(element.status, element.id) }}
+        </td>
       </ng-container>
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef class="custom-md-table-header"> Status </th>
-        <td mat-cell *matCellDef="let element" class="component-cell"> {{ formatStatus(element.status) }} </td>
+        <td mat-cell id="{{element.id}}-status" *matCellDef="let element" class="component-cell">
+          {{ formatStatus(element.status, element.id) }}
+        </td>
       </ng-container>
       <ng-container matColumnDef="test">
         <th mat-header-cell *matHeaderCellDef mat-sort-header class="test-column custom-md-table-header"> Test </th>
@@ -29,7 +33,7 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="deviceColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: deviceColumns;"></tr>
+      <tr mat-row *matRowDef="let row; columns: deviceColumns;" (click)="collapseComponents(row)"></tr>
     </table>
   </div>
 </div>
