@@ -1,6 +1,7 @@
 import logging
 from abc import ABC, abstractmethod
-from scclib.app import SccLib
+#from scclib.app import SccLib
+from cc_library.src.sciler.scclib.app import SccLib
 
 
 class Device(ABC):
