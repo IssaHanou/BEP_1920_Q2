@@ -17,7 +17,7 @@ import { Hint } from "./components/hint/hint";
   encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = "S.C.I.L.E.R";
+  title = "SCILER";
   nameOfRoom = "Super awesome escape";
   jsonConvert: JsonConvert;
   subscription: Subscription;
