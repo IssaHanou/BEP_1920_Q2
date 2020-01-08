@@ -25,7 +25,8 @@ export class AppComponent implements OnInit {
             return (
               date.getDate() +
               "-" +
-              date.getMonth() + 1 +
+              date.getMonth() +
+              1 +
               "-" +
               date.getFullYear() +
               " " +

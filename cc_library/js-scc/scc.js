@@ -37,9 +37,10 @@ class SccLib {
     };
 
     // MQTT
+
     this.client = mqtt.connect("ws://" + this.host, {
       port: this.port,
-      clientId: this.name,
+      clientId: this.name
     });
     this.client.on("connect", this._onConnect);
     this.client.on("message", this._onMessage);
