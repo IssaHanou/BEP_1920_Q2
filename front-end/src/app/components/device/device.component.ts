@@ -108,7 +108,6 @@ export class DeviceComponent implements OnInit {
    * @param row the row to collapse with full device data
    */
   collapseComponents(row) {
-    // document.getElementById(row.id + "-status").style;
     const oldValue = this.collapsed.get(row.id);
     this.collapsed.set(row.id, !oldValue);
   }
