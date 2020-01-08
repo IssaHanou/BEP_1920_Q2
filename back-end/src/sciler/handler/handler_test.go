@@ -528,7 +528,7 @@ func TestInstructionFromWrongDevice(t *testing.T) {
 	jsonHintMessage, _ := json.Marshal(&instructionMsg)
 	communicatorMock.On("Publish", "hint", string(jsonHintMessage), 3)
 	handler.msgMapper(instructionMsg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 0)
 }
 
 func TestSendStatusUnknownDevice(t *testing.T) {

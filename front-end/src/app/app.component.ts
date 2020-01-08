@@ -202,6 +202,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.nameOfRoom = jsonData.name;
 
     const cameraData = jsonData.cameras;
+    this.cameras = [];
     for (const obj of cameraData) {
       this.cameras.push(new Camera(obj));
     }
