@@ -6,6 +6,7 @@ import { MatSnackBar, MatSnackBarConfig } from "@angular/material";
 import { Subscription } from "rxjs";
 import { Devices } from "./components/device/devices";
 import { Timers } from "./components/timer/timers";
+import { Logger } from "./logger";
 
 @Component({
   selector: "app-root",
@@ -17,12 +18,14 @@ export class AppComponent implements OnInit, OnDestroy {
   title = "S.C.I.L.E.R";
   nameOfRoom = "Super awesome escape";
   jsonConvert: JsonConvert;
+  logger: Logger;
   subscription: Subscription;
   topics = ["front-end"];
   deviceList: Devices;
   timerList: Timers;
 
   constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
+    this.logger = new Logger();
     this.jsonConvert = new JsonConvert();
     this.deviceList = new Devices();
     this.timerList = new Timers();
@@ -54,15 +57,15 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subscription = this.mqttService
       .observe(topic)
       .subscribe((message: IMqttMessage) => {
-        console.log(
-          "log: received on topic " +
+        this.logger.log("info",
+          "received on topic " +
             message.topic +
             ", message: " +
             message.payload.toString()
         );
         this.processMessage(message.payload.toString());
       });
-    console.log("log: subscribed to topic: " + topic);
+    this.logger.log("info", "subscribed to topic: " + topic);
   }
 
   /**
@@ -78,8 +81,8 @@ export class AppComponent implements OnInit, OnDestroy {
     );
     const jsonMessage: string = this.jsonConvert.serialize(msg);
     this.mqttService.unsafePublish("back-end", JSON.stringify(jsonMessage));
-    console.log(
-      "log: sent instruction message: " + JSON.stringify(jsonMessage)
+    this.logger.log("info",
+      "sent instruction message: " + JSON.stringify(jsonMessage)
     );
   }
 
@@ -95,7 +98,7 @@ export class AppComponent implements OnInit, OnDestroy {
     });
     const jsonMessage: string = this.jsonConvert.serialize(msg);
     this.mqttService.unsafePublish("back-end", JSON.stringify(jsonMessage));
-    console.log("log: sent status message: " + JSON.stringify(jsonMessage));
+    this.logger.log("info", "sent status message: " + JSON.stringify(jsonMessage));
   }
 
   /**
@@ -108,7 +111,7 @@ export class AppComponent implements OnInit, OnDestroy {
     });
     const jsonMessage: string = this.jsonConvert.serialize(msg);
     this.mqttService.unsafePublish("back-end", JSON.stringify(jsonMessage));
-    console.log("log: sent connection message: " + JSON.stringify(jsonMessage));
+    this.logger.log("info", "sent connection message: " + JSON.stringify(jsonMessage));
   }
 
   /**
@@ -167,7 +170,7 @@ export class AppComponent implements OnInit, OnDestroy {
         break;
       }
       default:
-        console.log("log: received invalid message type " + msg.type);
+        this.logger.log("error", "received invalid message type " + msg.type);
         break;
     }
   }

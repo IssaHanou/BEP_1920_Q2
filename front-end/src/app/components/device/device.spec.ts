@@ -25,7 +25,6 @@ describe("DeviceComponent", () => {
   });
 
   it("should set status", () => {
-    console.log(device);
     expect(device.getValue("door")).toBe(true);
     const jsonData = JSON.parse(`{ "door" : false }`);
     device.updateStatus(jsonData);
