@@ -1,5 +1,4 @@
 import { Component, OnInit } from "@angular/core";
-import { Subscription, Observable, timer } from "rxjs";
 import { AppComponent } from "../../app.component";
 
 @Component({
@@ -8,26 +7,13 @@ import { AppComponent } from "../../app.component";
   styleUrls: ["./timer.component.css", "../../../assets/css/main.css"]
 })
 export class TimerComponent implements OnInit {
+
   constructor(private app: AppComponent) {}
 
-  private subscription: Subscription;
-  displayTime: string;
-  everySecond: Observable<number> = timer(0, 1000);
+  ngOnInit() {}
 
-  ngOnInit() {
-    this.subscription = this.everySecond.subscribe(seconds => {
-      for (const aTimer of this.app.timerList.getAll().values()) {
-        if (aTimer.state === "stateActive") {
-          aTimer.tick();
-        }
-        if (aTimer.duration <= 0) {
-          aTimer.state = "stateIdle";
-        }
-      }
-      this.displayTime = formatMS(
-        this.app.timerList.getTimer("general").getTimeLeft()
-      );
-    });
+  getDisplayTime() {
+    return this.app.displayTime;
   }
 }
 
@@ -40,5 +26,4 @@ export function formatMS(timeInMS) {
   const s = seconds < 10 ? "0" + seconds : seconds;
 
   return h + ":" + m + ":" + s;
-  // return moment(timeInMS).format("hh:mm:ss"); // TODO: Adds an hour
 }

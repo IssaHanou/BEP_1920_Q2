@@ -3,12 +3,13 @@ import { IMqttMessage, MqttService } from "ngx-mqtt";
 import { Message } from "./message";
 import { JsonConvert } from "json2typescript";
 import { MatSnackBar, MatSnackBarConfig } from "@angular/material";
-import { Subscription } from "rxjs";
+import { Observable, Subscription, timer } from "rxjs";
 import { Devices } from "./components/device/devices";
 import { Puzzles } from "./components/puzzle/puzzles";
 import { Timers } from "./components/timer/timers";
 import { Camera } from "./camera/camera";
 import { Hint } from "./components/hint/hint";
+import { formatMS } from "./components/timer/timer.component";
 
 @Component({
   selector: "app-root",
@@ -17,35 +18,43 @@ import { Hint } from "./components/hint/hint";
   encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit, OnDestroy {
+  // Variables for the home screen
   title = "SCILER";
   nameOfRoom = "Super awesome escape";
+
+  // Necessary tools
   jsonConvert: JsonConvert;
   subscription: Subscription;
-  topics = ["front-end"];
+
+  // Keeping track of data
   deviceList: Devices;
   puzzleList: Puzzles;
-  timerList: Timers;
+  hintList: Hint[];
   cameras: Camera[];
   selectedCamera: string;
-  hintList: Hint[];
+  timerList: Timers;
+  displayTime: string;
+  everySecond: Observable<number> = timer(0, 1000);
 
   constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
     this.jsonConvert = new JsonConvert();
     this.deviceList = new Devices();
     this.puzzleList = new Puzzles();
-    this.timerList = new Timers();
     this.cameras = [];
     this.hintList = [];
+    this.timerList = new Timers();
     const generalTimer = { id: "general", duration: 0, state: "stateIdle" };
     this.timerList.setTimer(generalTimer);
   }
 
   ngOnInit(): void {
-    for (const topic of this.topics) {
+    const topics = ["front-end"];
+    for (const topic of topics) {
       this.subscribeNewTopic(topic);
     }
     this.sendInstruction([{ instruction: "send setup" }]);
     this.sendConnection(true);
+    this.initializeTimers();
   }
 
   /**
@@ -60,7 +69,7 @@ export class AppComponent implements OnInit, OnDestroy {
   /**
    * Subscribe to topics.
    */
-  public subscribeNewTopic(topic: string): void {
+  private subscribeNewTopic(topic: string): void {
     this.subscription = this.mqttService
       .observe(topic)
       .subscribe((message: IMqttMessage) => {
@@ -98,7 +107,7 @@ export class AppComponent implements OnInit, OnDestroy {
    * @param start start status to be sent.
    * @param stop stop status to be sent.
    */
-  public sendStatus(start, stop) {
+  private sendStatus(start, stop) {
     const msg = new Message("front-end", "status", new Date(), {
       start,
       stop
@@ -112,7 +121,7 @@ export class AppComponent implements OnInit, OnDestroy {
    * Send an connection update to the broker, over back-end topic.
    * @param connected connection status to be sent.
    */
-  public sendConnection(connected: boolean) {
+  private sendConnection(connected: boolean) {
     const msg = new Message("front-end", "connection", new Date(), {
       connection: connected
     });
@@ -125,51 +134,16 @@ export class AppComponent implements OnInit, OnDestroy {
    * Process incoming message.
    * @param jsonMessage json message.
    */
-  public processMessage(jsonMessage: string) {
+  private processMessage(jsonMessage: string) {
     const msg: Message = Message.deserialize(jsonMessage);
 
     switch (msg.type) {
       case "confirmation": {
-        /**
-         * When the front-end receives confirmation message from client computer
-         * that instruction was completed, show the message to the user.
-         */
-
-        for (const instruction of msg.contents.instructed.contents) {
-          const display =
-            "received confirmation from " +
-            msg.deviceId +
-            " for instruction: " +
-            instruction.instruction;
-          this.openSnackbar(display, "");
-        }
+        this.confirmationHandler(msg);
         break;
       }
       case "instruction": {
-        for (const action of msg.contents) {
-          switch (action.instruction) {
-            case "reset":
-              {
-                this.deviceList.setDevice({
-                  id: "front-end",
-                  connection: true,
-                  status: {
-                    start: 0,
-                    stop: 0
-                  }
-                });
-              }
-              break;
-            case "status update": {
-              this.sendConnection(true);
-              break;
-            }
-            case "test": {
-              this.openSnackbar("performing instruction test", "");
-              break;
-            }
-          }
-        }
+        this.instructionHandler(msg.contents);
         break;
       }
       case "status": {
@@ -195,10 +169,56 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * When the front-end receives confirmation message from client computer
+   * that instruction was completed, show the message to the user.
+   */
+  private confirmationHandler(jsonData) {
+    for (const instruction of jsonData.contents.instructed.contents) {
+      const display =
+        "received confirmation from " +
+        jsonData.deviceId +
+        " for instruction: " +
+        instruction.instruction;
+      this.openSnackbar(display, "");
+    }
+  }
+
+  /**
+   * Handles the different instructions for front-end: reset, test, status update.
+   * @param jsonData containing instructions
+   */
+  private instructionHandler(jsonData) {
+    for (const action of jsonData) {
+      switch (action.instruction) {
+        case "reset":
+        {
+          this.deviceList.setDevice({
+            id: "front-end",
+            connection: true,
+            status: {
+              start: 0,
+              stop: 0
+            }
+          });
+        }
+          break;
+        case "status update": {
+          this.sendConnection(true);
+          break;
+        }
+        case "test": {
+          this.openSnackbar("performing instruction test", "");
+          break;
+        }
+      }
+    }
+  }
+
+  /**
    * The setup contains the name of the room, the map with hints per puzzle and the rule descriptions.
    * @param jsonData with name, hints, events
    */
-  public processSetUp(jsonData) {
+  private processSetUp(jsonData) {
     this.nameOfRoom = jsonData.name;
 
     const cameraData = jsonData.cameras;
@@ -228,6 +248,7 @@ export class AppComponent implements OnInit, OnDestroy {
       }
     }
   }
+
   /**
    * Opens snackbar with duration of 2 seconds.
    * @param message displays this message
@@ -238,5 +259,24 @@ export class AppComponent implements OnInit, OnDestroy {
     config.duration = 3000;
     config.panelClass = ["custom-snack-bar"];
     this.snackBar.open(message, action, config);
+  }
+
+  /**
+   * Initialize the timers to listen to every second and set their state accordingly.
+   */
+  private initializeTimers() {
+    this.subscription = this.everySecond.subscribe(seconds => {
+      for (const aTimer of this.timerList.getAll().values()) {
+        if (aTimer.state === "stateActive") {
+          aTimer.tick();
+        }
+        if (aTimer.duration <= 0) {
+          aTimer.state = "stateIdle";
+        }
+      }
+      this.displayTime = formatMS(
+        this.timerList.getTimer("general").getTimeLeft()
+      );
+    });
   }
 }
