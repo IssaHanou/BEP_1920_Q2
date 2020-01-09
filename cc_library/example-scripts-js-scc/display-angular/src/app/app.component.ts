@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
+import * as data from "../assets/display_config.json";
 const SccLib = require("../../../../js-scc"); // development
 // const SccLib = require("js-scc"); // production
 
@@ -11,38 +11,34 @@ const SccLib = require("../../../../js-scc"); // development
 export class AppComponent implements OnInit {
   title = "display";
   hint = "";
+  config;
   scc;
 
-  constructor(private http: HttpClient) {}
+  constructor() {
+    this.config = (data as any).default;
+    this.scc = new SccLib(this.config, 4, function(date, level, message) {
+      const formatDate = function(date) {
+        return (
+          date.getDate() +
+          "-" +
+          date.getMonth() +
+          1 +
+          "-" +
+          date.getFullYear() +
+          " " +
+          date.getHours() +
+          ":" +
+          date.getMinutes() +
+          ":" +
+          date.getSeconds()
+        );
+      };
+      console.log(
+        "time=" + formatDate(date) + " level=" + level + " msg=" + message
+      ); // call own logger
+    });
+  }
 
   ngOnInit(): void {
-    this.http
-      .get("assets/display_config.json")
-      .toPromise()
-      .then((response: any) => {
-        const config = response;
-        this.scc = new SccLib(config, 4, function(date, level, message) {
-          const formatDate = function(date) {
-            return (
-              date.getDate() +
-              "-" +
-              date.getMonth() +
-              1 +
-              "-" +
-              date.getFullYear() +
-              " " +
-              date.getHours() +
-              ":" +
-              date.getMinutes() +
-              ":" +
-              date.getSeconds()
-            );
-          };
-          console.log(
-            "time=" + formatDate(date) + " level=" + level + " msg=" + message
-          ); // call own logger
-        });
-        // this.scc.publish("test", "hoi hoi");
-      });
   }
 }
