@@ -17,6 +17,12 @@ class SccLib {
     this.host = config.host;
     this.port = config.port;
     this.labels = config.labels;
+
+    /**
+     * log uses the log function provided to log level, time and a message
+     * @param level one of the following strings: 'debug', 'info', 'warn', 'error', 'fatal'
+     * @param message custom string containing more information
+     */
     this.log = function(level, message) {
       logger(new Date(), level, message);
     };
@@ -36,18 +42,22 @@ class SccLib {
      * @private
      */
     this._onConnect = function() {
+      // subscripe to all labels and standard topics
       for (let label in this.labels) {
         this.client.subscribe(label);
       }
       this.client.subscribe("client-computers");
       this.client.subscribe(this.name);
 
+      // send connection status
       this._sendMessage(
         "back-end",
         new Message(this.name, "connection", {
           connection: true
         })
       );
+
+      // log successful connection
       this.log("info", "connected OK");
     };
 
@@ -72,7 +82,6 @@ class SccLib {
         "info",
         "message received:\n topic: " +
           message.topic +
-          ",\n message: " +
           ",\n message: " +
           message.payloadString
       );
@@ -122,7 +131,9 @@ class SccLib {
     });
   }
 
-  status_changed() {}
+  status_changed() {
+    // this._sendMessage("back-end", new Message(this.name, "status", this.device.getStatus()));
+  }
 }
 
 const formatDate = function(date) {
