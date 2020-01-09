@@ -15,7 +15,7 @@
       </ng-container>
       <ng-container matColumnDef="component">
         <th mat-header-cell *matHeaderCellDef class="custom-md-table-header onderdeel-header"> Onderdeel </th>
-        <td mat-cell id="{{element.id}}-component" *matCellDef="let element" class="component-cell">
+        <td mat-cell id="{{element.id}}-component" *matCellDef="let element" class="component-cell comp-pad-right">
           {{ getComponents(element.status, element.id) }}
         </td>
       </ng-container>

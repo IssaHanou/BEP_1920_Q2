@@ -18,9 +18,10 @@ func (handler *Handler) SendSetup() {
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "setup",
 		Contents: map[string]interface{}{
-			"name":   handler.Config.General.Name,
-			"hints":  handler.getHints(),
-			"events": handler.getEventDescriptions(),
+			"name":    handler.Config.General.Name,
+			"hints":   handler.getHints(),
+			"events":  handler.getEventDescriptions(),
+			"cameras": handler.getCameras(),
 		},
 	}
 	jsonMessage, _ := json.Marshal(&message)
@@ -155,6 +156,18 @@ func (handler *Handler) getEventDescriptions() map[string]string {
 		events[rule.ID] = rule.Description
 	}
 	return events
+}
+
+// getCameras returns map with camera name and camera link
+func (handler *Handler) getCameras() []map[string]string {
+	var cameras []map[string]string
+	for _, camera := range handler.Config.Cameras {
+		result := make(map[string]string)
+		result["name"] = camera.Name
+		result["link"] = camera.Link
+		cameras = append(cameras, result)
+	}
+	return cameras
 }
 
 // GetStatus asks devices to send status
