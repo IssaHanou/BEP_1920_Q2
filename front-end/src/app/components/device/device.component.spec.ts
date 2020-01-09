@@ -11,9 +11,11 @@ import {
   MatInputModule,
   MatPaginatorModule,
   MatSortModule,
+  MatTableDataSource,
   MatTableModule
 } from "@angular/material";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { Device } from "./device";
 
 describe("DeviceComponent", () => {
   let component: DeviceComponent;
@@ -59,5 +61,6 @@ describe("DeviceComponent", () => {
     expect(tableHeaders.item(1).textContent).toContain("Connectie");
     expect(tableHeaders.item(2).textContent).toContain("Onderdeel");
     expect(tableHeaders.item(3).textContent).toContain("Status");
+    expect(tableHeaders.item(4).textContent).toContain("Test");
   });
 });

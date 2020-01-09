@@ -1,7 +1,7 @@
 <div class="home-box device-box">
   <h3 class="header">Apparaten</h3>
   <div class="contents">
-    <table mat-table matSort #DeviceTableSort="matSort" [dataSource]="getDeviceStatus()" class="mat-elevation-z8 custom-md-table">
+    <table mat-table matSort #DeviceTableSort="matSort" [dataSource]="getDeviceList()" class="mat-elevation-z8 custom-md-table">
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header"> Apparaat </th>
         <td mat-cell *matCellDef="let element"> {{ element.id }} </td>
@@ -27,7 +27,7 @@
       </ng-container>
       <ng-container matColumnDef="test">
         <th mat-header-cell *matHeaderCellDef mat-sort-header class="test-column custom-md-table-header"> Test </th>
-        <td mat-cell *matCellDef="let element">
+        <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
           <button mat-button color=primary class="test-column" (click)="testDevice(element.id)">Test</button>
         </td>
       </ng-container>

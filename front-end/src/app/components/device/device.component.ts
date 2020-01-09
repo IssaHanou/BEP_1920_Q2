@@ -24,7 +24,7 @@ export class DeviceComponent implements OnInit {
    * Returns list of Device objects with their current status and connection.
    * Return in the form of map table data source, with sorting enabled.
    */
-  public getDeviceStatus(): MatTableDataSource<Device> {
+  public getDeviceList(): MatTableDataSource<Device> {
     const devices: Device[] = [];
     for (const device of this.app.deviceList.all.values()) {
       devices.push(device);
