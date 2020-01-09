@@ -41,7 +41,6 @@ import { ConfigComponent } from "./config/config.component";
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   hostname: "192.168.178.82",
   port: 8083,
-  clientId: "front-end",
   will: {
     topic: "back-end",
     payload: JSON.stringify(
