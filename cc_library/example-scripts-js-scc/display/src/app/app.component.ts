@@ -1,7 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { SccLib } from "../../../../js-scc/scc"; // can also be replace with import to node and npm link
 import { HttpClient } from "@angular/common/http";
-import * as Paho from "paho-mqtt";
 
 @Component({
   selector: "app-root",
