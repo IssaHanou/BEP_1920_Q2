@@ -50,8 +50,9 @@ func TestOnConfirmationMsgTrue(t *testing.T) {
 			"instructed": map[string]interface{}{
 				"device_id": "front-end",
 				"time_sent": "05-12-2019 09:42:10",
-				"contents":  []map[string]interface{}{{"instruction": "test"}},
-				"type":      "instruction",
+				"contents": []map[string]interface{}{{
+					"instruction": "test"}},
+				"type": "instruction",
 			},
 		},
 	}

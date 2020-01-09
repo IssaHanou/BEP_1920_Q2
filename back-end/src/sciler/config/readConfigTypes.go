@@ -3,6 +3,7 @@ package config
 // ReadConfig specifies all configuration elements of an escape room.
 type ReadConfig struct {
 	General       General            `json:"general"`
+	Cameras       []Camera           `json:"cameras"`
 	Devices       []ReadDevice       `json:"devices"`
 	Timers        []ReadTimer        `json:"timers"`
 	Puzzles       []ReadPuzzle       `json:"puzzles"`
@@ -15,6 +16,12 @@ type General struct {
 	Duration string `json:"duration"`
 	Host     string `json:"host"`
 	Port     int    `json:"port"`
+}
+
+// Camera is a struct describing camera feed with name of camera and link to the feed
+type Camera struct {
+	Name string `json:"name"`
+	Link string `json:"link"`
 }
 
 // ReadDevice is a struct that describes the configurations of a device in the room.

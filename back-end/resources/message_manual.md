@@ -43,8 +43,7 @@ are specific defined depending on the sender and receiver.
 - `contents`:
     - If type is `instruction`, then the then the message contents have
         - `instruction`: one of following instructions: 
-        `send setup`, `send status`, `reset all`, `test all`, `test device`, `finish rule`,
-         `hint`
+        `send setup`, `send status`, `reset all`, `test all`, `test device`, `finish rule`, `hint`
      
 ### Back-end to Front-end
 - `type`: the type of the message, this can be:
@@ -72,5 +71,8 @@ are specific defined depending on the sender and receiver.
         - `id` of timer
         - `duration` has a number of the duration left in milliseconds
         - `state` sting of the timer state
-    - If type is `setup`, the contents contains a `name` parameter carrying the name of the escape room 
-        and a `hints` parameter carrying a map with the name of puzzle as key and list of hints as value
+    - If type is `setup`, the contents:
+        - a `name` parameter carrying the name of the escape room 
+        - a `hints` parameter carrying a map with the name of puzzle as key and list of hints as value
+        - an `events` parameter carrying a map with the name of the rule as key and the description as value
+        - a `cameras` parameter carrying a a list with camera objects with a `name` and `link` tag

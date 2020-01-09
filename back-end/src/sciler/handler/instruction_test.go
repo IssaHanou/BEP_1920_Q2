@@ -70,6 +70,10 @@ func TestInstructionSetUp(t *testing.T) {
 			"events": map[string]string{
 				"correctSequence": "De juiste volgorde van cijfers moet gedraaid worden.",
 			},
+			"cameras": []map[string]string{
+				{"link": "https://raccoon.games", "name": "camera1"},
+				{"link": "https://debrouwerij.io", "name": "camera2"},
+			},
 		},
 	})
 	statusMessageFrontEnd, _ := json.Marshal(Message{
@@ -93,13 +97,13 @@ func TestInstructionSetUp(t *testing.T) {
 			"status": false},
 		},
 	})
+	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)
 	communicatorMock.On("Publish", "front-end", string(messageEventStatus), 3)
 	communicatorMock.On("Publish", "telephone", string(statusInstructionMsg), 3)
 	communicatorMock.On("Publish", "front-end", string(statusInstructionMsg), 3)
 	communicatorMock.On("Publish", "front-end", string(statusMessageFrontEnd), 3)
 	communicatorMock.On("Publish", "front-end", string(timerGeneralMessage), 3)
 	communicatorMock.On("Publish", "front-end", string(statusMessage), 3)
-	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)
 	handler.msgMapper(instructionMsg)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 7)
 }
