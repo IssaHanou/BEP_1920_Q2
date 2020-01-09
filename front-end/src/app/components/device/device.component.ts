@@ -47,7 +47,7 @@ export class DeviceComponent implements OnInit {
   getComponents(status: Map<string, any>, deviceId: string): string {
     if (!this.collapsed.get(deviceId)) {
       return "click to see components";
-    } else if (status.size == 0) {
+    } else if (status.size === 0) {
       return "nothing to show";
     } else {
       const keys = Array.from(status.keys());
