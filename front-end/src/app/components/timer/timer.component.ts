@@ -16,14 +16,3 @@ export class TimerComponent implements OnInit {
     return this.app.displayTime;
   }
 }
-
-export function formatMS(timeInMS) {
-  const seconds = parseInt(((timeInMS / 1000) % 60).toString(), 10);
-  const minutes = parseInt(((timeInMS / (1000 * 60)) % 60).toString(), 10);
-  const hours = parseInt(((timeInMS / (1000 * 60 * 60)) % 24).toString(), 10);
-  const h = hours < 10 ? "0" + hours : hours;
-  const m = minutes < 10 ? "0" + minutes : minutes;
-  const s = seconds < 10 ? "0" + seconds : seconds;
-
-  return h + ":" + m + ":" + s;
-}

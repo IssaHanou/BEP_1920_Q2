@@ -9,7 +9,7 @@ import { Puzzles } from "./components/puzzle/puzzles";
 import { Timers } from "./components/timer/timers";
 import { Camera } from "./camera/camera";
 import { Hint } from "./components/hint/hint";
-import { formatMS } from "./components/timer/timer.component";
+import { formatMS } from "./components/timer/timer";
 
 @Component({
   selector: "app-root",
@@ -107,7 +107,7 @@ export class AppComponent implements OnInit, OnDestroy {
    * @param start start status to be sent.
    * @param stop stop status to be sent.
    */
-  private sendStatus(start, stop) {
+  public sendStatus(start, stop) {
     const msg = new Message("front-end", "status", new Date(), {
       start,
       stop
@@ -121,7 +121,7 @@ export class AppComponent implements OnInit, OnDestroy {
    * Send an connection update to the broker, over back-end topic.
    * @param connected connection status to be sent.
    */
-  private sendConnection(connected: boolean) {
+  public sendConnection(connected: boolean) {
     const msg = new Message("front-end", "connection", new Date(), {
       connection: connected
     });
