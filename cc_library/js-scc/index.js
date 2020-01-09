@@ -51,8 +51,20 @@ class SccLib {
       this.log("info", "connected OK");
     };
 
-    this._onConnectFailure = function(err) {
-      this.log("error", err.errorMessage);
+    /**
+     * _onConnectFailure is a method that gets called when connecting failed
+     * it will log an error and try to reconnect on a regular interval till it succeeds
+     * @private
+     */
+    this._onConnectFailure = function() {
+      let retryCooldown = 10 * 1000; // 10 seconds before retrying to connect
+      this.log(
+        "error",
+        "connecting failed, retry in " + retryCooldown + " seconds"
+      );
+      setTimeout(() => {
+        this.connect();
+      }, retryCooldown);
     };
 
     this._onMessage = function(message) {
@@ -79,6 +91,12 @@ class SccLib {
     this.client.send(msg);
   }
 
+  /**
+   * connect connects to SCILER
+   * sets up a LWT (Last Will and Testament)
+   * sets up handlers for connection and connection failure
+   * sets up automatic reconnect
+   */
   connect() {
     let will = new Paho.Message(
       JSON.stringify({
@@ -95,14 +113,16 @@ class SccLib {
       onSuccess: () => {
         this._onConnect();
       },
-      onFailure: err => {
-        this._onConnectFailure(err);
-      }, // todo wait and try to connect again
+      onFailure: () => {
+        this._onConnectFailure();
+      },
       willMessage: will,
       reconnect: true,
       keepAliveInterval: 10
     });
   }
+
+  status_changed() {}
 }
 
 const formatDate = function(date) {
