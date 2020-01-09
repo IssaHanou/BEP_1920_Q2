@@ -6,31 +6,59 @@
 
 
 /*General styling*/
-body {
+body { /*body of the index.html*/
   background-color: #3f51b5;
-  max-height: 100%;
   min-width: 350px;
 }
-.home{
-  display: flex;
+.main { /*div of app.html*/
   flex-direction: column;
   flex-wrap: wrap;
   justify-content: center;
 }
+.main-content { /*sidenav content*/
+  background-color: #3f51b5;
+  padding: 10px;
+}
+
 .menu {
   background-color: #EEEEEE;
+  height: 155px;
 }
-.home-header {
-  max-width: 100%;
+.menu-list {
+  height: 145px;
+}
+.nav-item {
   font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+
+/*Tables for devices and events*/
+.custom-md-table {
+  width: 100%;
+  background-color: #EEEEEE;
+  text-align: left;
+}
+.custom-md-table-header {
+  font-weight: bold;
+}
+.boolean-column {
   text-align: center;
 }
+
+
+/*Other components*/
+.custom-md-button, button {
+  margin: 5px;
+  font-size: 16px;
+  border-radius: 4px;
+}
+
 
 
 /*Boxes on home page*/
 .home-box {
   font-family: Roboto, "Helvetica Neue", sans-serif;
-  margin: 30px;
+  margin: 0 30px 0;
   max-width: 100%;
 }
 .home-box .header {
@@ -39,9 +67,6 @@ body {
   background-color: #EEEEEE;
   margin-bottom: 5px;
   padding: 5px;
-}
-.subtitle, .title {
-  color: #EEEEEE;
 }
 .home-box .contents {
   background-color: #EEEEEE;
@@ -54,7 +79,7 @@ body {
 
 
 /*Small screens should have small margin*/
-@media only screen and (max-width: 400px) {
+@media only screen and (max-width: 500px) {
   .home-box {
     margin: 5px;
   }
@@ -66,41 +91,14 @@ body {
 }
 /*Define grid home page for large screens*/
 @media only screen and (min-width: 650px) {
-
-  .timer-box {grid-area: timer; row-span: 2}
-  .manage-box {grid-area: manage; row-span: 2}
-  .hint-box {grid-area: hint; row-span: 2}
-  .device-box {grid-area: device; row-span: 3}
-  .puzzle-box {grid-area: puzzle; row-span: 3}
+  .timer-box {grid-area: timer}
+  .manage-box {grid-area: manage}
+  .hint-box {grid-area: hint}
+  .device-box {grid-area: device}
+  .puzzle-box {grid-area: puzzle}
 
   .home-content {
     display: grid;
     grid-template-columns: 40% 60%;
   }
 }
-
-
-
-/*Tables for devices and events*/
-.custom-md-table {
-  width: 100%;
-  background-color: #EEEEEE;
-  text-align: left;
-  max-height: 100px;
-}
-.custom-md-table-header {
-  font-weight: bold;
-}
-.custom-md-table-page {
-  background-color: #EEEEEE;
-}
-
-
-/*Other components*/
-.custom-md-button, button {
-  margin: 5px;
-  font-size: 16px;
-  border-radius: 4px;
-}
-
-

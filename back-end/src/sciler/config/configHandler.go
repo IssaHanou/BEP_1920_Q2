@@ -40,6 +40,7 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, error) {
 	// Copy information from read config to working config.
 
 	config.General = readConfig.General
+	config.Cameras = readConfig.Cameras
 	config.Puzzles = generatePuzzles(readConfig.Puzzles, &config)
 	config.GeneralEvents = generateGeneralEvents(readConfig.GeneralEvents, &config)
 	config.Devices = make(map[string]*Device)

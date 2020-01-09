@@ -1,4 +1,4 @@
-import { formatMS } from "./components/timer/timer.component";
+import { formatMS } from "./components/timer/timer";
 /**
  * This logger will log the messages from the application.
  * It is currently implemented to log to the console, but this can be changed to log to a file on the server-side.

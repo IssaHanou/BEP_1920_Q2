@@ -10,6 +10,7 @@ import (
 // WorkingConfig has additional fields to ReadConfig, with lists of conditions, constraints and actions.
 type WorkingConfig struct {
 	General       General
+	Cameras       []Camera
 	Puzzles       []*Puzzle
 	GeneralEvents []*GeneralEvent
 	Devices       map[string]*Device
@@ -116,6 +117,11 @@ type InstructionSender interface {
 	SendInstruction(string, []ComponentInstruction)
 	SetTimer(string, ComponentInstruction)
 	HandleEvent(string)
+}
+
+// Finished is a method that checks is the a rule have been finished, meaning if it reached its maximum number of executions
+func (r *Rule) Finished() bool {
+	return r.Executed == r.Limit
 }
 
 // Execute performs all actions of a rule
