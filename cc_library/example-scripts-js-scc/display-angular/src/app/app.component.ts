@@ -1,4 +1,5 @@
 import { Component, OnInit } from "@angular/core";
+// @ts-ignore
 import * as data from "../assets/display_config.json";
 const SccLib = require("../../../../js-scc"); // development
 // const SccLib = require("js-scc"); // production
