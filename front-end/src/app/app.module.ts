@@ -27,7 +27,8 @@ import {
   MatToolbarModule,
   MatSidenavModule,
   MatListModule,
-  MatSelectModule
+  MatSelectModule,
+  MatExpansionModule
 } from "@angular/material";
 import { CdkTableModule } from "@angular/cdk/table";
 import { JsonConvert } from "json2typescript";
@@ -102,6 +103,7 @@ export const APP_ROUTES: Routes = [
     MatToolbarModule,
     MatIconModule,
     MatSelectModule,
+    MatExpansionModule,
     MatListModule,
     RouterModule.forRoot(APP_ROUTES),
     ReactiveFormsModule,

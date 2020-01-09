@@ -10,17 +10,12 @@
   }
 }
 
-/**Camera title box styling, adjacency**/
-.camera-title, .camera-form {
-  display: inline-block;
-  margin: 10px;
+/**Camera title styling**/
+.camera-title {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  color: #3f51b5;
 }
 
-@media only screen and (max-width: 550px) {
-  .camera-title, .camera-form {
-    display: block;
-  }
-}
 
 /**Width of drop down**/
 .mat-form-field {
