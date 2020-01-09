@@ -41,9 +41,6 @@ body { /*body of the index.html*/
 .custom-md-table-header {
   font-weight: bold;
 }
-.custom-md-table-page {
-  background-color: #EEEEEE;
-}
 .boolean-column {
   text-align: center;
 }

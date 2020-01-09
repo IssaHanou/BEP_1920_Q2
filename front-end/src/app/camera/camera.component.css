@@ -1,12 +1,14 @@
 /**Size of iframe**/
-.camera-feed {
-  width: 100%;
-  height: 100%;
+.feed-box {
+  height: 70vh;
 }
-
-@media only screen and (min-height: 600px) {
-  .camera-feed {
-    height: 500px;
+.camera-feed {
+  height: 100%;
+  width: 100%;
+}
+@media only screen and (max-height: 500px) {
+  .feed-box {
+    height: 50vh;
   }
 }
 
