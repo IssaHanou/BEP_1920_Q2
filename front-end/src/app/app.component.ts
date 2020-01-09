@@ -223,8 +223,11 @@ export class AppComponent implements OnInit, OnDestroy {
 
     const cameraData = jsonData.cameras;
     this.cameras = [];
-    for (const cam of cameraData) {
-      this.cameras.push(new Camera(cam));
+    console.log(cameraData);
+    if (cameraData !== null) {
+      for (const cam of cameraData) {
+        this.cameras.push(new Camera(cam));
+      }
     }
 
     const rules = jsonData.events;
