@@ -20,6 +20,7 @@ import {
   MatListModule,
   MatButtonModule,
   MatSelectModule,
+  MatExpansionModule,
   MatSortModule
 } from "@angular/material";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
@@ -49,6 +50,7 @@ describe("AppComponent", () => {
         MatToolbarModule,
         MatIconModule,
         MatSelectModule,
+        MatExpansionModule,
         MatListModule,
         CdkTableModule,
         RouterModule.forRoot(APP_ROUTES),
@@ -75,7 +77,7 @@ describe("AppComponent", () => {
     expect(app).toBeTruthy();
   });
 
-  it("should have as title 'S.C.I.L.E.R'", () => {
+  it("should have as title 'SCILER'", () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.debugElement.componentInstance;
     expect(app.title).toEqual("SCILER");
