@@ -1,0 +1,17 @@
+{
+  "id": "display-angular",
+  "description": "Display can print hints",
+  "host": "localhost",
+  "labels": ["hint"],
+  "port": 8083,
+  "input": {},
+  "output": {
+    "display": {
+      "type": "string",
+      "instructions": {
+        "hint": "string",
+        "text": "string"
+      }
+    }
+  }
+}

@@ -11,5 +11,11 @@ install prettier: `npm install --global prettier`
 
 `prettier --write "**/*.js"`
 
-### Setup development script using this module
+### Using this library
+- npm install with ```npm install js-scc```
+- import lib with ```const SccLib = require("js-scc");```
+- in case of:
+    - angular: add to dependency in `package.json`
+    - browser javascript: (example nodejs servering webpage with javascript which includes this library), [Browserify](http://browserify.org/) your javascript which includes this library.
+
 

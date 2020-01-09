@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
-import { SccLib } from "../../../../js-scc/scc"; // can also be replace with import to node and npm link
 import { HttpClient } from "@angular/common/http";
+const SccLib = require("../../../../js-scc"); // development
+// const SccLib = require("js-scc"); // production
 
 @Component({
   selector: "app-root",

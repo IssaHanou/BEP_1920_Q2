@@ -1,6 +1,7 @@
 {
   "name": "js-scc",
-  "version": "0.0.3",
+  "version": "0.0.6",
+  "main": "index.js",
   "license": "GNU General Public License v3 (GPL)",
   "dependencies": {
     "paho-mqtt": "^1.1.0"

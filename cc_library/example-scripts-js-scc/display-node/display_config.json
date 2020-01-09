@@ -1,5 +1,5 @@
 {
-  "id": "fancy-display",
+  "id": "display-node",
   "description": "Display can print hints",
   "host": "localhost",
   "labels": ["hint"],

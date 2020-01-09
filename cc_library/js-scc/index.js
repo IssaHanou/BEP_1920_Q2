@@ -13,7 +13,7 @@ class SccLib {
     };
     this.log("info", "Start of log for device: " + this.name);
 
-    this.client = new Paho.Client("localhost", 8083, "", "fancy-display");
+    this.client = new Paho.Client(this.host, this.port, "", this.name);
     this.client.onMessageArrived = (msg) => {this._onMessage(msg)};
 
     this.client.connect({
@@ -38,4 +38,4 @@ class SccLib {
     };
   }
 }
-export { SccLib };
+module.exports = SccLib;
