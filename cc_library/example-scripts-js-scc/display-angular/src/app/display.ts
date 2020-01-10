@@ -35,7 +35,7 @@ export class Display extends Device {
   }
 
   performInstruction() {
-
+    return true;
   }
 
   test() {

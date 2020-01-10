@@ -165,6 +165,12 @@ class SccLib {
       }, retryCooldown);
     };
 
+    /**
+     * _onMessage is a method that gets called whenever a new message arrives
+     * it will read the message and handle all instruction in the message
+     * @param message the receiving message
+     * @private
+     */
     this._onMessage = function(message) {
       this.log(
         "info",
@@ -177,6 +183,11 @@ class SccLib {
     };
   }
 
+  /**
+   * _handle handles the instructions in a message
+   * @param payloadString the payload of a message
+   * @private
+   */
   _handle(payloadString) {
     const message = JSON.parse(payloadString);
     if (message.type !== "instruction") {
@@ -185,10 +196,21 @@ class SccLib {
         "received non-instruction message of type: " + message.type
       );
     } else {
-      const success = this._checkMessage(message.contents);
+      let success = this._checkMessage(message.contents);
+      const confirmation = new Message(this.name, "confirmation", {
+        completed: success,
+        instructed: message
+      });
+      this._sendMessage("back-end", confirmation);
     }
   }
 
+  /**
+   * _checkMessage executes all instructions in a message
+   * @param contents list of instruction from the original instruction message
+   * @returns {boolean} returns true when all instruction could be performed
+   * @private
+   */
   _checkMessage(contents) {
     for (let i = 0; i < contents.length; i++) {
       const action = contents[i];
@@ -215,10 +237,24 @@ class SccLib {
           break;
         }
         default: {
+          if (!this.device.performInstruction(action)) {
+            // action NOT successful
+            this.log(
+              "warn",
+              "instruction " +
+                action.instruction +
+                " could not be performed, " +
+                action
+            );
+            return false;
+          } else {
+            this.log("info", "instruction performed " + instruction);
+          }
           break;
         }
       }
     }
+    return true;
   }
 
   /**
