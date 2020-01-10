@@ -77,6 +77,19 @@
       }
     },
     {
+      "id": "display-node",
+      "description": "displays messages",
+      "input": {},
+      "output": {
+        "hint": {
+          "type": "string",
+          "instructions": {
+            "hint": "string"
+          }
+        }
+      }
+    },
+    {
       "id": "door",
       "description": "device that controls a door magnet through a relay",
       "input": {},
