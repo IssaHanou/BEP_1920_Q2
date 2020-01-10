@@ -1,0 +1,253 @@
+{
+  "general": {
+    "name": "Hue Lights",
+    "duration": "30m",
+    "host": "localhost",
+    "port": 1883
+  },
+  "cameras": [
+  ],
+  "devices": [
+    {
+      "id": "hue_lights",
+      "description": "4 spotlights",
+      "input": {},
+      "output": {
+        "spot1": {
+          "type": "string",
+          "instructions": {
+            "scene": "string",
+            "manual": "array"
+          }
+        },
+        "spot2": {
+          "type": "string",
+          "instructions": {
+            "scene": "string",
+            "manual": "array"
+          }
+        },
+        "spot3": {
+          "type": "string",
+          "instructions": {
+            "scene": "string",
+            "manual": "array"
+          }
+        },
+        "spot4": {
+          "type": "string",
+          "instructions": {
+            "scene": "string",
+            "manual": "array"
+          }
+        },
+        "all": {
+          "type": "string",
+          "instructions": {
+            "scene": "string",
+            "manual": "array"
+          }
+        }
+      }
+    }
+  ],
+  "timers": [
+    {
+      "id": "timer1",
+      "duration": "10s"
+    }
+  ],
+  "puzzles": [
+      ],
+  "general_events": [
+    {
+      "name": "halloween lights",
+      "rules": [
+        {
+          "id": "halloweenLicht",
+          "description": "rood geel",
+          "limit": 100,
+          "conditions": {
+            "operator": "OR",
+            "list": []
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "hue_lights",
+              "message": [
+                {
+                  "component_id": "all",
+                  "instruction": "scene",
+                  "value": "MBvYmUk1U-EUaGz"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "kerst lights",
+      "rules": [
+        {
+          "id": "kerstLicht",
+          "description": "rood groen",
+          "limit": 100,
+          "conditions": {
+            "operator": "OR",
+            "list": []
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "hue_lights",
+              "message": [
+                {
+                  "component_id": "all",
+                  "instruction": "scene",
+                  "value": "0TOnN5zTfRSOTmC"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "lichte lights",
+      "rules": [
+        {
+          "id": "lichtlights",
+          "description": "very bright",
+          "limit": 100,
+          "conditions": {
+            "operator": "OR",
+            "list": []
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "hue_lights",
+              "message": [
+                {
+                  "component_id": "all",
+                  "instruction": "scene",
+                  "value": "xAgrIMeKpZD8Gla"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "spot1 lights",
+      "rules": [
+        {
+          "id": "spot1",
+          "description": "idk een kleur",
+          "limit": 100,
+          "conditions": {
+            "operator": "OR",
+            "list": []
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "hue_lights",
+              "message": [
+                {
+                  "component_id": "spot1",
+                  "instruction": "manual",
+                  "value": [true, 123,[0.61,0.36]]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "spot2 lights",
+      "rules": [
+        {
+          "id": "spot2",
+          "description": "idk een kleur",
+          "limit": 100,
+          "conditions": {
+            "operator": "OR",
+            "list": []
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "hue_lights",
+              "message": [
+                {
+                  "component_id": "spot2",
+                  "instruction": "manual",
+                  "value": [true, 123, [0.15,0.1]]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "spot3 lights",
+      "rules": [
+        {
+          "id": "spot3",
+          "description": "idk een kleur",
+          "limit": 100,
+          "conditions": {
+            "operator": "OR",
+            "list": []
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "hue_lights",
+              "message": [
+                {
+                  "component_id": "spot3",
+                  "instruction": "manual",
+                  "value": [true,123,[0.24,0.1]]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "spot4 lights",
+      "rules": [
+        {
+          "id": "spot4",
+          "description": "idk een kleur",
+          "limit": 100,
+          "conditions": {
+            "operator": "OR",
+            "list": []
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "hue_lights",
+              "message": [
+                {
+                  "component_id": "spot4",
+                  "instruction": "manual",
+                  "value": [ true, 123, [0.54,0.23]]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

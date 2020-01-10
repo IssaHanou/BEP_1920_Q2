@@ -1,0 +1,34 @@
+{
+  "id": "hue_lights",
+  "description": "4 spotlights",
+  "host": "localhost",
+  "labels": ["lamp"],
+  "port": 1883,
+  "input": {},
+  "output": {
+    "spot1": {
+      "type": "string",
+      "instructions": {
+        "scene": "string"
+      }
+    },
+    "spot2": {
+      "type": "string",
+      "instructions": {
+        "scene": "string"
+      }
+    },
+    "spot3": {
+      "type": "string",
+      "instructions": {
+        "scene": "string"
+      }
+    },
+    "spot4": {
+      "type": "string",
+      "instructions": {
+        "scene": "string"
+      }
+    }
+  }
+}
