@@ -5,8 +5,8 @@ To make sure all dependencies are loaded, run `pip install -r cc_library/require
 
 ### Checks
 - To check unittests, run `python -m unittest discover`.
-- To update formatting, run `black cc_library`.
-- To check the codestyle, run `flake8 cc_library`.
+- To update formatting, run `black py-scc`.
+- To check the codestyle, run `flake8 py-scc`.
 
 ### Raspberry Pi Set up
 For setting up a Pi, [a read the `README.md`](src/sciler/README.md) in the sciler package. 

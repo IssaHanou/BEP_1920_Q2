@@ -246,7 +246,9 @@ class SccLib:
                 self.device.reset()
                 logging.info(("instruction performed", instruction))
             else:
-                (success, failed_action) = self.device.perform_instruction(action) # TODO: remove failed_action as return argument
+                (success, failed_action) = self.device.perform_instruction(
+                    action
+                )  # TODO: remove failed_action as return argument
                 if success:
                     logging.info(("instruction performed", instruction))
                 else:
