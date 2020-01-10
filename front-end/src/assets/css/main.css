@@ -79,16 +79,23 @@ body { /*body of the index.html*/
 
 
 /*Small screens should have small margin*/
-@media only screen and (max-width: 500px) {
+@media only screen and (max-width: 800px) {
+  @media only screen and (min-width: 650px) {
+    .left {
+      margin: 0 5px 0 0;
+    }
+  }
   .home-box {
-    margin: 5px;
+    margin: 0;
+  }
+  .main-content {
+    padding: 0;
+  }
+  .home-box .contents {
+    padding: 0;
   }
 }
-@media only screen and (min-width: 650px) and (max-width: 700px) {
-  .home-box {
-    margin: 5px;
-  }
-}
+
 /*Define grid home page for large screens*/
 @media only screen and (min-width: 650px) {
   .timer-box {grid-area: timer}
