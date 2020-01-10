@@ -1,9 +1,9 @@
 import json
 import os
 import time
-from scclib.device import Device
 
 import requests
+from scclib.device import Device
 
 
 class Hue_lights(Device):
@@ -15,6 +15,10 @@ class Hue_lights(Device):
         config = open(file=abs_file_path)
         super().__init__(config)
         self.scene = "none"
+        self.hue_bridge = "http://192.168.178.128/"
+        self.hue_user = "JQrPwJNthHtfPEG9vhW3mqwIVuFo3ESLD3gvkZOB"
+        self.group = "Spotlight"
+        self.header = {"Content-type": "application/json"}
 
     def get_status(self):
         return {"all": self.scene}
@@ -32,19 +36,27 @@ class Hue_lights(Device):
     def test(self):
         print("test")
         params = json.dumps({"on": True, "bri": 200, "xy": [0.3, 0.3]})
-        headers = {"Content-type": "application/json"}
         requests.put(
-            "http://192.168.178.128/api/JQrPwJNthHtfPEG9vhW3mqwIVuFo3ESLD3gvkZOB/groups/Spotlights/action",
+            self.hue_bridge
+            + "api/"
+            + self.hue_user
+            + "/groups/"
+            + self.group
+            + "/action",
             data=params,
-            headers=headers,
+            headers=self.header,
         )
         time.sleep(2)
         params = json.dumps({"scene": self.scene})
-        headers = {"Content-type": "application/json"}
         resp = requests.put(
-            "http://192.168.178.128/api/JQrPwJNthHtfPEG9vhW3mqwIVuFo3ESLD3gvkZOB/groups/Spotlights/action",
+            self.hue_bridge
+            + "api/"
+            + self.hue_user
+            + "/groups/"
+            + self.group
+            + "/action",
             data=params,
-            headers=headers,
+            headers=self.header,
         )
         if resp.status_code == 200:
             print("Template has been published.")
@@ -55,11 +67,15 @@ class Hue_lights(Device):
     def set_scene(self, data):
         self.scene = data.get("value")
         params = json.dumps({"scene": self.scene})
-        headers = {"Content-type": "application/json"}
         resp = requests.put(
-            "http://192.168.178.128/api/JQrPwJNthHtfPEG9vhW3mqwIVuFo3ESLD3gvkZOB/groups/Spotlights/action",
+            self.hue_bridge
+            + "api/"
+            + self.hue_user
+            + "/groups/"
+            + self.group
+            + "/action",
             data=params,
-            headers=headers,
+            headers=self.header,
         )
         if resp.status_code == 200:
             print("Template has been published.")
@@ -69,14 +85,11 @@ class Hue_lights(Device):
 
     def set_manual(self, comp, data):
         params = json.dumps({"on": data[0], "bri": data[1], "xy": data[2]})
-        headers = {"Content-type": "application/json"}
         url = (
-            "http://192.168.178.128/api/JQrPwJNthHtfPEG9vhW3mqwIVuFo3ESLD3gvkZOB/lights/"
-            + comp[-1:]
-            + "/state"
+            self.hue_bridge + "api/" + self.hue_user + "/lights/" + comp[-1:] + "/state"
         )
         print(url, params, comp[-1:])
-        resp = requests.put(url, data=params, headers=headers)
+        resp = requests.put(url, data=params, headers=self.header,)
         if resp.status_code == 200:
             print("Template has been published.")
         else:
@@ -86,11 +99,15 @@ class Hue_lights(Device):
     def reset(self):
         self.scene = "none"
         params = json.dumps({"on": True, "bri": 50, "xy": [0.3, 0.3]})
-        headers = {"Content-type": "application/json"}
         resp = requests.put(
-            "http://192.168.178.128/api/JQrPwJNthHtfPEG9vhW3mqwIVuFo3ESLD3gvkZOB/groups/Spotlights/action",
+            self.hue_bridge
+            + "api/"
+            + self.hue_user
+            + "/groups/"
+            + self.group
+            + "/action",
             data=params,
-            headers=headers,
+            headers=self.header,
         )
         if resp.status_code == 200:
             print("Template has been published.")
