@@ -250,6 +250,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     const rules = jsonData.events;
+    this.puzzleList = new Puzzles();
     for (const rule in rules) {
       if (rules.hasOwnProperty(rule)) {
         this.puzzleList.addPuzzle(rule, rules[rule]);
