@@ -8,15 +8,15 @@ import { AppComponent } from "../app.component";
 })
 export class ConfigComponent implements OnInit {
 
-  uploaded: string = "";
-  data: string = "";
   reader: FileReader;
-  newConfig: string = "";
+  uploaded = "";
+  data = "";
+  newConfig = "";
   errors: string[];
   currentFile: File;
 
   /**
-   * Define listeners for the file reader.
+   * Define listeners for the file reader, which is used in the file reading button.
    * First resets the errors.
    * On reading file, it should check config on back-end.
    * On error, it should add to error list and log the error.
@@ -24,16 +24,21 @@ export class ConfigComponent implements OnInit {
   constructor(private app: AppComponent) {
     this.errors = [];
     this.reader = new FileReader();
+    const res = "result";
     this.reader.addEventListener("load", (e) => {
-      this.data = e.target["result"];
+      this.data = e.target[res];
       this.errors = [];
       this.app.configErrorList = [];
-      this.app.sendInstruction([{ instruction: "check config", config: this.data}]);
+      this.app.sendInstruction(
+        [{
+          instruction: "check config",
+          config: JSON.parse(this.data)
+        }]);
     });
     this.reader.addEventListener("error", (e) => {
-      this.errors.push(e.target["result"]);
+      this.errors.push(e.target[res]);
       console.log("log: error while reading file");
-      this.uploaded = "Error tijdens uploaden: " + e.target["result"];
+      this.uploaded = "Error tijdens uploaden: " + e.target[res];
     });
   }
 
@@ -53,11 +58,13 @@ export class ConfigComponent implements OnInit {
    * Use the config entered as new configuration for app.
    */
   sendConfig() {
-    this.app.sendInstruction([{instruction: "use config", config: this.data}]);
+    this.app.sendInstruction([{ instruction: "use config", config: JSON.parse(this.data) }]);
     this.newConfig = "Configuratie uit: " + this.currentFile.name + " wordt nu gebruikt";
   }
 
-  // All JSON errors will be shown per one - json unmarshal
+  /**
+   * All JSON errors will be shown per one - json unmarshal
+   */
   getErrors(): string[] {
     const list = [];
     for (const err of this.app.configErrorList) {
@@ -70,6 +77,6 @@ export class ConfigComponent implements OnInit {
   }
 
   noErrors(): boolean {
-    return this.errors.length == 0 && this.app.configErrorList.length == 0;
+    return this.errors.length === 0 && this.app.configErrorList.length === 0;
   }
 }

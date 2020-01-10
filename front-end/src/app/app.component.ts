@@ -96,7 +96,7 @@ export class AppComponent implements OnInit, OnDestroy {
    * @param instruction instruction to be sent.
    */
   public sendInstruction(instruction: any[]) {
-    let msg = new Message(
+    const msg = new Message(
       "front-end",
       "instruction",
       new Date(),
