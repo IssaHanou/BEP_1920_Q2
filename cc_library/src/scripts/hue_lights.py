@@ -34,7 +34,6 @@ class Hue_lights(Device):
         return True, None
 
     def test(self):
-        print("test")
         params = json.dumps({"on": True, "bri": 200, "xy": [0.3, 0.3]})
         requests.put(
             self.hue_bridge
@@ -59,9 +58,9 @@ class Hue_lights(Device):
             headers=self.header,
         )
         if resp.status_code == 200:
-            print("Template has been published.")
+            self.log("Template has been published.")
         else:
-            print("Unable to publish template.")
+            self.log("Unable to publish template.")
         self.status_changed()
 
     def set_scene(self, data):
@@ -78,9 +77,9 @@ class Hue_lights(Device):
             headers=self.header,
         )
         if resp.status_code == 200:
-            print("Template has been published.")
+            self.log("Template has been published.")
         else:
-            print("Unable to publish template.")
+            self.log("Unable to publish template.")
         self.status_changed()
 
     def set_manual(self, comp, data):
@@ -88,12 +87,11 @@ class Hue_lights(Device):
         url = (
             self.hue_bridge + "api/" + self.hue_user + "/lights/" + comp[-1:] + "/state"
         )
-        print(url, params, comp[-1:])
         resp = requests.put(url, data=params, headers=self.header,)
         if resp.status_code == 200:
-            print("Template has been published.")
+            self.log("Template has been published.")
         else:
-            print("Unable to publish template.")
+            self.log("Unable to publish template.")
         self.status_changed()
 
     def reset(self):
@@ -110,9 +108,9 @@ class Hue_lights(Device):
             headers=self.header,
         )
         if resp.status_code == 200:
-            print("Template has been published.")
+            self.log("action has been published.")
         else:
-            print("Unable to publish template.")
+            self.log("Unable to publish template.")
         self.status_changed()
 
     def main(self):
