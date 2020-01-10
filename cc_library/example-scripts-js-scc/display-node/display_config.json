@@ -1,7 +1,7 @@
 {
   "id": "display-node",
   "description": "Display can print hints",
-  "host": "localhost",
+  "host": "192.168.178.82",
   "labels": ["hint"],
   "port": 8083,
   "input": {},

@@ -30,7 +30,7 @@ import { JsonConvert } from "json2typescript";
 import { Message } from "./message";
 
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
-  hostname: "localhost",
+  hostname: "192.168.178.82",
   port: 8083,
   clientId: "front-end",
   will: {
