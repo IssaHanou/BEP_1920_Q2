@@ -44,20 +44,20 @@ export class AppComponent implements OnInit, OnDestroy {
     this.hintList = [];
     this.configErrorList = [];
     this.cameras = [];
-    this.timerList = new Timers();
+
+    const topics = ["front-end"];
+    for (const topic of topics) {
+      this.subscribeNewTopic(topic);
+    }
   }
 
   /**
    * Initialize app, also called upon loading new config file.
    */
   ngOnInit(): void {
+    this.timerList = new Timers();
     const generalTimer = { id: "general", duration: 0, state: "stateIdle" };
     this.timerList.setTimer(generalTimer);
-
-    const topics = ["front-end"];
-    for (const topic of topics) {
-      this.subscribeNewTopic(topic);
-    }
 
     this.sendInstruction([{ instruction: "send setup" }]);
     this.sendConnection(true);
@@ -151,7 +151,7 @@ export class AppComponent implements OnInit, OnDestroy {
     const msg: Message = Message.deserialize(jsonMessage);
     switch (msg.type) {
       case "confirmation": {
-        this.processConfirmation(jsonMessage);
+        this.processConfirmation(msg);
         break;
       }
       case "instruction": {
@@ -179,7 +179,9 @@ export class AppComponent implements OnInit, OnDestroy {
         break;
       }
       case "new config": {
+        this.stopTimers();
         this.ngOnInit();
+        this.openSnackbar("using new config: " + msg.contents.name, "");
         break;
       }
       default:
@@ -286,6 +288,14 @@ export class AppComponent implements OnInit, OnDestroy {
         this.timerList.getTimer("general").getTimeLeft()
       );
     });
+  }
+
+  /**
+   * Before using new configuration, first stop the current timer subscription.
+   * Otherwise time runs double.
+   */
+  private stopTimers() {
+    this.subscription.unsubscribe();
   }
 
   /**

@@ -12,6 +12,8 @@
 .config-button {
   margin-right: 10px;
 }
+
+/*Styling the output box*/
 .file-output-errors {
   background-color: #E68364;
   padding: 5px;
@@ -25,4 +27,9 @@
 }
 .error-list-title {
   font-weight: bold;
+}
+
+/*Minimal height to not shrimp the menu*/
+.config-box {
+  min-height: 155px;
 }

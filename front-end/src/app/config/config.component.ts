@@ -11,7 +11,6 @@ export class ConfigComponent implements OnInit {
   reader: FileReader;
   uploaded = "";
   data = "";
-  newConfig = "";
   errors: string[];
   currentFile: File;
 
@@ -50,16 +49,19 @@ export class ConfigComponent implements OnInit {
    */
   checkFile(files: FileList) {
     this.currentFile = files.item(0);
-    this.uploaded = "Uploaden gelukt: " + this.currentFile.name + "!";
     this.reader.readAsText(this.currentFile, "UTF-8");
+    this.uploaded = "Uploaden gelukt: " + this.currentFile.name + "!";
   }
 
   /**
    * Use the config entered as new configuration for app.
    */
   sendConfig() {
-    this.app.sendInstruction([{ instruction: "use config", config: JSON.parse(this.data) }]);
-    this.newConfig = "Configuratie uit: " + this.currentFile.name + " wordt nu gebruikt";
+    this.app.sendInstruction([{
+      instruction: "use config",
+      config: JSON.parse(this.data),
+      file: this.currentFile.name
+    }]);
   }
 
   /**

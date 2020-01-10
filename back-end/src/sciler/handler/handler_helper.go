@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/sirupsen/logrus"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"reflect"
 	"sciler/config"
 	"time"
@@ -215,10 +218,10 @@ func (handler *Handler) SetTimer(timerID string, instructions config.ComponentIn
 	handler.sendStatus(timerID)
 }
 
-// ProcessConfig reads the config in.
+// processConfig reads the config in.
 // If action is "check" then the return message must contain the possible errors
 // If action is "use" then the message must tell the config a new config is now used and put it to use
-func (handler *Handler) ProcessConfig(configToRead interface{}, action string) {
+func (handler *Handler) processConfig(configToRead interface{}, action string, fileName string) {
 	jsonBytes, err := json.Marshal(configToRead)
 	if err != nil {
 		logrus.Error(err)
@@ -234,8 +237,21 @@ func (handler *Handler) ProcessConfig(configToRead interface{}, action string) {
 		message.Contents = map[string][]string{"errors": errorList}
 	}
 	if action == "use" && len(errorList) == 0 {
-		message.Type = "new config"
+		dir, dirErr := os.Getwd()
+		if dirErr != nil {
+			logrus.Error(dirErr)
+		}
+		fullFileName := filepath.Join(dir, "back-end", "resources", fileName)
+		err = ioutil.WriteFile(fullFileName, jsonBytes, 0644)
+		if err != nil {
+			logrus.Error(err)
+		}
 		handler.Config = newConfig
+		handler.ConfigFile = fullFileName
+		handler.sendStatus("general")
+		message.Type = "new config"
+		message.Contents = map[string]string{"name": fileName}
+
 	}
 	jsonMessage, _ := json.Marshal(&message)
 	handler.Communicator.Publish("front-end", string(jsonMessage), 3)

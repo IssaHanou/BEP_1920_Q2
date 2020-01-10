@@ -22,7 +22,6 @@ func ReadFile(filename string) WorkingConfig {
 	if len(errorList) > 0 {
 		panic(errorList[0])
 	}
-	// TODO return config, errorList
 	return config
 }
 

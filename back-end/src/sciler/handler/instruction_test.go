@@ -461,17 +461,29 @@ func TestInstructionUseConfig(t *testing.T) {
 		Type:     "instruction",
 		Contents: []map[string]interface{}{{
 			"instruction": "use config",
-			"config":      configToTest},
+			"config":      configToTest,
+			"file":        "new_file.json"},
 		},
 	}
 	returnMsg := Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "new config",
-		Contents: map[string]interface{}{},
+		Contents: map[string]interface{}{"name": "new_file.json"},
 	}
+	timerGeneralMessage, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "time",
+		Contents: map[string]interface{}{
+			"state":    "stateIdle",
+			"duration": 1800000,
+			"id":       "general",
+		},
+	})
 	jsonMessage, _ := json.Marshal(&returnMsg)
+	communicatorMock.On("Publish", "front-end", string(timerGeneralMessage), 3)
 	communicatorMock.On("Publish", "front-end", string(jsonMessage), 3)
 	handler.msgMapper(instructionMsg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
 }

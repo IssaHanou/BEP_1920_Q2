@@ -1,15 +1,12 @@
 package handler
 
 import (
-	"bytes"
-	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/sirupsen/logrus"
 	"reflect"
 	"sciler/config"
-	"time"
 )
 
 // Message is a type that follows the structure all messages have, described in resources/message_manual.md
@@ -208,42 +205,23 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 				}
 			case "hint":
 				{
-					message := Message{
-						DeviceID: "back-end",
-						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-						Type:     "instruction",
-						Contents: []map[string]interface{}{{
-							"instruction":   "hint",
-							"value":         instruction["value"],
-							"instructed_by": raw.DeviceID},
-						},
-					}
-					jsonMessage, _ := json.Marshal(&message)
-					handler.Communicator.Publish("hint", string(jsonMessage), 3)
+					handler.SendInstruction("hint", []map[string]string{{
+						"instruction":   "hint",
+						"value":         instruction["value"].(string),
+						"instructed_by": raw.DeviceID,
+					}})
 				}
 			case "check config":
 				{
-					handler.ProcessConfig(instruction["config"], "check")
+					handler.processConfig(instruction["config"], "check", "")
 				}
 			case "use config":
 				{
-					handler.ProcessConfig(instruction["config"], "use")
+					handler.processConfig(instruction["config"], "use", instruction["file"].(string))
 				}
 			}
 		} else {
 			logrus.Warnf("%s, tried to instruct the back-end, only the front-end is allowed to instruct the back-end", raw.DeviceID)
 		}
 	}
-}
-
-func getBytes(key map[string]interface{}) []byte {
-	var buf bytes.Buffer
-	gob.Register(map[string]interface{}{})
-	gob.Register([]interface{}{})
-	enc := gob.NewEncoder(&buf)
-	err := enc.Encode(key)
-	if err != nil {
-		panic(err.Error())
-	}
-	return buf.Bytes()
 }
