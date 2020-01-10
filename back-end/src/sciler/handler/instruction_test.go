@@ -363,7 +363,6 @@ func TestOnInstructionMsgMapper(t *testing.T) {
 		"Nothing should have been changed after an instruction message type")
 }
 
-// TODO fix test to pass full config in json message
 func TestInstructionCheckConfigNoErrors(t *testing.T) {
 	communicatorMock := new(CommunicatorMock)
 	fileName := "../../../resources/testing/test_config.json"
@@ -405,14 +404,13 @@ func TestInstructionCheckConfigNoErrors(t *testing.T) {
 
 func TestInstructionCheckConfigWithErrors(t *testing.T) {
 	communicatorMock := new(CommunicatorMock)
-	fileName := "../../../resources/testing/test_config_errors.json"
-	workingConfig := config.ReadFile(fileName)
+	workingConfig := config.ReadFile("../../../resources/testing/test_config.json")
 	handler := Handler{
 		Config:       workingConfig,
-		ConfigFile:   fileName,
+		ConfigFile:   "../../../resources/testing/test_config.json",
 		Communicator: communicatorMock,
 	}
-	jsonFile, _ := ioutil.ReadFile(fileName)
+	jsonFile, _ := ioutil.ReadFile("../../../resources/testing/test_config_errors.json")
 	configToTest := make(map[string]interface{})
 	if err := json.Unmarshal(jsonFile, &configToTest); err != nil {
 		assert.FailNow(t, "cannot create instruction message")
@@ -421,8 +419,9 @@ func TestInstructionCheckConfigWithErrors(t *testing.T) {
 		DeviceID: "front-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "instruction",
-		Contents: []map[string]interface{}{
-			{"instruction": "check config", "config": configToTest},
+		Contents: []map[string]interface{}{{
+			"instruction": "check config",
+			"config":      configToTest},
 		},
 	}
 	returnMsg := Message{
@@ -431,7 +430,8 @@ func TestInstructionCheckConfigWithErrors(t *testing.T) {
 		Type:     "config",
 		Contents: map[string][]string{
 			"errors": {
-				"json: cannot unmarshal number into Go struct field General.general.duration of type string",
+				"time: unknown unit x in duration 10x",
+				"time: missing unit in duration 30",
 			},
 		},
 	}
@@ -459,14 +459,15 @@ func TestInstructionUseConfig(t *testing.T) {
 		DeviceID: "front-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "instruction",
-		Contents: []map[string]interface{}{
-			{"instruction": "use config", "config": configToTest},
+		Contents: []map[string]interface{}{{
+			"instruction": "use config",
+			"config":      configToTest},
 		},
 	}
 	returnMsg := Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "config",
+		Type:     "new config",
 		Contents: map[string]interface{}{},
 	}
 	jsonMessage, _ := json.Marshal(&returnMsg)

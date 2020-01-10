@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"bytes"
+	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -169,49 +171,30 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 				}
 			case "reset all":
 				{
-					message := Message{
-						DeviceID: "back-end",
-						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-						Type:     "instruction",
-						Contents: []map[string]interface{}{{
-							"instruction":   "reset",
-							"instructed_by": raw.DeviceID},
-						},
-					}
-					jsonMessage, _ := json.Marshal(&message)
-					handler.Communicator.Publish("client-computers", string(jsonMessage), 3)
-					handler.Communicator.Publish("front-end", string(jsonMessage), 3)
-
+					handler.SendInstruction("client-computers", []map[string]string{{
+						"instruction":   "reset",
+						"instructed_by": raw.DeviceID,
+					}})
+					handler.SendInstruction("front-end", []map[string]string{{
+						"instruction":   "reset",
+						"instructed_by": raw.DeviceID,
+					}})
 					handler.Config = config.ReadFile(handler.ConfigFile)
 					handler.sendStatus("general")
 				}
 			case "test all":
 				{
-					message := Message{
-						DeviceID: "back-end",
-						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-						Type:     "instruction",
-						Contents: []map[string]interface{}{{
-							"instruction":   "test",
-							"instructed_by": raw.DeviceID},
-						},
-					}
-					jsonMessage, _ := json.Marshal(&message)
-					handler.Communicator.Publish("client-computers", string(jsonMessage), 3)
+					handler.SendInstruction("client-computers", []map[string]string{{
+						"instruction":   "test",
+						"instructed_by": raw.DeviceID,
+					}})
 				}
 			case "test device":
 				{
-					message := Message{
-						DeviceID: "back-end",
-						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-						Type:     "instruction",
-						Contents: []map[string]interface{}{{
-							"instruction":   "test",
-							"instructed_by": raw.DeviceID},
-						},
-					}
-					jsonMessage, _ := json.Marshal(&message)
-					handler.Communicator.Publish(instruction["device"].(string), string(jsonMessage), 3)
+					handler.SendInstruction(instruction["device"].(string), []map[string]string{{
+						"instruction":   "test",
+						"instructed_by": raw.DeviceID,
+					}})
 				}
 			case "finish rule":
 				{
@@ -240,31 +223,27 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 				}
 			case "check config":
 				{
-					_, errorList := config.ReadJSON([]byte(fmt.Sprintf("%v", instruction["config"])))
-					message := Message{
-						DeviceID: "back-end",
-						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-						Type:     "config",
-						Contents: map[string][]string{"errors": errorList},
-					}
-					jsonMessage, _ := json.Marshal(&message)
-					handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+					handler.ProcessConfig(instruction["config"], "check")
 				}
 			case "use config":
 				{
-					handler.Config, _ = config.ReadJSON([]byte(fmt.Sprintf("%v", instruction["config"])))
-					message := Message{
-						DeviceID: "back-end",
-						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-						Type:     "new config",
-						Contents: map[string]interface{}{},
-					}
-					jsonMessage, _ := json.Marshal(&message)
-					handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+					handler.ProcessConfig(instruction["config"], "use")
 				}
 			}
 		} else {
 			logrus.Warnf("%s, tried to instruct the back-end, only the front-end is allowed to instruct the back-end", raw.DeviceID)
 		}
 	}
+}
+
+func getBytes(key map[string]interface{}) []byte {
+	var buf bytes.Buffer
+	gob.Register(map[string]interface{}{})
+	gob.Register([]interface{}{})
+	enc := gob.NewEncoder(&buf)
+	err := enc.Encode(key)
+	if err != nil {
+		panic(err.Error())
+	}
+	return buf.Bytes()
 }
