@@ -38,20 +38,19 @@ export class AppComponent implements OnInit, OnDestroy {
   everySecond: Observable<number> = timer(0, 1000);
 
   constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
-  }
-
-  /**
-   * Initialize app, also called upon loading new config file.
-   */
-  ngOnInit(): void {
     this.jsonConvert = new JsonConvert();
     this.deviceList = new Devices();
     this.puzzleList = new Puzzles();
     this.hintList = [];
     this.configErrorList = [];
     this.cameras = [];
-
     this.timerList = new Timers();
+  }
+
+  /**
+   * Initialize app, also called upon loading new config file.
+   */
+  ngOnInit(): void {
     const generalTimer = { id: "general", duration: 0, state: "stateIdle" };
     this.timerList.setTimer(generalTimer);
 
@@ -207,7 +206,7 @@ export class AppComponent implements OnInit, OnDestroy {
   /**
    * Process instruction messages. Two types exist: reset and status update.
    */
-  public processInstruction(jsonData) {
+  private processInstruction(jsonData) {
     for (const action of jsonData) {
       switch (action.instruction) {
         case "reset": {
@@ -271,18 +270,6 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Opens snackbar with duration of 2 seconds.
-   * @param message displays this message
-   * @param action: button to display
-   */
-  public openSnackbar(message: string, action: string) {
-    const config = new MatSnackBarConfig();
-    config.duration = 3000;
-    config.panelClass = ["custom-snack-bar"];
-    this.snackBar.open(message, action, config);
-  }
-
-  /**
    * Initialize the timers to listen to every second and set their state accordingly.
    */
   private initializeTimers() {
@@ -299,5 +286,17 @@ export class AppComponent implements OnInit, OnDestroy {
         this.timerList.getTimer("general").getTimeLeft()
       );
     });
+  }
+
+  /**
+   * Opens snackbar with duration of 2 seconds.
+   * @param message displays this message
+   * @param action: button to display
+   */
+  public openSnackbar(message: string, action: string) {
+    const config = new MatSnackBarConfig();
+    config.duration = 3000;
+    config.panelClass = ["custom-snack-bar"];
+    this.snackBar.open(message, action, config);
   }
 }
