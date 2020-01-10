@@ -6,7 +6,7 @@ import requests
 from scclib.device import Device
 
 
-class Hue_lights(Device):
+class HueLights(Device):
     def __init__(self):
         two_up = os.path.abspath(os.path.join(__file__, ".."))
         rel_path = "./hue_lights_config.json"
@@ -87,7 +87,7 @@ class Hue_lights(Device):
         url = (
             self.hue_bridge + "api/" + self.hue_user + "/lights/" + comp[-1:] + "/state"
         )
-        resp = requests.put(url, data=params, headers=self.header,)
+        resp = requests.put(url, data=params, headers=self.header)
         if resp.status_code == 200:
             self.log("Template has been published.")
         else:
@@ -118,5 +118,5 @@ class Hue_lights(Device):
 
 
 if __name__ == "__main__":
-    device = Hue_lights()
+    device = HueLights()
     device.main()
