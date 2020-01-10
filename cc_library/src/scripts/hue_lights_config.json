@@ -1,7 +1,7 @@
 {
   "id": "hue_lights",
   "description": "4 spotlights",
-  "host": "localhost",
+  "host": "192.168.178.82",
   "labels": ["lamp"],
   "port": 1883,
   "input": {},
