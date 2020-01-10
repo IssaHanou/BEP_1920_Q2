@@ -37,7 +37,7 @@ func newTimer(id string, d time.Duration) *Timer {
 	t.Duration = d
 	t.Finish = false
 	t.State = "stateIdle"
-	t.Ending = func() {
+	t.Ending = func() { // TODO test
 		t.State = "stateExpired"
 		t.Finish = true
 	}
@@ -79,7 +79,7 @@ func (t *Timer) Pause() bool {
 	if t.State != "stateActive" {
 		return false
 	}
-	if !t.T.Stop() {
+	if !t.T.Stop() { //TODO test
 		t.State = "stateExpired"
 		return false
 	}
@@ -188,17 +188,17 @@ func compare(param1 interface{}, param2 interface{}, comparision string) bool {
 	switch comparision {
 	case "eq":
 		if reflect.TypeOf(param1).Kind() == reflect.Int || reflect.TypeOf(param2).Kind() == reflect.Int {
-			return NumericToFloat64(param1) == NumericToFloat64(param2)
+			return numericToFloat64(param1) == numericToFloat64(param2)
 		}
 		return reflect.DeepEqual(param1, param2)
 	case "lt":
-		return NumericToFloat64(param1) < NumericToFloat64(param2)
+		return numericToFloat64(param1) < numericToFloat64(param2)
 	case "gt":
-		return NumericToFloat64(param1) > NumericToFloat64(param2)
+		return numericToFloat64(param1) > numericToFloat64(param2)
 	case "lte":
-		return NumericToFloat64(param1) <= NumericToFloat64(param2)
+		return numericToFloat64(param1) <= numericToFloat64(param2)
 	case "gte":
-		return NumericToFloat64(param1) >= NumericToFloat64(param2)
+		return numericToFloat64(param1) >= numericToFloat64(param2)
 	case "contains":
 		return contains(param1, param2)
 	default:
@@ -207,8 +207,8 @@ func compare(param1 interface{}, param2 interface{}, comparision string) bool {
 	}
 }
 
-// NumericToFloat64 checks if numeric value is in or float64 and returns float64
-func NumericToFloat64(input interface{}) float64 {
+// numericToFloat64 checks if numeric value is in or float64 and returns float64
+func numericToFloat64(input interface{}) float64 {
 	switch input.(type) {
 	case float64:
 		return input.(float64)

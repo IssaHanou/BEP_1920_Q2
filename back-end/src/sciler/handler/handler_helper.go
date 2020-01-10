@@ -223,7 +223,7 @@ func (handler *Handler) SetTimer(timerID string, instructions config.ComponentIn
 // If action is "use" then the message must tell the config a new config is now used and put it to use
 func (handler *Handler) processConfig(configToRead interface{}, action string, fileName string) {
 	jsonBytes, err := json.Marshal(configToRead)
-	if err != nil {
+	if err != nil { //TODO test
 		logrus.Error(err)
 	}
 	newConfig, errorList := config.ReadJSON(jsonBytes)
@@ -238,7 +238,7 @@ func (handler *Handler) processConfig(configToRead interface{}, action string, f
 	}
 	if action == "use" && len(errorList) == 0 {
 		dir, dirErr := os.Getwd()
-		if dirErr != nil {
+		if dirErr != nil { //TODO test
 			logrus.Error(dirErr)
 		}
 		fullFileName := filepath.Join(dir, "back-end", "resources", fileName)

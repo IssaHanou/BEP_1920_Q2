@@ -545,6 +545,6 @@ func Test_CheckTimerID(t *testing.T) {
 }
 
 func TestNumericToFloatNonNumeric(t *testing.T) {
-	assert.Equal(t, float64(0), NumericToFloat64("0"),
+	assert.Equal(t, float64(0), numericToFloat64("0"),
 		"non input or float value should return 0")
 }
