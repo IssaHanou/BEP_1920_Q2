@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/sirupsen/logrus"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"reflect"
 	"sciler/config"
 	"time"
@@ -18,9 +21,10 @@ func (handler *Handler) SendSetup() {
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "setup",
 		Contents: map[string]interface{}{
-			"name":   handler.Config.General.Name,
-			"hints":  handler.getHints(),
-			"events": handler.getEventDescriptions(),
+			"name":    handler.Config.General.Name,
+			"hints":   handler.getHints(),
+			"events":  handler.getEventDescriptions(),
+			"cameras": handler.getCameras(),
 		},
 	}
 	jsonMessage, _ := json.Marshal(&message)
@@ -34,8 +38,21 @@ func (handler *Handler) SendSetup() {
 	handler.sendEventStatus()
 }
 
+// SendComponentInstruction sends a list of instructions to a client
+func (handler *Handler) SendComponentInstruction(clientID string, instructions []config.ComponentInstruction) {
+	message := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: instructions,
+	}
+	jsonMessage, _ := json.Marshal(&message)
+	logrus.Infof("sending instruction data to %s: %s", clientID, fmt.Sprint(message.Contents))
+	handler.Communicator.Publish(clientID, string(jsonMessage), 3)
+}
+
 // SendInstruction sends a list of instructions to a client
-func (handler *Handler) SendInstruction(clientID string, instructions []config.ComponentInstruction) {
+func (handler *Handler) SendInstruction(clientID string, instructions []map[string]string) {
 	message := Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
@@ -157,6 +174,18 @@ func (handler *Handler) getEventDescriptions() map[string]string {
 	return events
 }
 
+// getCameras returns map with camera name and camera link
+func (handler *Handler) getCameras() []map[string]string {
+	var cameras []map[string]string
+	for _, camera := range handler.Config.Cameras {
+		result := make(map[string]string)
+		result["name"] = camera.Name
+		result["link"] = camera.Link
+		cameras = append(cameras, result)
+	}
+	return cameras
+}
+
 // GetStatus asks devices to send status
 func (handler *Handler) GetStatus(deviceID string) {
 	message := Message{
@@ -187,6 +216,45 @@ func (handler *Handler) SetTimer(timerID string, instructions config.ComponentIn
 		logrus.Warnf("error occurred while reading timer instruction message: %v", instructions.Instruction)
 	}
 	handler.sendStatus(timerID)
+}
+
+// processConfig reads the config in.
+// If action is "check" then the return message must contain the possible errors
+// If action is "use" then the message must tell the config a new config is now used and put it to use
+func (handler *Handler) processConfig(configToRead interface{}, action string, fileName string) {
+	jsonBytes, err := json.Marshal(configToRead)
+	if err != nil { //TODO test
+		logrus.Error(err)
+	}
+	newConfig, errorList := config.ReadJSON(jsonBytes)
+	message := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "config",
+		Contents: map[string][]string{},
+	}
+	if action == "check" {
+		message.Contents = map[string][]string{"errors": errorList}
+	}
+	if action == "use" && len(errorList) == 0 {
+		dir, dirErr := os.Getwd()
+		if dirErr != nil { //TODO test
+			logrus.Error(dirErr)
+		}
+		fullFileName := filepath.Join(dir, "back-end", "resources", fileName)
+		err = ioutil.WriteFile(fullFileName, jsonBytes, 0644)
+		if err != nil {
+			logrus.Error(err)
+		}
+		handler.Config = newConfig
+		handler.ConfigFile = fullFileName
+		handler.sendStatus("general")
+		message.Type = "new config"
+		message.Contents = map[string]string{"name": fileName}
+
+	}
+	jsonMessage, _ := json.Marshal(&message)
+	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 }
 
 // compareType compares a reflect.Kind and a string type and returns an error if not the same

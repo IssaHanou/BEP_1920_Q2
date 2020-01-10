@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
 	"sciler/config"
 	"testing"
 	"time"
@@ -70,6 +71,10 @@ func TestInstructionSetUp(t *testing.T) {
 			"events": map[string]string{
 				"correctSequence": "De juiste volgorde van cijfers moet gedraaid worden.",
 			},
+			"cameras": []map[string]string{
+				{"link": "https://raccoon.games", "name": "camera1"},
+				{"link": "https://debrouwerij.io", "name": "camera2"},
+			},
 		},
 	})
 	statusMessageFrontEnd, _ := json.Marshal(Message{
@@ -93,13 +98,13 @@ func TestInstructionSetUp(t *testing.T) {
 			"status": false},
 		},
 	})
+	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)
 	communicatorMock.On("Publish", "front-end", string(messageEventStatus), 3)
 	communicatorMock.On("Publish", "telephone", string(statusInstructionMsg), 3)
 	communicatorMock.On("Publish", "front-end", string(statusInstructionMsg), 3)
 	communicatorMock.On("Publish", "front-end", string(statusMessageFrontEnd), 3)
 	communicatorMock.On("Publish", "front-end", string(timerGeneralMessage), 3)
 	communicatorMock.On("Publish", "front-end", string(statusMessage), 3)
-	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)
 	handler.msgMapper(instructionMsg)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 7)
 }
@@ -356,4 +361,129 @@ func TestOnInstructionMsgMapper(t *testing.T) {
 	handler.msgMapper(msg)
 	assert.Equal(t, before, handler.Config,
 		"Nothing should have been changed after an instruction message type")
+}
+
+func TestInstructionCheckConfigNoErrors(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	fileName := "../../../resources/testing/test_config.json"
+	workingConfig := config.ReadFile(fileName)
+	handler := Handler{
+		Config:       workingConfig,
+		ConfigFile:   fileName,
+		Communicator: communicatorMock,
+	}
+	jsonFile, _ := ioutil.ReadFile(fileName)
+	configToTest := make(map[string]interface{})
+	if err := json.Unmarshal(jsonFile, &configToTest); err != nil {
+		assert.FailNow(t, "cannot create instruction message")
+	}
+	instructionMsg := Message{
+		DeviceID: "front-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{
+				"instruction": "check config",
+				"config":      configToTest,
+			},
+		},
+	}
+	returnMsg := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "config",
+		Contents: map[string][]string{
+			"errors": {},
+		},
+	}
+	jsonMessage, _ := json.Marshal(&returnMsg)
+	communicatorMock.On("Publish", "front-end", string(jsonMessage), 3)
+	handler.msgMapper(instructionMsg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+}
+
+func TestInstructionCheckConfigWithErrors(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	workingConfig := config.ReadFile("../../../resources/testing/test_config.json")
+	handler := Handler{
+		Config:       workingConfig,
+		ConfigFile:   "../../../resources/testing/test_config.json",
+		Communicator: communicatorMock,
+	}
+	jsonFile, _ := ioutil.ReadFile("../../../resources/testing/test_config_errors.json")
+	configToTest := make(map[string]interface{})
+	if err := json.Unmarshal(jsonFile, &configToTest); err != nil {
+		assert.FailNow(t, "cannot create instruction message")
+	}
+	instructionMsg := Message{
+		DeviceID: "front-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{{
+			"instruction": "check config",
+			"config":      configToTest},
+		},
+	}
+	returnMsg := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "config",
+		Contents: map[string][]string{
+			"errors": {
+				"time: unknown unit x in duration 10x",
+				"time: missing unit in duration 30",
+			},
+		},
+	}
+	jsonMessage, _ := json.Marshal(&returnMsg)
+	communicatorMock.On("Publish", "front-end", string(jsonMessage), 3)
+	handler.msgMapper(instructionMsg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+}
+
+func TestInstructionUseConfig(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	fileName := "../../../resources/testing/test_config.json"
+	workingConfig := config.ReadFile(fileName)
+	handler := Handler{
+		Config:       workingConfig,
+		ConfigFile:   fileName,
+		Communicator: communicatorMock,
+	}
+	jsonFile, _ := ioutil.ReadFile(fileName)
+	configToTest := make(map[string]interface{})
+	if err := json.Unmarshal(jsonFile, &configToTest); err != nil {
+		assert.FailNow(t, "cannot create instruction message")
+	}
+	instructionMsg := Message{
+		DeviceID: "front-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{{
+			"instruction": "use config",
+			"config":      configToTest,
+			"file":        "new_file.json"},
+		},
+	}
+	returnMsg := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "new config",
+		Contents: map[string]interface{}{"name": "new_file.json"},
+	}
+	timerGeneralMessage, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "time",
+		Contents: map[string]interface{}{
+			"state":    "stateIdle",
+			"duration": 1800000,
+			"id":       "general",
+		},
+	})
+	jsonMessage, _ := json.Marshal(&returnMsg)
+	communicatorMock.On("Publish", "front-end", string(timerGeneralMessage), 3)
+	communicatorMock.On("Publish", "front-end", string(jsonMessage), 3)
+	handler.msgMapper(instructionMsg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
 }

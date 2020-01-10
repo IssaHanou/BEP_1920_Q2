@@ -1,7 +1,7 @@
 {
   "general": {
     "name": "Escape X",
-    "duration": "00:30:00",
+    "duration": "30m",
     "host": "localhost",
     "port": 1883
   },
@@ -313,6 +313,14 @@
                       "value": true
                     }
                   ]
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "flipSwitch",
+                "constraints": {
+                  "comparison": "eq",
+                  "value": 1
                 }
               }
             ]

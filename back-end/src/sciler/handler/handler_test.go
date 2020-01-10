@@ -135,7 +135,7 @@ func TestSendInstruction(t *testing.T) {
 		Contents: inst,
 	})
 	communicatorMock.On("Publish", "display", string(msg), 3)
-	handler.SendInstruction("display", inst)
+	handler.SendComponentInstruction("display", inst)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
 }
 
@@ -525,19 +525,7 @@ func TestInstructionFromWrongDevice(t *testing.T) {
 			},
 		},
 	}
-	responseMessage := Message{
-		DeviceID: "back-end",
-		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "instruction",
-		Contents: []map[string]interface{}{
-			{
-				"instruction":   "hint",
-				"value":         "some useful hint",
-				"instructed_by": "front-end",
-			},
-		},
-	}
-	jsonHintMessage, _ := json.Marshal(&responseMessage)
+	jsonHintMessage, _ := json.Marshal(&instructionMsg)
 	communicatorMock.On("Publish", "hint", string(jsonHintMessage), 3)
 	handler.msgMapper(instructionMsg)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 0)
