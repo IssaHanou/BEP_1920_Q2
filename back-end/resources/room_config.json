@@ -64,7 +64,7 @@
       }
     },
     {
-      "id": "display",
+      "id": "display-angular",
       "description": "displays messages",
       "input": {},
       "output": {
@@ -183,7 +183,7 @@
             },
             {
               "type": "device",
-              "type_id": "display",
+              "type_id": "display-angular",
               "message": [
                 {
                   "component_id": "hint",
@@ -262,7 +262,7 @@
             },
             {
               "type": "device",
-              "type_id": "display",
+              "type_id": "display-angular",
               "message": [
                 {
                   "component_id": "hint",
@@ -344,7 +344,7 @@
             },
             {
               "type": "device",
-              "type_id": "display",
+              "type_id": "display-angular",
               "message": [
                 {
                   "component_id": "hint",
@@ -460,7 +460,7 @@
           "actions": [
             {
               "type": "device",
-              "type_id": "display",
+              "type_id": "display-angular",
               "message": [
                 {
                   "component_id": "hint",
@@ -491,7 +491,7 @@
           "actions": [
             {
               "type": "device",
-              "type_id": "display",
+              "type_id": "display-angular",
               "message": [
                 {
                   "component_id": "hint",
@@ -579,7 +579,7 @@
           "actions": [
             {
               "type": "device",
-              "type_id": "display",
+              "type_id": "display-angular",
               "message": [
                 {
                   "component_id": "hint",

@@ -1,5 +1,8 @@
 const Paho = require("paho-mqtt");
 
+/**
+ * Message is a class containing all info required by the message_manual.md
+ */
 class Message {
   constructor(device_id, type, contents) {
     this.device_id = device_id;
@@ -9,8 +12,93 @@ class Message {
   }
 }
 
+/**
+ * Abstract device class from which all custom devices should inherit.
+ * Defines all required methods needer for communication to S.C.I.L.E.R.
+ * @Abstract
+ */
+class Device {
+  constructor(config, logger) {
+    this.scclib = new SccLib(config, this, logger);
+
+    // make sure abstract class Device cannot be instantiated directly
+    if (this.constructor === Device) {
+      throw new TypeError(
+        "abstract class Device cannot be instantiated directly"
+      );
+    }
+
+    // make sure abstract method getStatus is implemented when extending from Device
+    if (typeof this.getStatus != "function") {
+      throw new TypeError("abstract method 'getStatus' not implemented");
+    }
+    // make sure abstract method performInstruction is implemented when extending from Device
+    if (typeof this.performInstruction != "function") {
+      throw new TypeError(
+        "abstract method 'performInstruction' not implemented"
+      );
+    }
+    // make sure abstract method test is implemented when extending from Device
+    if (typeof this.test != "function") {
+      throw new TypeError("abstract method 'test' not implemented");
+    }
+    // make sure abstract method reset is implemented when extending from Device
+    if (typeof this.reset != "function") {
+      throw new TypeError("abstract method 'reset' not implemented");
+    }
+  }
+
+  /**
+   * statusChanged should be called whenever the status of a device changes
+   */
+  statusChanged() {
+    this.scclib.statusChanged();
+  }
+
+  /**
+   * log can be used to log in the same logger as this library
+   * @param level one of the following strings: 'debug', 'info', 'warn', 'error', 'fatal'
+   * @param message custom string containing more information
+   */
+  log(level, message) {
+    this.scclib.log(level, message);
+  }
+
+  /**
+   * start starts the device
+   */
+  start() {
+    this.scclib.connect();
+  }
+}
+
+/**
+ * Class SccLib sets up the connection and the right handler
+ */
 class SccLib {
   constructor(config, device, logger) {
+    // type check config
+    const configProperties = ["id", "description", "host", "port", "labels"];
+    for (let configProperty of configProperties) {
+      if (!config.hasOwnProperty(configProperty)) {
+        throw new TypeError(
+            config + " should have a property: " + configProperty
+        );
+      }
+    }
+
+    // type check device
+    if (device.prototype instanceof Device) {
+      throw new TypeError(device + " should be of type Device");
+    }
+
+    // type check logger
+    if (typeof logger !== "function") {
+      throw new TypeError(
+        logger + " should be of type function(date, level, message)"
+      );
+    }
+
     this.device = device;
     this.name = config.id;
     this.info = config.description;
@@ -131,8 +219,11 @@ class SccLib {
     });
   }
 
-  status_changed() {
-    // this._sendMessage("back-end", new Message(this.name, "status", this.device.getStatus()));
+  statusChanged() {
+    this._sendMessage(
+      "back-end",
+      new Message(this.name, "status", this.device.getStatus())
+    );
   }
 }
 
@@ -152,4 +243,5 @@ const formatDate = function(date) {
     date.getSeconds()
   );
 };
-module.exports = SccLib;
+
+module.exports = Device;
