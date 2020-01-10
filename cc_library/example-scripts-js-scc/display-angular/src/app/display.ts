@@ -34,7 +34,17 @@ export class Display extends Device {
     }
   }
 
-  performInstruction() {
+  performInstruction(action) {
+    switch (action.instruction) {
+      case "hint": {
+        this.hint = action.value;
+        this.statusChanged();
+        break;
+      }
+      default: {
+        return false;
+      }
+    }
     return true;
   }
 

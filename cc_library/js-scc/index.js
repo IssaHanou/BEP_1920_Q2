@@ -131,8 +131,8 @@ class SccLib {
      */
     this._onConnect = function() {
       // subscripe to all labels and standard topics
-      for (let label in this.labels) {
-        this.client.subscribe(label);
+      for(let i = 0; i < this.labels.length; i++) {
+        this.client.subscribe(this.labels[i]);
       }
       this.client.subscribe("client-computers");
       this.client.subscribe(this.name);

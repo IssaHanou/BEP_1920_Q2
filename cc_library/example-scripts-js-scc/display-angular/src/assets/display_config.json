@@ -9,8 +9,7 @@
     "display": {
       "type": "string",
       "instructions": {
-        "hint": "string",
-        "text": "string"
+        "hint": "string"
       }
     }
   }
