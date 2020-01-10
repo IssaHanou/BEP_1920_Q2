@@ -7,7 +7,8 @@ import {
   MatFormFieldModule,
   MatSelectModule,
   MatSnackBar,
-  MatSnackBarModule
+  MatSnackBarModule,
+  MatExpansionModule
 } from "@angular/material";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { AppComponent } from "../app.component";
@@ -24,6 +25,7 @@ describe("CameraComponent", () => {
         MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
         MatFormFieldModule,
         MatSelectModule,
+        MatExpansionModule,
         MatSnackBarModule,
         BrowserAnimationsModule,
         ReactiveFormsModule

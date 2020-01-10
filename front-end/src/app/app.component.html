@@ -3,19 +3,16 @@
     <button mat-icon-button (click)="nav.toggle()"><mat-icon aria-label="menu">menu</mat-icon></button>
     <div class="home-header">
       <div class="title-box">
-        <p class="title">{{ title }}</p>
-      </div>
-      <div class="subtitle-box">
-        <p class="subtitle">{{ nameOfRoom }}</p>
+        <p class="title"> {{ title }} : {{ nameOfRoom }} </p>
       </div>
     </div>
   </mat-toolbar>
   <mat-sidenav-container>
     <mat-sidenav #nav mode="over" class="menu">
       <mat-nav-list class="menu-list">
-        <a mat-list-item class="nav-item" routerLink="/" (click)="nav.toggle()"><mat-icon>home</mat-icon> Operator overzicht</a>
-        <a mat-list-item class="nav-item" routerLink="/camera" (click)="nav.toggle()"><mat-icon>videocam</mat-icon> Camera overzicht</a>
-        <a mat-list-item class="nav-item" routerLink="/config" (click)="nav.toggle()"><mat-icon>build</mat-icon> Configuratie</a>
+        <a mat-list-item class="nav-item" routerLink="/" (click)="nav.toggle()"><mat-icon>home</mat-icon> Operator overzicht </a>
+        <a mat-list-item class="nav-item" routerLink="/camera" (click)="nav.toggle()"><mat-icon>videocam</mat-icon> Camera overzicht </a>
+        <a mat-list-item class="nav-item" routerLink="/config" (click)="nav.toggle()"><mat-icon>build</mat-icon> Configuratie </a>
       </mat-nav-list>
     </mat-sidenav>
     <mat-sidenav-content class="main-content">

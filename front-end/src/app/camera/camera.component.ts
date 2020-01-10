@@ -2,7 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { AppComponent } from "../app.component";
 import { Camera } from "./camera";
 import { DomSanitizer } from "@angular/platform-browser";
-import {FormControl} from "@angular/forms";
+import { FormControl } from "@angular/forms";
 
 @Component({
   selector: "app-camera",

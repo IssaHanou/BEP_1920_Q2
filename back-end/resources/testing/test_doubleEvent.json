@@ -97,7 +97,7 @@
       "rules": [
         {
           "id": "mainSwitch flipped",
-          "description": "Als de mainSwitch true is, gebeurd er nix",
+          "description": "Als de mainSwitch true is, gebeurt er niks",
           "limit": 1,
           "conditions": {
             "operator": "OR",
@@ -126,7 +126,7 @@
       "name": "eventB",
       "rules": [
         {
-          "id": "",
+          "id": "weldoen",
           "description": "Als rule 'mainSwitch flipped' is gedaan, dan moet greenLight1 aangaan",
           "limit": 1,
           "conditions": {

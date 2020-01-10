@@ -11,11 +11,17 @@ import { TimerComponent } from "./components/timer/timer.component";
 import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import { Overlay } from "@angular/cdk/overlay";
 import {
-  MatFormFieldModule, MatIconModule,
+  MatFormFieldModule,
+  MatIconModule,
   MatInputModule,
   MatSidenavModule,
-  MatSortModule, MatSelectModule,
-  MatTableModule, MatToolbarModule, MatListModule, MatButtonModule
+  MatTableModule,
+  MatToolbarModule,
+  MatListModule,
+  MatButtonModule,
+  MatSelectModule,
+  MatExpansionModule,
+  MatSortModule
 } from "@angular/material";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { BrowserModule } from "@angular/platform-browser";
@@ -37,12 +43,14 @@ describe("AppComponent", () => {
         MatTableModule,
         MatButtonModule,
         MatFormFieldModule,
+        MatSelectModule,
         MatInputModule,
         MatSortModule,
         MatSidenavModule,
         MatToolbarModule,
         MatIconModule,
         MatSelectModule,
+        MatExpansionModule,
         MatListModule,
         CdkTableModule,
         RouterModule.forRoot(APP_ROUTES),
@@ -69,31 +77,16 @@ describe("AppComponent", () => {
     expect(app).toBeTruthy();
   });
 
-  it("should have as title 'S.C.I.L.E.R'", () => {
+  it("should have as title 'SCILER'", () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual("S.C.I.L.E.R :");
-  });
-
-  it(`should have as subtitle 'Super awesome escape'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app.nameOfRoom).toEqual("Super awesome escape");
+    expect(app.title).toEqual("SCILER");
   });
 
   it("should render title", () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelectorAll("p").item(0).textContent).toContain("S.C.I.L.E.R :");
-  });
-
-  it("should render subtitle", () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelectorAll("p").item(1).textContent).toContain(
-      "Super awesome escape"
-    );
+    expect(compiled.querySelectorAll("p").item(0).textContent).toContain("SCILER");
   });
 });

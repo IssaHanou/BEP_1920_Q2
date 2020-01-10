@@ -1,0 +1,53 @@
+{
+  "general": {
+    "name": "Escape X",
+    "duration": "1m",
+    "host": "localhost",
+    "port": 1883
+  },
+  "timers": [
+    {
+      "id": "timer1",
+      "duration": "10s"
+    }
+  ],
+  "devices": [
+    {
+      "id": "display",
+      "description": "Laat hint zien",
+      "input": {
+        "display": "string"
+      },
+      "output": {
+        "display": {
+          "type": "string",
+          "instructions": {
+            "hint": "string"
+          }
+        }
+      }
+    }
+  ],
+  "puzzles": [
+    {
+      "name": "Puzzle",
+      "rules": [
+        {
+          "id": "rule",
+          "description": "My rule",
+          "limit": 0,
+          "conditions": {
+            "type": "device",
+            "type_id": "display",
+            "constraints": {
+              "component_id": "display",
+              "value": "test",
+              "comparison": "eq"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "general_events": []
+}

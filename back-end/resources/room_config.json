@@ -7,7 +7,8 @@
   },
    "cameras": [
      {"name": "camera1", "link": "https://raccoon.games"},
-     {"name": "camera2", "link": "https://debrouwerij.io"}
+     {"name": "camera2", "link": "https://debrouwerij.io"},
+     {"name": "muppets", "link": "https://www.youtube.com/embed/tgbNymZ7vqY"}
   ],
   "devices": [
     {
@@ -279,7 +280,9 @@
         }
       ],
       "hints": [
-        "Zet de schuiven nauwkeurig"
+        "Zet de schuiven nauwkeurig",
+        "Probeer het nog eens",
+        "dat kan sneller"
       ]
     },
     {
@@ -361,7 +364,8 @@
         }
       ],
       "hints": [
-        "Zet de schuiven nauwkeurig"
+        "Zet de schuiven nauwkeurig",
+        "Dit is dus echt best wel een superlange hint die je helemaal moet kunnen lezen"
       ]
     }
   ],
@@ -663,6 +667,15 @@
             ]
           },
           "actions": [
+            {
+              "type": "timer",
+              "type_id": "general",
+              "message": [
+                {
+                  "instruction": "pause"
+                }
+              ]
+            },
             {
               "type": "device",
               "type_id": "controlBoard",

@@ -1,26 +1,23 @@
 /**Size of iframe**/
+.feed-box {
+  height: 70vh;
+}
 .camera-feed {
-  width: 100%;
   height: 100%;
+  width: 100%;
 }
-
-@media only screen and (min-height: 600px) {
-  .camera-feed {
-    height: 500px;
+@media only screen and (max-height: 500px) {
+  .feed-box {
+    height: 50vh;
   }
 }
 
-/**Camera title box styling, adjacency**/
-.camera-title, .camera-form {
-  display: inline-block;
-  margin: 10px;
+/**Camera title styling**/
+.camera-title {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  color: #3f51b5;
 }
 
-@media only screen and (max-width: 550px) {
-  .camera-title, .camera-form {
-    display: block;
-  }
-}
 
 /**Width of drop down**/
 .mat-form-field {

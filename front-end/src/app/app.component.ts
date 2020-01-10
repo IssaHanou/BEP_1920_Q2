@@ -3,11 +3,13 @@ import { IMqttMessage, MqttService } from "ngx-mqtt";
 import { Message } from "./message";
 import { JsonConvert } from "json2typescript";
 import { MatSnackBar, MatSnackBarConfig } from "@angular/material";
-import { Subscription } from "rxjs";
+import { Observable, Subscription, timer } from "rxjs";
 import { Devices } from "./components/device/devices";
+import { Puzzles } from "./components/puzzle/puzzles";
 import { Timers } from "./components/timer/timers";
 import { Camera } from "./camera/camera";
-import {CameraComponent} from "./camera/camera.component";
+import { Hint } from "./components/hint/hint";
+import { formatMS } from "./components/timer/timer";
 
 @Component({
   selector: "app-root",
@@ -16,16 +18,24 @@ import {CameraComponent} from "./camera/camera.component";
   encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = "S.C.I.L.E.R :";
+  // Variables for the home screen
+  title = "SCILER";
   nameOfRoom = "Super awesome escape";
+
+  // Necessary tools
   jsonConvert: JsonConvert;
   subscription: Subscription;
-  topics = ["front-end"];
+
+  // Keeping track of data
   deviceList: Devices;
-  timerList: Timers;
+  puzzleList: Puzzles;
+  hintList: Hint[];
+  configErrorList: string[];
   cameras: Camera[];
   selectedCamera: string;
-  configErrorList: string[];
+  timerList: Timers;
+  displayTime: string;
+  everySecond: Observable<number> = timer(0, 1000);
 
   constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
   }
@@ -36,18 +46,23 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.jsonConvert = new JsonConvert();
     this.deviceList = new Devices();
-    this.timerList = new Timers();
-    this.cameras = [];
+    this.puzzleList = new Puzzles();
+    this.hintList = [];
     this.configErrorList = [];
-    const generaltimer = { id: "general", duration: 0, state: "stateIdle" };
-    this.timerList.setTimer(generaltimer);
+    this.cameras = [];
 
-    for (const topic of this.topics) {
+    this.timerList = new Timers();
+    const generalTimer = { id: "general", duration: 0, state: "stateIdle" };
+    this.timerList.setTimer(generalTimer);
+
+    const topics = ["front-end"];
+    for (const topic of topics) {
       this.subscribeNewTopic(topic);
     }
-    this.sendInstruction([{ instruction: "send status" }]);
-    this.sendInstruction([{ instruction: "cameras" }]);
+
+    this.sendInstruction([{ instruction: "send setup" }]);
     this.sendConnection(true);
+    this.initializeTimers();
   }
 
   /**
@@ -62,7 +77,7 @@ export class AppComponent implements OnInit, OnDestroy {
   /**
    * Subscribe to topics.
    */
-  public subscribeNewTopic(topic: string): void {
+  private subscribeNewTopic(topic: string): void {
     this.subscription = this.mqttService
       .observe(topic)
       .subscribe((message: IMqttMessage) => {
@@ -133,7 +148,7 @@ export class AppComponent implements OnInit, OnDestroy {
    * Process incoming message.
    * @param jsonMessage json message.
    */
-  public processMessage(jsonMessage: string) {
+  private processMessage(jsonMessage: string) {
     const msg: Message = Message.deserialize(jsonMessage);
     switch (msg.type) {
       case "confirmation": {
@@ -141,21 +156,23 @@ export class AppComponent implements OnInit, OnDestroy {
         break;
       }
       case "instruction": {
-        this.processInstruction(msg);
+        this.processInstruction(msg.contents);
         break;
       }
       case "status": {
         this.deviceList.setDevice(msg.contents);
         break;
       }
+      case "event status": {
+        this.puzzleList.updatePuzzles(msg.contents);
+        break;
+      }
       case "time": {
         this.timerList.setTimer(msg.contents);
         break;
       }
-      case "cameras": {
-        for (const obj of msg.contents) {
-          this.cameras.push(new Camera(obj));
-        }
+      case "setup": {
+        this.processSetUp(msg.contents);
         break;
       }
       case "config": {
@@ -176,14 +193,13 @@ export class AppComponent implements OnInit, OnDestroy {
    * When the front-end receives confirmation message from client computer
    * that instruction was completed, show the message to the user.
    */
-  public processConfirmation(jsonData) {
-    const keys = ["instructed", "contents", "instruction"];
-    for (const instruction of jsonData.contents[keys[0]][keys[1]]) {
+  private processConfirmation(jsonData) {
+    for (const instruction of jsonData.contents.instructed.contents) {
       const display =
         "received confirmation from " +
         jsonData.deviceId +
         " for instruction: " +
-        instruction[keys[2]];
+        instruction.instruction;
       this.openSnackbar(display, "");
     }
   }
@@ -194,8 +210,7 @@ export class AppComponent implements OnInit, OnDestroy {
   public processInstruction(jsonData) {
     for (const action of jsonData) {
       switch (action.instruction) {
-        case "reset":
-        {
+        case "reset": {
           this.deviceList.setDevice({
             id: "front-end",
             connection: true,
@@ -208,7 +223,49 @@ export class AppComponent implements OnInit, OnDestroy {
           break;
         case "status update": {
           this.sendConnection(true);
+          break;
         }
+        case "test": {
+          this.openSnackbar("performing instruction test", "");
+          break;
+        }
+      }
+    }
+  }
+
+  /**
+   * The setup contains the name of the room, the map with hints per puzzle and the rule descriptions.
+   * @param jsonData with name, hints, events
+   */
+  private processSetUp(jsonData) {
+    this.nameOfRoom = jsonData.name;
+
+    const cameraData = jsonData.cameras;
+    this.cameras = [];
+    if (cameraData !== null) {
+      for (const cam of cameraData) {
+        this.cameras.push(new Camera(cam));
+      }
+    }
+
+    const rules = jsonData.events;
+    for (const rule in rules) {
+      if (rules.hasOwnProperty(rule)) {
+        this.puzzleList.addPuzzle(rule, rules[rule]);
+      }
+    }
+
+    const allHints = jsonData.hints;
+    this.hintList = [];
+    for (const puzzle in allHints) {
+      if (allHints.hasOwnProperty(puzzle)) {
+        const hints = [];
+        for (const index in allHints[puzzle]) {
+          if (allHints[puzzle].hasOwnProperty(index)) {
+            hints.push(allHints[puzzle][index]);
+          }
+        }
+        this.hintList.push(new Hint(puzzle, hints));
       }
     }
   }
@@ -223,5 +280,24 @@ export class AppComponent implements OnInit, OnDestroy {
     config.duration = 3000;
     config.panelClass = ["custom-snack-bar"];
     this.snackBar.open(message, action, config);
+  }
+
+  /**
+   * Initialize the timers to listen to every second and set their state accordingly.
+   */
+  private initializeTimers() {
+    this.subscription = this.everySecond.subscribe(seconds => {
+      for (const aTimer of this.timerList.getAll().values()) {
+        if (aTimer.state === "stateActive") {
+          aTimer.tick();
+        }
+        if (aTimer.duration <= 0) {
+          aTimer.state = "stateIdle";
+        }
+      }
+      this.displayTime = formatMS(
+        this.timerList.getTimer("general").getTimeLeft()
+      );
+    });
   }
 }

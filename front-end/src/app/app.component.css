@@ -2,36 +2,32 @@
 .home-header {
   margin: 0 auto;
 }
-.subtitle, .title {
+.title {
   font-family: Roboto, "Helvetica Neue", sans-serif;
   color: #EEEEEE;
   font-weight: bold;
   text-align: center;
+  white-space: normal;
 }
-.title-box, .subtitle-box {
+.title-box {
   display: inline-block;
   margin: 0px 10px 0px 10px;
 }
 
-@media only screen and (max-width: 400px) {
-  .subtitle, .title {
-    font-size: 14px;
-  }
-}
-@media only screen and (min-width: 400px) and(max-width: 550px) {
-  .subtitle, .title {
+@media only screen and (max-width: 550px) {
+  .title {
     font-size: 18px;
   }
 }
 
 @media only screen and (min-width: 550px) and (max-width: 750px) {
-  .subtitle, .title {
+  .title {
     font-size: 24px;
   }
 }
 
 @media only screen and (min-width: 750px) {
-  .subtitle, .title {
+  .title {
     font-size: 36px;
   }
 }

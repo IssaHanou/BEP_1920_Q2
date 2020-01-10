@@ -1,0 +1,18 @@
+.rule-id {
+  white-space: nowrap;
+  min-width: 20%;
+}
+.rule-status {
+  width: 70px;
+}
+
+@media only screen and (max-width: 470px) {
+  .rule-description {
+    display: none;
+  }
+}
+@media only screen and (min-width: 650px) and (max-width: 765px) {
+  .rule-description {
+    display: none;
+  }
+}

@@ -27,7 +27,8 @@ import {
   MatToolbarModule,
   MatSidenavModule,
   MatListModule,
-  MatSelectModule
+  MatSelectModule,
+  MatExpansionModule
 } from "@angular/material";
 import { CdkTableModule } from "@angular/cdk/table";
 import { JsonConvert } from "json2typescript";
@@ -40,7 +41,6 @@ import { ConfigComponent } from "./config/config.component";
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   hostname: "192.168.178.82",
   port: 8083,
-  clientId: "front-end",
   will: {
     topic: "back-end",
     payload: JSON.stringify(
@@ -102,10 +102,11 @@ export const APP_ROUTES: Routes = [
     MatToolbarModule,
     MatIconModule,
     MatSelectModule,
+    MatExpansionModule,
     MatListModule,
-    CdkTableModule,
     RouterModule.forRoot(APP_ROUTES),
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    CdkTableModule
   ],
   providers: [
     MqttService,

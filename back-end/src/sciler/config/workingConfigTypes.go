@@ -119,6 +119,11 @@ type InstructionSender interface {
 	HandleEvent(string)
 }
 
+// Finished is a method that checks is the a rule have been finished, meaning if it reached its maximum number of executions
+func (r *Rule) Finished() bool {
+	return r.Executed == r.Limit
+}
+
 // Execute performs all actions of a rule
 // TODO test this
 func (r *Rule) Execute(handler InstructionSender) {
