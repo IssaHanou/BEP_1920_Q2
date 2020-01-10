@@ -211,8 +211,8 @@ class SccLib:
         message = message.payload.decode("utf-8")
         message = json.loads(message)
         if message.get("type") != "instruction":
-            logging.info(
-                ("received non-instruction message of type", message.get("type"))
+            logging.warning(
+                ("received non-instruction message of type: ", message.get("type"))
             )
         else:
             success = self.__check_message(message.get("contents"))

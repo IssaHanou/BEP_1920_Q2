@@ -82,7 +82,7 @@ class SccLib {
     for (let configProperty of configProperties) {
       if (!config.hasOwnProperty(configProperty)) {
         throw new TypeError(
-            config + " should have a property: " + configProperty
+          config + " should have a property: " + configProperty
         );
       }
     }
@@ -173,7 +173,52 @@ class SccLib {
           ",\n message: " +
           message.payloadString
       );
+      this._handle(message.payloadString);
     };
+  }
+
+  _handle(payloadString) {
+    const message = JSON.parse(payloadString);
+    if (message.type !== "instruction") {
+      this.log(
+        "warn",
+        "received non-instruction message of type: " + message.type
+      );
+    } else {
+      const success = this._checkMessage(message.contents);
+    }
+  }
+
+  _checkMessage(contents) {
+    for (let i = 0; i < contents.length; i++) {
+      const action = contents[i];
+
+      const instruction = action.instruction;
+      switch (instruction) {
+        case "test": {
+          this.device.test();
+          this.log("info", "instruction performed " + instruction);
+          break;
+        }
+        case "status update": {
+          const message = new Message(this.name, "connection", {
+            connection: true
+          });
+          this._sendMessage("back-end", message);
+          this.statusChanged();
+          this.log("info", "instruction performed " + instruction);
+          break;
+        }
+        case "reset": {
+          this.device.reset();
+          this.log("info", "instruction performed " + instruction);
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    }
   }
 
   /**
@@ -196,14 +241,11 @@ class SccLib {
    */
   connect() {
     let will = new Paho.Message(
-      JSON.stringify({
-        topic: "back-end",
-        payloadString: JSON.stringify(
-          new Message(this.name, "connection", {
-            connection: false
-          })
-        )
-      })
+      JSON.stringify(
+        new Message(this.name, "connection", {
+          connection: false
+        })
+      )
     );
     will.destinationName = "back-end";
     this.client.connect({

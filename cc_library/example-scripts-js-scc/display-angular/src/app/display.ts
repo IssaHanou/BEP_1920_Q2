@@ -40,7 +40,6 @@ export class Display extends Device {
 
   test() {
     this.hint = "test";
-    this.log("info", "test");
   }
 
   reset() {
