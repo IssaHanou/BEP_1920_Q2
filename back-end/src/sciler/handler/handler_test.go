@@ -135,7 +135,7 @@ func TestSendInstruction(t *testing.T) {
 		Contents: inst,
 	})
 	communicatorMock.On("Publish", "display", string(msg), 3)
-	handler.SendInstruction("display", inst)
+	handler.SendComponentInstruction("display", inst)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
 }
 

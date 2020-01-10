@@ -7,6 +7,7 @@ import { Observable, Subscription, timer } from "rxjs";
 import { Devices } from "./components/device/devices";
 import { Puzzles } from "./components/puzzle/puzzles";
 import { Timers } from "./components/timer/timers";
+import { Logger } from "./logger";
 import { Camera } from "./camera/camera";
 import { Hint } from "./components/hint/hint";
 import { formatMS } from "./components/timer/timer";
@@ -24,12 +25,14 @@ export class AppComponent implements OnInit, OnDestroy {
 
   // Necessary tools
   jsonConvert: JsonConvert;
+  logger: Logger;
   subscription: Subscription;
 
   // Keeping track of data
   deviceList: Devices;
   puzzleList: Puzzles;
   hintList: Hint[];
+  configErrorList: string[];
   cameras: Camera[];
   selectedCamera: string;
   timerList: Timers;
@@ -37,21 +40,28 @@ export class AppComponent implements OnInit, OnDestroy {
   everySecond: Observable<number> = timer(0, 1000);
 
   constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
+    this.logger = new Logger();
     this.jsonConvert = new JsonConvert();
     this.deviceList = new Devices();
     this.puzzleList = new Puzzles();
-    this.cameras = [];
     this.hintList = [];
-    this.timerList = new Timers();
-    const generalTimer = { id: "general", duration: 0, state: "stateIdle" };
-    this.timerList.setTimer(generalTimer);
-  }
+    this.configErrorList = [];
+    this.cameras = [];
 
-  ngOnInit(): void {
     const topics = ["front-end"];
     for (const topic of topics) {
       this.subscribeNewTopic(topic);
     }
+  }
+
+  /**
+   * Initialize app, also called upon loading new config file.
+   */
+  ngOnInit(): void {
+    this.timerList = new Timers();
+    const generalTimer = { id: "general", duration: 0, state: "stateIdle" };
+    this.timerList.setTimer(generalTimer);
+
     this.sendInstruction([{ instruction: "send setup" }]);
     this.sendConnection(true);
     this.initializeTimers();
@@ -73,15 +83,15 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subscription = this.mqttService
       .observe(topic)
       .subscribe((message: IMqttMessage) => {
-        console.log(
-          "log: received on topic " +
+        this.logger.log("info",
+          "received on topic " +
             message.topic +
             ", message: " +
             message.payload.toString()
         );
         this.processMessage(message.payload.toString());
       });
-    console.log("log: subscribed to topic: " + topic);
+    this.logger.log("info", "subscribed to topic: " + topic);
   }
 
   /**
@@ -95,10 +105,16 @@ export class AppComponent implements OnInit, OnDestroy {
       new Date(),
       instruction
     );
-    const jsonMessage: string = this.jsonConvert.serialize(msg);
-    this.mqttService.unsafePublish("back-end", JSON.stringify(jsonMessage));
-    console.log(
-      "log: sent instruction message: " + JSON.stringify(jsonMessage)
+    let jsonMessage: string = JSON.stringify(this.jsonConvert.serialize(msg));
+    this.mqttService.unsafePublish("back-end", jsonMessage);
+    for (const inst of instruction) {
+      if ("config" in inst) {
+        msg.contents = {config: "contents to long to print"};
+        jsonMessage = JSON.stringify(this.jsonConvert.serialize(msg));
+      }
+    }
+    this.logger.log("info",
+      "sent instruction message: " + jsonMessage
     );
   }
 
@@ -114,7 +130,7 @@ export class AppComponent implements OnInit, OnDestroy {
     });
     const jsonMessage: string = this.jsonConvert.serialize(msg);
     this.mqttService.unsafePublish("back-end", JSON.stringify(jsonMessage));
-    console.log("log: sent status message: " + JSON.stringify(jsonMessage));
+    this.logger.log("info", "sent status message: " + JSON.stringify(jsonMessage));
   }
 
   /**
@@ -127,7 +143,7 @@ export class AppComponent implements OnInit, OnDestroy {
     });
     const jsonMessage: string = this.jsonConvert.serialize(msg);
     this.mqttService.unsafePublish("back-end", JSON.stringify(jsonMessage));
-    console.log("log: sent connection message: " + JSON.stringify(jsonMessage));
+    this.logger.log("info", "sent connection message: " + JSON.stringify(jsonMessage));
   }
 
   /**
@@ -136,14 +152,13 @@ export class AppComponent implements OnInit, OnDestroy {
    */
   private processMessage(jsonMessage: string) {
     const msg: Message = Message.deserialize(jsonMessage);
-
     switch (msg.type) {
       case "confirmation": {
-        this.confirmationHandler(msg);
+        this.processConfirmation(msg);
         break;
       }
       case "instruction": {
-        this.instructionHandler(msg.contents);
+        this.processInstruction(msg.contents);
         break;
       }
       case "status": {
@@ -162,8 +177,18 @@ export class AppComponent implements OnInit, OnDestroy {
         this.processSetUp(msg.contents);
         break;
       }
+      case "config": {
+        this.configErrorList = msg.contents.errors;
+        break;
+      }
+      case "new config": {
+        this.stopTimers();
+        this.ngOnInit();
+        this.openSnackbar("using new config: " + msg.contents.name, "");
+        break;
+      }
       default:
-        console.log("log: received invalid message type " + msg.type);
+        this.logger.log("error", "received invalid message type " + msg.type);
         break;
     }
   }
@@ -172,7 +197,7 @@ export class AppComponent implements OnInit, OnDestroy {
    * When the front-end receives confirmation message from client computer
    * that instruction was completed, show the message to the user.
    */
-  private confirmationHandler(jsonData) {
+  private processConfirmation(jsonData) {
     for (const instruction of jsonData.contents.instructed.contents) {
       const display =
         "received confirmation from " +
@@ -184,14 +209,12 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Handles the different instructions for front-end: reset, test, status update.
-   * @param jsonData containing instructions
+   * Process instruction messages. Two types exist: reset and status update.
    */
-  private instructionHandler(jsonData) {
+  private processInstruction(jsonData) {
     for (const action of jsonData) {
       switch (action.instruction) {
-        case "reset":
-        {
+        case "reset": {
           this.deviceList.setDevice({
             id: "front-end",
             connection: true,
@@ -230,6 +253,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     const rules = jsonData.events;
+    this.puzzleList = new Puzzles();
     for (const rule in rules) {
       if (rules.hasOwnProperty(rule)) {
         this.puzzleList.addPuzzle(rule, rules[rule]);
@@ -252,18 +276,6 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Opens snackbar with duration of 2 seconds.
-   * @param message displays this message
-   * @param action: button to display
-   */
-  public openSnackbar(message: string, action: string) {
-    const config = new MatSnackBarConfig();
-    config.duration = 3000;
-    config.panelClass = ["custom-snack-bar"];
-    this.snackBar.open(message, action, config);
-  }
-
-  /**
    * Initialize the timers to listen to every second and set their state accordingly.
    */
   private initializeTimers() {
@@ -280,5 +292,25 @@ export class AppComponent implements OnInit, OnDestroy {
         this.timerList.getTimer("general").getTimeLeft()
       );
     });
+  }
+
+  /**
+   * Before using new configuration, first stop the current timer subscription.
+   * Otherwise time runs double.
+   */
+  private stopTimers() {
+    this.subscription.unsubscribe();
+  }
+
+  /**
+   * Opens snackbar with duration of 2 seconds.
+   * @param message displays this message
+   * @param action: button to display
+   */
+  public openSnackbar(message: string, action: string) {
+    const config = new MatSnackBarConfig();
+    config.duration = 3000;
+    config.panelClass = ["custom-snack-bar"];
+    this.snackBar.open(message, action, config);
   }
 }

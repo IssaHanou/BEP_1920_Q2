@@ -7,7 +7,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"reflect"
 	"sciler/config"
-	"time"
 )
 
 // Message is a type that follows the structure all messages have, described in resources/message_manual.md
@@ -169,49 +168,30 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 				}
 			case "reset all":
 				{
-					message := Message{
-						DeviceID: "back-end",
-						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-						Type:     "instruction",
-						Contents: []map[string]interface{}{{
-							"instruction":   "reset",
-							"instructed_by": raw.DeviceID},
-						},
-					}
-					jsonMessage, _ := json.Marshal(&message)
-					handler.Communicator.Publish("client-computers", string(jsonMessage), 3)
-					handler.Communicator.Publish("front-end", string(jsonMessage), 3)
-
+					handler.SendInstruction("client-computers", []map[string]string{{
+						"instruction":   "reset",
+						"instructed_by": raw.DeviceID,
+					}})
+					handler.SendInstruction("front-end", []map[string]string{{
+						"instruction":   "reset",
+						"instructed_by": raw.DeviceID,
+					}})
 					handler.Config = config.ReadFile(handler.ConfigFile)
 					handler.sendStatus("general")
 				}
 			case "test all":
 				{
-					message := Message{
-						DeviceID: "back-end",
-						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-						Type:     "instruction",
-						Contents: []map[string]interface{}{{
-							"instruction":   "test",
-							"instructed_by": raw.DeviceID},
-						},
-					}
-					jsonMessage, _ := json.Marshal(&message)
-					handler.Communicator.Publish("client-computers", string(jsonMessage), 3)
+					handler.SendInstruction("client-computers", []map[string]string{{
+						"instruction":   "test",
+						"instructed_by": raw.DeviceID,
+					}})
 				}
 			case "test device":
 				{
-					message := Message{
-						DeviceID: "back-end",
-						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-						Type:     "instruction",
-						Contents: []map[string]interface{}{{
-							"instruction":   "test",
-							"instructed_by": raw.DeviceID},
-						},
-					}
-					jsonMessage, _ := json.Marshal(&message)
-					handler.Communicator.Publish(instruction["device"].(string), string(jsonMessage), 3)
+					handler.SendInstruction(instruction["device"].(string), []map[string]string{{
+						"instruction":   "test",
+						"instructed_by": raw.DeviceID,
+					}})
 				}
 			case "finish rule":
 				{
@@ -225,18 +205,19 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 				}
 			case "hint":
 				{
-					message := Message{
-						DeviceID: "back-end",
-						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-						Type:     "instruction",
-						Contents: []map[string]interface{}{{
-							"instruction":   "hint",
-							"value":         instruction["value"],
-							"instructed_by": raw.DeviceID},
-						},
-					}
-					jsonMessage, _ := json.Marshal(&message)
-					handler.Communicator.Publish("hint", string(jsonMessage), 3)
+					handler.SendInstruction("hint", []map[string]string{{
+						"instruction":   "hint",
+						"value":         instruction["value"].(string),
+						"instructed_by": raw.DeviceID,
+					}})
+				}
+			case "check config":
+				{
+					handler.processConfig(instruction["config"], "check", "")
+				}
+			case "use config":
+				{
+					handler.processConfig(instruction["config"], "use", instruction["file"].(string))
 				}
 			}
 		} else {
