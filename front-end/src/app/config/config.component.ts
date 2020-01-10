@@ -36,7 +36,7 @@ export class ConfigComponent implements OnInit {
     });
     this.reader.addEventListener("error", (e) => {
       this.errors.push(e.target[res]);
-      console.log("log: error while reading file");
+      this.app.logger.log("error", "error while reading file");
       this.uploaded = "Error tijdens uploaden: " + e.target[res];
     });
   }
