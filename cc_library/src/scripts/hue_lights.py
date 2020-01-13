@@ -10,8 +10,9 @@ How to use Hue Lights with S.C.I.L.E.R.:
 - download Hue app
 - create groups and scenes to use in the escape room
 - retrieve IP address of hue bridge ( apt-get install avahi-utils ; avahi-browse -rt _hue._tcp )
-- retrieve valid hue username (curl -d '{"devicetype":"["whatever"]"}' -H "Content-Type: application/json" -X POST 'http://<BRIDGE_IP>/api' ; returns long id)
-- retrieve scene id's ( curl 'http://<BRIDGE_IP>/api/<YOUR_USERNAME>/scenes )
+- retrieve valid hue username (curl -d '{"devicetype":"["whatever"]"}' -H
+"Content-Type: application/json" -X POST 'http://<BRIDGE_IP>/api' ; returns long hue username)
+- retrieve scene id's ( curl 'http://<hue bridge IP>/api/<hue username>/scenes )
 - implement config using scene ids
 """
 
@@ -94,13 +95,23 @@ class HueLights(Device):
 
     def set_manual(self, comp, data):
         params = json.dumps({"on": data[0], "bri": data[1], "xy": data[2]})
-        if comp == "all" :
+        if comp == "all":
             url = (
-                    self.hue_bridge + "api/" + self.hue_user + "/groups/" + self.group + "/action"
+                self.hue_bridge
+                + "api/"
+                + self.hue_user
+                + "/groups/"
+                + self.group
+                + "/action"
             )
-        else :
+        else:
             url = (
-                    self.hue_bridge + "api/" + self.hue_user + "/lights/" + comp[-1:] + "/state"
+                self.hue_bridge
+                + "api/"
+                + self.hue_user
+                + "/lights/"
+                + comp[-1:]
+                + "/state"
             )
         resp = requests.put(url, data=params, headers=self.header)
         if resp.status_code == 200:
