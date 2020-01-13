@@ -25,26 +25,26 @@ class Device {
     // make sure abstract class Device cannot be instantiated directly
     if (this.constructor === Device) {
       throw new TypeError(
-        "abstract class Device cannot be instantiated directly"
+        "abstract class Device cannot be instantiated directly",
       );
     }
 
     // make sure abstract method getStatus is implemented when extending from Device
-    if (typeof this.getStatus != "function") {
+    if (typeof this.getStatus !== "function") {
       throw new TypeError("abstract method 'getStatus' not implemented");
     }
     // make sure abstract method performInstruction is implemented when extending from Device
-    if (typeof this.performInstruction != "function") {
+    if (typeof this.performInstruction !== "function") {
       throw new TypeError(
-        "abstract method 'performInstruction' not implemented"
+        "abstract method 'performInstruction' not implemented",
       );
     }
     // make sure abstract method test is implemented when extending from Device
-    if (typeof this.test != "function") {
+    if (typeof this.test !== "function") {
       throw new TypeError("abstract method 'test' not implemented");
     }
     // make sure abstract method reset is implemented when extending from Device
-    if (typeof this.reset != "function") {
+    if (typeof this.reset !== "function") {
       throw new TypeError("abstract method 'reset' not implemented");
     }
   }
@@ -81,10 +81,10 @@ class SccLib {
   constructor(config, device, logger) {
     // type check config
     const configProperties = ["id", "description", "host", "port", "labels"];
-    for (let configProperty of configProperties) {
+    for (const configProperty of configProperties) {
       if (!config.hasOwnProperty(configProperty)) {
         throw new TypeError(
-          config + " should have a property: " + configProperty
+          config + " should have a property: " + configProperty,
         );
       }
     }
@@ -97,7 +97,7 @@ class SccLib {
     // type check logger
     if (typeof logger !== "function") {
       throw new TypeError(
-        logger + " should be of type function(date, level, message)"
+        logger + " should be of type function(date, level, message)",
       );
     }
 
@@ -133,7 +133,7 @@ class SccLib {
      */
     this._onConnect = function() {
       // subscripe to all labels and standard topics
-      for(let i = 0; i < this.labels.length; i++) {
+      for (let i = 0; i < this.labels.length; i++) {
         this.client.subscribe(this.labels[i]);
       }
       this.client.subscribe("client-computers");
@@ -143,8 +143,8 @@ class SccLib {
       this._sendMessage(
         "back-end",
         new Message(this.name, "connection", {
-          connection: true
-        })
+          connection: true,
+        }),
       );
 
       // log successful connection
@@ -157,10 +157,10 @@ class SccLib {
      * @private
      */
     this._onConnectFailure = function() {
-      let retryCooldown = 10 * 1000; // 10 seconds before retrying to connect
+      const retryCooldown = 10 * 1000; // 10 seconds before retrying to connect
       this.log(
         "error",
-        "connecting failed, retry in " + retryCooldown + " seconds"
+        "connecting failed, retry in " + retryCooldown + " seconds",
       );
       setTimeout(() => {
         this.connect();
@@ -179,7 +179,7 @@ class SccLib {
         "message received:\n topic: " +
           message.topic +
           ",\n message: " +
-          message.payloadString
+          message.payloadString,
       );
       this._handle(message.payloadString);
     };
@@ -195,13 +195,13 @@ class SccLib {
     if (message.type !== "instruction") {
       this.log(
         "warn",
-        "received non-instruction message of type: " + message.type
+        "received non-instruction message of type: " + message.type,
       );
     } else {
-      let success = this._checkMessage(message.contents);
+      const success = this._checkMessage(message.contents);
       const confirmation = new Message(this.name, "confirmation", {
         completed: success,
-        instructed: message
+        instructed: message,
       });
       this._sendMessage("back-end", confirmation);
     }
@@ -226,7 +226,7 @@ class SccLib {
         }
         case "status update": {
           const message = new Message(this.name, "connection", {
-            connection: true
+            connection: true,
           });
           this._sendMessage("back-end", message);
           this.statusChanged();
@@ -246,7 +246,7 @@ class SccLib {
               "instruction " +
                 action.instruction +
                 " could not be performed, " +
-                action
+                action,
             );
             return false;
           } else {
@@ -266,7 +266,7 @@ class SccLib {
    * @private
    */
   _sendMessage(topic, message) {
-    let msg = new Paho.Message(JSON.stringify(message));
+    const msg = new Paho.Message(JSON.stringify(message));
     msg.destinationName = topic;
     this.client.send(msg);
   }
@@ -278,12 +278,12 @@ class SccLib {
    * sets up automatic reconnect
    */
   connect() {
-    let will = new Paho.Message(
+    const will = new Paho.Message(
       JSON.stringify(
         new Message(this.name, "connection", {
-          connection: false
-        })
-      )
+          connection: false,
+        }),
+      ),
     );
     will.destinationName = "back-end";
     this.client.connect({
@@ -295,7 +295,7 @@ class SccLib {
       },
       willMessage: will,
       reconnect: true,
-      keepAliveInterval: 10
+      keepAliveInterval: 10,
     });
   }
 
@@ -306,7 +306,7 @@ class SccLib {
   statusChanged() {
     this._sendMessage(
       "back-end",
-      new Message(this.name, "status", this.device.getStatus())
+      new Message(this.name, "status", this.device.getStatus()),
     );
   }
 }

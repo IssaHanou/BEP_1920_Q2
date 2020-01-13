@@ -9,5 +9,8 @@
   "devDependencies": {
     "prettier": "1.19.1"
   },
-  "preserveSymlinks": true
+  "preserveSymlinks": true,
+  "scripts": {
+    "format": "prettier --write **/*.js --config .prettier.config.js"
+  }
 }

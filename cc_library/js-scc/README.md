@@ -4,7 +4,7 @@ GNU GENERAL PUBLIC LICENSE Version 3, [see `LICENSE.md`](LICENSE.md)
 
 ### run prettier
 
-`prettier --write "**/*.js"`
+`npm run format`
 
 ### Using this library
 - npm install with ```npm install js-scc```
