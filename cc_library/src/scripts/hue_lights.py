@@ -94,9 +94,14 @@ class HueLights(Device):
 
     def set_manual(self, comp, data):
         params = json.dumps({"on": data[0], "bri": data[1], "xy": data[2]})
-        url = (
-            self.hue_bridge + "api/" + self.hue_user + "/lights/" + comp[-1:] + "/state"
-        )
+        if comp == "all" :
+            url = (
+                    self.hue_bridge + "api/" + self.hue_user + "/groups/" + self.group + "/action"
+            )
+        else :
+            url = (
+                    self.hue_bridge + "api/" + self.hue_user + "/lights/" + comp[-1:] + "/state"
+            )
         resp = requests.put(url, data=params, headers=self.header)
         if resp.status_code == 200:
             self.log("Template has been published.")
