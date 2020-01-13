@@ -21,7 +21,7 @@ class SccLib:
         self.host = self.config.get("host")
         self.port = self.config.get("port")
         self.labels = self.config.get("labels")
-        
+
         if not os.path.exists("logs"):
             os.mkdir("logs")
         filename = "logs/log-" + datetime.now().strftime("%d-%m-%YT--%H-%M-%S") + ".txt"
