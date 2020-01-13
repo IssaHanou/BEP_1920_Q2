@@ -1,0 +1,21 @@
+<div class="home-box camera-box">
+  <div class="header">
+    <mat-expansion-panel [expanded]="true">
+      <mat-expansion-panel-header>
+        <h3 class="camera-title">Camera</h3>
+      </mat-expansion-panel-header>
+
+      <form (ngSubmit)="setSrc()" class="camera-title">
+        <mat-form-field>
+          <mat-select [formControl]="selectedCameraControl" placeholder="Choose camera to see feed"
+                      (selectionChange)="setSrc()">
+            <mat-option *ngFor="let camera of allCameras()" [value]="camera.name">{{ camera.name }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </form>
+    </mat-expansion-panel>
+  </div>
+  <div class="contents feed-box">
+    <iframe #cameraFeed [src]="cameraFeedSrc" class="camera-feed" allowFullScreen></iframe>
+  </div>
+</div>

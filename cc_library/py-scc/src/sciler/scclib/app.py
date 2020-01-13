@@ -21,6 +21,7 @@ class SccLib:
         self.host = self.config.get("host")
         self.port = self.config.get("port")
         self.labels = self.config.get("labels")
+
         if not os.path.exists("logs"):
             os.mkdir("logs")
         filename = "logs/log-" + datetime.now().strftime("%d-%m-%YT--%H-%M-%S") + ".txt"
@@ -212,8 +213,8 @@ class SccLib:
         message = message.payload.decode("utf-8")
         message = json.loads(message)
         if message.get("type") != "instruction":
-            logging.info(
-                ("received non-instruction message of type", message.get("type"))
+            logging.warning(
+                ("received non-instruction message of type: ", message.get("type"))
             )
         else:
             success = self.__check_message(message.get("contents"))
@@ -231,7 +232,7 @@ class SccLib:
             instruction = action.get("instruction")
             if instruction == "test":
                 self.device.test()
-                logging.info(("instruction performed", action))
+                logging.info(("instruction performed", instruction))
             elif instruction == "status update":
                 msg_dict = {
                     "device_id": self.name,
@@ -242,14 +243,16 @@ class SccLib:
                 msg = json.dumps(msg_dict)
                 self.__send_message("back-end", msg)
                 self.status_changed()
-                logging.info(("instruction performed", action))
+                logging.info(("instruction performed", instruction))
             elif instruction == "reset":
                 self.device.reset()
-                logging.info("instruction performed", action)
+                logging.info(("instruction performed", instruction))
             else:
-                (success, failed_action) = self.device.perform_instruction(action)
+                (success, failed_action) = self.device.perform_instruction(
+                    action
+                )  # TODO: remove failed_action as return argument
                 if success:
-                    logging.info(("instruction performed", action))
+                    logging.info(("instruction performed", instruction))
                 else:
                     logging.warning(
                         (

@@ -5,6 +5,11 @@
     "host": "192.168.178.82",
     "port": 1883
   },
+   "cameras": [
+     {"name": "camera1", "link": "https://raccoon.games"},
+     {"name": "camera2", "link": "https://debrouwerij.io"},
+     {"name": "muppets", "link": "https://www.youtube.com/embed/tgbNymZ7vqY"}
+  ],
   "devices": [
     {
       "id": "controlBoard",
@@ -64,7 +69,20 @@
       }
     },
     {
-      "id": "display",
+      "id": "display-angular",
+      "description": "displays messages",
+      "input": {},
+      "output": {
+        "hint": {
+          "type": "string",
+          "instructions": {
+            "hint": "string"
+          }
+        }
+      }
+    },
+    {
+      "id": "display-node",
       "description": "displays messages",
       "input": {},
       "output": {
@@ -183,7 +201,7 @@
             },
             {
               "type": "device",
-              "type_id": "display",
+              "type_id": "display-angular",
               "message": [
                 {
                   "component_id": "hint",
@@ -262,7 +280,7 @@
             },
             {
               "type": "device",
-              "type_id": "display",
+              "type_id": "display-angular",
               "message": [
                 {
                   "component_id": "hint",
@@ -275,7 +293,9 @@
         }
       ],
       "hints": [
-        "Zet de schuiven nauwkeurig"
+        "Zet de schuiven nauwkeurig",
+        "Probeer het nog eens",
+        "dat kan sneller"
       ]
     },
     {
@@ -344,7 +364,7 @@
             },
             {
               "type": "device",
-              "type_id": "display",
+              "type_id": "display-angular",
               "message": [
                 {
                   "component_id": "hint",
@@ -357,7 +377,8 @@
         }
       ],
       "hints": [
-        "Zet de schuiven nauwkeurig"
+        "Zet de schuiven nauwkeurig",
+        "Dit is dus echt best wel een superlange hint die je helemaal moet kunnen lezen"
       ]
     }
   ],
@@ -460,7 +481,7 @@
           "actions": [
             {
               "type": "device",
-              "type_id": "display",
+              "type_id": "display-angular",
               "message": [
                 {
                   "component_id": "hint",
@@ -491,7 +512,7 @@
           "actions": [
             {
               "type": "device",
-              "type_id": "display",
+              "type_id": "display-angular",
               "message": [
                 {
                   "component_id": "hint",
@@ -579,7 +600,7 @@
           "actions": [
             {
               "type": "device",
-              "type_id": "display",
+              "type_id": "display-angular",
               "message": [
                 {
                   "component_id": "hint",
@@ -659,6 +680,15 @@
             ]
           },
           "actions": [
+            {
+              "type": "timer",
+              "type_id": "general",
+              "message": [
+                {
+                  "instruction": "pause"
+                }
+              ]
+            },
             {
               "type": "device",
               "type_id": "controlBoard",

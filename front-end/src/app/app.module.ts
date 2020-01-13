@@ -6,7 +6,7 @@ import { DeviceComponent } from "./components/device/device.component";
 import { TimerComponent } from "./components/timer/timer.component";
 import { ManageComponent } from "./components/manage/manage.component";
 import { PuzzleComponent } from "./components/puzzle/puzzle.component";
-import { FormsModule } from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 import { MqttModule, MqttService, IMqttServiceOptions } from "ngx-mqtt";
 import {
@@ -21,18 +21,26 @@ import {
   MATERIAL_SANITY_CHECKS,
   MatFormFieldModule,
   MatInputModule,
-  MatPaginatorModule,
+  MatIconModule,
   MatSortModule,
-  MatTableModule
+  MatTableModule,
+  MatToolbarModule,
+  MatSidenavModule,
+  MatListModule,
+  MatSelectModule,
+  MatExpansionModule
 } from "@angular/material";
 import { CdkTableModule } from "@angular/cdk/table";
 import { JsonConvert } from "json2typescript";
 import { Message } from "./message";
+import { RouterModule, Routes } from "@angular/router";
+import { HomeComponent } from "./home/home.component";
+import { CameraComponent } from "./camera/camera.component";
+import { ConfigComponent } from "./config/config.component";
 
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   hostname: "192.168.178.82",
   port: 8083,
-  clientId: "front-end",
   will: {
     topic: "back-end",
     payload: JSON.stringify(
@@ -48,6 +56,12 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   keepalive: 10
 };
 
+export const APP_ROUTES: Routes = [
+  {path: "", component: HomeComponent},
+  {path: "camera", component: CameraComponent},
+  {path: "config", component: ConfigComponent}
+];
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -55,7 +69,10 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     DeviceComponent,
     TimerComponent,
     ManageComponent,
-    PuzzleComponent
+    PuzzleComponent,
+    HomeComponent,
+    CameraComponent,
+    ConfigComponent
   ],
   exports: [
     AppComponent,
@@ -64,6 +81,9 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     TimerComponent,
     ManageComponent,
     PuzzleComponent,
+    HomeComponent,
+    CameraComponent,
+    ConfigComponent,
     MatFormFieldModule,
     MatSortModule
   ],
@@ -77,20 +97,29 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
-    MatPaginatorModule,
     MatSortModule,
+    MatSidenavModule,
+    MatToolbarModule,
+    MatIconModule,
+    MatSelectModule,
+    MatExpansionModule,
+    MatListModule,
+    RouterModule.forRoot(APP_ROUTES),
+    ReactiveFormsModule,
     CdkTableModule
   ],
   providers: [
     MqttService,
     MatSnackBar,
     Overlay,
-    DeviceComponent,
     {
       provide: HAMMER_LOADER,
       useValue: () => new Promise(() => {})
     }, // prevents warning in console
-    { provide: MATERIAL_SANITY_CHECKS, useValue: false } // prevents warning in console
+    {
+      provide: MATERIAL_SANITY_CHECKS,
+      useValue: false
+    } // prevents warning in console
   ],
   bootstrap: [AppComponent],
   entryComponents: [MatSnackBarContainer]

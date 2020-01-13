@@ -5,6 +5,10 @@
     "host": "localhost",
     "port": 1883
   },
+  "cameras": [
+    {"name": "camera1", "link": "https://raccoon.games"},
+    {"name": "camera2", "link": "https://debrouwerij.io"}
+  ],
   "devices": [
     {
       "id": "controlBoard",

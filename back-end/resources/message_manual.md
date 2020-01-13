@@ -18,6 +18,7 @@ are specific defined depending on the sender and receiver.
         - `instruction`: one of the instructions specified for this device or 
         component or one of following instructions: `test`, `status update`, `reset`
         - `value`: this is the value (argument) for the instruction (optional)
+        - `instructed_by`: this is the id of the device which originally send this instruction (usually front-end)
         - `component_id`: this will be the id of a component in a timer or device, 
                 (optional)
    
@@ -32,7 +33,7 @@ are specific defined depending on the sender and receiver.
     a format defined in the configurations of the device. e.g. `{redSwitch: true, redSlider: 40, redLed: "aan"}`
     - If type is `confirmation`,  then the message contents has te following:
         - `completed` is a boolean.
-        - `instructed` is the original instruction message for the device
+        - `instructed` is the original instruction message for the device, including the `instructed_by` tag
     - If type is `connection`, then the message contents has te following:
         - `connection` is a boolean defining the connection status of the device.
         
@@ -41,7 +42,8 @@ are specific defined depending on the sender and receiver.
     - `instruction`
 - `contents`:
     - If type is `instruction`, then the then the message contents have
-        - `instruction`: one of following instructions: `test all`, `send status`, `hint`, `start`, `stop`, `reset all`.
+        - `instruction`: one of following instructions: 
+        `send setup`, `send status`, `reset all`, `test all`, `test device`, `finish rule`, `hint`
      
 ### Back-end to Front-end
 - `type`: the type of the message, this can be:
@@ -51,18 +53,26 @@ are specific defined depending on the sender and receiver.
     - `instruction`
 - `contents`:
     - If type is `confirmation`, then the then the message contents have
-        - `instructed` 
-        - `contents`
-        - `instruction`
-    - If type is `status`, then the then the message contents have
+        - `completed`
+        - `instructed`, which contains the original instruction with in the `contents`:
+            - `instruction`
+            - `instructed_by`
+    - If type is `instruction`, then the then the message contents have
+             - `instruction` with value `reset` or `status update` or `test`
+    - If type is `status`, then the message contents has
         - `id` of device
         - `status` has a map of `component_id` keys and `status` values
         - `connection` boolean
+    - If type is `event status`, then the message contents has objects with
+        - `id` of rule
+        - `description` of rule
+        - `status` of rule describes whether rule is finished or not
     - If type is `time`, then the then the message contents have
         - `id` of timer
         - `duration` has a number of the duration left in milliseconds
         - `state` sting of the timer state
-    - If type is `instruction`, then the then the message contents have
-        - `instrucion` with value `reset` or `status update`
-
-        
+    - If type is `setup`, the contents:
+        - a `name` parameter carrying the name of the escape room 
+        - a `hints` parameter carrying a map with the name of puzzle as key and list of hints as value
+        - an `events` parameter carrying a map with the name of the rule as key and the description as value
+        - a `cameras` parameter carrying a a list with camera objects with a `name` and `link` tag
