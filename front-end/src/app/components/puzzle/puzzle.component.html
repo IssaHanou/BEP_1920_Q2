@@ -14,8 +14,14 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="description">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header"> Beschrijving </th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header rule-description"> Beschrijving </th>
         <td mat-cell *matCellDef="let element" class="rule-description"> {{ element.description }} </td>
+      </ng-container>
+      <ng-container matColumnDef="done">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header"> Puzzel klaar </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-button color=primary (click)="finishRule(element.id)">Klaar</button>
+        </td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="puzzleColumns"></tr>

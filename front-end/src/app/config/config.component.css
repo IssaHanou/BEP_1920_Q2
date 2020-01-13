@@ -1,0 +1,35 @@
+/**'Hide' the actual input and style the label as button**/
+.original-config-button {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  padding: 5px;
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+.config-button {
+  margin: 10px;
+}
+
+/*Styling the output box*/
+.file-output-errors {
+  background-color: #E68364;
+  padding: 5px;
+}
+.file-output-no-errors {
+  background-color: #87D37C;
+  padding: 5px;
+}
+.error-list {
+  text-align: left;
+}
+.error-list-title {
+  font-weight: bold;
+}
+
+/*Minimal height to not shrimp the menu*/
+.config-box {
+  min-height: 155px;
+}

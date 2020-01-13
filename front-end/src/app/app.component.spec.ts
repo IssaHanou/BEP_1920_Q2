@@ -1,9 +1,9 @@
 import { TestBed, async } from "@angular/core/testing";
 import { AppComponent } from "./app.component";
 import { HintComponent } from "./components/hint/hint.component";
-import { FormsModule } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MqttModule, MqttService } from "ngx-mqtt";
-import { MQTT_SERVICE_OPTIONS } from "./app.module";
+import { APP_ROUTES, MQTT_SERVICE_OPTIONS } from "./app.module";
 import { DeviceComponent } from "./components/device/device.component";
 import { ManageComponent } from "./components/manage/manage.component";
 import { PuzzleComponent } from "./components/puzzle/puzzle.component";
@@ -12,29 +12,55 @@ import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
 import { Overlay } from "@angular/cdk/overlay";
 import {
   MatFormFieldModule,
+  MatIconModule,
   MatInputModule,
-  MatPaginatorModule,
-  MatSortModule,
-  MatTableModule
+  MatSidenavModule,
+  MatTableModule,
+  MatToolbarModule,
+  MatListModule,
+  MatButtonModule,
+  MatSelectModule,
+  MatExpansionModule,
+  MatSortModule
 } from "@angular/material";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { BrowserModule } from "@angular/platform-browser";
+import { CdkTableModule } from "@angular/cdk/table";
+import { RouterModule } from "@angular/router";
+import { CameraComponent } from "./camera/camera.component";
+import { HomeComponent } from "./home/home.component";
+import { ConfigComponent } from "./config/config.component";
 
 describe("AppComponent", () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
+        BrowserModule,
         FormsModule,
         MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
-        MatTableModule,
-        MatSortModule,
-        MatPaginatorModule,
-        MatFormFieldModule,
-        MatInputModule,
+        BrowserAnimationsModule,
         MatSnackBarModule,
-        BrowserAnimationsModule
+        MatTableModule,
+        MatButtonModule,
+        MatFormFieldModule,
+        MatSelectModule,
+        MatInputModule,
+        MatSortModule,
+        MatSidenavModule,
+        MatToolbarModule,
+        MatIconModule,
+        MatSelectModule,
+        MatExpansionModule,
+        MatListModule,
+        CdkTableModule,
+        RouterModule.forRoot(APP_ROUTES),
+        ReactiveFormsModule
       ],
       declarations: [
         AppComponent,
+        CameraComponent,
+        HomeComponent,
+        ConfigComponent,
         HintComponent,
         DeviceComponent,
         ManageComponent,
@@ -51,16 +77,16 @@ describe("AppComponent", () => {
     expect(app).toBeTruthy();
   });
 
-  it("should have as title 'S.C.I.L.E.R'", () => {
+  it("should have as title 'SCILER'", () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual("S.C.I.L.E.R");
+    expect(app.title).toEqual("SCILER");
   });
 
   it("should render title", () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector("h1").textContent).toContain("S.C.I.L.E.R");
+    expect(compiled.querySelectorAll("p").item(0).textContent).toContain("SCILER");
   });
 });

@@ -1,17 +1,10 @@
 import { Puzzle } from "./puzzle";
-import { PuzzleComponent } from "./puzzle.component";
 
-describe("PuzzleComponent", () => {
+describe("Puzzle", () => {
   let puzzle: Puzzle;
 
   beforeEach(() => {
-    const jsonData = JSON.parse(`{
-          "id": "Door open",
-          "status": false,
-           "description": "The door opens"
-        }
-    `);
-    puzzle = new Puzzle(jsonData);
+    puzzle = new Puzzle("Door open", "this is my rule");
   });
 
   it("should create", () => {

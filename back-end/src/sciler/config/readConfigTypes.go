@@ -3,6 +3,7 @@ package config
 // ReadConfig specifies all configuration elements of an escape room.
 type ReadConfig struct {
 	General       General            `json:"general"`
+	Cameras       []Camera           `json:"cameras"`
 	Devices       []ReadDevice       `json:"devices"`
 	Timers        []ReadTimer        `json:"timers"`
 	Puzzles       []ReadPuzzle       `json:"puzzles"`
@@ -15,6 +16,12 @@ type General struct {
 	Duration string `json:"duration"`
 	Host     string `json:"host"`
 	Port     int    `json:"port"`
+}
+
+// Camera is a struct describing camera feed with name of camera and link to the feed
+type Camera struct {
+	Name string `json:"name"`
+	Link string `json:"link"`
 }
 
 // ReadDevice is a struct that describes the configurations of a device in the room.
@@ -104,11 +111,12 @@ type Action struct {
 }
 
 // Execute is a method that performs the action
+// TODO test this
 func (action Action) Execute(handler InstructionSender) {
 	switch action.Type { // this cannot be any other Type than device or timer, (checked in checkActions function)
 	case "device":
 		{
-			handler.SendInstruction(action.TypeID, action.Message)
+			handler.SendComponentInstruction(action.TypeID, action.Message)
 		}
 	case "timer":
 		{

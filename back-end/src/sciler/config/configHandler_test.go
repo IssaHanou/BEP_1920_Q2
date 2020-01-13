@@ -21,6 +21,30 @@ func TestDurationError(t *testing.T) {
 		"Incorrect json (duration in int) should panic")
 }
 
+func TestDurationErrorWrongFormat(t *testing.T) {
+	filename := "../../../resources/testing/testDurationErrorWrongFormat.json"
+	assert.PanicsWithValue(t,
+		"time: missing unit in duration 30",
+		func() { ReadFile(filename) },
+		"Incorrect json (duration without unit specification) should panic")
+}
+
+func TestDurationTimerError(t *testing.T) {
+	filename := "../../../resources/testing/testDurationTimerError.json"
+	assert.PanicsWithValue(t,
+		"json: cannot unmarshal number into Go struct field ReadTimer.timers.duration of type string",
+		func() { ReadFile(filename) },
+		"Incorrect json (timer duration in int) should panic")
+}
+
+func TestDurationTimerErrorWrongFormat(t *testing.T) {
+	filename := "../../../resources/testing/testDurationTimerErrorWrongFormat.json"
+	assert.PanicsWithValue(t,
+		"time: unknown unit x in duration 10x",
+		func() { ReadFile(filename) },
+		"Incorrect json (timer duration with incorrect unit specification) should panic")
+}
+
 func TestDeviceInputWrongTypeError(t *testing.T) {
 	filename := "../../../resources/testing/wrong-types/testDeviceInputWrongTypeError.json"
 	assert.PanicsWithValue(t,
@@ -37,7 +61,7 @@ func TestReadFile(t *testing.T) {
 func TestDeviceConstraintNotPresent(t *testing.T) {
 	filename := "../../../resources/testing/testDeviceConstraintNotPresent.json"
 	assert.PanicsWithValue(t,
-		"device with id non existing not found in map",
+		"on rule flipSwitch: device with id non existing not found in map",
 		func() { ReadFile(filename) },
 		"ReadDevice used in constraint should be present in device logics")
 }
@@ -45,7 +69,7 @@ func TestDeviceConstraintNotPresent(t *testing.T) {
 func TestComponentConstraintNotPresent(t *testing.T) {
 	filename := "../../../resources/testing/testComponentConstraintNotPresent.json"
 	assert.PanicsWithValue(t,
-		"component with id non existing not found in map",
+		"on rule correctSequence: component with id non existing not found in map",
 		func() { ReadFile(filename) },
 		"Component used in constraint should be present in device logics")
 }
@@ -53,7 +77,7 @@ func TestComponentConstraintNotPresent(t *testing.T) {
 func TestIncorrectTypeCondition(t *testing.T) {
 	filename := "../../../resources/testing/testIncorrectTypeCondition.json"
 	assert.PanicsWithValue(t,
-		"invalid type of condition: not device or timer",
+		"on rule correctSequence: invalid type of condition: not device or timer",
 		func() { ReadFile(filename) },
 		"ReadCondition type should be 'device' or 'timer'")
 }
