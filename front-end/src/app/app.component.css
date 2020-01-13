@@ -2,6 +2,11 @@
 .home-header {
   margin: 0 auto;
 }
+.currentTime {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  color: #EEEEEE;
+  font-weight: bold;
+}
 .title {
   font-family: Roboto, "Helvetica Neue", sans-serif;
   color: #EEEEEE;

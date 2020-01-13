@@ -40,3 +40,10 @@ export function formatMS(timeInMS) {
 
   return h + ":" + m + ":" + s;
 }
+
+/**
+ * Format the time in milliseconds to a string in the format hh:mm.
+ */
+export function formatTime(timeInMS) {
+  return formatMS(timeInMS).substr(0, 5);
+}

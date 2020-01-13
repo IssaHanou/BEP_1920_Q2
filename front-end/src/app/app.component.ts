@@ -10,7 +10,7 @@ import { Timers } from "./components/timer/timers";
 import { Logger } from "./logger";
 import { Camera } from "./camera/camera";
 import { Hint } from "./components/hint/hint";
-import { formatMS } from "./components/timer/timer";
+import {formatMS, formatTime} from "./components/timer/timer";
 
 @Component({
   selector: "app-root",
@@ -312,5 +312,12 @@ export class AppComponent implements OnInit, OnDestroy {
     config.duration = 3000;
     config.panelClass = ["custom-snack-bar"];
     this.snackBar.open(message, action, config);
+  }
+
+  /**
+   * Return the current time to display.
+   */
+  getCurrentTime() {
+    return formatTime(new Date());
   }
 }
