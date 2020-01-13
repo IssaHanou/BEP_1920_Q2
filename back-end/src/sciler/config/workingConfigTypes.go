@@ -27,7 +27,7 @@ type Timer struct {
 	T         *time.Timer
 	State     string
 	Ending    func()
-	Finish    bool
+	Finished  bool
 }
 
 // newTimer create a new timer
@@ -35,11 +35,11 @@ func newTimer(id string, d time.Duration) *Timer {
 	t := new(Timer)
 	t.ID = id
 	t.Duration = d
-	t.Finish = false
+	t.Finished = false
 	t.State = "stateIdle"
 	t.Ending = func() { // TODO test
 		t.State = "stateExpired"
-		t.Finish = true
+		t.Finished = true
 	}
 	return t
 }
@@ -65,7 +65,7 @@ func (t *Timer) Start(handler InstructionSender) bool {
 	t.State = "stateActive"
 	t.Ending = func() {
 		t.State = "stateExpired"
-		t.Finish = true
+		t.Finished = true
 		logrus.Info("timer finished", t.ID)
 		handler.HandleEvent(t.ID)
 	}
@@ -408,7 +408,7 @@ func (constraint Constraint) Resolve(condition Condition, config WorkingConfig) 
 	case "timer":
 		{
 			timer := config.Timers[condition.TypeID]
-			return compare(timer.Finish, constraint.Value, constraint.Comparison)
+			return compare(timer.Finished, constraint.Value, constraint.Comparison)
 
 		}
 	default:

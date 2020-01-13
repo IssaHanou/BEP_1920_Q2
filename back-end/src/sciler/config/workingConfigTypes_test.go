@@ -37,7 +37,7 @@ func TestTimer_GetTimeLeft(t *testing.T) {
 		T:         nil,
 		State:     "stateIdle",
 		Ending:    nil,
-		Finish:    false,
+		Finished:  false,
 	}
 	left, state := timer.GetTimeLeft()
 	assert.Equal(t, left, 10*time.Second)
@@ -52,7 +52,7 @@ func TestTimer_GetTimeLeft_Active(t *testing.T) {
 		T:         nil,
 		State:     "stateIdle",
 		Ending:    nil,
-		Finish:    false,
+		Finished:  false,
 	}
 	timer.Start(nil)
 	left, state := timer.GetTimeLeft()
@@ -68,7 +68,7 @@ func TestTimer_Start(t *testing.T) {
 		T:         nil,
 		State:     "stateIdle",
 		Ending:    nil,
-		Finish:    false,
+		Finished:  false,
 	}
 	timer.Start(nil)
 	assert.Equal(t, timer.State, "stateActive")
@@ -82,7 +82,7 @@ func TestTimer_Start_False(t *testing.T) {
 		T:         nil,
 		State:     "stateIdle",
 		Ending:    nil,
-		Finish:    false,
+		Finished:  false,
 	}
 	ok := timer.Start(nil)
 	assert.Equal(t, ok, true)
@@ -98,7 +98,7 @@ func TestTimer_Pause(t *testing.T) {
 		T:         nil,
 		State:     "stateIdle",
 		Ending:    nil,
-		Finish:    false,
+		Finished:  false,
 	}
 	timer.Start(nil)
 	assert.Equal(t, timer.State, "stateActive")
@@ -114,7 +114,7 @@ func TestTimer_Pause_False(t *testing.T) {
 		T:         nil,
 		State:     "stateIdle",
 		Ending:    nil,
-		Finish:    false,
+		Finished:  false,
 	}
 	ok := timer.Pause()
 	assert.Equal(t, timer.State, "stateIdle")
@@ -129,7 +129,7 @@ func TestTimer_Stop(t *testing.T) {
 		T:         nil,
 		State:     "stateIdle",
 		Ending:    nil,
-		Finish:    false,
+		Finished:  false,
 	}
 	timer.Start(nil)
 	assert.Equal(t, timer.State, "stateActive")
@@ -145,7 +145,7 @@ func TestTimer_Stop_False(t *testing.T) {
 		T:         nil,
 		State:     "stateIdle",
 		Ending:    nil,
-		Finish:    false,
+		Finished:  false,
 	}
 	ok := timer.Stop()
 	assert.Equal(t, ok, false)
@@ -465,7 +465,7 @@ func Test_ResolveDeviceTrue(t *testing.T) {
 func Test_ResolveTimerTrue(t *testing.T) {
 	filename := "../../../resources/testing/test_resolveTrue.json"
 	config := ReadFile(filename)
-	config.Timers["timer1"].Finish = true
+	config.Timers["timer1"].Finished = true
 	assert.True(t, config.GeneralEvents[0].GetRules()[0].Conditions.Resolve(config))
 }
 
