@@ -11,7 +11,7 @@ This mainly consists of:
 
 ## Set-up Device
 - run `pip install -i https://test.pypi.org/simple/ scclib`
-- create custom device script, which should inherit from Device
+- create a custom device script, with a class inheriting from the Device superclass, whose main method is called in the script
 - write configuration for the the device, according to device_manual.md, in the same folder as the script
 - start broker for device to connect with
 - run `python3 <custom-device>.py`
