@@ -13,8 +13,9 @@ class Message {
 }
 
 /**
- * Abstract device class from which all custom devices should inherit.
- * Defines all required methods needer for communication to S.C.I.L.E.R.
+ * Abstract device class from which all custom devices should inherit
+ * Defines all required methods needed for communication to SCILER
+ * In order to add an device to SCILER, extend this class
  * @Abstract
  */
 class Device {
@@ -50,6 +51,7 @@ class Device {
 
   /**
    * statusChanged should be called whenever the status of a device changes
+   * It retrieves the status and communicates that status back to sciler
    */
   statusChanged() {
     this.scclib.statusChanged();
@@ -297,6 +299,10 @@ class SccLib {
     });
   }
 
+  /**
+   * statusChanged should be called whenever the status of a device changes
+   * It retrieves the status and communicates that status back to sciler
+   */
   statusChanged() {
     this._sendMessage(
       "back-end",
@@ -305,6 +311,12 @@ class SccLib {
   }
 }
 
+/**
+ * formatDate is a helper function for setting date in the right format dd-mm-yyyy hh:mm:ss
+ * @private
+ * @param date { Date } the date to format
+ * @returns {string} the formatted date
+ */
 const formatDate = function(date) {
   return (
     date.getDate() +
