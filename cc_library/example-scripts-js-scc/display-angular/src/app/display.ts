@@ -3,6 +3,9 @@ const Device = require("../../../../js-scc"); // development
 
 export class Display extends Device {
   private hint: string;
+  private time: string;
+  private roomName: string;
+
   constructor(config) {
     super(config, function(date, level, message) {
       const formatDate = function(date) {
@@ -26,6 +29,8 @@ export class Display extends Device {
       ); // call own logger
     });
     this.hint = "";
+    this.time = "00:30:00";
+    this.roomName = "Escape room";
   }
 
   getStatus() {
