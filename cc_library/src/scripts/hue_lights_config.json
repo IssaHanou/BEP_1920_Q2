@@ -11,35 +11,32 @@
     "spot1": {
       "type": "string",
       "instructions": {
-        "scene": "string",
         "manual": "array"
       }
     },
     "spot2": {
       "type": "string",
       "instructions": {
-        "scene": "string",
         "manual": "array"
       }
     },
     "spot3": {
       "type": "string",
       "instructions": {
-        "scene": "string",
         "manual": "array"
       }
     },
     "spot4": {
       "type": "string",
       "instructions": {
-        "scene": "string",
         "manual": "array"
       }
     },
     "all": {
       "type": "string",
       "instructions": {
-        "scene": "string"
+        "scene": "string",
+        "manual": "array"
       }
     }
   }

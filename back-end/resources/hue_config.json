@@ -15,29 +15,25 @@
         },
         "spot1": {
           "instructions": {
-            "manual": "array",
-            "scene": "string"
+            "manual": "array"
           },
           "type": "string"
         },
         "spot2": {
           "instructions": {
-            "manual": "array",
-            "scene": "string"
+            "manual": "array"
           },
           "type": "string"
         },
         "spot3": {
           "instructions": {
-            "manual": "array",
-            "scene": "string"
+            "manual": "array"
           },
           "type": "string"
         },
         "spot4": {
           "instructions": {
-            "manual": "array",
-            "scene": "string"
+            "manual": "array"
           },
           "type": "string"
         }
@@ -46,7 +42,7 @@
   ],
   "general": {
     "duration": "30m",
-    "host": "localhost",
+    "host": "192.168.178.82",
     "name": "Hue Lights",
     "port": 1883
   },
