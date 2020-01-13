@@ -5,6 +5,16 @@ import time
 import requests
 from scclib.device import Device
 
+"""
+How to use Hue Lights with S.C.I.L.E.R.:
+- download Hue app
+- create groups and scenes to use in the escape room
+- retrieve IP address of hue bridge ( apt-get install avahi-utils ; avahi-browse -rt _hue._tcp )
+- retrieve valid hue username (curl -d '{"devicetype":"["whatever"]"}' -H "Content-Type: application/json" -X POST 'http://<BRIDGE_IP>/api' ; returns long id)
+- retrieve scene id's ( curl 'http://<BRIDGE_IP>/api/<YOUR_USERNAME>/scenes )
+- implement config using scene ids
+"""
+
 
 class HueLights(Device):
     def __init__(self):
@@ -17,7 +27,7 @@ class HueLights(Device):
         self.scene = "none"
         self.hue_bridge = "http://192.168.178.128/"
         self.hue_user = "JQrPwJNthHtfPEG9vhW3mqwIVuFo3ESLD3gvkZOB"
-        self.group = "Spotlight"
+        self.group = "Spotlights"
         self.header = {"Content-type": "application/json"}
 
     def get_status(self):
