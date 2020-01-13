@@ -8,7 +8,6 @@
    |\_________\|_______|\|__|\|_______|\|_______|\|__|\|__|
    \|_________|                                            
 ```                                                           
-                                                           
 
 ### structure
 There are two versions of the S.C.I.L.E.R. Client Computer Library:

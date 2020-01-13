@@ -9,23 +9,14 @@ This mainly consists of:
 - `device_manual.md` the manual for writing configuration files for devices
 - `LICENSE.md` the license with which this library complies
 
-## Set-up device with package.
-- create custom device script, which should inherit from `Device`, add it to `cc_library/src/scripts`
-- write configuration for the the device, according to `device_manual.md`, add it to `cc_library/src/scripts`
-- test the device script, by altering `device_test.py`, import the class on line 7, change the device class in line 15 and the config file name in line 21
-
-
-
-## Set-up testing device (full cc_library)
-- create custom device script, which should inherit from `Device`, add it to `cc_library/src/scripts`
-- write configuration for the the device, according to `device_manual.md`, in the same file as the script
-- start broker for device to connect with. 
-- move the cc_library directory onto the Pi
-- run `pip3 install paho-mqtt` on Pi
-- run `python3 cc_library/src/scripts/<custom-device>.py` on Pi to start device
-
-## Set-up Pi (TODO)
-
+## Set-up Device
+- run `pip install -i https://test.pypi.org/simple/ scclib`
+- create a custom device script, with a class inheriting from the Device superclass, whose main method is called in the script
+- write configuration for the the device, according to device_manual.md, in the same folder as the script
+- start broker for device to connect with
+- run `python3 <custom-device>.py`
 
 ## License
 This library is licensed with GNU GPL v3, see `LICENSE.md`.
+
+
