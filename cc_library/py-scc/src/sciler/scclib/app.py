@@ -15,12 +15,13 @@ class SccLib:
         Initialize device with its configuration json file and python script.
         """
         self.device = device
-        self.name = config.get("id")
-        self.info = config.get("description")
-        self.host = config.get("host")
-        self.port = config.get("port")
-        self.labels = config.get("labels")
-        self.config = config
+        self.config = json.load(config)
+        self.name = self.config.get("id")
+        self.info = self.config.get("description")
+        self.host = self.config.get("host")
+        self.port = self.config.get("port")
+        self.labels = self.config.get("labels")
+        
         if not os.path.exists("logs"):
             os.mkdir("logs")
         filename = "logs/log-" + datetime.now().strftime("%d-%m-%YT--%H-%M-%S") + ".txt"
