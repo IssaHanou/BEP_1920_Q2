@@ -11,17 +11,22 @@ import (
 
 // Communicator is a type that maintains communication with the front-end and the client computers.
 type Communicator struct {
-	client           mqtt.Client
-	topicsOfInterest []string
+	client mqtt.Client
 }
 
-// NewCommunicator is a constructor for a Communicator
-func NewCommunicator(host string, port int, topicsOfInterest []string) *Communicator {
+// Start is a function that will start the communication by connecting to the broker and subscribing to all topics of interest
+func (communicator *Communicator) Start(host string, port int, topicsOfInterest []string, handler mqtt.MessageHandler, onStart func()) {
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("%s://%s:%d", "tcp", host, port))
 	opts.SetClientID("back-end")
-	opts.SetConnectionLostHandler(onConnectionLost)
-	opts.SetKeepAlive(20)
+	opts.SetConnectionLostHandler(func(client mqtt.Client, err error) {
+		logger.Warn(fmt.Sprintf("connection lost: %v", err))
+		if client.IsConnected() {
+			client.Disconnect(500)
+		}
+		communicator.Start(host, port, topicsOfInterest, handler, onStart)
+	})
+	opts.SetKeepAlive(time.Duration(5) * time.Second)
 	will, _ := json.Marshal(map[string]interface{}{
 		"device_id": "back-end",
 		"time_sent": time.Now().Format("02-01-2006 15:04:05"),
@@ -34,14 +39,11 @@ func NewCommunicator(host string, port int, topicsOfInterest []string) *Communic
 	})
 	opts.SetWill("front-end", string(will), 0, false)
 	client := mqtt.NewClient(opts)
-	return &Communicator{client, topicsOfInterest}
-}
 
-// Start is a function that will start the communication by connecting to the broker and subscribing to all topics of interest
-func (communicator *Communicator) Start(handler mqtt.MessageHandler, onStart func()) {
+	communicator.client = client
 	_ = action(communicator.client.Connect, "connect", -1)
 	topics := make(map[string]byte)
-	for _, topic := range communicator.topicsOfInterest {
+	for _, topic := range topicsOfInterest {
 		topics[topic] = byte(0)
 	}
 	_ = action(func() mqtt.Token {

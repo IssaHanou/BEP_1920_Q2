@@ -35,10 +35,10 @@ func main() {
 	host := configurations.General.Host
 	port := configurations.General.Port
 
-	communicator := communication.NewCommunicator(host, port, topics)
+	communicator := communication.Communicator{}
 
-	messageHandler := handler.Handler{Config: configurations, ConfigFile: filename, Communicator: communicator}
-	go communicator.Start(messageHandler.NewHandler, func() {
+	messageHandler := handler.Handler{Config: configurations, ConfigFile: filename, Communicator: &communicator}
+	go communicator.Start(host, port, topics, messageHandler.NewHandler, func() {
 		messageHandler.SendSetup()
 	})
 
