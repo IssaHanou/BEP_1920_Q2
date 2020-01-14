@@ -310,7 +310,7 @@
   ],
   "puzzles": [
     {
-      "name": "puzzel keypad to door",
+      "name": "puzzel keypad to lights",
       "rules": [
         {
           "id": "codedeur",
@@ -366,6 +366,135 @@
               ],
               "type": "device",
               "type_id": "hue_lights"
+            }
+          ]
+        }
+      ],
+      "hints": [
+        "Zet de schuiven nauwkeurig"
+      ]
+    },
+    {
+      "name": "puzzel keypad to party",
+      "rules": [
+        {
+          "id": "party",
+          "description": "er moet een code gestuurd worden, dan gaan de lampen 1 voor 1 aan",
+          "limit": 1,
+          "conditions": {
+            "operator": "AND",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "keypad",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "component_id": "code",
+                      "comparison": "eq",
+                      "value": 1234
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "start",
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "spot1",
+                  "instruction": "manual",
+                  "value": [
+                    true,
+                    123,
+                    [
+                      0.61,
+                      0.36
+                    ]
+                  ]
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights",
+              "delay": "2s"
+            },
+            {
+              "message": [
+                {
+                  "component_id": "all",
+                  "instruction": "scene",
+                  "value": "xAgrIMeKpZD8Gla"
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
+            },
+            {
+              "message": [
+                {
+                  "component_id": "spot2",
+                  "instruction": "manual",
+                  "value": [
+                    true,
+                    123,
+                    [
+                      0.15,
+                      0.1
+                    ]
+                  ]
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights",
+              "delay": "3s"
+            },
+            {
+              "message": [
+                {
+                  "component_id": "spot3",
+                  "instruction": "manual",
+                  "value": [
+                    true,
+                    123,
+                    [
+                      0.24,
+                      0.1
+                    ]
+                  ]
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights",
+              "delay": "4s"
+            },
+            {
+              "message": [
+                {
+                  "component_id": "spot4",
+                  "instruction": "manual",
+                  "value": [
+                    true,
+                    123,
+                    [
+                      0.54,
+                      0.23
+                    ]
+                  ]
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights",
+              "delay": "1s"
             }
           ]
         }
