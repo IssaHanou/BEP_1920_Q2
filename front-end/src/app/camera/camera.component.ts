@@ -3,7 +3,7 @@ import { AppComponent } from "../app.component";
 import { Camera } from "./camera";
 import { DomSanitizer } from "@angular/platform-browser";
 import { FormControl } from "@angular/forms";
-import {FullScreen} from "../fullscreen";
+import { FullScreen } from "../fullscreen";
 
 @Component({
   selector: "app-camera",
@@ -19,8 +19,8 @@ export class CameraComponent extends FullScreen implements OnInit, AfterViewInit
   openSecond = false;
   fullScreen = false;
 
-  @ViewChild('cameraBox', {static: true}) cameraBox: ElementRef;
-  @ViewChild('contents', {static: true}) boxContents: ElementRef;
+  @ViewChild("cameraBox", {static: true}) cameraBox: ElementRef;
+  @ViewChild("contents", {static: true}) boxContents: ElementRef;
 
   /**
    * The app is used for the list of all cameras.
@@ -114,7 +114,7 @@ export class CameraComponent extends FullScreen implements OnInit, AfterViewInit
   closeFullScreen() {
     // Trigger fullscreen
     this.boxContents.nativeElement.style.height = "70vh";
-    super.closeFullScreen()
+    super.closeFullScreen();
     this.fullScreen = false;
   }
 

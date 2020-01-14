@@ -10,8 +10,8 @@ import { Timers } from "./components/timer/timers";
 import { Logger } from "./logger";
 import { Camera } from "./camera/camera";
 import { Hint } from "./components/hint/hint";
-import {formatMS, formatTime} from "./components/timer/timer";
-import {FullScreen} from "./fullscreen";
+import { formatMS, formatTime } from "./components/timer/timer";
+import { FullScreen } from "./fullscreen";
 
 @Component({
   selector: "app-root",
