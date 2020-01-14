@@ -39,7 +39,7 @@ func (handler *Handler) SendSetup() {
 }
 
 // SendComponentInstruction sends a list of instructions to a client
-func (handler *Handler) SendComponentInstruction(clientID string, instructions []config.ComponentInstruction) {
+func (handler *Handler) SendComponentInstruction(clientID string, instructions []config.ComponentInstruction, delay string) {
 	message := Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
@@ -47,8 +47,18 @@ func (handler *Handler) SendComponentInstruction(clientID string, instructions [
 		Contents: instructions,
 	}
 	jsonMessage, _ := json.Marshal(&message)
-	logrus.Infof("sending instruction data to %s: %s", clientID, fmt.Sprint(message.Contents))
-	handler.Communicator.Publish(clientID, string(jsonMessage), 3)
+	delayDur, err := time.ParseDuration(delay)
+	if err == nil {
+		go func() {
+			logrus.Infof("waiting %s to send instruction data to %s: %s", delay, clientID, fmt.Sprint(message.Contents))
+			time.Sleep(delayDur)
+			logrus.Infof("sending instruction data to %s after waiting %s: %s", clientID, delay, fmt.Sprint(message.Contents))
+			handler.Communicator.Publish(clientID, string(jsonMessage), 3)
+		}()
+	} else {
+		logrus.Infof("sending instruction data to %s: %s", clientID, fmt.Sprint(message.Contents))
+		handler.Communicator.Publish(clientID, string(jsonMessage), 3)
+	}
 }
 
 // SendInstruction sends a list of instructions to a client

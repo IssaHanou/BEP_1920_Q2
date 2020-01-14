@@ -38,6 +38,14 @@
           "type": "string"
         }
       }
+    },
+    {
+      "id": "keypad",
+      "description": "Keypad with input 4 numbers",
+      "input": {
+        "code": "numeric"
+      },
+      "output": {}
     }
   ],
   "general": {
@@ -47,6 +55,41 @@
     "port": 1883
   },
   "general_events": [
+    {
+      "name": "Start knop",
+      "rules": [
+        {
+          "id": "start",
+          "description": "Als het spel start, moeten alle rode leds aan gaan en de groene uit",
+          "limit": 1,
+          "conditions": {
+            "operator": "OR",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "front-end",
+                "constraints": {
+                  "component_id": "start",
+                  "comparison": "gte",
+                  "value": 1
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "timer",
+              "type_id": "general",
+              "message": [
+                {
+                  "instruction": "start"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
     {
       "name": "halloween lights",
       "rules": [
@@ -265,7 +308,73 @@
       ]
     }
   ],
-  "puzzles": [],
+  "puzzles": [
+    {
+      "name": "puzzel keypad to door",
+      "rules": [
+        {
+          "id": "codedeur",
+          "description": "er moet een code gestuurd worden, dan gaan de halloween lichten aan, en na 10 sec de velle lichten",
+          "limit": 1,
+          "conditions": {
+            "operator": "AND",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "keypad",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "component_id": "code",
+                      "comparison": "eq",
+                      "value": 45
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "start",
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "all",
+                  "instruction": "scene",
+                  "value": "xAgrIMeKpZD8Gla"
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights",
+              "delay": "5s"
+            },
+            {
+              "message": [
+                {
+                  "component_id": "all",
+                  "instruction": "scene",
+                  "value": "MBvYmUk1U-EUaGz"
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
+            }
+          ]
+        }
+      ],
+      "hints": [
+        "Zet de schuiven nauwkeurig"
+      ]
+    }
+  ],
   "timers": [
     {
       "duration": "10s",
