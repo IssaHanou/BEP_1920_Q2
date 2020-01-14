@@ -53,12 +53,12 @@ func main() {
 	host := configurations.General.Host
 	port := configurations.General.Port
 
-	communicator := communication.Communicator{}
-
-	messageHandler := handler.Handler{Config: configurations, ConfigFile: filename, Communicator: &communicator}
-	go communicator.Start(host, port, topics, messageHandler.NewHandler, func() {
+	messageHandler := handler.Handler{Config: configurations, ConfigFile: filename}
+	messageHandler.Communicator = communication.NewCommunicator(host, port, topics, messageHandler.NewHandler, func() {
 		messageHandler.SendSetup()
 	})
+
+	messageHandler.Communicator.Start()
 
 	// prevent exit
 	select {}

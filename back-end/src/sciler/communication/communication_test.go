@@ -2,6 +2,7 @@ package communication
 
 import (
 	"errors"
+	"fmt"
 	"github.com/eclipse/paho.mqtt.golang"
 	"github.com/stretchr/testify/mock"
 	"testing"
@@ -53,6 +54,7 @@ func (c ClientMock) IsConnectionOpen() bool {
 }
 
 func (c ClientMock) Connect() mqtt.Token {
+	fmt.Println("TEST!!!")
 	args := c.Called()
 	return args.Get(0).(mqtt.Token)
 }
@@ -88,34 +90,26 @@ func (c ClientMock) OptionsReader() mqtt.ClientOptionsReader {
 
 func TestCommunicator_Start(t *testing.T) {
 	client := new(ClientMock)
-	communicator := Communicator{
-		client:           client,
-		topicsOfInterest: []string{"back-end", "test"},
-	}
-
+	communicator := Communicator{client: client}
 	client.On("Connect").Return(new(TokenMockSuccess)).Once()
-	communicator.Start(func(client mqtt.Client, message mqtt.Message) {}, func() {})
+	communicator.Start()
 	client.AssertExpectations(t)
 }
 
 func TestCommunicator_Publish(t *testing.T) {
 	client := new(ClientMock)
-	communicator := Communicator{
-		client:           client,
-		topicsOfInterest: []string{"back-end", "test"},
-	}
+	communicator := Communicator{client: client}
 	client.On("Publish", "test", byte(0), false, "json").Return(new(TokenMockSuccess)).Once()
+	communicator.setClient(client)
 	communicator.Publish("test", "json", 3)
 	client.AssertExpectations(t)
 }
 
 func TestCommunicator_PublishFailure(t *testing.T) {
 	client := new(ClientMock)
-	communicator := Communicator{
-		client:           client,
-		topicsOfInterest: []string{"back-end", "test"},
-	}
+	communicator := Communicator{client: client}
 	client.On("Publish", "test", byte(0), false, "json").Return(new(TokenMockFailure)).Times(3)
+	communicator.setClient(client)
 	communicator.Publish("test", "json", 3)
 	client.AssertExpectations(t)
 }

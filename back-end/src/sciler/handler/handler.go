@@ -19,8 +19,8 @@ type Message struct {
 
 // Communicator interface is an interface for mqtt communication
 type Communicator interface {
-	Start(host string, port int, topicsOfInterest []string, handler mqtt.MessageHandler, onStart func())
 	Publish(topic string, message string, retrials int)
+	Start()
 }
 
 // Handler is a type that mqqt handlers have
