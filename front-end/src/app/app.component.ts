@@ -42,11 +42,7 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
     this.logger = new Logger();
     this.jsonConvert = new JsonConvert();
-    this.deviceList = new Devices();
-    this.puzzleList = new Puzzles();
-    this.hintList = [];
-    this.configErrorList = [];
-    this.cameras = [];
+    this.initializeVariables();
 
     const topics = ["front-end"];
     for (const topic of topics) {
@@ -58,15 +54,21 @@ export class AppComponent implements OnInit, OnDestroy {
    * Initialize app, also called upon loading new config file.
    */
   ngOnInit(): void {
-    this.timerList = new Timers();
-    const generalTimer = { id: "general", duration: 0, state: "stateIdle" };
-    this.timerList.setTimer(generalTimer);
-
     this.sendInstruction([{ instruction: "send setup" }]);
     this.sendConnection(true);
     this.initializeTimers();
   }
 
+  initializeVariables() {
+    this.deviceList = new Devices();
+    this.puzzleList = new Puzzles();
+    this.hintList = [];
+    this.configErrorList = [];
+    this.cameras = [];
+    this.timerList = new Timers();
+    const generalTimer = { id: "general", duration: 0, state: "stateIdle" };
+    this.timerList.setTimer(generalTimer);
+  }
   /**
    * The purpose of this is, when the user leave the app we should cleanup our subscriptions
    * and close the connection with the broker
@@ -188,6 +190,7 @@ export class AppComponent implements OnInit, OnDestroy {
       }
       case "new config": {
         this.stopTimers();
+        this.initializeVariables();
         this.ngOnInit();
         this.openSnackbar("using new config: " + msg.contents.name, "");
         break;
