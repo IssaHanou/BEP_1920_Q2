@@ -38,7 +38,7 @@ func (handler *Handler) SendSetup() {
 	handler.sendEventStatus()
 }
 
-// SendComponentInstruction sends a list of instructions to a client
+// SendComponentInstruction sends a list of instructions to a client, with a delay if given a valid duration.
 func (handler *Handler) SendComponentInstruction(clientID string, instructions []config.ComponentInstruction, delay string) {
 	message := Message{
 		DeviceID: "back-end",
