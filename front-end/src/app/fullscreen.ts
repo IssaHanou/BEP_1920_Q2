@@ -8,9 +8,9 @@ export class FullScreen {
   /**
    * Uses HTML5 API to open the full screen.
    */
-  openFullScreen() {
+  openFullScreen(element) {
     // Trigger fullscreen
-    const docElmWithBrowsersFullScreenFunctions = document.documentElement as HTMLElement & {
+    const docElmWithBrowsersFullScreenFunctions = element as HTMLElement & {
       mozRequestFullScreen(): Promise<void>;
       webkitRequestFullscreen(): Promise<void>;
       msRequestFullscreen(): Promise<void>;
@@ -56,7 +56,7 @@ export class FullScreen {
     if (this.fullScreen) {
       this.closeFullScreen();
     } else {
-      this.openFullScreen();
+      this.openFullScreen(document.documentElement);
     }
   }
 }
