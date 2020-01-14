@@ -5,17 +5,49 @@
         <h3 class="camera-title">Camera</h3>
       </mat-expansion-panel-header>
 
-      <form (ngSubmit)="setSrc()" class="camera-title">
-        <mat-form-field>
-          <mat-select [formControl]="selectedCameraControl" placeholder="Choose camera to see feed"
-                      (selectionChange)="setSrc()">
-            <mat-option *ngFor="let camera of allCameras()" [value]="camera.name">{{ camera.name }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </form>
+      <div class="camera-selection">
+        <div class="left">
+          <form (ngSubmit)="setSrc()" class="camera-title">
+            <mat-form-field>
+              <mat-select [formControl]="selectedCameraControl" placeholder="Choose camera to see its feed"
+                          (selectionChange)="setSrc()">
+                <mat-option *ngFor="let camera of allCameras()" [value]="camera.name">{{ camera.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </form>
+        </div>
+        <div class="center">
+          <mat-checkbox [(ngModel)]="openSecond">Open second camera</mat-checkbox>
+        </div>
+        <div class="right">
+          <ng-container *ngIf="openSecond">
+            <form (ngSubmit)="setSrc()" class="camera-title">
+              <mat-form-field>
+                <mat-select [formControl]="selectedCameraControl2" placeholder="Choose camera to see its feed"
+                            (selectionChange)="setSrc2()">
+                  <mat-option *ngFor="let camera of allCameras()" [value]="camera.name">{{ camera.name }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </form>
+          </ng-container>
+        </div>
+      </div>
     </mat-expansion-panel>
   </div>
-  <div class="contents feed-box">
-    <iframe #cameraFeed [src]="cameraFeedSrc" class="camera-feed" allowFullScreen></iframe>
+
+  <div class="contents">
+    <div class="normal feed-box" *ngIf="!openSecond">
+      <iframe [src]="cameraFeedSrc" class="camera-feed" allowFullScreen></iframe>
+    </div>
+
+    <div class="split-screen" *ngIf="openSecond">
+      <div class="feed-box first-box">
+        <iframe [src]="cameraFeedSrc" class="camera-feed" allowFullScreen></iframe>
+      </div>
+
+      <div class="feed-box second-box" *ngIf="openSecond">
+        <iframe [src]="cameraFeedSrc2" class="camera-feed" allowFullScreen></iframe>
+      </div>
+    </div>
   </div>
 </div>

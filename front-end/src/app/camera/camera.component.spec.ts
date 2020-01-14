@@ -6,6 +6,7 @@ import { MQTT_SERVICE_OPTIONS } from "../app.module";
 import {
   MatFormFieldModule,
   MatSelectModule,
+  MatCheckboxModule,
   MatSnackBar,
   MatSnackBarModule,
   MatExpansionModule
@@ -26,6 +27,7 @@ describe("CameraComponent", () => {
         MatFormFieldModule,
         MatSelectModule,
         MatExpansionModule,
+        MatCheckboxModule,
         MatSnackBarModule,
         BrowserAnimationsModule,
         ReactiveFormsModule

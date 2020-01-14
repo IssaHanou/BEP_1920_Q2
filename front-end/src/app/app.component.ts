@@ -35,6 +35,8 @@ export class AppComponent implements OnInit, OnDestroy {
   configErrorList: string[];
   cameras: Camera[];
   selectedCamera: string;
+  selectedCamera2: string;
+  openSecondCamera = false;
   timerList: Timers;
   displayTime: string;
   everySecond: Observable<number> = timer(0, 1000);
