@@ -13,6 +13,7 @@ import { Overlay } from "@angular/cdk/overlay";
 import {
   MatFormFieldModule,
   MatIconModule,
+  MatCheckboxModule,
   MatInputModule,
   MatSidenavModule,
   MatTableModule,
@@ -46,6 +47,7 @@ describe("AppComponent", () => {
         MatSelectModule,
         MatInputModule,
         MatSortModule,
+        MatCheckboxModule,
         MatSidenavModule,
         MatToolbarModule,
         MatIconModule,
@@ -87,6 +89,6 @@ describe("AppComponent", () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelectorAll("p").item(0).textContent).toContain("SCILER");
+    expect(compiled.querySelectorAll("p").item(1).textContent).toContain("SCILER");
   });
 });
