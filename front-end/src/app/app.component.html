@@ -7,6 +7,9 @@
         <p class="title"> {{ title }} : {{ nameOfRoom }} </p>
       </div>
     </div>
+    <span (click)="$event.stopPropagation()">
+      <button mat-icon-button (click)="setFullScreen()"><mat-icon>fullscreen</mat-icon></button>
+    </span>
   </mat-toolbar>
   <mat-sidenav-container>
     <mat-sidenav #nav mode="over" class="menu">
