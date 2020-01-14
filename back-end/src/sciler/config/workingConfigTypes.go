@@ -90,6 +90,30 @@ func (t *Timer) Pause() bool {
 	return true
 }
 
+// AddTime Add time to a timer
+func (t *Timer) AddSubTime(handler InstructionSender, time time.Duration, add bool) bool {
+	if t.State == "stateIdle" {
+		if add {
+			t.Duration = t.Duration + time
+		} else {
+			if t.Duration > time {
+				t.Duration = t.Duration - time
+			} else {
+				return false
+			}
+		}
+		return true
+	} else if t.State == "stateActive" {
+		t.Pause()
+		t.AddSubTime(handler, time, add)
+		t.Start(handler)
+		return true
+	} else if t.State == "stateExpired" {
+		return false
+	}
+	return false
+}
+
 // Stop make a timer stop
 func (t *Timer) Stop() bool {
 	if t.State != "stateActive" {

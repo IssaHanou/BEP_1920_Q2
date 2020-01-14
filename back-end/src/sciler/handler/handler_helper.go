@@ -208,8 +208,20 @@ func (handler *Handler) SetTimer(timerID string, instructions config.ComponentIn
 		handler.Config.Timers[timerID].Start(handler)
 	case "pause":
 		handler.Config.Timers[timerID].Pause()
-	case "add": // TODO: implement timer Add
-	case "subtract": // TODO: implement timer subtract
+	case "add":
+		time, err := time.ParseDuration(fmt.Sprintf("%v", instructions.Value))
+		if err == nil {
+			handler.Config.Timers[timerID].AddSubTime(handler, time, true)
+		} else {
+			logrus.Warnf("error occurred while reading value of instruction: %v", instructions.Instruction)
+		}
+	case "subtract":
+		time, err := time.ParseDuration(fmt.Sprintf("%v", instructions.Value))
+		if err == nil {
+			handler.Config.Timers[timerID].AddSubTime(handler, time, false)
+		} else {
+			logrus.Warnf("error occurred while reading value of instruction: %v", instructions.Instruction)
+		}
 	case "stop":
 		handler.Config.Timers[timerID].Stop()
 	default:
