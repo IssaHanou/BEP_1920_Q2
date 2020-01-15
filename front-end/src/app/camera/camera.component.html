@@ -1,6 +1,18 @@
 <div #cameraBox id="cameraBox" class="home-box camera-box">
-  <div class="header">
-    <mat-expansion-panel #expansionPanel [expanded]="true" >
+  <!--If in full screen only show the camera title with the full screen button-->
+  <div class="header full-screen-title" *ngIf="fullScreen">
+    <h3 class="camera-title">
+      Camera
+      <span>
+        <button mat-icon-button (click)="setFullScreen()" style="vertical-align: center">
+          <mat-icon>fullscreen</mat-icon>
+        </button>
+      </span>
+    </h3>
+  </div>
+  <div class="header" *ngIf="!fullScreen">
+    <!--If not in full screen, the header is the full dropdown expansion panel-->
+    <mat-expansion-panel #expansionPanel [expanded]="true">
       <mat-expansion-panel-header (click)="expandPanel(expansionPanel, $event)">
         <h3 class="camera-title">
           Camera

@@ -20,6 +20,10 @@
 .camera-title {
   font-family: Roboto, "Helvetica Neue", sans-serif;
   color: #3f51b5;
+  margin: 0;
+}
+.full-screen-title {
+  max-height: 50px;
 }
 
 /**Width of drop down**/
