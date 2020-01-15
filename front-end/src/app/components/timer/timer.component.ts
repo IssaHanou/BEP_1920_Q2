@@ -22,7 +22,9 @@ export class TimerComponent implements OnInit {
     if (device !== null) {
       const status = device.status;
       if (status.get("start") > 0 && status.get("stop") === 0) {
-        const doneTime = formatTime(new Date().getTime() + this.app.timerList.getTimer("general").duration);
+        const date = new Date();
+        const timeDiff = date.getTime()+ this.app.timerList.getTimer("general").duration;
+        const doneTime = formatTime(timeDiff, date.getTimezoneOffset());
         return "Klaar om " + doneTime;
       }
     }

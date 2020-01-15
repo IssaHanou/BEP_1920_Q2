@@ -325,6 +325,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
    * Return the current time to display.
    */
   getCurrentTime() {
-    return formatTime(new Date());
+    const date = new Date();
+    return formatTime(date.getTime(), date.getTimezoneOffset());
   }
 }

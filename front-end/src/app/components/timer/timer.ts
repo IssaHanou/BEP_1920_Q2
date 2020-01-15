@@ -43,7 +43,10 @@ export function formatMS(timeInMS) {
 
 /**
  * Format the time in milliseconds to a string in the format hh:mm.
+ * Timezone off set is in minutes.
  */
-export function formatTime(timeInMS) {
+export function formatTime(timeInMS, tzOffSet) {
+  const tzInMs =  60 * 1000 * tzOffSet;
+  timeInMS = timeInMS - tzInMs;
   return formatMS(timeInMS).substr(0, 5);
 }
