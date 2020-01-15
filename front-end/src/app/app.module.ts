@@ -6,7 +6,7 @@ import { DeviceComponent } from "./components/device/device.component";
 import { TimerComponent } from "./components/timer/timer.component";
 import { ManageComponent } from "./components/manage/manage.component";
 import { PuzzleComponent } from "./components/puzzle/puzzle.component";
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
 import { MqttModule, MqttService, IMqttServiceOptions } from "ngx-mqtt";
 import {
@@ -53,13 +53,13 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     qos: 1,
     retain: false
   },
-  keepalive: 10
+  keepalive: 5
 };
 
 export const APP_ROUTES: Routes = [
-  {path: "", component: HomeComponent},
-  {path: "camera", component: CameraComponent},
-  {path: "config", component: ConfigComponent}
+  { path: "", component: HomeComponent },
+  { path: "camera", component: CameraComponent },
+  { path: "config", component: ConfigComponent }
 ];
 
 @NgModule({
