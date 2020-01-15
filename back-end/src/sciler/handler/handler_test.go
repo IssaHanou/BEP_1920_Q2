@@ -79,13 +79,12 @@ func TestHandler_SetTimer_Start(t *testing.T) {
 	assert.Equal(t, "stateIdle", handler.Config.Timers["TestTimer"].State)
 	handler.SetTimer("TestTimer", content)
 	assert.Equal(t, "stateActive", handler.Config.Timers["TestTimer"].State)
-
 }
 
 func TestHandler_SetTimer_Stop(t *testing.T) {
 	handler := getTestHandler()
 	content := config.ComponentInstruction{Instruction: "stop"}
-	handler.Config.Timers["TestTimer"].Start(nil)
+	handler.Config.Timers["TestTimer"].Start(handler)
 	assert.Equal(t, "stateActive", handler.Config.Timers["TestTimer"].State)
 	handler.SetTimer("TestTimer", content)
 	assert.Equal(t, "stateExpired", handler.Config.Timers["TestTimer"].State)
@@ -94,10 +93,55 @@ func TestHandler_SetTimer_Stop(t *testing.T) {
 func TestHandler_SetTimer_Pause(t *testing.T) {
 	handler := getTestHandler()
 	content := config.ComponentInstruction{Instruction: "pause"}
-	handler.Config.Timers["TestTimer"].Start(nil)
+	handler.Config.Timers["TestTimer"].Start(handler)
 	assert.Equal(t, "stateActive", handler.Config.Timers["TestTimer"].State)
 	handler.SetTimer("TestTimer", content)
 	assert.Equal(t, "stateIdle", handler.Config.Timers["TestTimer"].State)
+}
+
+func TestHandler_SetTimer_Add(t *testing.T) {
+	handler := getTestHandler()
+	content := config.ComponentInstruction{Instruction: "add", Value: "5s"}
+	assert.Equal(t, 5, int(handler.Config.Timers["TestTimer"].Duration.Seconds()))
+	handler.SetTimer("TestTimer", content)
+	assert.Equal(t, 10, int(handler.Config.Timers["TestTimer"].Duration.Seconds()))
+
+}
+
+func TestHandler_SetTimer_Add_Parse_error(t *testing.T) {
+	handler := getTestHandler()
+	content := config.ComponentInstruction{Instruction: "add", Value: "5"}
+	assert.Equal(t, 5, int(handler.Config.Timers["TestTimer"].Duration.Seconds()))
+	handler.SetTimer("TestTimer", content)
+	assert.Equal(t, 5, int(handler.Config.Timers["TestTimer"].Duration.Seconds()))
+
+}
+
+func TestHandler_SetTimer_Subtract(t *testing.T) {
+	handler := getTestHandler()
+	content := config.ComponentInstruction{Instruction: "subtract", Value: "3s"}
+	assert.Equal(t, 5, int(handler.Config.Timers["TestTimer"].Duration.Seconds()))
+	handler.SetTimer("TestTimer", content)
+	assert.Equal(t, 2, int(handler.Config.Timers["TestTimer"].Duration.Seconds()))
+
+}
+
+func TestHandler_SetTimer_Subtract_Parse_Error(t *testing.T) {
+	handler := getTestHandler()
+	content := config.ComponentInstruction{Instruction: "subtract", Value: "3"}
+	assert.Equal(t, 5, int(handler.Config.Timers["TestTimer"].Duration.Seconds()))
+	handler.SetTimer("TestTimer", content)
+	assert.Equal(t, 5, int(handler.Config.Timers["TestTimer"].Duration.Seconds()))
+
+}
+
+func TestHandler_SetTimer_Done(t *testing.T) {
+	handler := getTestHandler()
+	content := config.ComponentInstruction{Instruction: "done"}
+	handler.Config.Timers["TestTimer"].Start(handler)
+	assert.Equal(t, "stateActive", handler.Config.Timers["TestTimer"].State)
+	handler.SetTimer("TestTimer", content)
+	assert.Equal(t, "stateExpired", handler.Config.Timers["TestTimer"].State)
 }
 
 func TestGetStatus(t *testing.T) {

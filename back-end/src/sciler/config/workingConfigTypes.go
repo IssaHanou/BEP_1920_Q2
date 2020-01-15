@@ -81,10 +81,6 @@ func (t *Timer) Pause() error {
 	if t.State != "stateActive" {
 		return fmt.Errorf("timer %v does not have a Active state and can not be paused", t.ID)
 	}
-	if !t.T.Stop() { //TODO test
-		t.State = "stateExpired"
-		return fmt.Errorf("timer %v failed to stop for an unknown reason", t.ID)
-	}
 	t.Duration, _ = t.GetTimeLeft()
 	t.State = "stateIdle"
 	logrus.Infof("timer paused with %v left", t.Duration)
@@ -116,7 +112,7 @@ func (t *Timer) AddSubTime(handler InstructionSender, time time.Duration, add bo
 	} else if t.State == "stateExpired" {
 		return fmt.Errorf("timer %v could not be edited since it is already Expired", t.ID)
 	}
-	return fmt.Errorf("timer %v could not be edited because there is somethinf wrong with its state: %v", t.ID, t.State)
+	return fmt.Errorf("timer %v could not be edited because there is something wrong with its state: %v", t.ID, t.State)
 }
 
 // Stop make a timer stop
@@ -125,9 +121,13 @@ func (t *Timer) Stop() error {
 	if t.State == "stateExpired" {
 		return fmt.Errorf("timer %v is already Expired and can not be stopped again", t.ID)
 	}
-	t.StartedAt = time.Now()
+	if t.State == "stateIdle" {
+		t.Duration = 0 * time.Second
+	} else {
+		t.T.Stop()
+	}
 	t.State = "stateExpired"
-	t.T.Stop()
+
 	logrus.Infof("timer %v stopped and set to Expired without handling it's actions", t.ID)
 	return nil
 }
