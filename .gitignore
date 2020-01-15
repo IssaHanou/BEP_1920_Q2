@@ -6,7 +6,7 @@ __pycache__/
 back-end/pkg
 back-end/bin
 back-end/src/*
-back-end/resources/room_config.json
+back-end/resources/production/*.json
 !back-end/src/sciler
 */debug.log
 /cc_library/py-scc/src/scripts/logs/
