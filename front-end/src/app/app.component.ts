@@ -58,11 +58,19 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.mqttService.onOffline.subscribe(() => {
       this.logger.log("error", "Connection to broker lost");
-      for (const tuple of this.deviceList.all) {
-        const device = tuple[1];
-        device.connection = false;
-      }
+      this.setConnectionAllDevices(false);
     });
+  }
+
+  /**
+   * Sets connection of all devices
+   * @param connection boolean
+   */
+  private setConnectionAllDevices(connection: boolean) {
+    for (const tuple of this.deviceList.all) {
+      const device = tuple[1];
+      device.connection = false;
+    }
   }
 
   /**
@@ -170,6 +178,7 @@ export class AppComponent implements OnInit, OnDestroy {
    */
   private processMessage(jsonMessage: string) {
     const msg: Message = Message.deserialize(jsonMessage);
+
     switch (msg.type) {
       case "confirmation": {
         this.processConfirmation(msg);
@@ -181,6 +190,11 @@ export class AppComponent implements OnInit, OnDestroy {
       }
       case "status": {
         this.deviceList.setDevice(msg.contents);
+
+        // When the back-end/front-end disconnects, all devices are disconnected
+        if (msg.contents.id === "front-end" && !msg.contents.connection) {
+          this.setConnectionAllDevices(false);
+        }
         break;
       }
       case "event status": {

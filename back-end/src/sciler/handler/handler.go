@@ -87,7 +87,7 @@ func (handler *Handler) onConnectionMsg(raw Message) {
 			logrus.Info("setting connection status of ", raw.DeviceID, " to ", value)
 			handler.sendStatus(raw.DeviceID)
 			if raw.DeviceID == "front-end" && !value.(bool) { // when a front-end disconnect, check if another front-end is connected (maybe multiple front-ends are running
-				handler.GetStatus("front-end")
+				handler.SendSetup()
 			}
 		}
 	}
