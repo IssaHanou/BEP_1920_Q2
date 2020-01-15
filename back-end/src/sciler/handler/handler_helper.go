@@ -203,29 +203,36 @@ func (handler *Handler) GetStatus(deviceID string) {
 
 // SetTimer starts given timer
 func (handler *Handler) SetTimer(timerID string, instructions config.ComponentInstruction) {
+	err := error(nil)
 	switch instructions.Instruction {
 	case "start":
-		handler.Config.Timers[timerID].Start(handler)
+		err = handler.Config.Timers[timerID].Start(handler)
 	case "pause":
-		handler.Config.Timers[timerID].Pause()
+		err = handler.Config.Timers[timerID].Pause()
 	case "add":
-		time, err := time.ParseDuration(fmt.Sprintf("%v", instructions.Value))
-		if err == nil {
-			handler.Config.Timers[timerID].AddSubTime(handler, time, true)
+		time, durErr := time.ParseDuration(fmt.Sprintf("%v", instructions.Value))
+		if durErr == nil {
+			err = handler.Config.Timers[timerID].AddSubTime(handler, time, true)
 		} else {
-			logrus.Warnf("error occurred while reading value of instruction: %v", instructions.Instruction)
+			err = fmt.Errorf("could not parse %v to duration to add for timer %v", instructions.Value, timerID)
 		}
 	case "subtract":
-		time, err := time.ParseDuration(fmt.Sprintf("%v", instructions.Value))
-		if err == nil {
-			handler.Config.Timers[timerID].AddSubTime(handler, time, false)
+		time, durErr := time.ParseDuration(fmt.Sprintf("%v", instructions.Value))
+		if durErr == nil {
+			err = handler.Config.Timers[timerID].AddSubTime(handler, time, false)
 		} else {
-			logrus.Warnf("error occurred while reading value of instruction: %v", instructions.Instruction)
+			err = fmt.Errorf("could not parse %v to duration to subtract for timer %v", instructions.Value, timerID)
 		}
 	case "stop":
-		handler.Config.Timers[timerID].Stop()
+		err = handler.Config.Timers[timerID].Stop()
+	case "done":
+		err = handler.Config.Timers[timerID].Done()
 	default:
-		logrus.Warnf("error occurred while reading timer instruction message: %v", instructions.Instruction)
+		err = fmt.Errorf("error occurred while reading timer instruction message: %v", instructions.Instruction)
+	}
+
+	if err != nil {
+		logrus.Error(err)
 	}
 	handler.sendStatus(timerID)
 }

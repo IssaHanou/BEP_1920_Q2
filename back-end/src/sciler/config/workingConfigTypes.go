@@ -50,80 +50,98 @@ func (t *Timer) GetTimeLeft() (time.Duration, string) {
 	if t.State == "stateActive" {
 		dif := time.Now().Sub(t.StartedAt)
 		left = t.Duration - dif
-	} else {
+	} else if t.State == "stateIdle" {
 		left = t.Duration
 	}
 	return left, t.State
 }
 
-// Start starts Timer that will send the current time on its channel after at least duration d.
-func (t *Timer) Start(handler InstructionSender) bool {
+// Start starts Timer that executes handler.HandleEvent(t.ID) after duration d.
+// Can not start if timer is not state Idle
+func (t *Timer) Start(handler InstructionSender) error {
 	if t.State != "stateIdle" {
-		return false
+		return fmt.Errorf("timer %v does not have an Idle state and can not be started", t.ID)
 	}
 	t.StartedAt = time.Now()
 	t.State = "stateActive"
 	t.Ending = func() {
 		t.State = "stateExpired"
 		t.Finish = true
-		logrus.Info("timer finished", t.ID)
+		logrus.Infof("timer %v finished", t.ID)
 		handler.HandleEvent(t.ID)
 	}
 	t.T = time.AfterFunc(t.Duration, t.Ending)
-	logrus.Info("timer started for ", t.Duration)
-	return true
+	logrus.Infof("timer %v started for %v", t.ID, t.Duration)
+	return nil
 }
 
-// Pause make a timer pause
-func (t *Timer) Pause() bool {
+// Pause sets the timer to Idle and sets new duration to the time left
+// can not pause if timer is not state Active
+func (t *Timer) Pause() error {
 	if t.State != "stateActive" {
-		return false
+		return fmt.Errorf("timer %v does not have a Active state and can not be paused", t.ID)
 	}
 	if !t.T.Stop() { //TODO test
 		t.State = "stateExpired"
-		return false
+		return fmt.Errorf("timer %v failed to stop for an unknown reason", t.ID)
 	}
+	t.Duration, _ = t.GetTimeLeft()
 	t.State = "stateIdle"
-	dur := time.Now().Sub(t.StartedAt)
-	t.Duration = t.Duration - dur
-	logrus.Info("timer paused with ", t.Duration, " left")
-	return true
+	logrus.Infof("timer paused with %v left", t.Duration)
+	return nil
 }
 
-// AddTime Add time to a timer
-func (t *Timer) AddSubTime(handler InstructionSender, time time.Duration, add bool) bool {
+// AddSubTime add or subtract time to a timer
+// can only subtract if that time is equally left
+// can only add or subtract time if the state is not Expired
+func (t *Timer) AddSubTime(handler InstructionSender, time time.Duration, add bool) error {
 	if t.State == "stateIdle" {
 		if add {
 			t.Duration = t.Duration + time
+			logrus.Infof("timer %v added %v to duration and now has a duration of %v", t.ID, time, t.Duration)
 		} else {
 			if t.Duration > time {
 				t.Duration = t.Duration - time
+				logrus.Infof("timer %v subtracted %v to duration and now has a duration of %v", t.ID, time, t.Duration)
 			} else {
-				return false
+				return fmt.Errorf("timer %v could not subtract %v since there is only %v left", t.ID, time, t.Duration)
 			}
 		}
-		return true
+		return nil
 	} else if t.State == "stateActive" {
 		t.Pause()
-		t.AddSubTime(handler, time, add)
+		err := t.AddSubTime(handler, time, add)
 		t.Start(handler)
-		return true
+		return err
 	} else if t.State == "stateExpired" {
-		return false
+		return fmt.Errorf("timer %v could not be edited since it is already Expired", t.ID)
 	}
-	return false
+	return fmt.Errorf("timer %v could not be edited because there is somethinf wrong with its state: %v", t.ID, t.State)
 }
 
 // Stop make a timer stop
-func (t *Timer) Stop() bool {
-	if t.State != "stateActive" {
-		return false
+// can not stop timer that has state Expired
+func (t *Timer) Stop() error {
+	if t.State == "stateExpired" {
+		return fmt.Errorf("timer %v is already Expired and can not be stopped again", t.ID)
 	}
 	t.StartedAt = time.Now()
 	t.State = "stateExpired"
 	t.T.Stop()
-	logrus.Info("timer stopped")
-	return true
+	logrus.Infof("timer %v stopped and set to Expired without handling it's actions", t.ID)
+	return nil
+}
+
+// Done finishes the timer as if it ran out of time
+// can not finish a timer that is already Expired
+func (t *Timer) Done() error {
+	if t.State == "stateExpired" {
+		return fmt.Errorf("timer %v is already Expired and can not be finished again", t.ID)
+	}
+	t.Ending()
+	t.T.Stop()
+	logrus.Infof("timer %v stopped and set to Expired, actions are being handled", t.ID)
+	return nil
 }
 
 // Rule is a struct that describes how action flow is handled in the escape room.

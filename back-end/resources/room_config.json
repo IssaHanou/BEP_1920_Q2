@@ -498,8 +498,8 @@
       "name": "timer dingen",
       "rules": [
         {
-          "id": "add 5 min",
-          "description": "5 seconde na de start wordt er een hint verstuurd",
+          "id": "add 5 min timer",
+          "description": "add 5 min to general",
           "limit": 1,
           "conditions": {    "list": [],
             "operator": "OR"      },
@@ -515,9 +515,10 @@
               ]
             }
           ]
-        },{
-          "id": "sub 5 min",
-          "description": "5 seconde na de start wordt er een hint verstuurd",
+        },
+        {
+          "id": "sub 5 min timer",
+          "description": "sub 5 min to general",
           "limit": 1,
           "conditions": {       "list": [],
             "operator": "OR"   },
@@ -529,6 +530,78 @@
                 {
                   "instruction": "subtract",
                   "value": "5m"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "done timer",
+          "description": "done general",
+          "limit": 1,
+          "conditions": {       "list": [],
+            "operator": "OR"   },
+          "actions": [
+            {
+              "type": "timer",
+              "type_id": "general",
+              "message": [
+                {
+                  "instruction": "done"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "pause timer",
+          "description": "pause general",
+          "limit": 1,
+          "conditions": {       "list": [],
+            "operator": "OR"   },
+          "actions": [
+            {
+              "type": "timer",
+              "type_id": "general",
+              "message": [
+                {
+                  "instruction": "pause"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "start timer",
+          "description": "start general",
+          "limit": 1,
+          "conditions": {       "list": [],
+            "operator": "OR"   },
+          "actions": [
+            {
+              "type": "timer",
+              "type_id": "general",
+              "message": [
+                {
+                  "instruction": "start"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "stop timer",
+          "description": "stop general",
+          "limit": 1,
+          "conditions": {       "list": [],
+            "operator": "OR"   },
+          "actions": [
+            {
+              "type": "timer",
+              "type_id": "general",
+              "message": [
+                {
+                  "instruction": "stop"
                 }
               ]
             }
@@ -727,7 +800,7 @@
               "type_id": "general",
               "message": [
                 {
-                  "instruction": "pause"
+                  "instruction": "stop"
                 }
               ]
             },
