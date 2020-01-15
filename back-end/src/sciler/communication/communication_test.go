@@ -2,7 +2,6 @@ package communication
 
 import (
 	"errors"
-	"fmt"
 	"github.com/eclipse/paho.mqtt.golang"
 	"github.com/stretchr/testify/mock"
 	"testing"
