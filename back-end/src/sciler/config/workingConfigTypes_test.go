@@ -46,7 +46,6 @@ func (handlerMock *HandlerMock) HandleEvent(id string) {
 	// do nothing
 }
 
-// TODO Test last timer parts: t.Ending() and t.Stop()
 func TestTimer_GetTimeLeft(t *testing.T) {
 	timer := Timer{
 		ID:        "testTimer",
@@ -95,7 +94,7 @@ func TestTimer_Start(t *testing.T) {
 func TestTimer_Finish(t *testing.T) {
 	timer := Timer{
 		ID:        "testTimer",
-		Duration:  1 * time.Second,
+		Duration:  100 * time.Millisecond,
 		StartedAt: time.Time{},
 		T:         nil,
 		State:     "stateIdle",
@@ -106,7 +105,7 @@ func TestTimer_Finish(t *testing.T) {
 	timer.Start(handlerMock)
 	assert.Equal(t, timer.State, "stateActive")
 	assert.Equal(t, timer.Finish, false)
-	time.Sleep(2 * time.Second)
+	time.Sleep(1 * time.Second)
 	assert.Equal(t, timer.State, "stateExpired")
 	assert.Equal(t, timer.Finish, true)
 
