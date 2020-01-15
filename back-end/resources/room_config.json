@@ -5,10 +5,19 @@
     "host": "192.168.178.82",
     "port": 1883
   },
-   "cameras": [
-     {"name": "camera1", "link": "https://raccoon.games"},
-     {"name": "camera2", "link": "https://debrouwerij.io"},
-     {"name": "muppets", "link": "https://www.youtube.com/embed/tgbNymZ7vqY"}
+  "cameras": [
+    {
+      "name": "camera1",
+      "link": "https://raccoon.games"
+    },
+    {
+      "name": "camera2",
+      "link": "https://debrouwerij.io"
+    },
+    {
+      "name": "muppets",
+      "link": "https://www.youtube.com/embed/tgbNymZ7vqY"
+    }
   ],
   "devices": [
     {
@@ -384,86 +393,6 @@
   ],
   "general_events": [
     {
-      "name": "Start knop",
-      "rules": [
-        {
-          "id": "start",
-          "description": "Als het spel start, moeten alle rode leds aan gaan en de groene uit",
-          "limit": 1,
-          "conditions": {
-            "operator": "OR",
-            "list": [
-              {
-                "type": "device",
-                "type_id": "front-end",
-                "constraints": {
-                  "component_id": "start",
-                  "comparison": "gte",
-                  "value": 1
-                }
-              }
-            ]
-          },
-          "actions": [
-            {
-              "type": "device",
-              "type_id": "controlBoard",
-              "message": [
-                {
-                  "component_id": "redLight1",
-                  "instruction": "turnOnOff",
-                  "value": true
-                },
-                {
-                  "component_id": "redLight2",
-                  "instruction": "turnOnOff",
-                  "value": true
-                },
-                {
-                  "component_id": "redLight3",
-                  "instruction": "turnOnOff",
-                  "value": true
-                },
-                {
-                  "component_id": "greenLight1",
-                  "instruction": "turnOnOff",
-                  "value": false
-                },
-                {
-                  "component_id": "greenLight2",
-                  "instruction": "turnOnOff",
-                  "value": false
-                },
-                {
-                  "component_id": "greenLight3",
-                  "instruction": "turnOnOff",
-                  "value": false
-                }
-              ]
-            },
-            {
-              "type": "timer",
-              "type_id": "timer2",
-              "message": [
-                {
-                  "instruction": "start"
-                }
-              ]
-            },
-            {
-              "type": "timer",
-              "type_id": "general",
-              "message": [
-                {
-                  "instruction": "start"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
       "name": "late hint",
       "rules": [
         {
@@ -657,73 +586,202 @@
           ]
         }
       ]
-    },
+    }
+  ],
+  "button_events": [
     {
-      "name": "Stop knop",
-      "rules": [
-        {
-          "id": "stop",
-          "description": "Als het spel stopt, moeten alle lichten uitgaan",
-          "limit": 1,
-          "conditions": {
-            "operator": "OR",
-            "list": [
-              {
-                "type": "device",
-                "type_id": "front-end",
-                "constraints": {
-                  "component_id": "stop",
-                  "comparison": "eq",
-                  "value": 1
-                }
-              }
-            ]
+      "id": "start",
+      "description": "Als het spel start, moeten alle rode leds aan gaan en de groene uit",
+      "limit": 1,
+      "conditions": {
+        "operator": "AND",
+        "list": [
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "start",
+              "comparison": "eq",
+              "value": true
+            }
           },
-          "actions": [
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "stop",
+              "comparison": "eq",
+              "value": false
+            }
+          }
+        ]
+      },
+      "actions": [
+        {
+          "type": "device",
+          "type_id": "controlBoard",
+          "message": [
             {
-              "type": "timer",
-              "type_id": "general",
-              "message": [
-                {
-                  "instruction": "pause"
-                }
-              ]
+              "component_id": "redLight1",
+              "instruction": "turnOnOff",
+              "value": true
             },
             {
-              "type": "device",
-              "type_id": "controlBoard",
-              "message": [
-                {
-                  "component_id": "redLight1",
-                  "instruction": "turnOnOff",
-                  "value": false
-                },
-                {
-                  "component_id": "redLight2",
-                  "instruction": "turnOnOff",
-                  "value": false
-                },
-                {
-                  "component_id": "redLight3",
-                  "instruction": "turnOnOff",
-                  "value": false
-                },
-                {
-                  "component_id": "greenLight1",
-                  "instruction": "turnOnOff",
-                  "value": false
-                },
-                {
-                  "component_id": "greenLight2",
-                  "instruction": "turnOnOff",
-                  "value": false
-                },
-                {
-                  "component_id": "greenLight3",
-                  "instruction": "turnOnOff",
-                  "value": false
-                }
-              ]
+              "component_id": "redLight2",
+              "instruction": "turnOnOff",
+              "value": true
+            },
+            {
+              "component_id": "redLight3",
+              "instruction": "turnOnOff",
+              "value": true
+            },
+            {
+              "component_id": "greenLight1",
+              "instruction": "turnOnOff",
+              "value": false
+            },
+            {
+              "component_id": "greenLight2",
+              "instruction": "turnOnOff",
+              "value": false
+            },
+            {
+              "component_id": "greenLight3",
+              "instruction": "turnOnOff",
+              "value": false
+            }
+          ]
+        },
+        {
+          "type": "timer",
+          "type_id": "timer2",
+          "message": [
+            {
+              "instruction": "start"
+            }
+          ]
+        },
+        {
+          "type": "timer",
+          "type_id": "general",
+          "message": [
+            {
+              "instruction": "start"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stop",
+      "description": "Als het spel stopt, moeten alle lichten uitgaan",
+      "limit": 1,
+      "conditions": {
+        "operator": "AND",
+        "list": [
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "stop",
+              "comparison": "eq",
+              "value": true
+            }
+          },
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "start",
+              "comparison": "eq",
+              "value": true
+            }
+          }
+        ]
+      },
+      "actions": [
+        {
+          "type": "timer",
+          "type_id": "general",
+          "message": [
+            {
+              "instruction": "pause"
+            }
+          ]
+        },
+        {
+          "type": "device",
+          "type_id": "controlBoard",
+          "message": [
+            {
+              "component_id": "redLight1",
+              "instruction": "turnOnOff",
+              "value": false
+            },
+            {
+              "component_id": "redLight2",
+              "instruction": "turnOnOff",
+              "value": false
+            },
+            {
+              "component_id": "redLight3",
+              "instruction": "turnOnOff",
+              "value": false
+            },
+            {
+              "component_id": "greenLight1",
+              "instruction": "turnOnOff",
+              "value": false
+            },
+            {
+              "component_id": "greenLight2",
+              "instruction": "turnOnOff",
+              "value": false
+            },
+            {
+              "component_id": "greenLight3",
+              "instruction": "turnOnOff",
+              "value": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pause",
+      "description": "Als pauze wordt gedrukt, stopt de tijd en wordt de volgende keer weer hervat",
+      "limit": 0,
+      "conditions": {
+        "operator": "AND",
+        "list": [
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "start",
+              "comparison": "eq",
+              "value": true
+            }
+          },
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "pause",
+              "comparison": "eq",
+              "value": true
+            }
+          }
+        ]
+      },
+      "actions": [
+        {
+          "type": "timer",
+          "type_id": "general",
+          "message": [
+            {
+              "instruction": "pause"
             }
           ]
         }

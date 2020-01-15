@@ -13,6 +13,7 @@ type WorkingConfig struct {
 	Cameras       []Camera
 	Puzzles       []*Puzzle
 	GeneralEvents []*GeneralEvent
+	ButtonEvents  []*Rule
 	Devices       map[string]*Device
 	Timers        map[string]*Timer
 	StatusMap     map[string][]*Rule
@@ -121,11 +122,10 @@ type InstructionSender interface {
 
 // Finished is a method that checks is the a rule have been finished, meaning if it reached its maximum number of executions
 func (r *Rule) Finished() bool {
-	return r.Executed == r.Limit
+	return r.Executed == r.Limit && r.Limit != 0
 }
 
 // Execute performs all actions of a rule
-// TODO test this
 func (r *Rule) Execute(handler InstructionSender) {
 	for _, action := range r.Actions {
 		action.Execute(handler)

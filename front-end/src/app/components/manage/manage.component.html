@@ -1,9 +1,14 @@
 <div class="home-box manage-box">
   <h3 class="header">Acties</h3>
   <div class="contents">
-    <button mat-raised-button color=primary class="start" (click)="onClickStartButton()">Start</button>
-    <button mat-raised-button color=warn class="stop" (click)="onClickStopButton()">Stop</button>
-    <button mat-raised-button color=primary class="test" (click)="onClickTestButton()">Test</button>
-    <button mat-raised-button color=primary class="reset" (click)="onClickResetButton()">Reset</button>
+    <div>
+      <button mat-raised-button color=primary (click)="onClickTestButton()">test</button>
+      <button mat-raised-button color=primary (click)="onClickResetButton()">reset</button>
+    </div>
+    <div>
+      <ng-container *ngFor="let btn of getButtons()">
+        <button mat-raised-button color=primary (click)="onClickCustomButton(btn)">{{ btn }}</button>
+      </ng-container>
+    </div>
   </div>
 </div>

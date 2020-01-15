@@ -74,5 +74,148 @@
     }
   ],
   "general_events": [
+  ],
+  "button_events": [
+    {
+      "id": "start",
+      "description": "Als het spel start, moeten alle rode leds aan gaan en de groene uit",
+      "limit": 1,
+      "conditions": {
+        "operator": "OR",
+        "list": [
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "start",
+              "comparison": "gte",
+              "value": 1
+            }
+          }
+        ]
+      },
+      "actions": [
+        {
+          "type": "device",
+          "type_id": "controlBoard",
+          "message": [
+            {
+              "component_id": "redLight1",
+              "instruction": "turnOnOff",
+              "value": true
+            },
+            {
+              "component_id": "redLight2",
+              "instruction": "turnOnOff",
+              "value": true
+            },
+            {
+              "component_id": "redLight3",
+              "instruction": "turnOnOff",
+              "value": true
+            },
+            {
+              "component_id": "greenLight1",
+              "instruction": "turnOnOff",
+              "value": false
+            },
+            {
+              "component_id": "greenLight2",
+              "instruction": "turnOnOff",
+              "value": false
+            },
+            {
+              "component_id": "greenLight3",
+              "instruction": "turnOnOff",
+              "value": false
+            }
+          ]
+        },
+        {
+          "type": "timer",
+          "type_id": "timer2",
+          "message": [
+            {
+              "instruction": "start"
+            }
+          ]
+        },
+        {
+          "type": "timer",
+          "type_id": "general",
+          "message": [
+            {
+              "instruction": "start"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stop",
+      "description": "Als het spel stopt, moeten alle lichten uitgaan",
+      "limit": 1,
+      "conditions": {
+        "operator": "OR",
+        "list": [
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "stop",
+              "comparison": "eq",
+              "value": 1
+            }
+          }
+        ]
+      },
+      "actions": [
+        {
+          "type": "timer",
+          "type_id": "general",
+          "message": [
+            {
+              "instruction": "pause"
+            }
+          ]
+        },
+        {
+          "type": "device",
+          "type_id": "controlBoard",
+          "message": [
+            {
+              "component_id": "redLight1",
+              "instruction": "turnOnOff",
+              "value": false
+            },
+            {
+              "component_id": "redLight2",
+              "instruction": "turnOnOff",
+              "value": false
+            },
+            {
+              "component_id": "redLight3",
+              "instruction": "turnOnOff",
+              "value": false
+            },
+            {
+              "component_id": "greenLight1",
+              "instruction": "turnOnOff",
+              "value": false
+            },
+            {
+              "component_id": "greenLight2",
+              "instruction": "turnOnOff",
+              "value": false
+            },
+            {
+              "component_id": "greenLight3",
+              "instruction": "turnOnOff",
+              "value": false
+            }
+          ]
+        }
+      ]
+    }
   ]
 }

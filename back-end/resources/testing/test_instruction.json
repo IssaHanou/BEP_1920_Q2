@@ -64,7 +64,29 @@
               "value": "test",
               "comparison": "eq"
             }
-          }
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "display",
+              "message": [
+                {
+                  "component_id": "display",
+                  "instruction": "hint",
+                  "value": "it tested!"
+                }
+              ]
+            },
+            {
+              "type": "timer",
+              "type_id": "general",
+              "message": [
+                {
+                  "instruction": "start"
+                }
+              ]
+            }
+          ]
         }
       ]
     }

@@ -5,6 +5,7 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"math"
 	"sciler/communication"
 	"sciler/config"
 	"testing"
@@ -551,5 +552,49 @@ func TestSendStatusUnknownDevice(t *testing.T) {
 
 	communicatorMock.On("Publish", "hint", string(msg), 3)
 	handler.sendStatus("Unknown device or timer")
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 0)
+}
+
+func TestOnInstructionMsgFinishUnkwownRule(t *testing.T) {
+	msg := Message{
+		DeviceID: "front-end",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "instruction",
+		Contents: []map[string]interface{}{{
+			"instruction": "finish rule",
+			"rule":        "this-does-not-exist"},
+		},
+	}
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_instruction.json"),
+		Communicator: communicatorMock,
+	}
+	returnMessage, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "event status",
+		Contents: []map[string]interface{}{{
+			"id":     "rule",
+			"status": false},
+		},
+	})
+	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)
+	handler.onInstructionMsg(msg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+}
+
+func TestOnInstructionMsgInvalidConfig(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	fileName := "../../../resources/testing/test_config.json"
+	workingConfig := config.ReadFile(fileName)
+	handler := Handler{
+		Config:       workingConfig,
+		ConfigFile:   fileName,
+		Communicator: communicatorMock,
+	}
+	configToTest := math.Inf(1)
+	communicatorMock.On("Publish", "front-end", mock.Anything, 3)
+	handler.processConfig(configToTest, "check", fileName)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 0)
 }

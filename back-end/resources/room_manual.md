@@ -7,10 +7,12 @@ An example can be seen in `example.config.json`. The same format
 There are three main components to the file:
 
 - `general`
+- `cameras`
 - `devices`
 - `timers`
 - `puzzles` 
 - `general_events`
+- `button_events`
 - `rules` which are defined for puzzles
 
 ### General
@@ -20,6 +22,12 @@ This is the general information of the escape room. It includes the following ta
 - `duration`: this is the duration of the escape room, which should be a string in the format "hh:mm:ss".
 - `host`: this is the IP address of the broker through which clients and back-end connect, formatted as a string.
 - `port`: this is the port on which the broker runs, formatted as integer. 
+
+### Cameras
+This will be a list of camera objects, that are set up in the room. An object has two properties:
+
+- `name`: the name of the camera
+- `link`: the link to the camera's IP address
 
 ### Devices
 This will be a list of all devices in the room. Each device is defined as a JSON object with the following properties:
@@ -51,6 +59,13 @@ General events have the following properties:
 
 - `name`: name of event, for example "start"
 - `rules`: array of rule objects (see below)
+
+### Button Events
+Button events are events that happen on the click of a button in the front-end. 
+The event in the config is a rule, as defined below.
+The conditions must include the value of the button on which it should execute. 
+The can also include extra parameters that the executing of the rule depends on, 
+like stop can only be pressed when start is already pressed.
 
 ### Rules
 Rules are defined by:

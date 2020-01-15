@@ -75,4 +75,5 @@ are specific defined depending on the sender and receiver.
         - a `name` parameter carrying the name of the escape room 
         - a `hints` parameter carrying a map with the name of puzzle as key and list of hints as value
         - an `events` parameter carrying a map with the name of the rule as key and the description as value
-        - a `cameras` parameter carrying a a list with camera objects with a `name` and `link` tag
+        - a `cameras` parameter carrying a list with camera objects with a `name` and `link` tag
+        - a `buttons` parameter carrying a list of button names that should be added to the front-end 

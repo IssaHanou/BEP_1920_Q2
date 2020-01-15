@@ -199,8 +199,9 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 					rule, ok := handler.Config.RuleMap[ruleToFinish]
 					if !ok {
 						logrus.Errorf("could not find rule with id %s in map", ruleToFinish)
+					} else {
+						rule.Execute(handler)
 					}
-					rule.Execute(handler)
 					handler.sendEventStatus()
 				}
 			case "hint":

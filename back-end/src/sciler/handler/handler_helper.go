@@ -25,6 +25,7 @@ func (handler *Handler) SendSetup() {
 			"hints":   handler.getHints(),
 			"events":  handler.getEventDescriptions(),
 			"cameras": handler.getCameras(),
+			"buttons": handler.getButtons(),
 		},
 	}
 	jsonMessage, _ := json.Marshal(&message)
@@ -122,7 +123,7 @@ func (handler *Handler) sendStatus(deviceID string) {
 func (handler *Handler) HandleEvent(id string) {
 	if rules, ok := handler.Config.StatusMap[id]; ok {
 		for _, rule := range rules {
-			if rule.Executed < rule.Limit && rule.Conditions.Resolve(handler.Config) {
+			if (rule.Executed < rule.Limit || rule.Limit == 0) && rule.Conditions.Resolve(handler.Config) {
 				rule.Execute(handler)
 			}
 		}
@@ -143,7 +144,7 @@ func (handler *Handler) sendEventStatus() {
 	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 }
 
-// getEventStatus returns json list with json objects with keys ["id", "status"]
+// getEventStatus returns a json list with json objects with keys ["id", "status"]
 // status is json object with key ruleName and value true (if executed == limit) or false
 func (handler *Handler) getEventStatus() []map[string]interface{} {
 	var list []map[string]interface{}
@@ -156,7 +157,7 @@ func (handler *Handler) getEventStatus() []map[string]interface{} {
 	return list
 }
 
-// getHints returns map of hints with puzzle name as key and list of hints for that puzzle as value
+// getHints returns a map of hints with puzzle name as key and list of hints for that puzzle as value
 func (handler *Handler) getHints() map[string][]string {
 	hints := make(map[string][]string)
 	for _, puzzle := range handler.Config.Puzzles {
@@ -165,7 +166,7 @@ func (handler *Handler) getHints() map[string][]string {
 	return hints
 }
 
-// getEventDescriptions returns map of hints with puzzle name as key and list of hints for that puzzle as value
+// getEventDescriptions returns a map of hints with puzzle name as key and list of hints for that puzzle as value
 func (handler *Handler) getEventDescriptions() map[string]string {
 	events := make(map[string]string)
 	for _, rule := range handler.Config.RuleMap {
@@ -174,7 +175,7 @@ func (handler *Handler) getEventDescriptions() map[string]string {
 	return events
 }
 
-// getCameras returns map with camera name and camera link
+// getCameras returns a map with camera name and camera link
 func (handler *Handler) getCameras() []map[string]string {
 	var cameras []map[string]string
 	for _, camera := range handler.Config.Cameras {
@@ -184,6 +185,15 @@ func (handler *Handler) getCameras() []map[string]string {
 		cameras = append(cameras, result)
 	}
 	return cameras
+}
+
+// getButtons returns a list with button names
+func (handler *Handler) getButtons() []string {
+	var buttons []string
+	for _, btn := range handler.Config.ButtonEvents {
+		buttons = append(buttons, btn.ID)
+	}
+	return buttons
 }
 
 // GetStatus asks devices to send status
@@ -223,38 +233,36 @@ func (handler *Handler) SetTimer(timerID string, instructions config.ComponentIn
 // If action is "use" then the message must tell the config a new config is now used and put it to use
 func (handler *Handler) processConfig(configToRead interface{}, action string, fileName string) {
 	jsonBytes, err := json.Marshal(configToRead)
-	if err != nil { //TODO test
+	if err != nil {
 		logrus.Error(err)
-	}
-	newConfig, errorList := config.ReadJSON(jsonBytes)
-	message := Message{
-		DeviceID: "back-end",
-		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "config",
-		Contents: map[string][]string{},
-	}
-	if action == "check" {
-		message.Contents = map[string][]string{"errors": errorList}
-	}
-	if action == "use" && len(errorList) == 0 {
-		dir, dirErr := os.Getwd()
-		if dirErr != nil { //TODO test
-			logrus.Error(dirErr)
+	} else {
+		newConfig, errorList := config.ReadJSON(jsonBytes)
+		message := Message{
+			DeviceID: "back-end",
+			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+			Type:     "config",
+			Contents: map[string][]string{},
 		}
-		fullFileName := filepath.Join(dir, "back-end", "resources", fileName)
-		err = ioutil.WriteFile(fullFileName, jsonBytes, 0644)
-		if err != nil {
-			logrus.Error(err)
+		if action == "check" {
+			message.Contents = map[string][]string{"errors": errorList}
 		}
-		handler.Config = newConfig
-		handler.ConfigFile = fullFileName
-		handler.sendStatus("general")
-		message.Type = "new config"
-		message.Contents = map[string]string{"name": fileName}
+		if action == "use" && len(errorList) == 0 {
+			dir, _ := os.Getwd()
+			fullFileName := filepath.Join(dir, "back-end", "resources", fileName)
+			err = ioutil.WriteFile(fullFileName, jsonBytes, 0644)
+			if err != nil {
+				logrus.Error(err)
+			}
+			handler.Config = newConfig
+			handler.ConfigFile = fullFileName
+			handler.sendStatus("general")
+			message.Type = "new config"
+			message.Contents = map[string]string{"name": fileName}
 
+		}
+		jsonMessage, _ := json.Marshal(&message)
+		handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 	}
-	jsonMessage, _ := json.Marshal(&message)
-	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 }
 
 // compareType compares a reflect.Kind and a string type and returns an error if not the same

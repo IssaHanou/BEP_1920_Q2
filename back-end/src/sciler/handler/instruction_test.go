@@ -70,11 +70,14 @@ func TestInstructionSetUp(t *testing.T) {
 			},
 			"events": map[string]string{
 				"correctSequence": "De juiste volgorde van cijfers moet gedraaid worden.",
+				"start":           "Als het spel start, moeten alle rode leds aan gaan en de groene uit",
+				"stop":            "Als het spel stopt, moeten alle lichten uitgaan",
 			},
 			"cameras": []map[string]string{
 				{"link": "https://raccoon.games", "name": "camera1"},
 				{"link": "https://debrouwerij.io", "name": "camera2"},
 			},
+			"buttons": []string{"start", "stop"},
 		},
 	})
 	statusMessageFrontEnd, _ := json.Marshal(Message{
@@ -93,13 +96,23 @@ func TestInstructionSetUp(t *testing.T) {
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "event status",
-		Contents: []map[string]interface{}{{
-			"id":     "correctSequence",
-			"status": false},
+		Contents: []map[string]interface{}{
+			{
+				"id":     "correctSequence",
+				"status": false,
+			},
+			{
+				"id":     "start",
+				"status": false,
+			},
+			{
+				"id":     "stop",
+				"status": false,
+			},
 		},
 	})
-	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)
 	communicatorMock.On("Publish", "front-end", string(messageEventStatus), 3)
+	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)
 	communicatorMock.On("Publish", "telephone", string(statusInstructionMsg), 3)
 	communicatorMock.On("Publish", "front-end", string(statusInstructionMsg), 3)
 	communicatorMock.On("Publish", "front-end", string(statusMessageFrontEnd), 3)
@@ -311,9 +324,31 @@ func TestOnInstructionMsgFinishRule(t *testing.T) {
 			"status": true},
 		},
 	})
+	instHintMessage, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{{
+			"component_id": "display",
+			"instruction":  "hint",
+			"value":        "it tested!"},
+		},
+	})
+	instTimerMessage, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "time",
+		Contents: map[string]interface{}{
+			"duration": 1800000,
+			"id":       "general",
+			"state":    "stateActive",
+		},
+	})
+	communicatorMock.On("Publish", "front-end", string(instTimerMessage), 3)
 	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)
+	communicatorMock.On("Publish", "display", string(instHintMessage), 3)
 	handler.onInstructionMsg(msg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
 }
 
 func TestOnInstructionMsgHint(t *testing.T) {

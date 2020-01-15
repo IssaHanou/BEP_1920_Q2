@@ -35,6 +35,7 @@ export class AppComponent implements OnInit, OnDestroy {
   configErrorList: string[];
   cameras: Camera[];
   selectedCamera: string;
+  manageButtons: string[];
   timerList: Timers;
   displayTime: string;
   everySecond: Observable<number> = timer(0, 1000);
@@ -47,6 +48,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.hintList = [];
     this.configErrorList = [];
     this.cameras = [];
+    this.manageButtons = [];
 
     const topics = ["front-end"];
     for (const topic of topics) {
@@ -120,14 +122,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   /**
    * Send an status to the broker, over back-end topic.
-   * @param start start status to be sent.
-   * @param stop stop status to be sent.
+   * @param status json data with key is the component (button name) and value is the status (boolean).
    */
-  public sendStatus(start, stop) {
-    const msg = new Message("front-end", "status", new Date(), {
-      start,
-      stop
-    });
+  public sendStatus(status) {
+    const msg = new Message("front-end", "status", new Date(), status);
     const jsonMessage: string = this.jsonConvert.serialize(msg);
     this.mqttService.unsafePublish("back-end", JSON.stringify(jsonMessage));
     this.logger.log("info", "sent status message: " + JSON.stringify(jsonMessage));
@@ -215,16 +213,17 @@ export class AppComponent implements OnInit, OnDestroy {
     for (const action of jsonData) {
       switch (action.instruction) {
         case "reset": {
+          let statusMsg = new Map<string, boolean>();
+          for (const component of this.manageButtons) {
+            statusMsg.set(component, false);
+          }
           this.deviceList.setDevice({
             id: "front-end",
             connection: true,
-            status: {
-              start: 0,
-              stop: 0
-            }
+            status: statusMsg
           });
-        }
           break;
+        }
         case "status update": {
           this.sendConnection(true);
           break;
@@ -239,7 +238,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   /**
    * The setup contains the name of the room, the map with hints per puzzle and the rule descriptions.
-   * @param jsonData with name, hints, events
+   * @param jsonData with name, hints, events, cameras and buttons
    */
   private processSetUp(jsonData) {
     this.nameOfRoom = jsonData.name;
@@ -249,6 +248,14 @@ export class AppComponent implements OnInit, OnDestroy {
     if (cameraData !== null) {
       for (const cam of cameraData) {
         this.cameras.push(new Camera(cam));
+      }
+    }
+
+    const buttonData = jsonData.buttons;
+    this.manageButtons = [];
+    if (buttonData !== null) {
+      for (const btn of buttonData) {
+        this.manageButtons.push(btn);
       }
     }
 

@@ -48,21 +48,17 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 	config.Puzzles = newPuzzles
 	newEvents, eventErrors := generateGeneralEvents(readConfig.GeneralEvents, &config)
 	config.GeneralEvents = newEvents
-	errorList = append(errorList, append(puzzleErrors, eventErrors...)...)
+	newButtonEvents, buttonEventErrors := generateRules(readConfig.ButtonEvents, &config)
+	config.ButtonEvents = newButtonEvents
+	errorList = append(errorList, append(append(puzzleErrors, eventErrors...), buttonEventErrors...)...)
 
 	config.Devices = make(map[string]*Device)
 	for _, readDevice := range readConfig.Devices {
 		config.Devices[readDevice.ID] = &(Device{readDevice.ID, readDevice.Description, readDevice.Input,
 			readDevice.Output, make(map[string]interface{}), false})
 	}
-	config.Devices["front-end"] = &(Device{
-		ID:          "front-end",
-		Description: "The operator webapp for managing a escape room",
-		Input:       map[string]string{"start": "numeric", "stop": "numeric"},
-		Output:      nil,
-		Status:      map[string]interface{}{"start": 0, "stop": 0},
-		Connection:  false,
-	})
+	createFrontEndDevice(&config)
+
 	config.Timers = make(map[string]*Timer)
 	for _, readTimer := range readConfig.Timers {
 		duration, err := time.ParseDuration(readTimer.Duration)
@@ -89,6 +85,23 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 	return config, errorList
 }
 
+func createFrontEndDevice(config *WorkingConfig) {
+	input := make(map[string]string)
+	status := make(map[string]interface{})
+	for _, btn := range config.ButtonEvents {
+		input[btn.ID] = "boolean"
+		status[btn.ID] = false
+	}
+	config.Devices["front-end"] = &(Device{
+		ID:          "front-end",
+		Description: "The operator webapp for managing a escape room",
+		Input:       input,
+		Output:      nil,
+		Status:      status,
+		Connection:  false,
+	})
+}
+
 func getAllRules(config *WorkingConfig) []*Rule {
 	var rules []*Rule
 	for _, event := range config.GeneralEvents {
@@ -97,6 +110,10 @@ func getAllRules(config *WorkingConfig) []*Rule {
 
 	for _, event := range config.Puzzles {
 		rules = append(rules, event.GetRules()...)
+	}
+
+	for _, event := range config.ButtonEvents {
+		rules = append(rules, event)
 	}
 	return rules
 }

@@ -39,7 +39,7 @@ import { CameraComponent } from "./camera/camera.component";
 import { ConfigComponent } from "./config/config.component";
 
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
-  hostname: "192.168.178.82",
+  hostname: "192.168.178.102",
   port: 8083,
   will: {
     topic: "back-end",
