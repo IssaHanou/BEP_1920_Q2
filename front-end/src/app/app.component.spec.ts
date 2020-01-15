@@ -1,4 +1,4 @@
-import {TestBed, async, ComponentFixture} from "@angular/core/testing";
+import { TestBed, async, ComponentFixture } from "@angular/core/testing";
 import { AppComponent } from "./app.component";
 import { HintComponent } from "./components/hint/hint.component";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -93,6 +93,8 @@ describe("AppComponent", () => {
 
   it("should render title", () => {
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelectorAll("p").item(0).textContent).toContain("SCILER");
+    expect(compiled.querySelectorAll("p").item(0).textContent).toContain(
+      "SCILER"
+    );
   });
 });
