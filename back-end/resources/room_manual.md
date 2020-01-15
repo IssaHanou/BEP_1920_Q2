@@ -91,3 +91,4 @@ This can be displayed in the front-end, so should be readable and in Dutch.
     - `message` in case of type `timer`:   
         - `instruction`: one of the instructions for timer, e.g. `start`, `stop`, `pause`(, `add`, `subtract`)
         - TODO `value`: optional, in case of `add` and `subtract` a time should be given in format XhXmXs 
+    - `delay` in case of type `device`: This is optional, this is a duration in format XhXmXs, if an action has a delay, the message will publish after this delay.

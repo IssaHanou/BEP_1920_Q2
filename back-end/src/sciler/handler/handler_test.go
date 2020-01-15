@@ -136,8 +136,41 @@ func TestSendInstruction(t *testing.T) {
 		Contents: inst,
 	})
 	communicatorMock.On("Publish", "display", string(msg), 3)
-	handler.SendComponentInstruction("display", inst)
+	handler.SendComponentInstruction("display", inst, "")
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+}
+
+func TestSendInstructionDelay(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_instruction.json"),
+		Communicator: communicatorMock,
+	}
+	inst := []config.ComponentInstruction{
+		{"display", "hint", "my hint"},
+	}
+	inst2 := []config.ComponentInstruction{
+		{"display", "hint", "my hint 2"},
+	}
+	msg, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: inst,
+	})
+	msg2, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: inst2,
+	})
+	communicatorMock.On("Publish", "display", string(msg), 3)
+	communicatorMock.On("Publish", "display", string(msg2), 3)
+	handler.SendComponentInstruction("display", inst, "")
+	handler.SendComponentInstruction("display", inst2, "5s")
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+	time.Sleep(6 * time.Second)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
 }
 
 ////////////////////////////// Connection tests //////////////////////////////
