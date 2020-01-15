@@ -58,9 +58,9 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
 };
 
 export const APP_ROUTES: Routes = [
-  {path: "", component: HomeComponent},
-  {path: "camera", component: CameraComponent},
-  {path: "config", component: ConfigComponent}
+  { path: "", component: HomeComponent },
+  { path: "camera", component: CameraComponent },
+  { path: "config", component: ConfigComponent }
 ];
 
 @NgModule({

@@ -95,6 +95,8 @@ describe("AppComponent", () => {
 
   it("should render title", () => {
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelectorAll("p").item(1).textContent).toContain("SCILER");
+    expect(compiled.querySelectorAll("p").item(1).textContent).toContain(
+      "SCILER"
+    );
   });
 });

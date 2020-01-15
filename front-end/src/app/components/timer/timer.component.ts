@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { AppComponent } from "../../app.component";
-import {formatMS, formatTime} from "./timer";
+import { formatMS, formatTime } from "./timer";
 
 @Component({
   selector: "app-timer",
@@ -8,7 +8,6 @@ import {formatMS, formatTime} from "./timer";
   styleUrls: ["./timer.component.css", "../../../assets/css/main.css"]
 })
 export class TimerComponent implements OnInit {
-
   constructor(private app: AppComponent) {}
 
   ngOnInit() {}
