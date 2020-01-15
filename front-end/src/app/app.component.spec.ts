@@ -89,6 +89,8 @@ describe("AppComponent", () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelectorAll("p").item(1).textContent).toContain("SCILER");
+    expect(compiled.querySelectorAll("p").item(1).textContent).toContain(
+      "SCILER"
+    );
   });
 });

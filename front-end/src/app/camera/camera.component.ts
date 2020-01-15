@@ -1,4 +1,11 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild
+} from "@angular/core";
 import { AppComponent } from "../app.component";
 import { Camera } from "./camera";
 import { DomSanitizer } from "@angular/platform-browser";
@@ -10,8 +17,8 @@ import { FullScreen } from "../fullscreen";
   templateUrl: "./camera.component.html",
   styleUrls: ["./camera.component.css"]
 })
-export class CameraComponent extends FullScreen implements OnInit, AfterViewInit, OnDestroy {
-
+export class CameraComponent extends FullScreen
+  implements OnInit, AfterViewInit, OnDestroy {
   selectedCameraControl = new FormControl();
   cameraFeedSrc: any;
   selectedCameraControl2 = new FormControl();
@@ -19,8 +26,8 @@ export class CameraComponent extends FullScreen implements OnInit, AfterViewInit
   openSecond = false;
   fullScreen = false;
 
-  @ViewChild("cameraBox", {static: true}) cameraBox: ElementRef;
-  @ViewChild("contents", {static: true}) boxContents: ElementRef;
+  @ViewChild("cameraBox", { static: true }) cameraBox: ElementRef;
+  @ViewChild("contents", { static: true }) boxContents: ElementRef;
 
   /**
    * The app is used for the list of all cameras.
@@ -39,7 +46,9 @@ export class CameraComponent extends FullScreen implements OnInit, AfterViewInit
       this.selectedCameraControl.setValue(this.allCameras()[0].name);
       this.setSrc();
     } else {
-      this.cameraFeedSrc = this.sanitizer.bypassSecurityTrustResourceUrl("about:blank");
+      this.cameraFeedSrc = this.sanitizer.bypassSecurityTrustResourceUrl(
+        "about:blank"
+      );
     }
     if (this.app.selectedCamera2 !== undefined) {
       this.selectedCameraControl2.setValue(this.app.selectedCamera2);
@@ -48,13 +57,14 @@ export class CameraComponent extends FullScreen implements OnInit, AfterViewInit
       this.selectedCameraControl2.setValue(this.allCameras()[0].name);
       this.setSrc2();
     } else {
-      this.cameraFeedSrc2 = this.sanitizer.bypassSecurityTrustResourceUrl("about:blank");
+      this.cameraFeedSrc2 = this.sanitizer.bypassSecurityTrustResourceUrl(
+        "about:blank"
+      );
     }
     this.openSecond = this.app.openSecondCamera;
   }
 
-  ngAfterViewInit(): void {
-  }
+  ngAfterViewInit(): void {}
 
   ngOnDestroy(): void {
     this.app.openSecondCamera = this.openSecond;
@@ -71,7 +81,9 @@ export class CameraComponent extends FullScreen implements OnInit, AfterViewInit
   setSrc() {
     for (const cam of this.allCameras()) {
       if (this.selectedCameraControl.value === cam.name) {
-        this.cameraFeedSrc = this.sanitizer.bypassSecurityTrustResourceUrl(cam.link);
+        this.cameraFeedSrc = this.sanitizer.bypassSecurityTrustResourceUrl(
+          cam.link
+        );
         this.app.selectedCamera = this.selectedCameraControl.value;
       }
     }
@@ -84,7 +96,9 @@ export class CameraComponent extends FullScreen implements OnInit, AfterViewInit
   setSrc2() {
     for (const cam of this.allCameras()) {
       if (this.selectedCameraControl2.value === cam.name) {
-        this.cameraFeedSrc2 = this.sanitizer.bypassSecurityTrustResourceUrl(cam.link);
+        this.cameraFeedSrc2 = this.sanitizer.bypassSecurityTrustResourceUrl(
+          cam.link
+        );
         this.app.selectedCamera2 = this.selectedCameraControl2.value;
       }
     }

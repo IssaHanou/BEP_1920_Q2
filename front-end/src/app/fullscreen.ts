@@ -1,9 +1,7 @@
 export class FullScreen {
-
   fullScreen = false;
 
-  constructor() {
-  }
+  constructor() {}
 
   /**
    * Uses HTML5 API to open the full screen.
@@ -18,11 +16,14 @@ export class FullScreen {
 
     if (docElmWithBrowsersFullScreenFunctions.requestFullscreen) {
       docElmWithBrowsersFullScreenFunctions.requestFullscreen();
-    } else if (docElmWithBrowsersFullScreenFunctions.mozRequestFullScreen) { /* Firefox */
+    } else if (docElmWithBrowsersFullScreenFunctions.mozRequestFullScreen) {
+      /* Firefox */
       docElmWithBrowsersFullScreenFunctions.mozRequestFullScreen();
-    } else if (docElmWithBrowsersFullScreenFunctions.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+    } else if (docElmWithBrowsersFullScreenFunctions.webkitRequestFullscreen) {
+      /* Chrome, Safari and Opera */
       docElmWithBrowsersFullScreenFunctions.webkitRequestFullscreen();
-    } else if (docElmWithBrowsersFullScreenFunctions.msRequestFullscreen) { /* IE/Edge */
+    } else if (docElmWithBrowsersFullScreenFunctions.msRequestFullscreen) {
+      /* IE/Edge */
       docElmWithBrowsersFullScreenFunctions.msRequestFullscreen();
     }
     this.fullScreen = true;
@@ -39,11 +40,14 @@ export class FullScreen {
     };
     if (docWithBrowsersExitFunctions.exitFullscreen) {
       docWithBrowsersExitFunctions.exitFullscreen();
-    } else if (docWithBrowsersExitFunctions.mozCancelFullScreen) { /* Firefox */
+    } else if (docWithBrowsersExitFunctions.mozCancelFullScreen) {
+      /* Firefox */
       docWithBrowsersExitFunctions.mozCancelFullScreen();
-    } else if (docWithBrowsersExitFunctions.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+    } else if (docWithBrowsersExitFunctions.webkitExitFullscreen) {
+      /* Chrome, Safari and Opera */
       docWithBrowsersExitFunctions.webkitExitFullscreen();
-    } else if (docWithBrowsersExitFunctions.msExitFullscreen) { /* IE/Edge */
+    } else if (docWithBrowsersExitFunctions.msExitFullscreen) {
+      /* IE/Edge */
       docWithBrowsersExitFunctions.msExitFullscreen();
     }
     this.fullScreen = false;

@@ -7,7 +7,6 @@ import { AppComponent } from "../app.component";
   styleUrls: ["./config.component.css"]
 })
 export class ConfigComponent implements OnInit {
-
   reader: FileReader;
   uploaded = "";
   data = "";
@@ -24,25 +23,25 @@ export class ConfigComponent implements OnInit {
     this.errors = [];
     this.reader = new FileReader();
     const res = "result";
-    this.reader.addEventListener("load", (e) => {
+    this.reader.addEventListener("load", e => {
       this.data = e.target[res];
       this.errors = [];
       this.app.configErrorList = [];
-      this.app.sendInstruction(
-        [{
+      this.app.sendInstruction([
+        {
           instruction: "check config",
           config: JSON.parse(this.data)
-        }]);
+        }
+      ]);
     });
-    this.reader.addEventListener("error", (e) => {
+    this.reader.addEventListener("error", e => {
       this.errors.push(e.target[res]);
       this.app.logger.log("error", "error while reading file");
       this.uploaded = "Error tijdens uploaden: " + e.target[res];
     });
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   /**
    * When file is submitted, call file reader.
@@ -57,11 +56,13 @@ export class ConfigComponent implements OnInit {
    * Use the config entered as new configuration for app.
    */
   sendConfig() {
-    this.app.sendInstruction([{
-      instruction: "use config",
-      config: JSON.parse(this.data),
-      file: this.currentFile.name
-    }]);
+    this.app.sendInstruction([
+      {
+        instruction: "use config",
+        config: JSON.parse(this.data),
+        file: this.currentFile.name
+      }
+    ]);
   }
 
   /**
@@ -73,7 +74,7 @@ export class ConfigComponent implements OnInit {
       list.push(err);
     }
     for (const err of this.errors) {
-      list.push(err)
+      list.push(err);
     }
     return list;
   }
