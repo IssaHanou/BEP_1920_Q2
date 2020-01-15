@@ -1,0 +1,733 @@
+{
+  "general": {
+    "name": "Escape X",
+    "duration": "30m",
+    "host": "192.168.178.82",
+    "port": 1883
+  },
+   "cameras": [
+     {"name": "camera1", "link": "https://raccoon.games"},
+     {"name": "camera2", "link": "https://debrouwerij.io"},
+     {"name": "muppets", "link": "https://www.youtube.com/embed/tgbNymZ7vqY"}
+  ],
+  "devices": [
+    {
+      "id": "controlBoard",
+      "description": "Control board with three switches, three slides with lights and one main switch.",
+      "input": {
+        "redSwitch": "boolean",
+        "orangeSwitch": "boolean",
+        "greenSwitch": "boolean",
+        "slider1": "numeric",
+        "slider2": "numeric",
+        "slider3": "numeric",
+        "mainSwitch": "boolean"
+      },
+      "output": {
+        "greenLight1": {
+          "type": "string",
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          }
+        },
+        "greenLight2": {
+          "type": "string",
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          }
+        },
+        "greenLight3": {
+          "type": "string",
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          }
+        },
+        "redLight1": {
+          "type": "string",
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          }
+        },
+        "redLight2": {
+          "type": "string",
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          }
+        },
+        "redLight3": {
+          "type": "string",
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          }
+        }
+      }
+    },
+    {
+      "id": "display-angular",
+      "description": "displays messages",
+      "input": {},
+      "output": {
+        "hint": {
+          "type": "string",
+          "instructions": {
+            "hint": "string"
+          }
+        }
+      }
+    },
+    {
+      "id": "display-node",
+      "description": "displays messages",
+      "input": {},
+      "output": {
+        "hint": {
+          "type": "string",
+          "instructions": {
+            "hint": "string"
+          }
+        }
+      }
+    },
+    {
+      "id": "door",
+      "description": "device that controls a door magnet through a relay",
+      "input": {},
+      "output": {
+        "door": {
+          "type": "string",
+          "instructions": {
+            "open": "boolean"
+          }
+        }
+      }
+    },
+    {
+      "id": "keypad",
+      "description": "Keypad with input 4 numbers",
+      "input": {
+        "code": "numeric"
+      },
+      "output": {}
+    }
+  ],
+  "timers": [
+    {
+      "id": "timer1",
+      "duration": "10s"
+    },
+    {
+      "id": "timer2",
+      "duration": "5s"
+    },
+    {
+      "id": "timer3",
+      "duration": "1m"
+    },
+    {
+      "id": "timer4",
+      "duration": "1h"
+    },
+    {
+      "id": "timer5",
+      "duration": "20s"
+    },
+    {
+      "id": "timer6",
+      "duration": "5s"
+    }
+  ],
+  "puzzles": [
+    {
+      "name": "puzzel rood",
+      "rules": [
+        {
+          "id": "rood",
+          "description": "Wanneer de rode switch op true staat en de slider 100, dan sturen we een hint met 'puzzle rood opgelost'",
+          "limit": 1,
+          "conditions": {
+            "operator": "AND",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "controlBoard",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "component_id": "redSwitch",
+                      "comparison": "eq",
+                      "value": true
+                    },
+                    {
+                      "component_id": "slider1",
+                      "comparison": "eq",
+                      "value": 100
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "start",
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "controlBoard",
+              "message": [
+                {
+                  "component_id": "redLight1",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "turnOnOff",
+                  "value": true
+                }
+              ]
+            },
+            {
+              "type": "device",
+              "type_id": "display-angular",
+              "message": [
+                {
+                  "component_id": "hint",
+                  "instruction": "hint",
+                  "value": "puzzle rood opgelost!"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "hints": [
+        "Zet de schuiven nauwkeurig"
+      ]
+    },
+    {
+      "name": "puzzel oranje",
+      "rules": [
+        {
+          "id": "oranje",
+          "description": "Wanneer de rode oranje op true staat en de slider tussen 50 en 80, dan sturen we een hint met 'puzzle oranje opgelost'",
+          "limit": 1,
+          "conditions": {
+            "operator": "AND",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "controlBoard",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "component_id": "orangeSwitch",
+                      "comparison": "eq",
+                      "value": true
+                    },
+                    {
+                      "component_id": "slider2",
+                      "comparison": "lte",
+                      "value": 80
+                    },
+                    {
+                      "component_id": "slider2",
+                      "comparison": "gte",
+                      "value": 50
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "start",
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "controlBoard",
+              "message": [
+                {
+                  "component_id": "redLight2",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "greenLight2",
+                  "instruction": "turnOnOff",
+                  "value": true
+                }
+              ]
+            },
+            {
+              "type": "device",
+              "type_id": "display-angular",
+              "message": [
+                {
+                  "component_id": "hint",
+                  "instruction": "hint",
+                  "value": "puzzle oranje opgelost!"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "hints": [
+        "Zet de schuiven nauwkeurig",
+        "Probeer het nog eens",
+        "dat kan sneller"
+      ]
+    },
+    {
+      "name": "puzzel groen",
+      "rules": [
+        {
+          "id": "groen",
+          "description": "Wanneer de groen switch op true staat en de slider 100, en rule rood is al opgelost, dan sturen we een hint met 'puzzle groen opgelost'",
+          "limit": 1,
+          "conditions": {
+            "operator": "AND",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "controlBoard",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "component_id": "greenSwitch",
+                      "comparison": "eq",
+                      "value": true
+                    },
+                    {
+                      "component_id": "slider3",
+                      "comparison": "eq",
+                      "value": 100
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "rood",
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "start",
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "controlBoard",
+              "message": [
+                {
+                  "component_id": "redLight3",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "greenLight3",
+                  "instruction": "turnOnOff",
+                  "value": true
+                }
+              ]
+            },
+            {
+              "type": "device",
+              "type_id": "display-angular",
+              "message": [
+                {
+                  "component_id": "hint",
+                  "instruction": "hint",
+                  "value": "puzzle groen opgelost!"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "hints": [
+        "Zet de schuiven nauwkeurig",
+        "Dit is dus echt best wel een superlange hint die je helemaal moet kunnen lezen"
+      ]
+    }
+  ],
+  "general_events": [
+    {
+      "name": "Start knop",
+      "rules": [
+        {
+          "id": "start",
+          "description": "Als het spel start, moeten alle rode leds aan gaan en de groene uit",
+          "limit": 1,
+          "conditions": {
+            "operator": "OR",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "front-end",
+                "constraints": {
+                  "component_id": "start",
+                  "comparison": "gte",
+                  "value": 1
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "controlBoard",
+              "message": [
+                {
+                  "component_id": "redLight1",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "redLight2",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "redLight3",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "greenLight2",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "greenLight3",
+                  "instruction": "turnOnOff",
+                  "value": false
+                }
+              ]
+            },
+            {
+              "type": "timer",
+              "type_id": "timer2",
+              "message": [
+                {
+                  "instruction": "start"
+                }
+              ]
+            },
+            {
+              "type": "timer",
+              "type_id": "general",
+              "message": [
+                {
+                  "instruction": "start"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "late hint",
+      "rules": [
+        {
+          "id": "hint",
+          "description": "5 seconde na de start wordt er een hint verstuurd",
+          "limit": 1,
+          "conditions": {
+            "type": "timer",
+            "type_id": "timer2",
+            "constraints": {
+              "comparison": "eq",
+              "value": true
+            }
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "display-angular",
+              "message": [
+                {
+                  "component_id": "hint",
+                  "instruction": "hint",
+                  "value": "je bent al 5 seconde bezig, misschien moet je naar het blaadje kijken :)"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stop Time up",
+      "rules": [
+        {
+          "id": "time up",
+          "description": "Na de duration van het spel faalt de groep",
+          "limit": 1,
+          "conditions": {
+            "type": "timer",
+            "type_id": "general",
+            "constraints": {
+              "comparison": "eq",
+              "value": true
+            }
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "display-angular",
+              "message": [
+                {
+                  "component_id": "hint",
+                  "instruction": "hint",
+                  "value": "Je tijd is voorbij!"
+                }
+              ]
+            },
+            {
+              "type": "device",
+              "type_id": "controlBoard",
+              "message": [
+                {
+                  "component_id": "redLight1",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "redLight2",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "redLight3",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "greenLight2",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "greenLight3",
+                  "instruction": "turnOnOff",
+                  "value": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stop Done",
+      "rules": [
+        {
+          "id": "Puzzles done",
+          "description": "Puzzles zijn opgelost dus time stop",
+          "limit": 1,
+          "conditions": {
+            "operator": "AND",
+            "list": [
+              {
+                "type": "rule",
+                "type_id": "rood",
+                "constraints": {
+                  "comparison": "eq",
+                  "value": 1
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "groen",
+                "constraints": {
+                  "comparison": "eq",
+                  "value": 1
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "oranje",
+                "constraints": {
+                  "comparison": "eq",
+                  "value": 1
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "display-angular",
+              "message": [
+                {
+                  "component_id": "hint",
+                  "instruction": "hint",
+                  "value": "Puzzle opgelost!"
+                }
+              ]
+            },
+            {
+              "type": "device",
+              "type_id": "controlBoard",
+              "message": [
+                {
+                  "component_id": "redLight1",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "redLight2",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "redLight3",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "greenLight2",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "greenLight3",
+                  "instruction": "turnOnOff",
+                  "value": true
+                }
+              ]
+            },
+            {
+              "type": "timer",
+              "type_id": "general",
+              "message": [
+                {
+                  "instruction": "pause"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stop knop",
+      "rules": [
+        {
+          "id": "stop",
+          "description": "Als het spel stopt, moeten alle lichten uitgaan",
+          "limit": 1,
+          "conditions": {
+            "operator": "OR",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "front-end",
+                "constraints": {
+                  "component_id": "stop",
+                  "comparison": "eq",
+                  "value": 1
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "timer",
+              "type_id": "general",
+              "message": [
+                {
+                  "instruction": "pause"
+                }
+              ]
+            },
+            {
+              "type": "device",
+              "type_id": "controlBoard",
+              "message": [
+                {
+                  "component_id": "redLight1",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "redLight2",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "redLight3",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "greenLight2",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "greenLight3",
+                  "instruction": "turnOnOff",
+                  "value": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

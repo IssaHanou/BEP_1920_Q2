@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"io/ioutil"
 	"sciler/config"
 	"testing"
@@ -222,11 +223,12 @@ func TestOnInstructionMsgResetAll(t *testing.T) {
 	jsonInstructionMsg, _ := json.Marshal(&responseMsg)
 	jsonStatusMsg, _ := json.Marshal(&statusMsg)
 
-	communicatorMock.On("Publish", "client-computers", string(jsonInstructionMsg), 3)
-	communicatorMock.On("Publish", "front-end", string(jsonInstructionMsg), 3)
-	communicatorMock.On("Publish", "front-end", string(jsonStatusMsg), 3)
+	communicatorMock.On("Publish", "client-computers", string(jsonInstructionMsg), 3).Once()
+	communicatorMock.On("Publish", "front-end", string(jsonInstructionMsg), 3).Once()
+	communicatorMock.On("Publish", "front-end", string(jsonStatusMsg), 3).Once()
+	communicatorMock.On("Publish", mock.AnythingOfType("string"), mock.AnythingOfType("string"), 3) // all calls from sendStatus update (tested in another test)
 	handler.msgMapper(instructionMsg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 13)
 }
 
 func TestOnInstructionMsgTestAll(t *testing.T) {
