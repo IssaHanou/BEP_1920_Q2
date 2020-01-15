@@ -54,7 +54,6 @@ func (c ClientMock) IsConnectionOpen() bool {
 }
 
 func (c ClientMock) Connect() mqtt.Token {
-	fmt.Println("TEST!!!")
 	args := c.Called()
 	return args.Get(0).(mqtt.Token)
 }
