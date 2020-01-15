@@ -12,4 +12,5 @@ back-end/resources/room_config.json
 /cc_library/py-scc/src/scripts/logs/
 /cc_library/venv
 /cc_library/src
+front-end/src/app/assets/config.json
 *.log
