@@ -157,7 +157,7 @@ type Rule struct {
 
 // InstructionSender is an interface needed for preventing cyclic imports
 type InstructionSender interface {
-	SendComponentInstruction(string, []ComponentInstruction)
+	SendComponentInstruction(string, []ComponentInstruction, string)
 	SetTimer(string, ComponentInstruction)
 	HandleEvent(string)
 }
