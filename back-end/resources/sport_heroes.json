@@ -27,13 +27,13 @@
     },
     {
       "id": "start-deur",
-      "description": "device that controls a door magnet through a relay",
+      "description": "deur heeft een ledstrip",
       "input": {},
       "output": {
-        "door": {
+        "ledstrip": {
           "type": "string",
           "instructions": {
-            "open": "boolean"
+            "aan": "boolean"
           }
         }
       }
@@ -115,10 +115,23 @@
       }
     },
     {
+      "id": "tablet_boxen",
+      "description": "whatsapp geluid afspelen",
+      "input": {},
+      "output": {
+        "box": {
+          "type": "string",
+          "instructions": {
+            "bestand": "string"
+          }
+        }
+      }
+    },
+    {
       "id": "Whatsapp",
       "description": "Whatsapp van de spelers",
       "input": {
-        "typing" : "string",
+        "typing": "string",
         "currentPerson": "string",
         "messages": "array",
         "speler-bericht": "string"
@@ -142,7 +155,9 @@
       "id": "playlist-beeldscherm",
       "description": "Beeldscherm met spotify playlist",
       "input": {
-        "playlist": "string"
+        "playlist": "string",
+        "kabel": "boolean",
+        "knoppen status": "string"
       },
       "output": {
       }
@@ -151,16 +166,8 @@
       "id": "koelkast",
       "description": "koelkast waar een drankje met chip in komt",
       "input": {
-        "chip": "string"
-      },
-      "output": {
-      }
-    },
-    {
-      "id": "start-knop-speler",
-      "description": "de spelers kunnen op een start-knop klinken om te beginnen",
-      "input": {
-        "knop": "boolean"
+        "chip": "string",
+        "deur": "boolean"
       },
       "output": {
       }
@@ -176,84 +183,6 @@
     {
       "name": "Start kamer",
       "rules": [
-        {
-          "id": "Start kamer: start filmpje",
-          "description": "Er wordt op de start-knop gedrukt",
-          "limit": 1,
-          "conditions": {
-            "operator": "AND",
-            "list": [
-              {
-                "type": "device",
-                "type_id": "start-knop-speler",
-                "constraints": {
-                  "operator": "AND",
-                  "list": [
-                    {
-                      "component_id": "knop",
-                      "comparison": "eq",
-                      "value": true
-                    }
-                  ]
-                }
-              },
-              {
-                "type": "rule",
-                "type_id": "start",
-                "constraints": {
-                  "comparison": "gte",
-                  "value": 1
-                }
-              }
-            ]
-          },
-          "actions": [
-            {
-              "type": "device",
-              "type_id": "hue_lights",
-              "message": [
-                {
-                  "component_id": "all",
-                  "instruction": "scene",
-                  "value": "lichten-uit"
-                }
-              ]
-            },
-            {
-              "type": "device",
-              "type_id": "boxen",
-              "message": [
-                {
-                  "component_id": "box",
-                  "instruction": "bestand",
-                  "value": "start-filmpje"
-                }
-              ],
-              "delay": "2s"
-            },
-            {
-              "type": "device",
-              "type_id": "start-beeldscherm",
-              "message": [
-                {
-                  "component_id": "film",
-                  "instruction": "bestand",
-                  "value": "start-filmpje"
-                }
-              ],
-              "delay": "2s"
-            },
-            {
-              "type": "timer",
-              "type_id": "tijdStartFilm",
-              "message": [
-                {
-                  "instruction": "start"
-                }
-              ]
-            }
-          ]
-        },
         {
           "id": "Start kamer: deur open",
           "description": "het filmpje is afgelopen",
@@ -277,8 +206,8 @@
               "type_id": "start-deur",
               "message": [
                 {
-                  "component_id": "door",
-                  "instruction": "open",
+                  "component_id": "ledstrip",
+                  "instruction": "aan",
                   "value": true
                 }
               ]
@@ -290,7 +219,7 @@
                 {
                   "component_id": "all",
                   "instruction": "scene",
-                  "value": "highlight-tablet"
+                  "value": "highlight-spellenkast-tablet"
                 }
               ]
             },
@@ -382,7 +311,7 @@
                 {
                   "component_id": "person",
                   "instruction": "tekst",
-                  "value": "Zetten jullie de muziek aan?"
+                  "value": "Zetten jullie de muziek aan? 4291"
                 }
               ],
               "delay": "2s"
@@ -484,6 +413,18 @@
             },
             {
               "type": "device",
+              "type_id": "hue_lights",
+              "message": [
+                {
+                  "component_id": "all",
+                  "instruction": "scene",
+                  "value": "gedimt"
+                }
+              ],
+              "delay": "30s"
+            },
+            {
+              "type": "device",
               "type_id": "boxen",
               "message": [
                 {
@@ -525,7 +466,8 @@
                   "instruction": "tekst",
                   "value": "Klinkt lekker! Zetten jullie de drank koud?"
                 }
-              ]
+              ],
+              "delay": "5s"
             }
           ]
         },
@@ -544,13 +486,12 @@
                   "list": [
                     {
                       "component_id": "playlist",
-                      "comparison": "eq",
-                      "value": "foute playlist"
+                      "comparison": "not",
+                      "value": "goede playlist"
                     }
                   ]
                 }
               }
-
             ]
           },
           "actions": [
@@ -600,9 +541,9 @@
       "name": "Drank puzzel",
       "rules": [
         {
-          "id": "Drank puzzel: Bier",
+          "id": "Drank puzzel: Bier1",
           "description": "er is bier in de koelkast gedaan",
-          "limit": 10,
+          "limit": 1,
           "conditions": {
             "operator": "AND",
             "list": [
@@ -616,6 +557,11 @@
                       "component_id": "chip",
                       "comparison": "eq",
                       "value": "bier"
+                    },
+                    {
+                      "component_id": "deur",
+                      "comparison": "eq",
+                      "value": true
                     }
                   ]
                 }
@@ -644,6 +590,120 @@
                   "value": "bier-stress"
                 }
               ]
+            },
+            {
+              "type": "device",
+              "type_id": "boxen",
+              "message": [
+                {
+                  "component_id": "box",
+                  "instruction": "bestand",
+                  "value": "whatsapp-geluid"
+                }
+              ],
+              "delay": "5s"
+            },
+            {
+              "type": "device",
+              "type_id": "Whatsapp",
+              "message": [
+                {
+                  "component_id": "person",
+                  "instruction": "tekst",
+                  "value": "niks was de afspraak he"
+                }
+              ],
+              "delay": "5s"
+            }
+          ]
+        },
+        {
+          "id": "Drank puzzel: Bier2",
+          "description": "er is bier in de koelkast gedaan",
+          "limit": 1,
+          "conditions": {
+            "operator": "AND",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "koelkast",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "component_id": "chip",
+                      "comparison": "eq",
+                      "value": "bier"
+                    },
+                    {
+                      "component_id": "deur",
+                      "comparison": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "Drank puzzel: Bier1",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "value": 1
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "hue_lights",
+              "message": [
+                {
+                  "component_id": "all",
+                  "instruction": "scene",
+                  "value": "bier-scene"
+                }
+              ]
+            },
+            {
+              "type": "device",
+              "type_id": "boxen",
+              "message": [
+                {
+                  "component_id": "box",
+                  "instruction": "bestand",
+                  "value": "bier-stress"
+                }
+              ]
+            },
+            {
+              "type": "device",
+              "type_id": "boxen",
+              "message": [
+                {
+                  "component_id": "box",
+                  "instruction": "bestand",
+                  "value": "whatsapp-geluid"
+                }
+              ],
+              "delay": "5s"
+            },
+            {
+              "type": "device",
+              "type_id": "Whatsapp",
+              "message": [
+                {
+                  "component_id": "person",
+                  "instruction": "tekst",
+                  "value": "niks was de afspraak he"
+                }
+              ],
+              "delay": "5s"
             }
           ]
         },
@@ -727,6 +787,50 @@
             {
               "type": "timer",
               "type_id": "general",
+              "message": [
+                {
+                  "instruction": "start"
+                }
+              ]
+            },
+            {
+              "type": "device",
+              "type_id": "hue_lights",
+              "message": [
+                {
+                  "component_id": "all",
+                  "instruction": "scene",
+                  "value": "lichten-uit"
+                }
+              ]
+            },
+            {
+              "type": "device",
+              "type_id": "boxen",
+              "message": [
+                {
+                  "component_id": "box",
+                  "instruction": "bestand",
+                  "value": "start-filmpje"
+                }
+              ],
+              "delay": "2s"
+            },
+            {
+              "type": "device",
+              "type_id": "start-beeldscherm",
+              "message": [
+                {
+                  "component_id": "film",
+                  "instruction": "bestand",
+                  "value": "start-filmpje"
+                }
+              ],
+              "delay": "2s"
+            },
+            {
+              "type": "timer",
+              "type_id": "tijdStartFilm",
               "message": [
                 {
                   "instruction": "start"
