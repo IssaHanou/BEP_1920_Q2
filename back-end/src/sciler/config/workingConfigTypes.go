@@ -81,6 +81,7 @@ func (t *Timer) Pause() error {
 	if t.State != "stateActive" {
 		return fmt.Errorf("timer %v does not have a Active state and can not be paused", t.ID)
 	}
+	t.T.Stop()
 	t.Duration, _ = t.GetTimeLeft()
 	t.State = "stateIdle"
 	logrus.Infof("timer paused with %v left", t.Duration)
