@@ -36,3 +36,11 @@
     font-size: 36px;
   }
 }
+
+.check-mark {
+  color: green;
+}
+
+.cross {
+  color: red;
+}
