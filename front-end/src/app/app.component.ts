@@ -85,7 +85,8 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subscription = this.mqttService
       .observe(topic)
       .subscribe((message: IMqttMessage) => {
-        this.logger.log("info",
+        this.logger.log(
+          "info",
           "received on topic " +
             message.topic +
             ", message: " +
@@ -111,13 +112,11 @@ export class AppComponent implements OnInit, OnDestroy {
     this.mqttService.unsafePublish("back-end", jsonMessage);
     for (const inst of instruction) {
       if ("config" in inst) {
-        msg.contents = {config: "contents to long to print"};
+        msg.contents = { config: "contents to long to print" };
         jsonMessage = JSON.stringify(this.jsonConvert.serialize(msg));
       }
     }
-    this.logger.log("info",
-      "sent instruction message: " + jsonMessage
-    );
+    this.logger.log("info", "sent instruction message: " + jsonMessage);
   }
 
   /**
@@ -132,7 +131,10 @@ export class AppComponent implements OnInit, OnDestroy {
     });
     const jsonMessage: string = this.jsonConvert.serialize(msg);
     this.mqttService.unsafePublish("back-end", JSON.stringify(jsonMessage));
-    this.logger.log("info", "sent status message: " + JSON.stringify(jsonMessage));
+    this.logger.log(
+      "info",
+      "sent status message: " + JSON.stringify(jsonMessage)
+    );
   }
 
   /**
@@ -145,7 +147,10 @@ export class AppComponent implements OnInit, OnDestroy {
     });
     const jsonMessage: string = this.jsonConvert.serialize(msg);
     this.mqttService.unsafePublish("back-end", JSON.stringify(jsonMessage));
-    this.logger.log("info", "sent connection message: " + JSON.stringify(jsonMessage));
+    this.logger.log(
+      "info",
+      "sent connection message: " + JSON.stringify(jsonMessage)
+    );
   }
 
   /**
@@ -217,16 +222,17 @@ export class AppComponent implements OnInit, OnDestroy {
   private processInstruction(jsonData) {
     for (const action of jsonData) {
       switch (action.instruction) {
-        case "reset": {
-          this.deviceList.setDevice({
-            id: "front-end",
-            connection: true,
-            status: {
-              start: 0,
-              stop: 0
-            }
-          });
-        }
+        case "reset":
+          {
+            this.deviceList.setDevice({
+              id: "front-end",
+              connection: true,
+              status: {
+                start: 0,
+                stop: 0
+              }
+            });
+          }
           break;
         case "status update": {
           this.sendConnection(true);
