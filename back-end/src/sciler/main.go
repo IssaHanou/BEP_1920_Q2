@@ -29,7 +29,7 @@ func main() {
 	multi := io.MultiWriter(os.Stdout, file)
 	logrus.SetOutput(multi)
 
-	filename := filepath.Join(dir, "back-end", "resources", "room_config.json")
+	filename := filepath.Join(dir, "back-end", "resources", "production", "room_config.json")
 	configurations := config.ReadFile(filename)
 	logrus.Info("configurations read from: " + filename)
 	host := configurations.General.Host

@@ -3,13 +3,14 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 # Installation
 In `front-end` module.
+
+## Set-up configuration
+- in directory `front-end` (copy and) rename [src/assets/`config.json.default`](src/assets/config.json.default) to `config.json`
+- (optional), change this file as desired
+
 ### Set-up dependencies
 ````
     npm install
-````
-### Set-up mqtt library
-````
-    npm install ngx-mqtt --save
 ````
 
 ### Set-up prettier
