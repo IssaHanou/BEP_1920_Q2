@@ -1,4 +1,4 @@
-import {TestBed, async, ComponentFixture} from "@angular/core/testing";
+import { TestBed, async, ComponentFixture } from "@angular/core/testing";
 import { AppComponent } from "./app.component";
 import { HintComponent } from "./components/hint/hint.component";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";

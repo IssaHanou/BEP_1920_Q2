@@ -1,7 +1,9 @@
 package config
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"testing"
 	"time"
 )
@@ -28,7 +30,22 @@ func TestGeneralEvent_GetRules(t *testing.T) {
 	assert.Equal(t, generalEvent.GetRules(), []*Rule{rule})
 }
 
-// TODO Test last timer parts: t.Ending() and t.Stop()
+type HandlerMock struct {
+	mock.Mock
+}
+
+func (handlerMock *HandlerMock) SendComponentInstruction(string, []ComponentInstruction, string) {
+	// do nothing
+}
+
+func (handlerMock *HandlerMock) SetTimer(string, ComponentInstruction) {
+	// do nothing
+}
+
+func (handlerMock *HandlerMock) HandleEvent(id string) {
+	// do nothing
+}
+
 func TestTimer_GetTimeLeft(t *testing.T) {
 	timer := Timer{
 		ID:        "testTimer",
@@ -54,8 +71,9 @@ func TestTimer_GetTimeLeft_Active(t *testing.T) {
 		Ending:    nil,
 		Finished:  false,
 	}
-	timer.Start(nil)
+	err := timer.Start(nil)
 	left, state := timer.GetTimeLeft()
+	assert.Nil(t, err)
 	assert.GreaterOrEqual(t, left.Seconds(), (timer.Duration - time.Now().Sub(timer.StartedAt)).Seconds())
 	assert.Equal(t, state, "stateActive")
 }
@@ -70,8 +88,30 @@ func TestTimer_Start(t *testing.T) {
 		Ending:    nil,
 		Finished:  false,
 	}
-	timer.Start(nil)
+	err := timer.Start(nil)
+	assert.Nil(t, err)
 	assert.Equal(t, timer.State, "stateActive")
+}
+
+func TestTimer_Finish(t *testing.T) {
+	timer := Timer{
+		ID:        "testTimer",
+		Duration:  100 * time.Millisecond,
+		StartedAt: time.Time{},
+		T:         nil,
+		State:     "stateIdle",
+		Ending:    nil,
+		Finished:  false,
+	}
+	handlerMock := new(HandlerMock)
+	err := timer.Start(handlerMock)
+	assert.Nil(t, err)
+	assert.Equal(t, timer.State, "stateActive")
+	assert.Equal(t, timer.Finished, false)
+	time.Sleep(1 * time.Second)
+	assert.Equal(t, timer.State, "stateExpired")
+	assert.Equal(t, timer.Finished, true)
+
 }
 
 func TestTimer_Start_False(t *testing.T) {
@@ -85,9 +125,9 @@ func TestTimer_Start_False(t *testing.T) {
 		Finished:  false,
 	}
 	ok := timer.Start(nil)
-	assert.Equal(t, ok, true)
+	assert.Equal(t, ok, nil)
 	ok2 := timer.Start(nil)
-	assert.Equal(t, ok2, false)
+	assert.Equal(t, ok2, fmt.Errorf("timer testTimer does not have an Idle state and can not be started"))
 }
 
 func TestTimer_Pause(t *testing.T) {
@@ -100,13 +140,15 @@ func TestTimer_Pause(t *testing.T) {
 		Ending:    nil,
 		Finished:  false,
 	}
-	timer.Start(nil)
+	err := timer.Start(nil)
+	assert.Nil(t, err)
 	assert.Equal(t, timer.State, "stateActive")
-	timer.Pause()
+	err2 := timer.Pause()
+	assert.Nil(t, err2)
 	assert.Equal(t, timer.State, "stateIdle")
 }
 
-func TestTimer_Pause_False(t *testing.T) {
+func TestTimer_Pause_fail(t *testing.T) {
 	timer := Timer{
 		ID:        "testTimer",
 		Duration:  10 * time.Second,
@@ -117,8 +159,7 @@ func TestTimer_Pause_False(t *testing.T) {
 		Finished:  false,
 	}
 	ok := timer.Pause()
-	assert.Equal(t, timer.State, "stateIdle")
-	assert.Equal(t, ok, false)
+	assert.Equal(t, ok, fmt.Errorf("timer testTimer does not have a Active state and can not be paused"))
 }
 
 func TestTimer_Stop(t *testing.T) {
@@ -131,13 +172,15 @@ func TestTimer_Stop(t *testing.T) {
 		Ending:    nil,
 		Finished:  false,
 	}
-	timer.Start(nil)
+	err := timer.Start(nil)
+	assert.Nil(t, err)
 	assert.Equal(t, timer.State, "stateActive")
-	timer.Stop()
+	err2 := timer.Stop()
+	assert.Nil(t, err2)
 	assert.Equal(t, timer.State, "stateExpired")
 }
 
-func TestTimer_Stop_False(t *testing.T) {
+func TestTimer_Done(t *testing.T) {
 	timer := Timer{
 		ID:        "testTimer",
 		Duration:  10 * time.Second,
@@ -147,8 +190,153 @@ func TestTimer_Stop_False(t *testing.T) {
 		Ending:    nil,
 		Finished:  false,
 	}
+	handlerMock := new(HandlerMock)
+	err := timer.Start(handlerMock)
+	assert.Nil(t, err)
+	assert.Equal(t, timer.State, "stateActive")
+	err2 := timer.Done()
+	assert.Nil(t, err2)
+	assert.Equal(t, timer.State, "stateExpired")
+}
+
+func TestTimer_Stop_Idle(t *testing.T) {
+	timer := Timer{
+		ID:        "testTimer",
+		Duration:  10 * time.Second,
+		StartedAt: time.Time{},
+		T:         nil,
+		State:     "stateIdle",
+		Ending:    nil,
+		Finished:  false,
+	}
+	err := timer.Stop()
+	assert.Nil(t, err)
+	assert.Equal(t, timer.State, "stateExpired")
+}
+
+func TestTimer_Stop_Expired(t *testing.T) {
+	timer := Timer{
+		ID:        "testTimer",
+		Duration:  10 * time.Second,
+		StartedAt: time.Time{},
+		T:         nil,
+		State:     "stateExpired",
+		Ending:    nil,
+		Finished:  false,
+	}
 	ok := timer.Stop()
-	assert.Equal(t, ok, false)
+	assert.Equal(t, ok, fmt.Errorf("timer testTimer is already Expired and can not be stopped again"))
+}
+
+func TestTimer_Done_Expired(t *testing.T) {
+	timer := Timer{
+		ID:        "testTimer",
+		Duration:  10 * time.Second,
+		StartedAt: time.Time{},
+		T:         nil,
+		State:     "stateExpired",
+		Ending:    nil,
+		Finished:  false,
+	}
+	ok := timer.Done()
+	assert.Equal(t, ok, fmt.Errorf("timer testTimer is already Expired and can not be finished again"))
+}
+
+func TestTimer_AddSubTime_Add(t *testing.T) {
+	timer := Timer{
+		ID:        "testTimer",
+		Duration:  10 * time.Second,
+		StartedAt: time.Time{},
+		T:         nil,
+		State:     "stateIdle",
+		Ending:    nil,
+		Finished:  false,
+	}
+	assert.Equal(t, 10*time.Second, timer.Duration)
+	err := timer.AddSubTime(nil, 5*time.Second, true)
+	assert.Nil(t, err)
+	assert.Equal(t, 15*time.Second, timer.Duration)
+}
+
+func TestTimer_AddSubTime_Subtract(t *testing.T) {
+	timer := Timer{
+		ID:        "testTimer",
+		Duration:  10 * time.Second,
+		StartedAt: time.Time{},
+		T:         nil,
+		State:     "stateIdle",
+		Ending:    nil,
+		Finished:  false,
+	}
+	assert.Equal(t, 10*time.Second, timer.Duration)
+	err := timer.AddSubTime(nil, 5*time.Second, false)
+	assert.Nil(t, err)
+	assert.Equal(t, 5*time.Second, timer.Duration)
+}
+
+func TestTimer_AddSubTime_Subtract_Fail(t *testing.T) {
+	timer := Timer{
+		ID:        "testTimer",
+		Duration:  10 * time.Second,
+		StartedAt: time.Time{},
+		T:         nil,
+		State:     "stateIdle",
+		Ending:    nil,
+		Finished:  false,
+	}
+	assert.Equal(t, 10*time.Second, timer.Duration)
+	ok := timer.AddSubTime(nil, 11*time.Second, false)
+	assert.Equal(t, 10*time.Second, timer.Duration)
+	assert.Equal(t, ok, fmt.Errorf("timer testTimer could not subtract 11s since there is only 10s left"))
+
+}
+
+func TestTimer_AddSubTime_Active(t *testing.T) {
+	timer := Timer{
+		ID:        "testTimer",
+		Duration:  10 * time.Second,
+		StartedAt: time.Time{},
+		T:         nil,
+		State:     "stateIdle",
+		Ending:    nil,
+		Finished:  false,
+	}
+	err := timer.Start(nil)
+	assert.Nil(t, err)
+	left1, state := timer.GetTimeLeft()
+	err2 := timer.AddSubTime(nil, 3*time.Second, true)
+	assert.Nil(t, err2)
+	left2, state := timer.GetTimeLeft()
+	assert.GreaterOrEqual(t, int(left1.Seconds())+3, int(left2.Seconds()))
+	assert.Equal(t, state, "stateActive")
+}
+
+func TestTimer_AddSubTime_Expired(t *testing.T) {
+	timer := Timer{
+		ID:        "testTimer",
+		Duration:  10 * time.Second,
+		StartedAt: time.Time{},
+		T:         nil,
+		State:     "stateExpired",
+		Ending:    nil,
+		Finished:  false,
+	}
+	ok := timer.AddSubTime(nil, 3*time.Second, true)
+	assert.Equal(t, ok, fmt.Errorf("timer testTimer could not be edited since it is already Expired"))
+}
+
+func TestTimer_AddSubTime_Very_wrong(t *testing.T) {
+	timer := Timer{
+		ID:        "testTimer",
+		Duration:  10 * time.Second,
+		StartedAt: time.Time{},
+		T:         nil,
+		State:     "stateWrong",
+		Ending:    nil,
+		Finished:  false,
+	}
+	ok := timer.AddSubTime(nil, 3*time.Second, true)
+	assert.Equal(t, ok, fmt.Errorf("timer testTimer could not be edited because there is something wrong with its state: stateWrong"))
 }
 
 func TestPuzzle_GetName(t *testing.T) {
