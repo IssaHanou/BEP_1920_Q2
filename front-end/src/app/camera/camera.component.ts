@@ -19,7 +19,6 @@ import { FullScreen } from "../fullscreen";
 })
 export class CameraComponent extends FullScreen
   implements OnInit, AfterViewInit, OnDestroy {
-
   selectedCameraControl = new FormControl();
   cameraFeedSrc: any;
   selectedCameraControl2 = new FormControl();
