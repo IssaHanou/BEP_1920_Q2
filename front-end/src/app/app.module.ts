@@ -7,6 +7,7 @@ import { TimerComponent } from "./components/timer/timer.component";
 import { ManageComponent } from "./components/manage/manage.component";
 import { PuzzleComponent } from "./components/puzzle/puzzle.component";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import * as config from "../assets/config.json";
 
 import { MqttModule, MqttService, IMqttServiceOptions } from "ngx-mqtt";
 import {
@@ -39,8 +40,8 @@ import { CameraComponent } from "./camera/camera.component";
 import { ConfigComponent } from "./config/config.component";
 
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
-  hostname: "192.168.178.82",
-  port: 8083,
+  hostname: config.host,
+  port: config.port,
   will: {
     topic: "back-end",
     payload: JSON.stringify(

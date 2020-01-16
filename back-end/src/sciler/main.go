@@ -47,7 +47,7 @@ func main() {
 
 	logger.Info("writing logs to both console and " + writeFile)
 
-	filename := filepath.Join(dir, "back-end", "resources", "room_config.json")
+	filename := filepath.Join(dir, "back-end", "resources", "production", "room_config.json")
 	configurations := config.ReadFile(filename)
 	logger.Info("configurations read from: " + filename)
 	host := configurations.General.Host
