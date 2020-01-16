@@ -10,8 +10,8 @@
       <ng-container matColumnDef="connection">
         <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header"> Connectie</th>
         <td mat-cell *matCellDef="let element" class="boolean-column">
-          <ng-container *ngIf="element.connection"><div class="check-mark">&#10004;</div></ng-container>
-          <ng-container *ngIf="!element.connection"><div class="cross">&#10006;</div></ng-container>
+          <ng-container *ngIf="element.connection"><span class="check-mark">&#10004;</span></ng-container>
+          <ng-container *ngIf="!element.connection"><span class="cross">&#10006;</span></ng-container>
         </td>
       </ng-container>
       <ng-container matColumnDef="component">
