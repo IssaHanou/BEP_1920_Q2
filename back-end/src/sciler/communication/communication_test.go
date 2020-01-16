@@ -2,63 +2,11 @@ package communication
 
 import (
 	"errors"
-	"fmt"
 	"github.com/eclipse/paho.mqtt.golang"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"testing"
 	"time"
 )
-
-func TestNewCommunicator(t *testing.T) {
-	type args struct {
-		host             string
-		port             int
-		topicsOfInterest []string
-	}
-
-	optionsLocal := mqtt.NewClientOptions()
-	optionsLocal.AddBroker(fmt.Sprintf("%s://%s:%d", "tcp", "localhost", 1883))
-	optionsLocal.SetClientID("back-end")
-	optionsLocal.SetConnectionLostHandler(onConnectionLost)
-
-	tests := []struct {
-		name string
-		args args
-		want *Communicator
-	}{
-		{
-			name: "two topics",
-			args: args{
-				host:             "localhost",
-				port:             1883,
-				topicsOfInterest: []string{"test", "back-end"},
-			},
-			want: &Communicator{
-				client:           mqtt.NewClient(optionsLocal),
-				topicsOfInterest: []string{"test", "back-end"},
-			},
-		},
-		{
-			name: "no topics",
-			args: args{
-				host:             "localhost",
-				port:             1883,
-				topicsOfInterest: nil,
-			},
-			want: &Communicator{
-				client:           mqtt.NewClient(optionsLocal),
-				topicsOfInterest: nil,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := NewCommunicator(tt.args.host, tt.args.port, tt.args.topicsOfInterest)
-			assert.Equal(t, got.topicsOfInterest, tt.want.topicsOfInterest)
-		})
-	}
-}
 
 type TokenMockSuccess struct {
 	mock.Mock
@@ -140,34 +88,26 @@ func (c ClientMock) OptionsReader() mqtt.ClientOptionsReader {
 
 func TestCommunicator_Start(t *testing.T) {
 	client := new(ClientMock)
-	communicator := Communicator{
-		client:           client,
-		topicsOfInterest: []string{"back-end", "test"},
-	}
-
+	communicator := Communicator{client: client}
 	client.On("Connect").Return(new(TokenMockSuccess)).Once()
-	communicator.Start(func(client mqtt.Client, message mqtt.Message) {}, func() {})
+	communicator.Start()
 	client.AssertExpectations(t)
 }
 
 func TestCommunicator_Publish(t *testing.T) {
 	client := new(ClientMock)
-	communicator := Communicator{
-		client:           client,
-		topicsOfInterest: []string{"back-end", "test"},
-	}
+	communicator := Communicator{client: client}
 	client.On("Publish", "test", byte(0), false, "json").Return(new(TokenMockSuccess)).Once()
+	communicator.setClient(client)
 	communicator.Publish("test", "json", 3)
 	client.AssertExpectations(t)
 }
 
 func TestCommunicator_PublishFailure(t *testing.T) {
 	client := new(ClientMock)
-	communicator := Communicator{
-		client:           client,
-		topicsOfInterest: []string{"back-end", "test"},
-	}
+	communicator := Communicator{client: client}
 	client.On("Publish", "test", byte(0), false, "json").Return(new(TokenMockFailure)).Times(3)
+	communicator.setClient(client)
 	communicator.Publish("test", "json", 3)
 	client.AssertExpectations(t)
 }
