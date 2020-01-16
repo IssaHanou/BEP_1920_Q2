@@ -318,7 +318,7 @@ func TestOnInstructionMsgFinishRule(t *testing.T) {
 		Contents: map[string]interface{}{
 			"duration": 10000,
 			"id":       "timer1",
-			"state":    "stateActive",
+			"state":    "stateIdle",
 		},
 	})
 	communicatorMock.On("Publish", "front-end", string(instMessage), 3)
