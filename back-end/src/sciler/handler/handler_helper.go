@@ -213,17 +213,36 @@ func (handler *Handler) GetStatus(deviceID string) {
 
 // SetTimer starts given timer
 func (handler *Handler) SetTimer(timerID string, instructions config.ComponentInstruction) {
+	err := error(nil)
 	switch instructions.Instruction {
 	case "start":
-		handler.Config.Timers[timerID].Start(handler)
+		err = handler.Config.Timers[timerID].Start(handler)
 	case "pause":
-		handler.Config.Timers[timerID].Pause()
-	case "add": // TODO: implement timer Add
-	case "subtract": // TODO: implement timer subtract
+		err = handler.Config.Timers[timerID].Pause()
+	case "add":
+		time, durErr := time.ParseDuration(fmt.Sprintf("%v", instructions.Value))
+		if durErr == nil {
+			err = handler.Config.Timers[timerID].AddSubTime(handler, time, true)
+		} else {
+			err = fmt.Errorf("could not parse %v to duration to add for timer %v", instructions.Value, timerID)
+		}
+	case "subtract":
+		time, durErr := time.ParseDuration(fmt.Sprintf("%v", instructions.Value))
+		if durErr == nil {
+			err = handler.Config.Timers[timerID].AddSubTime(handler, time, false)
+		} else {
+			err = fmt.Errorf("could not parse %v to duration to subtract for timer %v", instructions.Value, timerID)
+		}
 	case "stop":
-		handler.Config.Timers[timerID].Stop()
+		err = handler.Config.Timers[timerID].Stop()
+	case "done":
+		err = handler.Config.Timers[timerID].Done()
 	default:
-		logrus.Warnf("error occurred while reading timer instruction message: %v", instructions.Instruction)
+		err = fmt.Errorf("error occurred while reading timer instruction message: %v", instructions.Instruction)
+	}
+
+	if err != nil {
+		logrus.Error(err)
 	}
 	handler.sendStatus(timerID)
 }
