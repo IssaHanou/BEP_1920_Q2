@@ -10,7 +10,7 @@ run `go get ./...` in the `sciler` folder to go get all dependencies
 ## Back-end on Raspberry Pi
 #### setup config:
 - in directory `back-end` (copy and) rename [resources/`room_config.json.default`](resources/production/room_config.json.default) to `room_config.json`
-- (optional), change this file as desired following the [room_manual.md](resources/production/room_manual.md)
+- (optional), change this file as desired following the [room_manual.md](resources/manuals/room_manual.md)
 
 #### if needed install go1.13.4:
 - run  `pi@raspberrypi:~ $ wget https://storage.googleapis.com/golang/go1.13.4.linux-armv6l.tar.gz`
