@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"io/ioutil"
 	"sciler/config"
 	"testing"
@@ -235,11 +236,12 @@ func TestOnInstructionMsgResetAll(t *testing.T) {
 	jsonInstructionMsg, _ := json.Marshal(&responseMsg)
 	jsonStatusMsg, _ := json.Marshal(&statusMsg)
 
-	communicatorMock.On("Publish", "client-computers", string(jsonInstructionMsg), 3)
-	communicatorMock.On("Publish", "front-end", string(jsonInstructionMsg), 3)
-	communicatorMock.On("Publish", "front-end", string(jsonStatusMsg), 3)
+	communicatorMock.On("Publish", "client-computers", string(jsonInstructionMsg), 3).Once()
+	communicatorMock.On("Publish", "front-end", string(jsonInstructionMsg), 3).Once()
+	communicatorMock.On("Publish", "front-end", string(jsonStatusMsg), 3).Once()
+	communicatorMock.On("Publish", mock.AnythingOfType("string"), mock.AnythingOfType("string"), 3) // all calls from sendStatus update (tested in another test)
 	handler.msgMapper(instructionMsg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 13)
 }
 
 func TestOnInstructionMsgTestAll(t *testing.T) {
@@ -341,7 +343,7 @@ func TestOnInstructionMsgFinishRule(t *testing.T) {
 		Contents: map[string]interface{}{
 			"duration": 1800000,
 			"id":       "general",
-			"state":    "stateActive",
+			"state":    "stateIdleActive",
 		},
 	})
 	communicatorMock.On("Publish", "front-end", string(instTimerMessage), 3)
@@ -467,6 +469,8 @@ func TestInstructionCheckConfigWithErrors(t *testing.T) {
 			"errors": {
 				"time: unknown unit x in duration 10x",
 				"time: missing unit in duration 30",
+				"host: different from current host for front and back-end",
+				"port: different from current port for front and back-end",
 			},
 		},
 	}
@@ -506,19 +510,9 @@ func TestInstructionUseConfig(t *testing.T) {
 		Type:     "new config",
 		Contents: map[string]interface{}{"name": "new_file.json"},
 	}
-	timerGeneralMessage, _ := json.Marshal(Message{
-		DeviceID: "back-end",
-		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "time",
-		Contents: map[string]interface{}{
-			"state":    "stateIdle",
-			"duration": 1800000,
-			"id":       "general",
-		},
-	})
 	jsonMessage, _ := json.Marshal(&returnMsg)
-	communicatorMock.On("Publish", "front-end", string(timerGeneralMessage), 3)
-	communicatorMock.On("Publish", "front-end", string(jsonMessage), 3)
+	communicatorMock.On("Publish", "front-end", string(jsonMessage), 3).Once()
+	communicatorMock.On("Publish", mock.AnythingOfType("string"), mock.AnythingOfType("string"), 3) // sendSetup tested in another test
 	handler.msgMapper(instructionMsg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 12)
 }

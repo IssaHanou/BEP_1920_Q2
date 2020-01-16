@@ -82,7 +82,7 @@
               "type_id": "general",
               "message": [
                 {
-                  "instruction": "start"
+                  "instruction": "pause"
                 }
               ]
             }

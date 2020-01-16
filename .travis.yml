@@ -18,7 +18,9 @@ matrix:
         - xvfb
       dist: xenial
       before_script:
-        - cd front-end/
+        - cd front-end/src/assets
+        - mv config.json.default config.json
+        - cd ../../
         - npm install -g @angular/cli
         - npm update
         - export DISPLAY=:99.0

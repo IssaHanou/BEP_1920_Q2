@@ -6,7 +6,8 @@ import { DeviceComponent } from "./components/device/device.component";
 import { TimerComponent } from "./components/timer/timer.component";
 import { ManageComponent } from "./components/manage/manage.component";
 import { PuzzleComponent } from "./components/puzzle/puzzle.component";
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import * as config from "../assets/config.json";
 
 import { MqttModule, MqttService, IMqttServiceOptions } from "ngx-mqtt";
 import {
@@ -22,6 +23,7 @@ import {
   MatFormFieldModule,
   MatInputModule,
   MatIconModule,
+  MatCheckboxModule,
   MatSortModule,
   MatTableModule,
   MatToolbarModule,
@@ -39,8 +41,8 @@ import { CameraComponent } from "./camera/camera.component";
 import { ConfigComponent } from "./config/config.component";
 
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
-  hostname: "192.168.178.102",
-  port: 8083,
+  hostname: config.host,
+  port: config.port,
   will: {
     topic: "back-end",
     payload: JSON.stringify(
@@ -53,13 +55,13 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     qos: 1,
     retain: false
   },
-  keepalive: 10
+  keepalive: 5
 };
 
 export const APP_ROUTES: Routes = [
-  {path: "", component: HomeComponent},
-  {path: "camera", component: CameraComponent},
-  {path: "config", component: ConfigComponent}
+  { path: "", component: HomeComponent },
+  { path: "camera", component: CameraComponent },
+  { path: "config", component: ConfigComponent }
 ];
 
 @NgModule({
@@ -95,6 +97,7 @@ export const APP_ROUTES: Routes = [
     MatSnackBarModule,
     MatTableModule,
     MatButtonModule,
+    MatCheckboxModule,
     MatFormFieldModule,
     MatInputModule,
     MatSortModule,

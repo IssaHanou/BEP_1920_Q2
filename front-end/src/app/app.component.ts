@@ -10,7 +10,8 @@ import { Timers } from "./components/timer/timers";
 import { Logger } from "./logger";
 import { Camera } from "./camera/camera";
 import { Hint } from "./components/hint/hint";
-import { formatMS } from "./components/timer/timer";
+import { formatMS, formatTime } from "./components/timer/timer";
+import { FullScreen } from "./fullscreen";
 
 @Component({
   selector: "app-root",
@@ -18,7 +19,7 @@ import { formatMS } from "./components/timer/timer";
   styleUrls: ["./app.component.css", "../assets/css/main.css"],
   encapsulation: ViewEncapsulation.None
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   // Variables for the home screen
   title = "SCILER";
   nameOfRoom = "Super awesome escape";
@@ -35,40 +36,64 @@ export class AppComponent implements OnInit, OnDestroy {
   configErrorList: string[];
   cameras: Camera[];
   selectedCamera: string;
+  selectedCamera2: string;
+  openSecondCamera = false;
   manageButtons: string[];
   timerList: Timers;
   displayTime: string;
   everySecond: Observable<number> = timer(0, 1000);
 
   constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
+    super();
     this.logger = new Logger();
     this.jsonConvert = new JsonConvert();
-    this.deviceList = new Devices();
-    this.puzzleList = new Puzzles();
-    this.hintList = [];
-    this.configErrorList = [];
-    this.cameras = [];
-    this.manageButtons = [];
+    this.initializeVariables();
 
     const topics = ["front-end"];
     for (const topic of topics) {
       this.subscribeNewTopic(topic);
+    }
+
+    this.mqttService.onConnect.subscribe(() => {
+      this.logger.log("info", "Connected to broker");
+      this.sendInstruction([{ instruction: "send setup" }]);
+      this.sendConnection(true);
+      this.initializeTimers();
+    });
+
+    this.mqttService.onOffline.subscribe(() => {
+      this.logger.log("error", "Connection to broker lost");
+      this.setConnectionAllDevices(false);
+    });
+  }
+
+  /**
+   * Sets connection of all devices
+   * @param connection boolean
+   */
+  private setConnectionAllDevices(connection: boolean) {
+    for (const tuple of this.deviceList.all) {
+      const device = tuple[1];
+      device.connection = false;
     }
   }
 
   /**
    * Initialize app, also called upon loading new config file.
    */
-  ngOnInit(): void {
+  ngOnInit(): void {}
+
+  initializeVariables() {
+    this.deviceList = new Devices();
+    this.puzzleList = new Puzzles();
+    this.hintList = [];
+    this.configErrorList = [];
+    this.cameras = [];
+    this.manageButtons = [];
     this.timerList = new Timers();
     const generalTimer = { id: "general", duration: 0, state: "stateIdle" };
     this.timerList.setTimer(generalTimer);
-
-    this.sendInstruction([{ instruction: "send setup" }]);
-    this.sendConnection(true);
-    this.initializeTimers();
   }
-
   /**
    * The purpose of this is, when the user leave the app we should cleanup our subscriptions
    * and close the connection with the broker
@@ -85,7 +110,8 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subscription = this.mqttService
       .observe(topic)
       .subscribe((message: IMqttMessage) => {
-        this.logger.log("info",
+        this.logger.log(
+          "info",
           "received on topic " +
             message.topic +
             ", message: " +
@@ -111,13 +137,11 @@ export class AppComponent implements OnInit, OnDestroy {
     this.mqttService.unsafePublish("back-end", jsonMessage);
     for (const inst of instruction) {
       if ("config" in inst) {
-        msg.contents = {config: "contents to long to print"};
+        msg.contents = { config: "contents to long to print" };
         jsonMessage = JSON.stringify(this.jsonConvert.serialize(msg));
       }
     }
-    this.logger.log("info",
-      "sent instruction message: " + jsonMessage
-    );
+    this.logger.log("info", "sent instruction message: " + jsonMessage);
   }
 
   /**
@@ -128,7 +152,10 @@ export class AppComponent implements OnInit, OnDestroy {
     const msg = new Message("front-end", "status", new Date(), status);
     const jsonMessage: string = this.jsonConvert.serialize(msg);
     this.mqttService.unsafePublish("back-end", JSON.stringify(jsonMessage));
-    this.logger.log("info", "sent status message: " + JSON.stringify(jsonMessage));
+    this.logger.log(
+      "info",
+      "sent status message: " + JSON.stringify(jsonMessage)
+    );
   }
 
   /**
@@ -141,7 +168,10 @@ export class AppComponent implements OnInit, OnDestroy {
     });
     const jsonMessage: string = this.jsonConvert.serialize(msg);
     this.mqttService.unsafePublish("back-end", JSON.stringify(jsonMessage));
-    this.logger.log("info", "sent connection message: " + JSON.stringify(jsonMessage));
+    this.logger.log(
+      "info",
+      "sent connection message: " + JSON.stringify(jsonMessage)
+    );
   }
 
   /**
@@ -150,6 +180,7 @@ export class AppComponent implements OnInit, OnDestroy {
    */
   private processMessage(jsonMessage: string) {
     const msg: Message = Message.deserialize(jsonMessage);
+
     switch (msg.type) {
       case "confirmation": {
         this.processConfirmation(msg);
@@ -161,6 +192,11 @@ export class AppComponent implements OnInit, OnDestroy {
       }
       case "status": {
         this.deviceList.setDevice(msg.contents);
+
+        // When the back-end/front-end disconnects, all devices are disconnected
+        if (msg.contents.id === "front-end" && !msg.contents.connection) {
+          this.setConnectionAllDevices(false);
+        }
         break;
       }
       case "event status": {
@@ -180,8 +216,6 @@ export class AppComponent implements OnInit, OnDestroy {
         break;
       }
       case "new config": {
-        this.stopTimers();
-        this.ngOnInit();
         this.openSnackbar("using new config: " + msg.contents.name, "");
         break;
       }
@@ -319,5 +353,22 @@ export class AppComponent implements OnInit, OnDestroy {
     config.duration = 3000;
     config.panelClass = ["custom-snack-bar"];
     this.snackBar.open(message, action, config);
+  }
+
+  /**
+   * Return the current time to display.
+   */
+  getCurrentTime() {
+    const date = new Date();
+    return formatTime(date.getTime(), date.getTimezoneOffset());
+  }
+
+  /**
+   * Stops timers, then creates new variables and timers
+   */
+  public resetConfig() {
+    this.stopTimers();
+    this.initializeVariables();
+    this.initializeTimers();
   }
 }

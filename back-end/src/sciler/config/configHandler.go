@@ -53,11 +53,11 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 	errorList = append(errorList, append(append(puzzleErrors, eventErrors...), buttonEventErrors...)...)
 
 	config.Devices = make(map[string]*Device)
+	createFrontEndDevice(&config)
 	for _, readDevice := range readConfig.Devices {
 		config.Devices[readDevice.ID] = &(Device{readDevice.ID, readDevice.Description, readDevice.Input,
 			readDevice.Output, make(map[string]interface{}), false})
 	}
-	createFrontEndDevice(&config)
 
 	config.Timers = make(map[string]*Timer)
 	for _, readTimer := range readConfig.Timers {

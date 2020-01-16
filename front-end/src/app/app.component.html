@@ -1,11 +1,15 @@
 <div class="main">
   <mat-toolbar color="primary" class="toolbar">
     <button mat-icon-button (click)="nav.toggle()"><mat-icon aria-label="menu">menu</mat-icon></button>
+    <p class="currentTime">{{ getCurrentTime() }} </p>
     <div class="home-header">
       <div class="title-box">
         <p class="title"> {{ title }} : {{ nameOfRoom }} </p>
       </div>
     </div>
+    <span (click)="$event.stopPropagation()">
+      <button mat-icon-button (click)="setFullScreen()"><mat-icon>fullscreen</mat-icon></button>
+    </span>
   </mat-toolbar>
   <mat-sidenav-container>
     <mat-sidenav #nav mode="over" class="menu">
