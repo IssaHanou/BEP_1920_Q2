@@ -27,7 +27,7 @@ export class Devices {
    * getDevice is a getter for devices
    * @param dev device id
    */
-  getDevice(dev) {
+  getDevice(dev: string) {
     if (this.all.has(dev)) {
       return this.all.get(dev);
     } else {

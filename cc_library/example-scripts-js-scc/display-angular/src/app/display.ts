@@ -29,8 +29,8 @@ export class Display extends Device {
 
   getStatus() {
     return {
-      "hint": this.hint
-    }
+      hint: this.hint
+    };
   }
 
   performInstruction(action) {

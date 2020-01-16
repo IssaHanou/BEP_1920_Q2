@@ -64,7 +64,18 @@
               "value": "test",
               "comparison": "eq"
             }
-          }
+          },
+          "actions": [
+            {
+              "type": "timer",
+              "type_id": "timer1",
+              "message": [
+                {
+                  "instruction": "pause"
+                }
+              ]
+            }
+          ]
         }
       ]
     }

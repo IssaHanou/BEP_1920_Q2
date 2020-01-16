@@ -4,7 +4,6 @@ import { formatMS } from "./components/timer/timer";
  * It is currently implemented to log to the console, but this can be changed to log to a file on the server-side.
  */
 export class Logger {
-
   constructor() {}
 
   /**
@@ -13,8 +12,13 @@ export class Logger {
    * @param msg to log
    */
   public log(level: string, msg: string) {
-    console.log("time=" + new Date().toLocaleString()
-      + ", level=" + level
-      + ", msg=" + msg);
+    console.log(
+      "time=" +
+        new Date().toLocaleString() +
+        ", level=" +
+        level +
+        ", msg=" +
+        msg
+    );
   }
 }
