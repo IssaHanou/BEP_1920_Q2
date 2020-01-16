@@ -28,7 +28,7 @@ func main() {
 	for _, level := range logger.AllLevels {
 		pathMap[level] = writeFile
 	}
-	// create a hook for file for logrus
+	// create a hook for file for logger
 	hook := lfshook.NewHook(pathMap, &logger.TextFormatter{
 		FullTimestamp:   true,
 		DisableColors:   true,
