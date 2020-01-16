@@ -76,7 +76,8 @@ export class FullScreen {
       webkitExitFullscreen(): Promise<void>;
       msExitFullscreen(): Promise<void>;
     };
-    if (docWithBrowsersExitFunctions.fullscreen != this.fullScreen) {
+    const docFullScreen = docWithBrowsersExitFunctions.fullscreenElement != null;
+    if (docFullScreen !== this.fullScreen) {
       this.fullScreen = !this.fullScreen;
     }
   }
