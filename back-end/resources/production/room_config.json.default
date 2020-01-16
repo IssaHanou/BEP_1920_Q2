@@ -5,10 +5,19 @@
     "host": "192.168.178.82",
     "port": 1883
   },
-   "cameras": [
-     {"name": "camera1", "link": "https://raccoon.games"},
-     {"name": "camera2", "link": "https://debrouwerij.io"},
-     {"name": "muppets", "link": "https://www.youtube.com/embed/tgbNymZ7vqY"}
+  "cameras": [
+    {
+      "name": "camera1",
+      "link": "https://raccoon.games"
+    },
+    {
+      "name": "camera2",
+      "link": "https://debrouwerij.io"
+    },
+    {
+      "name": "muppets",
+      "link": "https://www.youtube.com/embed/tgbNymZ7vqY"
+    }
   ],
   "devices": [
     {
@@ -501,8 +510,10 @@
           "id": "add 5 min timer",
           "description": "add 5 min to general",
           "limit": 1,
-          "conditions": {    "list": [],
-            "operator": "OR"      },
+          "conditions": {
+            "list": [],
+            "operator": "OR"
+          },
           "actions": [
             {
               "type": "timer",
@@ -520,8 +531,10 @@
           "id": "sub 5 min timer",
           "description": "sub 5 min to general",
           "limit": 1,
-          "conditions": {       "list": [],
-            "operator": "OR"   },
+          "conditions": {
+            "list": [],
+            "operator": "OR"
+          },
           "actions": [
             {
               "type": "timer",
@@ -539,8 +552,10 @@
           "id": "done timer",
           "description": "done general",
           "limit": 1,
-          "conditions": {       "list": [],
-            "operator": "OR"   },
+          "conditions": {
+            "list": [],
+            "operator": "OR"
+          },
           "actions": [
             {
               "type": "timer",
@@ -557,8 +572,10 @@
           "id": "pause timer",
           "description": "pause general",
           "limit": 1,
-          "conditions": {       "list": [],
-            "operator": "OR"   },
+          "conditions": {
+            "list": [],
+            "operator": "OR"
+          },
           "actions": [
             {
               "type": "timer",
@@ -575,8 +592,10 @@
           "id": "start timer",
           "description": "start general",
           "limit": 1,
-          "conditions": {       "list": [],
-            "operator": "OR"   },
+          "conditions": {
+            "list": [],
+            "operator": "OR"
+          },
           "actions": [
             {
               "type": "timer",
@@ -593,8 +612,10 @@
           "id": "stop timer",
           "description": "stop general",
           "limit": 1,
-          "conditions": {       "list": [],
-            "operator": "OR"   },
+          "conditions": {
+            "list": [],
+            "operator": "OR"
+          },
           "actions": [
             {
               "type": "timer",
