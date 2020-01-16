@@ -8,6 +8,7 @@ type ReadConfig struct {
 	Timers        []ReadTimer        `json:"timers"`
 	Puzzles       []ReadPuzzle       `json:"puzzles"`
 	GeneralEvents []ReadGeneralEvent `json:"general_events"`
+	Labels        []string           `json:"labels"`
 }
 
 // General is a struct that describes the configurations of an escape room.
@@ -123,7 +124,12 @@ func (action Action) Execute(handler InstructionSender) {
 		{
 			handler.SetTimer(action.TypeID, action.Message[0])
 		}
+	case "label":
+		{
+			handler.SendLabelInstruction(action.TypeID, action.Message, action.Delay)
+		}
 	}
+
 }
 
 // ComponentInstruction can be sent across clients of the brokers.
@@ -137,4 +143,5 @@ type ComponentInstruction struct {
 type OutputObject struct {
 	Type         string            `json:"type"`
 	Instructions map[string]string `json:"instructions"`
+	Label        []string          `json:"label"`
 }

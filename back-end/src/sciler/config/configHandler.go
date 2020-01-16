@@ -84,6 +84,7 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 		// and with checking constraint
 		config.StatusMap = generateStatusMap(&config)
 		config.RuleMap = generateRuleMap(&config)
+		config.LabelMap = generateLabelMap(&config)
 		errorList = append(errorList, checkConfig(config)...)
 	}
 	return config, errorList
@@ -111,6 +112,20 @@ func generateRuleMap(config *WorkingConfig) map[string]*Rule {
 	return ruleMap
 }
 
+func generateLabelMap(config *WorkingConfig) map[string][]*Component {
+	labelMap := make(map[string][]*Component)
+	devices := config.Devices
+	for _, device := range devices {
+		for compID, comp := range device.Output {
+			for _, label := range comp.Label {
+				component := &Component{Device: device, ID: compID}
+				labelMap[label] = appendWhenUniqueComp(labelMap[label], component)
+			}
+		}
+	}
+	return labelMap
+}
+
 func generateStatusMap(config *WorkingConfig) map[string][]*Rule {
 	statusMap := make(map[string][]*Rule)
 	rules := getAllRules(config)
@@ -132,6 +147,15 @@ func appendWhenUnique(rules []*Rule, rule *Rule) []*Rule {
 		}
 	}
 	return append(rules, rule)
+}
+
+func appendWhenUniqueComp(comps []*Component, comp *Component) []*Component {
+	for _, existingComp := range comps {
+		if reflect.DeepEqual(*existingComp, *comp) {
+			return comps
+		}
+	}
+	return append(comps, comp)
 }
 
 // checkConfig is a method that will return an error if the constraints value type is not equal to the device input type specified, the actions type is not equal to the device output type, or some other not allowed json configuration
@@ -169,9 +193,11 @@ func checkActions(actions []Action, config WorkingConfig) []string {
 			}
 		case "timer":
 			errorList = append(errorList, checkActionTimer(action, config)...)
+		case "label":
+			errorList = append(errorList, checkActionLabel(action, config)...)
 		default:
 			errorList = append(errorList,
-				fmt.Sprintf("only device and timer are accepted as type for an action, however type was specified as: %s", action.Type))
+				fmt.Sprintf("only device, timer and label are accepted as type for an action, however type was specified as: %s", action.Type))
 		}
 	}
 	return errorList
@@ -250,6 +276,17 @@ func checkActionDevice(action Action, config WorkingConfig) []string {
 					fmt.Sprintf("component with id %s not found in map", actionMessage.ComponentID))
 			}
 		}
+	} else {
+		errorList = append(errorList,
+			fmt.Sprintf("device with id %s not found in map", action.TypeID))
+	}
+	return errorList
+}
+
+func checkActionLabel(action Action, config WorkingConfig) []string {
+	errorList := make([]string, 0)
+	if _, ok := config.LabelMap[action.TypeID]; ok { // checks if device can be found in the map, if so, it is stored in variable device
+
 	} else {
 		errorList = append(errorList,
 			fmt.Sprintf("device with id %s not found in map", action.TypeID))
