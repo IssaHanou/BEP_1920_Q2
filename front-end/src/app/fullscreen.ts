@@ -7,7 +7,6 @@ export class FullScreen {
    * Uses HTML5 API to open the full screen.
    */
   openFullScreen(element) {
-    // Trigger fullscreen
     const docElmWithBrowsersFullScreenFunctions = element as HTMLElement & {
       mozRequestFullScreen(): Promise<void>;
       webkitRequestFullscreen(): Promise<void>;
@@ -38,6 +37,7 @@ export class FullScreen {
       webkitExitFullscreen(): Promise<void>;
       msExitFullscreen(): Promise<void>;
     };
+
     if (docWithBrowsersExitFunctions.exitFullscreen) {
       docWithBrowsersExitFunctions.exitFullscreen();
     } else if (docWithBrowsersExitFunctions.mozCancelFullScreen) {
@@ -57,10 +57,27 @@ export class FullScreen {
    * Determine whether to open of close full screen.
    */
   setFullScreen() {
+    this.checkFullScreenEsc();
+
     if (this.fullScreen) {
       this.closeFullScreen();
     } else {
       this.openFullScreen(document.documentElement);
+    }
+  }
+
+  /**
+   * When the full screen is opened with the button, but closed with Esc,
+   * the full screen boolean is not reset, so do it manually.
+   */
+  checkFullScreenEsc() {
+    const docWithBrowsersExitFunctions = document as Document & {
+      mozCancelFullScreen(): Promise<void>;
+      webkitExitFullscreen(): Promise<void>;
+      msExitFullscreen(): Promise<void>;
+    };
+    if (docWithBrowsersExitFunctions.fullscreen != this.fullScreen) {
+      this.fullScreen = !this.fullScreen;
     }
   }
 }

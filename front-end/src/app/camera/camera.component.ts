@@ -137,6 +137,8 @@ export class CameraComponent extends FullScreen
    * Overrides super method.
    */
   setFullScreen() {
+    this.checkFullScreenEsc();
+
     if (this.fullScreen) {
       this.closeFullScreen();
     } else {
