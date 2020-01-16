@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { AppComponent } from "../../app.component";
+import { formatMS, formatTime } from "./timer";
 
 @Component({
   selector: "app-timer",
@@ -13,5 +14,18 @@ export class TimerComponent implements OnInit {
 
   getDisplayTime() {
     return this.app.displayTime;
+  }
+
+  getDoneTime() {
+    const device = this.app.deviceList.getDevice("front-end");
+    if (device !== null) {
+      const status = device.status;
+      if (status.get("start") > 0 && status.get("stop") === 0) {
+        const date = new Date();
+        const timeDiff = date.getTime()+ this.app.timerList.getTimer("general").duration;
+        const doneTime = formatTime(timeDiff, date.getTimezoneOffset());
+        return "Klaar om " + doneTime;
+      }
+    }
   }
 }

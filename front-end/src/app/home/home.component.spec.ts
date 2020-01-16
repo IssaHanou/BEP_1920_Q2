@@ -17,6 +17,7 @@ import {
   MatSnackBar,
   MatSnackBarModule,
   MatSortModule,
+  MatCheckboxModule,
   MatExpansionModule,
   MatTableModule,
   MatToolbarModule
@@ -53,6 +54,7 @@ describe("HomeComponent", () => {
         MatSidenavModule,
         MatToolbarModule,
         MatIconModule,
+        MatCheckboxModule,
         MatSelectModule,
         MatExpansionModule,
         MatListModule,

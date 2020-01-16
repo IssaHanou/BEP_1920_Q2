@@ -10,7 +10,8 @@ import { Timers } from "./components/timer/timers";
 import { Logger } from "./logger";
 import { Camera } from "./camera/camera";
 import { Hint } from "./components/hint/hint";
-import { formatMS } from "./components/timer/timer";
+import { formatMS, formatTime } from "./components/timer/timer";
+import { FullScreen } from "./fullscreen";
 
 @Component({
   selector: "app-root",
@@ -18,7 +19,7 @@ import { formatMS } from "./components/timer/timer";
   styleUrls: ["./app.component.css", "../assets/css/main.css"],
   encapsulation: ViewEncapsulation.None
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   // Variables for the home screen
   title = "SCILER";
   nameOfRoom = "Super awesome escape";
@@ -35,11 +36,14 @@ export class AppComponent implements OnInit, OnDestroy {
   configErrorList: string[];
   cameras: Camera[];
   selectedCamera: string;
+  selectedCamera2: string;
+  openSecondCamera = false;
   timerList: Timers;
   displayTime: string;
   everySecond: Observable<number> = timer(0, 1000);
 
   constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
+    super();
     this.logger = new Logger();
     this.jsonConvert = new JsonConvert();
     this.initializeVariables();
@@ -343,6 +347,14 @@ export class AppComponent implements OnInit, OnDestroy {
     config.duration = 3000;
     config.panelClass = ["custom-snack-bar"];
     this.snackBar.open(message, action, config);
+  }
+
+  /**
+   * Return the current time to display.
+   */
+  getCurrentTime() {
+    const date = new Date();
+    return formatTime(date.getTime(), date.getTimezoneOffset());
   }
 
   /**

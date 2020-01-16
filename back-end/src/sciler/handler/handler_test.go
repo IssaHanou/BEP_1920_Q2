@@ -39,7 +39,7 @@ func getTestHandler() *Handler {
 				T:         nil,
 				State:     "stateIdle",
 				Ending:    nil,
-				Finish:    false,
+				Finished:  false,
 			}),
 		},
 		GeneralEvents: nil,

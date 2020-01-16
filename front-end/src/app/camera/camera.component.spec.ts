@@ -6,7 +6,9 @@ import { MQTT_SERVICE_OPTIONS } from "../app.module";
 import {
   MatFormFieldModule,
   MatSelectModule,
+  MatCheckboxModule,
   MatSnackBar,
+  MatIconModule,
   MatSnackBarModule,
   MatExpansionModule
 } from "@angular/material";
@@ -26,6 +28,8 @@ describe("CameraComponent", () => {
         MatFormFieldModule,
         MatSelectModule,
         MatExpansionModule,
+        MatIconModule,
+        MatCheckboxModule,
         MatSnackBarModule,
         BrowserAnimationsModule,
         ReactiveFormsModule

@@ -13,7 +13,8 @@
     </form>
     <form (ngSubmit)="onCustomHint()">
       <mat-form-field>
-        <input matInput type="text" name="customHint" [(ngModel)]="customHint" placeholder="Type een eigen hint">
+        <input matInput #input type="text" name="customHint" [(ngModel)]="customHint" placeholder="Type een eigen hint">
+        <mat-hint>{{input.value?.length || 0}} characters</mat-hint>
       </mat-form-field>
       <input type="submit" value="Stuur" class="mat-raised-button mat-primary hint-button custom-md-button">
     </form>

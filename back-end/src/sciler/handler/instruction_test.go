@@ -313,9 +313,20 @@ func TestOnInstructionMsgFinishRule(t *testing.T) {
 			"status": true},
 		},
 	})
+	instMessage, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "time",
+		Contents: map[string]interface{}{
+			"duration": 10000,
+			"id":       "timer1",
+			"state":    "stateIdle",
+		},
+	})
+	communicatorMock.On("Publish", "front-end", string(instMessage), 3)
 	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)
 	handler.onInstructionMsg(msg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
 }
 
 func TestOnInstructionMsgHint(t *testing.T) {
