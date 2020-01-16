@@ -56,6 +56,7 @@ export class ConfigComponent implements OnInit {
    * Use the config entered as new configuration for app.
    */
   sendConfig() {
+    this.app.resetConfig();
     this.app.sendInstruction([
       {
         instruction: "use config",

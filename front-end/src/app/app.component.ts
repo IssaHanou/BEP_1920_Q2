@@ -214,9 +214,6 @@ export class AppComponent implements OnInit, OnDestroy {
         break;
       }
       case "new config": {
-        this.stopTimers();
-        this.initializeVariables();
-        this.ngOnInit();
         this.openSnackbar("using new config: " + msg.contents.name, "");
         break;
       }
@@ -346,5 +343,14 @@ export class AppComponent implements OnInit, OnDestroy {
     config.duration = 3000;
     config.panelClass = ["custom-snack-bar"];
     this.snackBar.open(message, action, config);
+  }
+
+  /**
+   * Stops timers, then creates new variables and timers
+   */
+  public resetConfig() {
+    this.stopTimers();
+    this.initializeVariables();
+    this.initializeTimers();
   }
 }

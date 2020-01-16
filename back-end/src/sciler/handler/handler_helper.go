@@ -244,6 +244,12 @@ func (handler *Handler) processConfig(configToRead interface{}, action string, f
 		Contents: map[string][]string{},
 	}
 	if action == "check" {
+		if newConfig.General.Host != handler.Config.General.Host {
+			errorList = append(errorList, "host: different host from front and back-end")
+		}
+		if newConfig.General.Port != handler.Config.General.Port {
+			errorList = append(errorList, "port: different port from front and back-end")
+		}
 		message.Contents = map[string][]string{"errors": errorList}
 	}
 	if action == "use" && len(errorList) == 0 {
@@ -251,14 +257,14 @@ func (handler *Handler) processConfig(configToRead interface{}, action string, f
 		if dirErr != nil { //TODO test
 			logrus.Error(dirErr)
 		}
-		fullFileName := filepath.Join(dir, "back-end", "resources", fileName)
+		fullFileName := filepath.Join(dir, "back-end", "resources", "production", fileName)
 		err = ioutil.WriteFile(fullFileName, jsonBytes, 0644)
 		if err != nil {
 			logrus.Error(err)
 		}
 		handler.Config = newConfig
 		handler.ConfigFile = fullFileName
-		handler.sendStatus("general")
+		handler.SendSetup()
 		message.Type = "new config"
 		message.Contents = map[string]string{"name": fileName}
 
