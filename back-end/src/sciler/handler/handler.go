@@ -36,7 +36,7 @@ func (handler *Handler) NewHandler(client mqtt.Client, message mqtt.Message) {
 	if err := json.Unmarshal(message.Payload(), &raw); err != nil {
 		logger.Errorf("invalid JSON received: %v", err)
 	}
-	go handler.msgMapper(raw)
+	handler.msgMapper(raw)
 }
 
 // msgMapper sends the right message through to the right function

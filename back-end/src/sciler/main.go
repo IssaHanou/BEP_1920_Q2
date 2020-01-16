@@ -7,6 +7,7 @@ import (
 	logger "github.com/sirupsen/logrus"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sciler/communication"
 	"sciler/config"
 	"sciler/handler"
@@ -16,6 +17,9 @@ import (
 var topics = []string{"back-end"}
 
 func main() {
+	// set maximum number of cores
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
 	dir, dirErr := os.Getwd()
 	if dirErr != nil {
 		logger.Fatal(dirErr)

@@ -326,6 +326,7 @@ func TestOnInstructionMsgFinishRule(t *testing.T) {
 	communicatorMock.On("Publish", "front-end", string(instMessage), 3)
 	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)
 	handler.onInstructionMsg(msg)
+	time.Sleep(time.Duration(10) * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
 }
 
