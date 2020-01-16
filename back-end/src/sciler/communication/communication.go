@@ -49,11 +49,11 @@ func NewCommunicator(host string, port int, topicsOfInterest []string, handler m
 			return client.SubscribeMultiple(topics, handler)
 		}, "subscribing", -1)
 
-		logger.Infof("Connected to %s:%d with subscriptions to %s", host, port, topicsOfInterest)
+		logger.Infof("connected to %s:%d with subscriptions to %s", host, port, topicsOfInterest)
 		onStart()
 	})
 	opts.SetReconnectingHandler(func(client mqtt.Client, options *mqtt.ClientOptions) {
-		logger.Info("Trying to reconnect")
+		logger.Info("trying to reconnect")
 	})
 	will, _ := json.Marshal(map[string]interface{}{
 		"device_id": "back-end",

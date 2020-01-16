@@ -58,6 +58,7 @@ func main() {
 		messageHandler.SendSetup()
 	})
 
+	logger.Infof("attempting to connect to broker at %s on port %v", host, port)
 	messageHandler.Communicator.Start()
 
 	// prevent exit
