@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"sciler/communication"
@@ -15,7 +14,7 @@ type CommunicatorMock struct {
 	mock.Mock
 }
 
-func (communicatorMock *CommunicatorMock) Start(handler mqtt.MessageHandler, onStart func()) {
+func (communicatorMock *CommunicatorMock) Start() {
 	// do nothing
 }
 
@@ -67,9 +66,11 @@ func getTestHandler() *Handler {
 			}),
 		},
 	}
+	messageHandler := Handler{Config: workingConfig, ConfigFile: "fake file name"}
 	communicator := communication.NewCommunicator(workingConfig.General.Host,
-		workingConfig.General.Port, []string{"back-end", "test"})
-	return &Handler{workingConfig, "fake file name", communicator}
+		workingConfig.General.Port, []string{"back-end", "test"}, messageHandler.NewHandler, func() {})
+	messageHandler.Communicator = communicator
+	return &messageHandler
 }
 
 ////////////////////////////// Helper method tests //////////////////////////////
