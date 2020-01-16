@@ -8,13 +8,17 @@ When using Goland uncheck `Use GOPATH that is defined in system environment` and
 run `go get ./...` in the `sciler` folder to go get all dependencies
 
 ## Back-end on Raspberry Pi
-if needed install go1.13.4:
+#### setup config:
+- in directory `back-end` (copy and) rename [resources/`room_config.json.default`](resources/production/room_config.json.default) to `room_config.json`
+- (optional), change this file as desired following the [room_manual.md](resources/manuals/room_manual.md)
+
+#### if needed install go1.13.4:
 - run  `pi@raspberrypi:~ $ wget https://storage.googleapis.com/golang/go1.13.4.linux-armv6l.tar.gz`
 - run  `pi@raspberrypi:~ $ sudo tar -C /usr/local -xzf go1.7.3.linux-armv6l.tar.gz`
 - run ` pi@raspberrypi:~ $ export PATH=$PATH:/usr/local/go/bin` 
 - run ` pi@raspberrypi:~ $ go version` to check if succeeded 
 
-then:
+#### then:
 - add to .profile (with `pi@raspberrypi:~ $ nano .profile` for example): \
 `export GOROOT=/usr/local/go` \
 `export PATH=$PATH:$GOROOT/bin`\

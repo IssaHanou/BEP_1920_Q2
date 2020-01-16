@@ -7,7 +7,6 @@ import { AppComponent } from "../../app.component";
   styleUrls: ["./timer.component.css", "../../../assets/css/main.css"]
 })
 export class TimerComponent implements OnInit {
-
   constructor(private app: AppComponent) {}
 
   ngOnInit() {}
