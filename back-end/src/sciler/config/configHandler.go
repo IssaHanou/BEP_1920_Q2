@@ -285,11 +285,17 @@ func checkActionDevice(action Action, config WorkingConfig) []string {
 
 func checkActionLabel(action Action, config WorkingConfig) []string {
 	errorList := make([]string, 0)
-	if _, ok := config.LabelMap[action.TypeID]; ok { // checks if device can be found in the map, if so, it is stored in variable device
-
+	if _, ok := config.LabelMap[action.TypeID]; ok { // checks if label can be found in the map, if so, it is stored in variable device
+		for _, instruction := range action.Message {
+			for _, comp := range config.LabelMap[action.TypeID] {
+				instruction.ComponentID = comp.ID
+				errorList = append(errorList,
+					checkActionDevice(Action{TypeID: comp.Device.ID, Message: []ComponentInstruction{instruction}}, config)...)
+			}
+		}
 	} else {
 		errorList = append(errorList,
-			fmt.Sprintf("device with id %s not found in map", action.TypeID))
+			fmt.Sprintf("label with id %s not found in map", action.TypeID))
 	}
 	return errorList
 }
