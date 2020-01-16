@@ -61,7 +61,7 @@ func (handler *Handler) SendComponentInstruction(clientID string, instructions [
 	}
 }
 
-// SendLabelInstruction provides the action with a componentID and a device to send it to
+// SendLabelInstruction provides the action with a componentID from de LabelMap and a device to send it to
 func (handler *Handler) SendLabelInstruction(labelID string, instructions []config.ComponentInstruction, delay string) {
 	for _, instruction := range instructions {
 		for _, comp := range handler.Config.LabelMap[labelID] {

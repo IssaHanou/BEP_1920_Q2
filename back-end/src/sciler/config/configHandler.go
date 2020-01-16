@@ -112,6 +112,7 @@ func generateRuleMap(config *WorkingConfig) map[string]*Rule {
 	return ruleMap
 }
 
+// generateLabelMap makes a map from a label to a component by checking all components if they have labels
 func generateLabelMap(config *WorkingConfig) map[string][]*Component {
 	labelMap := make(map[string][]*Component)
 	devices := config.Devices
@@ -188,9 +189,7 @@ func checkActions(actions []Action, config WorkingConfig) []string {
 	for _, action := range actions {
 		switch action.Type {
 		case "device":
-			{
-				errorList = append(errorList, checkActionDevice(action, config)...)
-			}
+			errorList = append(errorList, checkActionDevice(action, config)...)
 		case "timer":
 			errorList = append(errorList, checkActionTimer(action, config)...)
 		case "label":
@@ -283,6 +282,8 @@ func checkActionDevice(action Action, config WorkingConfig) []string {
 	return errorList
 }
 
+// checkActionLabel checks if there is a label with this ID,
+// and checks if all components under this label have the correct instructions with a call to checkActionDevice
 func checkActionLabel(action Action, config WorkingConfig) []string {
 	errorList := make([]string, 0)
 	if _, ok := config.LabelMap[action.TypeID]; ok { // checks if label can be found in the map, if so, it is stored in variable device
