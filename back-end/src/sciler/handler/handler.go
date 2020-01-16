@@ -86,6 +86,9 @@ func (handler *Handler) onConnectionMsg(raw Message) {
 			handler.Config.Devices[raw.DeviceID] = device
 			logrus.Info("setting connection status of ", raw.DeviceID, " to ", value)
 			handler.sendStatus(raw.DeviceID)
+			if raw.DeviceID == "front-end" && !value.(bool) { // when a front-end disconnect, check if another front-end is connected (maybe multiple front-ends are running
+				handler.SendSetup()
+			}
 		}
 	}
 }
@@ -177,7 +180,7 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 						"instructed_by": raw.DeviceID,
 					}})
 					handler.Config = config.ReadFile(handler.ConfigFile)
-					handler.sendStatus("general")
+					handler.SendSetup()
 				}
 			case "test all":
 				{

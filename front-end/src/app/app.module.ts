@@ -54,7 +54,7 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     qos: 1,
     retain: false
   },
-  keepalive: 10
+  keepalive: 5
 };
 
 export const APP_ROUTES: Routes = [

@@ -48,16 +48,35 @@ export class AppComponent implements OnInit, OnDestroy {
     for (const topic of topics) {
       this.subscribeNewTopic(topic);
     }
+
+    this.mqttService.onConnect.subscribe(() => {
+      this.logger.log("info", "Connected to broker");
+      this.sendInstruction([{ instruction: "send setup" }]);
+      this.sendConnection(true);
+      this.initializeTimers();
+    });
+
+    this.mqttService.onOffline.subscribe(() => {
+      this.logger.log("error", "Connection to broker lost");
+      this.setConnectionAllDevices(false);
+    });
+  }
+
+  /**
+   * Sets connection of all devices
+   * @param connection boolean
+   */
+  private setConnectionAllDevices(connection: boolean) {
+    for (const tuple of this.deviceList.all) {
+      const device = tuple[1];
+      device.connection = false;
+    }
   }
 
   /**
    * Initialize app, also called upon loading new config file.
    */
-  ngOnInit(): void {
-    this.sendInstruction([{ instruction: "send setup" }]);
-    this.sendConnection(true);
-    this.initializeTimers();
-  }
+  ngOnInit(): void {}
 
   initializeVariables() {
     this.deviceList = new Devices();
@@ -159,6 +178,7 @@ export class AppComponent implements OnInit, OnDestroy {
    */
   private processMessage(jsonMessage: string) {
     const msg: Message = Message.deserialize(jsonMessage);
+
     switch (msg.type) {
       case "confirmation": {
         this.processConfirmation(msg);
@@ -170,6 +190,11 @@ export class AppComponent implements OnInit, OnDestroy {
       }
       case "status": {
         this.deviceList.setDevice(msg.contents);
+
+        // When the back-end/front-end disconnects, all devices are disconnected
+        if (msg.contents.id === "front-end" && !msg.contents.connection) {
+          this.setConnectionAllDevices(false);
+        }
         break;
       }
       case "event status": {
@@ -189,9 +214,6 @@ export class AppComponent implements OnInit, OnDestroy {
         break;
       }
       case "new config": {
-        this.stopTimers();
-        this.initializeVariables();
-        this.ngOnInit();
         this.openSnackbar("using new config: " + msg.contents.name, "");
         break;
       }
@@ -321,5 +343,14 @@ export class AppComponent implements OnInit, OnDestroy {
     config.duration = 3000;
     config.panelClass = ["custom-snack-bar"];
     this.snackBar.open(message, action, config);
+  }
+
+  /**
+   * Stops timers, then creates new variables and timers
+   */
+  public resetConfig() {
+    this.stopTimers();
+    this.initializeVariables();
+    this.initializeTimers();
   }
 }
