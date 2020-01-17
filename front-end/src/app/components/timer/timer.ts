@@ -46,7 +46,7 @@ export function formatMS(timeInMS) {
  * Timezone off set is in minutes.
  */
 export function formatTime(timeInMS, tzOffSet) {
-  const tzInMs =  60 * 1000 * tzOffSet;
+  const tzInMs = 60 * 1000 * tzOffSet;
   timeInMS = timeInMS - tzInMs;
   return formatMS(timeInMS).substr(0, 5);
 }

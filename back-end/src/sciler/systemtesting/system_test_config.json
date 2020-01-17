@@ -1,0 +1,27 @@
+{
+  "general": {
+    "name": "System Test",
+    "duration": "30m",
+    "host": "localhost",
+    "port": 1883
+  },
+  "cameras": [],
+  "devices": [
+    {
+      "id": "latency",
+      "description": "client computer to test latency",
+      "input": {},
+      "output": {
+        "pinged": {
+          "type": "boolean",
+          "instructions": {
+            "ping": "boolean"
+          }
+        }
+      }
+    }
+  ],
+  "timers": [],
+  "puzzles": [],
+  "general_events": []
+}

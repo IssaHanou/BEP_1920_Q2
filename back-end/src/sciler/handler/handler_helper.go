@@ -343,7 +343,8 @@ func (handler *Handler) checkStatusType(device config.Device, status interface{}
 	return nil
 }
 
-func getMapSlice(input interface{}) ([]map[string]interface{}, error) {
+// GetMapSlice is a function that takes an interface witch is a slice of map[string] to interface casts it to this form
+func GetMapSlice(input interface{}) ([]map[string]interface{}, error) {
 	bytes, _ := json.Marshal(input)
 	var output []map[string]interface{} // dirty trick to go from interface{} to []map[string]interface{}
 	err := json.Unmarshal(bytes, &output)

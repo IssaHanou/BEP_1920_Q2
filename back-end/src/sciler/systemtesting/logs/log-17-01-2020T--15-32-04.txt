@@ -1,0 +1,1 @@
+2020-01-17 15:32:04,548 [INFO ]  Start of log for device: latency

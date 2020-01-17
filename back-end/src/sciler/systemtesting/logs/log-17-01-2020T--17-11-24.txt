@@ -1,0 +1,10 @@
+2020-01-17 17:11:24,118 [INFO ]  Start of log for device: latency
+2020-01-17 17:11:24,123 [INFO ]  connected to broker
+2020-01-17 17:11:24,123 [INFO ]  ('subscribed to topic', 'client-computers')
+2020-01-17 17:11:24,124 [INFO ]  ('subscribed to topic', 'latency')
+2020-01-17 17:11:24,124 [INFO ]  ('back-end message published', '{"device_id": "latency", "time_sent": "17-01-2020 17:11:24", "type": "connection", "contents": {"connection": true}}')
+2020-01-17 17:15:08,739 [INFO ]  ('message received: topic', 'latency', 'message', '{"device_id":"back-end","time_sent":"17-01-2020 17:15:08","type":"instruction","contents":[{"instructed_by":"back-end","instruction":"ping"}]}')
+2020-01-17 17:15:08,746 [INFO ]  ('instruction performed', 'ping')
+2020-01-17 17:15:08,746 [INFO ]  ('back-end message published', '{"device_id": "latency", "time_sent": "17-01-2020 17:15:08", "type": "confirmation", "contents": {"completed": true, "instructed": {"device_id": "back-end", "time_sent": "17-01-2020 17:15:08", "type": "instruction", "contents": [{"instructed_by": "back-end", "instruction": "ping"}]}}}')
+2020-01-17 17:15:08,747 [INFO ]  ('message received: topic', 'latency', 'message', '{"device_id":"back-end","time_sent":"17-01-2020 17:15:08","type":"instruction","contents":[{"instruction":"status update"}]}')
+2020-01-17 17:15:08,747 [INFO ]  ('back-end message published', '{"device_id": "latency", "time_sent": "17-01-2020 17:15:08", "type": "connection", "contents": {"connection": true}}')

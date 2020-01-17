@@ -1,0 +1,16 @@
+{
+  "id": "latency",
+  "description": "Test client computer for testing latency",
+  "host": "localhost",
+  "labels": [],
+  "port": 1883,
+  "input": {},
+  "output": {
+    "ping": {
+      "type": "boolean",
+      "instructions": {
+        "ping": "boolean"
+      }
+    }
+  }
+}

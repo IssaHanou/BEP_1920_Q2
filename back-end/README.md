@@ -14,7 +14,7 @@ run `go get ./...` in the `sciler` folder to go get all dependencies
 
 #### if needed install go1.13.4:
 - run  `pi@raspberrypi:~ $ wget https://storage.googleapis.com/golang/go1.13.4.linux-armv6l.tar.gz`
-- run  `pi@raspberrypi:~ $ sudo tar -C /usr/local -xzf go1.7.3.linux-armv6l.tar.gz`
+- run  `pi@raspberrypi:~ $ sudo tar -C /usr/local -xzf go1.13.4.linux-armv6l.tar.gz`
 - run ` pi@raspberrypi:~ $ export PATH=$PATH:/usr/local/go/bin` 
 - run ` pi@raspberrypi:~ $ go version` to check if succeeded 
 
@@ -24,10 +24,11 @@ run `go get ./...` in the `sciler` folder to go get all dependencies
 `export PATH=$PATH:$GOROOT/bin`\
 `export GOPATH=~/go/src/BEP_1920_Q2/back-end`\
 `export PATH=$PATH:$GOPATH/bin`
+- reboot
 - run `pi@raspberrypi:~/go/src $ git clone https://github.com/IssaHanou/BEP_1920_Q2.git`
 - run `pi@raspberrypi:~/go/src/BEP_1920_Q2/back-end/src/sciler $ go get ./...`
 - run `pi@raspberrypi:~/go/src/BEP_1920_Q2 $ go install sciler`
-- run `pi@raspberrypi:~/go/src/BEP_1920_Q2 $ sciler`
+- run `pi@raspberrypi:~/go/src/BEP_1920_Q2 $ back-end/bin/sciler`
 
 ### Setup gofmt and golint to run automatically:
 - install golint: `go get -u golang.org/x/lint/golint`

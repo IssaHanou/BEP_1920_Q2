@@ -107,7 +107,7 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 		return
 	}
 	msg := original.(map[string]interface{})
-	instructionContents, err := getMapSlice(msg["contents"])
+	instructionContents, err := GetMapSlice(msg["contents"])
 	if err != nil {
 		logrus.Errorf(err.Error())
 		return
@@ -146,7 +146,7 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 func (handler *Handler) onInstructionMsg(raw Message) {
 	logrus.Info("instruction message received from: ", raw.DeviceID)
 
-	instructions, err := getMapSlice(raw.Contents)
+	instructions, err := GetMapSlice(raw.Contents)
 	if err != nil {
 		logrus.Error(err)
 		return
