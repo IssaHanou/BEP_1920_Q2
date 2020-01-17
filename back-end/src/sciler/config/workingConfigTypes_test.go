@@ -34,6 +34,10 @@ type HandlerMock struct {
 	mock.Mock
 }
 
+func (handlerMock *HandlerMock) SendLabelInstruction(string, []ComponentInstruction, string) {
+	// do nothing
+}
+
 func (handlerMock *HandlerMock) SendComponentInstruction(string, []ComponentInstruction, string) {
 	// do nothing
 }
