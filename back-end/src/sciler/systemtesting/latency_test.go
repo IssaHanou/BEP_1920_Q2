@@ -74,7 +74,7 @@ func executeScript(script string) {
 		}
 		fmt.Println(string(out))
 	} else if runtime.GOOS == "linux" {
-		out, err := exec.Command(script).Output()
+		out, err := exec.Command("./" + script).Output()
 		if err != nil {
 			logger.Fatal(err)
 		}
