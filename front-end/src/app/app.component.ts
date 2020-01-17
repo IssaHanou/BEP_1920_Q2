@@ -12,6 +12,8 @@ import { Camera } from "./camera/camera";
 import { Hint } from "./components/hint/hint";
 import { formatMS, formatTime } from "./components/timer/timer";
 import { FullScreen } from "./fullscreen";
+import {Button} from "./components/manage/button";
+import {Buttons} from "./components/manage/buttons";
 
 @Component({
   selector: "app-root",
@@ -32,13 +34,13 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   // Keeping track of data
   deviceList: Devices;
   puzzleList: Puzzles;
+  manageButtons: Buttons;
   hintList: Hint[];
   configErrorList: string[];
   cameras: Camera[];
   selectedCamera: string;
   selectedCamera2: string;
   openSecondCamera = false;
-  manageButtons: string[];
   timerList: Timers;
   displayTime: string;
   everySecond: Observable<number> = timer(0, 1000);
@@ -86,10 +88,10 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   initializeVariables() {
     this.deviceList = new Devices();
     this.puzzleList = new Puzzles();
+    this.manageButtons = new Buttons();
     this.hintList = [];
     this.configErrorList = [];
     this.cameras = [];
-    this.manageButtons = [];
     this.timerList = new Timers();
     const generalTimer = { id: "general", duration: 0, state: "stateIdle" };
     this.timerList.setTimer(generalTimer);
@@ -203,6 +205,10 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
         this.puzzleList.updatePuzzles(msg.contents);
         break;
       }
+      case "front-end status": {
+        this.manageButtons.setButtons(msg.contents);
+        break;
+      }
       case "time": {
         this.timerList.setTimer(msg.contents);
         break;
@@ -247,15 +253,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
     for (const action of jsonData) {
       switch (action.instruction) {
         case "reset": {
-          let statusMsg = new Map<string, boolean>();
-          for (const component of this.manageButtons) {
-            statusMsg.set(component, false);
-          }
-          this.deviceList.setDevice({
-            id: "front-end",
-            connection: true,
-            status: statusMsg
-          });
+          this.resetFrontEndStatus();
           break;
         }
         case "status update": {
@@ -268,6 +266,21 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
         }
       }
     }
+  }
+
+  /**
+   * Update the device list with front-end start-up status: all buttons are not clicked.
+   */
+  private resetFrontEndStatus() {
+    let statusMsg = new Map<string, boolean>();
+    for (const key of this.manageButtons.all.keys()) {
+      statusMsg.set(key, false);
+    }
+    this.deviceList.setDevice({
+      id: "front-end",
+      connection: true,
+      status: statusMsg
+    });
   }
 
   /**
@@ -286,10 +299,10 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
     }
 
     const buttonData = jsonData.buttons;
-    this.manageButtons = [];
+    this.manageButtons = new Buttons();
     if (buttonData !== null) {
       for (const btn of buttonData) {
-        this.manageButtons.push(btn);
+        this.manageButtons.setButton(btn);
       }
     }
 

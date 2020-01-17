@@ -50,6 +50,7 @@ func (handler *Handler) msgMapper(raw Message) {
 		{
 			handler.updateStatus(raw)
 			handler.sendStatus(raw.DeviceID)
+			handler.sendFrontEndStatus(raw)
 			handler.HandleEvent(raw.DeviceID)
 			handler.sendEventStatus()
 		}

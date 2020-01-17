@@ -89,6 +89,9 @@ func (handler *Handler) SendInstruction(clientID string, instructions []map[stri
 func (handler *Handler) updateStatus(raw Message) {
 	contents := raw.Contents.(map[string]interface{})
 	if device, ok := handler.Config.Devices[raw.DeviceID]; ok {
+		if device.ID == "front-end" {
+			handler.handleFrontEndStatus(contents)
+		}
 		logrus.Info("status message received from: " + raw.DeviceID + ", status: " + fmt.Sprint(raw.Contents))
 		for k, v := range contents {
 			err := handler.checkStatusType(*device, v, k)
@@ -160,7 +163,34 @@ func (handler *Handler) sendEventStatus() {
 		Contents: status,
 	}
 	jsonMessage, _ := json.Marshal(&message)
-	logrus.Info("sending event status to front-end")
+	logrus.Infof("sending event status to front-end: %v", status)
+	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+}
+
+// Handles status updates from front-end specifically as these will only be affected by button events,
+// which are handled differently.
+// The rule that belongs to the pressed button (with updated status) is executed
+func (handler *Handler) handleFrontEndStatus(contents map[string]interface{}) {
+	device, _ := handler.Config.Devices["front-end"]
+	for component, status := range device.Status {
+		rule, _ := handler.Config.RuleMap[component]
+		if status != contents[component].(bool) {
+			rule.Execute(handler)
+		}
+	}
+}
+
+// Sends the front-end the new status of disabled buttons
+func (handler *Handler) sendFrontEndStatus(message Message) {
+	returnMsg := handler.getButtons()
+	newMessage := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "front-end status",
+		Contents: returnMsg,
+	}
+	jsonMessage, _ := json.Marshal(&newMessage)
+	logrus.Infof("sending front-end disabled status: %v", returnMsg)
 	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 }
 
@@ -168,13 +198,26 @@ func (handler *Handler) sendEventStatus() {
 // status is json object with key ruleName and value true (if executed == limit) or false
 func (handler *Handler) getEventStatus() []map[string]interface{} {
 	var list []map[string]interface{}
-	for _, rule := range handler.Config.RuleMap {
+	for _, rule := range handler.getPuzzleRules() {
 		var status = make(map[string]interface{})
 		status["id"] = rule.ID
 		status["status"] = rule.Finished()
 		list = append(list, status)
 	}
 	return list
+}
+
+func (handler *Handler) getPuzzleRules() []*config.Rule {
+	var rules []*config.Rule
+	for _, event := range handler.Config.GeneralEvents {
+		rules = append(rules, event.GetRules()...)
+	}
+
+	for _, event := range handler.Config.Puzzles {
+		rules = append(rules, event.GetRules()...)
+	}
+
+	return rules
 }
 
 // getHints returns a map of hints with puzzle name as key and list of hints for that puzzle as value
@@ -208,10 +251,17 @@ func (handler *Handler) getCameras() []map[string]string {
 }
 
 // getButtons returns a list with button names
-func (handler *Handler) getButtons() []string {
-	var buttons []string
+func (handler *Handler) getButtons() []map[string]interface{} {
+	var buttons []map[string]interface{}
 	for _, btn := range handler.Config.ButtonEvents {
-		buttons = append(buttons, btn.ID)
+		rule, ok := handler.Config.RuleMap[btn.ID]
+		if !ok {
+			logrus.Errorf("rule with id %s not found in rule map for button %s", rule.ID, btn.ID)
+		}
+		button := make(map[string]interface{})
+		button["id"] = btn.ID
+		button["disabled"] = !btn.Conditions.Resolve(handler.Config) || rule.Finished()
+		buttons = append(buttons, button)
 	}
 	return buttons
 }

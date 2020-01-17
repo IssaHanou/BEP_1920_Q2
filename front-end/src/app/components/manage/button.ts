@@ -7,4 +7,8 @@ export class Button {
     this.id = jsonData.id;
     this.disabled = jsonData.disabled;
   }
+
+  updateDisabled(newValue) {
+    this.disabled = newValue;
+  }
 }

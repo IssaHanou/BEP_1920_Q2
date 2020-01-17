@@ -48,7 +48,7 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 	config.Puzzles = newPuzzles
 	newEvents, eventErrors := generateGeneralEvents(readConfig.GeneralEvents, &config)
 	config.GeneralEvents = newEvents
-	newButtonEvents, buttonEventErrors := generateRules(readConfig.ButtonEvents, &config)
+	newButtonEvents, buttonEventErrors := generateButtonEvents(readConfig.ButtonEvents, &config)
 	config.ButtonEvents = newButtonEvents
 	errorList = append(errorList, append(append(puzzleErrors, eventErrors...), buttonEventErrors...)...)
 
@@ -103,6 +103,7 @@ func createFrontEndDevice(config *WorkingConfig) {
 	})
 }
 
+// does not include button events, because those should not be added to status map, only to rule map
 func getAllRules(config *WorkingConfig) []*Rule {
 	var rules []*Rule
 	for _, event := range config.GeneralEvents {
@@ -113,15 +114,16 @@ func getAllRules(config *WorkingConfig) []*Rule {
 		rules = append(rules, event.GetRules()...)
 	}
 
-	for _, event := range config.ButtonEvents {
-		rules = append(rules, event)
-	}
 	return rules
 }
 
 func generateRuleMap(config *WorkingConfig) map[string]*Rule {
 	ruleMap := make(map[string]*Rule)
 	rules := getAllRules(config)
+
+	for _, event := range config.ButtonEvents {
+		rules = append(rules, event)
+	}
 
 	for _, rule := range rules {
 		ruleMap[rule.ID] = rule
@@ -350,6 +352,15 @@ func generateGeneralEvent(event ReadEvent, config *WorkingConfig) (*GeneralEvent
 		Name:  event.GetName(),
 		Rules: rules,
 	}, errorList
+}
+
+func generateButtonEvents(buttonEvents []ReadRule, config *WorkingConfig) (map[string]*Rule, []string) {
+	newEvents := make(map[string]*Rule)
+	rules, errorList := generateRules(buttonEvents, config)
+	for _, rule := range rules {
+		newEvents[rule.ID] = rule
+	}
+	return newEvents, errorList
 }
 
 func generateRules(readRules []ReadRule, config *WorkingConfig) ([]*Rule, []string) {

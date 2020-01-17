@@ -13,7 +13,7 @@ type WorkingConfig struct {
 	Cameras       []Camera
 	Puzzles       []*Puzzle
 	GeneralEvents []*GeneralEvent
-	ButtonEvents  []*Rule
+	ButtonEvents  map[string]*Rule
 	Devices       map[string]*Device
 	Timers        map[string]*Timer
 	StatusMap     map[string][]*Rule

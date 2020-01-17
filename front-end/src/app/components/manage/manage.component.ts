@@ -1,5 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { AppComponent } from "../../app.component";
+import {Device} from "../device/device";
+import {Button} from "./button";
 
 @Component({
   selector: "app-manage",
@@ -13,7 +15,11 @@ export class ManageComponent implements OnInit {
   ngOnInit() {}
 
   getButtons() {
-    return this.app.manageButtons;
+    const buttons: Button[] = [];
+    for (const btn of this.app.manageButtons.all.values()) {
+      buttons.push(btn);
+    }
+    return buttons;
   }
 
   onClickTestButton() {
@@ -26,7 +32,8 @@ export class ManageComponent implements OnInit {
   }
 
   /**
-   * When clicking a button in the front-end manage section, send updated data to the back-end.
+   * When clicking a button in the front-end manage section,
+   * send updated data to the back-end.
    * All buttons have a boolean type, only update the pressed button.
    * @param btnID the button that is pressed
    */
@@ -35,12 +42,12 @@ export class ManageComponent implements OnInit {
     if (device != null) {
       const status = device.status;
       const statusMsg = {};
-      for (const component of this.app.manageButtons) {
-        let statusToSet = status.get(component);
-        if (btnID === component) {
+      for (const component of this.app.manageButtons.all.values()) {
+        let statusToSet = status.get(component.id);
+        if (btnID === component.id) {
           statusToSet = !statusToSet;
         }
-        statusMsg[component] = statusToSet;
+        statusMsg[component.id] = statusToSet;
       }
       this.app.sendStatus(statusMsg);
     }
