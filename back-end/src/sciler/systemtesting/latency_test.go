@@ -20,6 +20,7 @@ import (
 // Make sure when running windows, the setup in systemtesting/README.md is followed
 
 func TestLatency(t *testing.T) {
+	executeScript("test.sh")
 	executeScript("clientComputer.sh")
 	executeScript("localBroker.sh")
 	dir, dirErr := os.Getwd()
