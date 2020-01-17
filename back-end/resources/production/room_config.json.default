@@ -34,46 +34,70 @@
       },
       "output": {
         "greenLight1": {
-          "type": "string",
           "instructions": {
             "blink": "array",
             "turnOnOff": "boolean"
-          }
+          },
+          "label": [
+            "greenled",
+            "red"
+          ],
+          "type": "string"
         },
         "greenLight2": {
-          "type": "string",
           "instructions": {
             "blink": "array",
             "turnOnOff": "boolean"
-          }
+          },
+          "label": [
+            "greenled",
+            "orange"
+          ],
+          "type": "string"
         },
         "greenLight3": {
-          "type": "string",
           "instructions": {
             "blink": "array",
             "turnOnOff": "boolean"
-          }
+          },
+          "label": [
+            "greenled",
+            "green"
+          ],
+          "type": "string"
         },
         "redLight1": {
-          "type": "string",
           "instructions": {
             "blink": "array",
             "turnOnOff": "boolean"
-          }
+          },
+          "label": [
+            "redled",
+            "red"
+          ],
+          "type": "string"
         },
         "redLight2": {
-          "type": "string",
           "instructions": {
             "blink": "array",
             "turnOnOff": "boolean"
-          }
+          },
+          "label": [
+            "redled",
+            "orange"
+          ],
+          "type": "string"
         },
         "redLight3": {
-          "type": "string",
           "instructions": {
             "blink": "array",
             "turnOnOff": "boolean"
-          }
+          },
+          "label": [
+            "redled",
+            "green"
+          ],
+          "type": "string"
         }
       }
     },
@@ -153,127 +177,84 @@
   ],
   "puzzles": [
     {
+      "hints": [
+        "Zet de schuiven nauwkeurig"
+      ],
       "name": "puzzel rood",
       "rules": [
         {
-          "id": "rood",
-          "description": "Wanneer de rode switch op true staat en de slider 100, dan sturen we een hint met 'puzzle rood opgelost'",
-          "limit": 1,
-          "conditions": {
-            "operator": "AND",
-            "list": [
-              {
-                "type": "device",
-                "type_id": "controlBoard",
-                "constraints": {
-                  "operator": "AND",
-                  "list": [
-                    {
-                      "component_id": "redSwitch",
-                      "comparison": "eq",
-                      "value": true
-                    },
-                    {
-                      "component_id": "slider1",
-                      "comparison": "eq",
-                      "value": 100
-                    }
-                  ]
-                }
-              },
-              {
-                "type": "rule",
-                "type_id": "start",
-                "constraints": {
-                  "comparison": "gte",
-                  "value": 1
-                }
-              }
-            ]
-          },
           "actions": [
             {
-              "type": "device",
-              "type_id": "controlBoard",
               "message": [
                 {
-                  "component_id": "redLight1",
-                  "instruction": "turnOnOff",
-                  "value": false
-                },
-                {
-                  "component_id": "greenLight1",
                   "instruction": "turnOnOff",
                   "value": true
                 }
-              ]
+              ],
+              "type": "label",
+              "type_id": "red"
             },
             {
-              "type": "device",
-              "type_id": "display-angular",
               "message": [
                 {
                   "component_id": "hint",
                   "instruction": "hint",
                   "value": "puzzle rood opgelost!"
                 }
-              ]
+              ],
+              "type": "device",
+              "type_id": "display-angular"
             }
-          ]
-        }
-      ],
-      "hints": [
-        "Zet de schuiven nauwkeurig"
-      ]
-    },
-    {
-      "name": "puzzel oranje",
-      "rules": [
-        {
-          "id": "oranje",
-          "description": "Wanneer de rode oranje op true staat en de slider tussen 50 en 80, dan sturen we een hint met 'puzzle oranje opgelost'",
-          "limit": 1,
+          ],
           "conditions": {
-            "operator": "AND",
             "list": [
               {
-                "type": "device",
-                "type_id": "controlBoard",
                 "constraints": {
-                  "operator": "AND",
                   "list": [
                     {
-                      "component_id": "orangeSwitch",
                       "comparison": "eq",
+                      "component_id": "redSwitch",
                       "value": true
                     },
                     {
-                      "component_id": "slider2",
-                      "comparison": "lte",
-                      "value": 80
-                    },
-                    {
-                      "component_id": "slider2",
-                      "comparison": "gte",
-                      "value": 50
+                      "comparison": "eq",
+                      "component_id": "slider1",
+                      "value": 100
                     }
-                  ]
-                }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "controlBoard"
               },
               {
-                "type": "rule",
-                "type_id": "start",
                 "constraints": {
                   "comparison": "gte",
                   "value": 1
-                }
+                },
+                "type": "rule",
+                "type_id": "start"
               }
-            ]
+            ],
+            "operator": "AND"
           },
+          "description": "Wanneer de rode switch op true staat en de slider 100, dan sturen we een hint met 'puzzle rood opgelost'",
+          "id": "rood",
+          "limit": 1
+        }
+      ]
+    },
+    {
+      "hints": [
+        "Zet de schuiven nauwkeurig",
+        "Probeer het nog eens",
+        "dat kan sneller"
+      ],
+      "name": "puzzel oranje",
+      "rules": [
+        {
           "actions": [
             {
-              "type": "device",
-              "type_id": "controlBoard",
               "message": [
                 {
                   "component_id": "redLight2",
@@ -285,79 +266,75 @@
                   "instruction": "turnOnOff",
                   "value": true
                 }
-              ]
+              ],
+              "type": "device",
+              "type_id": "controlBoard"
             },
             {
-              "type": "device",
-              "type_id": "display-angular",
               "message": [
                 {
                   "component_id": "hint",
                   "instruction": "hint",
                   "value": "puzzle oranje opgelost!"
                 }
-              ]
+              ],
+              "type": "device",
+              "type_id": "display-angular"
             }
-          ]
-        }
-      ],
-      "hints": [
-        "Zet de schuiven nauwkeurig",
-        "Probeer het nog eens",
-        "dat kan sneller"
-      ]
-    },
-    {
-      "name": "puzzel groen",
-      "rules": [
-        {
-          "id": "groen",
-          "description": "Wanneer de groen switch op true staat en de slider 100, en rule rood is al opgelost, dan sturen we een hint met 'puzzle groen opgelost'",
-          "limit": 1,
+          ],
           "conditions": {
-            "operator": "AND",
             "list": [
               {
-                "type": "device",
-                "type_id": "controlBoard",
                 "constraints": {
-                  "operator": "AND",
                   "list": [
                     {
-                      "component_id": "greenSwitch",
                       "comparison": "eq",
+                      "component_id": "orangeSwitch",
                       "value": true
                     },
                     {
-                      "component_id": "slider3",
-                      "comparison": "eq",
-                      "value": 100
+                      "comparison": "lte",
+                      "component_id": "slider2",
+                      "value": 80
+                    },
+                    {
+                      "comparison": "gte",
+                      "component_id": "slider2",
+                      "value": 50
                     }
-                  ]
-                }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "controlBoard"
               },
               {
-                "type": "rule",
-                "type_id": "rood",
                 "constraints": {
                   "comparison": "gte",
                   "value": 1
-                }
-              },
-              {
+                },
                 "type": "rule",
-                "type_id": "start",
-                "constraints": {
-                  "comparison": "gte",
-                  "value": 1
-                }
+                "type_id": "start"
               }
-            ]
+            ],
+            "operator": "AND"
           },
+          "description": "Wanneer de rode oranje op true staat en de slider tussen 50 en 80, dan sturen we een hint met 'puzzle oranje opgelost'",
+          "id": "oranje",
+          "limit": 1
+        }
+      ]
+    },
+    {
+      "hints": [
+        "Zet de schuiven nauwkeurig",
+        "Dit is dus echt best wel een superlange hint die je helemaal moet kunnen lezen"
+      ],
+      "name": "puzzel groen",
+      "rules": [
+        {
           "actions": [
             {
-              "type": "device",
-              "type_id": "controlBoard",
               "message": [
                 {
                   "component_id": "redLight3",
@@ -369,25 +346,66 @@
                   "instruction": "turnOnOff",
                   "value": true
                 }
-              ]
+              ],
+              "type": "device",
+              "type_id": "controlBoard"
             },
             {
-              "type": "device",
-              "type_id": "display-angular",
               "message": [
                 {
                   "component_id": "hint",
                   "instruction": "hint",
                   "value": "puzzle groen opgelost!"
                 }
-              ]
+              ],
+              "type": "device",
+              "type_id": "display-angular"
             }
-          ]
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "component_id": "greenSwitch",
+                      "value": true
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "slider3",
+                      "value": 100
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "controlBoard"
+              },
+              {
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                },
+                "type": "rule",
+                "type_id": "rood"
+              },
+              {
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                },
+                "type": "rule",
+                "type_id": "start"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "Wanneer de groen switch op true staat en de slider 100, en rule rood is al opgelost, dan sturen we een hint met 'puzzle groen opgelost'",
+          "id": "groen",
+          "limit": 1
         }
-      ],
-      "hints": [
-        "Zet de schuiven nauwkeurig",
-        "Dit is dus echt best wel een superlange hint die je helemaal moet kunnen lezen"
       ]
     }
   ],
@@ -727,15 +745,6 @@
             "type": "device",
             "type_id": "front-end",
             "constraints": {
-              "component_id": "start",
-              "comparison": "eq",
-              "value": true
-            }
-          },
-          {
-            "type": "device",
-            "type_id": "front-end",
-            "constraints": {
               "component_id": "stop",
               "comparison": "eq",
               "value": false
@@ -811,15 +820,6 @@
             "type": "device",
             "type_id": "front-end",
             "constraints": {
-              "component_id": "stop",
-              "comparison": "eq",
-              "value": true
-            }
-          },
-          {
-            "type": "device",
-            "type_id": "front-end",
-            "constraints": {
               "component_id": "start",
               "comparison": "eq",
               "value": true
@@ -887,15 +887,6 @@
             "type_id": "front-end",
             "constraints": {
               "component_id": "start",
-              "comparison": "eq",
-              "value": true
-            }
-          },
-          {
-            "type": "device",
-            "type_id": "front-end",
-            "constraints": {
-              "component_id": "pause",
               "comparison": "eq",
               "value": true
             }

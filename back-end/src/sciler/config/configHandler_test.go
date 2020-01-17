@@ -125,7 +125,7 @@ func TestWrongComponentIDType(t *testing.T) {
 func Test_CheckActionWrongType(t *testing.T) {
 	filename := "../../../resources/testing/wrong-types/testCheckActionWrongType.json"
 	assert.PanicsWithValue(t,
-		"only device and timer are accepted as type for an action, however type was specified as: non existing",
+		"only device, timer and label are accepted as type for an action, however type was specified as: non existing",
 		func() { ReadFile(filename) },
 		"Only device and timer are not supported as action type")
 
@@ -159,6 +159,22 @@ func Test_CheckActionWrongInstruction(t *testing.T) {
 	filename := "../../../resources/testing/wrong-types/testCheckActionWrongInstruction.json"
 	assert.PanicsWithValue(t,
 		"instruction non existing not found in map",
+		func() { ReadFile(filename) },
+		"Cannot perform an action with an unknown instruction")
+}
+
+func Test_CheckActionWrongInstructionLabel(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckLabelWrongInstruction.json"
+	assert.PanicsWithValue(t,
+		"instruction non existing not found in map",
+		func() { ReadFile(filename) },
+		"Cannot perform an action with an unknown instruction")
+}
+
+func Test_CheckActionWrongLabel(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckLabelWrong.json"
+	assert.PanicsWithValue(t,
+		"label with id non existing not found in map",
 		func() { ReadFile(filename) },
 		"Cannot perform an action with an unknown instruction")
 }

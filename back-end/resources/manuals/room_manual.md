@@ -39,6 +39,7 @@ This will be a list of all devices in the room. Each device is defined as a JSON
 - `output`: defines what this components outputs as their status and what instructions can be performed on this component
     - `type`: defines type of values to be expected as output. Possible types are: "string", "boolean", "numeric", "array", or a custom name. 
     - `instructions`: this is a map of the name of an instruction to the type of argument the instruction takes
+    - `label`: this is a list of possible labels this component listens to when an action gets called on a label.
     
 ### Timers
 This will be a list of all the time related actions/conditions. all timers have to be started in a action and be checked in a condition to be used.
@@ -97,13 +98,16 @@ This can be displayed in the front-end, so should be readable and in Dutch.
                 In case of "timer" type, this is non-existent. 
 - `actions`: this is an array of actions:
         
-    - `type`: this can be `device` or `timer`
-    - `type_id`: the id of device or timer, depending on type respectively
+    - `type`: this can be `device`, `timer` or `label`
+    - `type_id`: the id of device, timer or label, depending on type respectively
     - `message` in case of type `device`: this defines a list of componentInstructions which have:
         - `component_id`: this will be the id of a component in a timer or device
         - `instruction`: one of the instructions specified for this device and component
         - `value`: this is the value for the instruction of the type specified for this device and component
     - `message` in case of type `timer`:   
-        - `instruction`: one of the instructions for timer, e.g. `start`, `stop`, `pause`, `done`, `add`, `subtract`
-        - `value`: optional, in case of `add` and `subtract` a time should be given in format XhXmXs 
-    - `delay` in case of type `device`: This is optional, this is a duration in format XhXmXs, if an action has a delay, the message will publish after this delay.
+           - `instruction`: one of the instructions for timer, e.g. `start`, `stop`, `pause`, `done`, `add`, `subtract`
+           - `value`: optional, in case of `add` and `subtract` a time should be given in format XhXmXs 
+    - `message` in case of type `label`:   
+           - `instruction`: one of the instructions specified for the components with this label
+           - `value`: this is the value for the instruction of the type specified for this device and component 
+    - `delay` in case of type `device` or `label`: This is optional, this is a duration in format XhXmXs, if an action has a delay, the message will publish after this delay.

@@ -18,6 +18,7 @@ type WorkingConfig struct {
 	Timers        map[string]*Timer
 	StatusMap     map[string][]*Rule
 	RuleMap       map[string]*Rule
+	LabelMap      map[string][]*Component
 }
 
 // Timer is a timer in the escape game
@@ -157,6 +158,7 @@ type InstructionSender interface {
 	SendComponentInstruction(string, []ComponentInstruction, string)
 	SetTimer(string, ComponentInstruction)
 	HandleEvent(string)
+	SendLabelInstruction(string, []ComponentInstruction, string)
 }
 
 // Finished is a method that checks is the a rule have been finished, meaning if it reached its maximum number of executions
@@ -284,6 +286,12 @@ type Condition struct {
 	Type        string
 	TypeID      string
 	Constraints LogicalConstraint
+}
+
+// Component is a struct that links a component id with a device id
+type Component struct {
+	ID     string
+	Device *Device
 }
 
 // GetConditionIDs returns a slice of all condition type IDs in the LogicalCondition
