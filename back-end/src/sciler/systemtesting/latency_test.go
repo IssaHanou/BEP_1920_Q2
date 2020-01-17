@@ -1,6 +1,7 @@
 package systemtesting
 
 import (
+	"encoding/json"
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	logger "github.com/sirupsen/logrus"
@@ -13,25 +14,14 @@ import (
 	"sciler/config"
 	"sciler/handler"
 	"testing"
+	"time"
 )
 
 // Make sure when running windows, the setup in systemtesting/README.md is followed
 
 func TestLatency(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		out, err := exec.Command("bash", "localBroker.sh").Output()
-		if err != nil {
-			logger.Fatal(err)
-		}
-		fmt.Println(string(out))
-	} else if runtime.GOOS == "linux" {
-		out, err := exec.Command("localBroker.sh").Output()
-		if err != nil {
-			logger.Fatal(err)
-		}
-		fmt.Println(string(out))
-	}
-
+	executeScript("clientComputer.sh")
+	executeScript("localBroker.sh")
 	dir, dirErr := os.Getwd()
 	if dirErr != nil {
 		logger.Fatal(dirErr)
@@ -44,10 +34,19 @@ func TestLatency(t *testing.T) {
 	host := configurations.General.Host
 	port := configurations.General.Port
 
+	var responseTime time.Time
+
 	messageHandler := handler.Handler{Config: configurations, ConfigFile: filename}
 	messageHandler.Communicator = communication.NewCommunicator(host, port, []string{"back-end"}, func(client mqtt.Client, message mqtt.Message) {
-		//messageHandler.NewHandler(client, message)
-		logger.Info(message.Payload())
+		var msg handler.Message
+		if err := json.Unmarshal(message.Payload(), &msg); err != nil {
+			logger.Errorf("invalid JSON received: %v", err)
+		}
+
+		if msg.Type == "confirmation" {
+			responseTime = time.Now()
+		}
+
 	}, func() {
 		messageHandler.SendSetup()
 	})
@@ -55,11 +54,30 @@ func TestLatency(t *testing.T) {
 	messageHandler.Communicator.Start()
 
 	// Send instruction to Client computer
-	logger.Info(messageHandler.Config.Devices["latency"].Status)
+	requestTime := time.Now()
 	messageHandler.SendInstruction("latency", []map[string]string{{
 		"instruction":   "ping",
 		"instructed_by": "back-end",
 	}})
 
-	assert.Equal(t, true, true)
+	time.Sleep(time.Duration(1) * time.Second)
+	latency := responseTime.Sub(requestTime)
+	logger.Info(latency)
+	assert.True(t, latency.Round(time.Millisecond).Milliseconds() <= 100)
+}
+
+func executeScript(script string) {
+	if runtime.GOOS == "windows" {
+		out, err := exec.Command("bash", script).Output()
+		if err != nil {
+			logger.Fatal(err)
+		}
+		fmt.Println(string(out))
+	} else if runtime.GOOS == "linux" {
+		out, err := exec.Command(script).Output()
+		if err != nil {
+			logger.Fatal(err)
+		}
+		fmt.Println(string(out))
+	}
 }
