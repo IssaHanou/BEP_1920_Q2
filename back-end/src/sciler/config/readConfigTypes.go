@@ -108,7 +108,7 @@ type Action struct {
 	Type    string                 `json:"type"`
 	TypeID  string                 `json:"type_id"`
 	Message []ComponentInstruction `json:"message"`
-	Delay   string                 `json: delay`
+	Delay   string                 `json:"delay"`
 }
 
 // Execute is a method that performs the action

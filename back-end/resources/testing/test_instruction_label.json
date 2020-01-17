@@ -20,6 +20,7 @@
             "hint": "string"
           },
           "label": [
+            "display-label2",
             "display-label2"
           ]
         }
@@ -89,8 +90,8 @@
       "name": "Puzzle2",
       "rules": [
         {
-          "id": "rule",
-          "description": "My rule",
+          "id": "rule2",
+          "description": "My rule 2",
           "limit": 1,
           "conditions": {
             "type": "device",
