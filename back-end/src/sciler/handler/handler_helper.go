@@ -49,12 +49,10 @@ func (handler *Handler) SendComponentInstruction(clientID string, instructions [
 	jsonMessage, _ := json.Marshal(&message)
 	delayDur, err := time.ParseDuration(delay)
 	if err == nil {
-		go func() {
-			logger.Infof("waiting %s to send instruction data to %s: %s", delay, clientID, fmt.Sprint(message.Contents))
-			time.Sleep(delayDur)
-			logger.Infof("sending instruction data to %s after waiting %s: %s", clientID, delay, fmt.Sprint(message.Contents))
-			handler.Communicator.Publish(clientID, string(jsonMessage), 3)
-		}()
+		logger.Infof("waiting %s to send instruction data to %s: %s", delay, clientID, fmt.Sprint(message.Contents))
+		time.Sleep(delayDur)
+		logger.Infof("sending instruction data to %s after waiting %s: %s", clientID, delay, fmt.Sprint(message.Contents))
+		handler.Communicator.Publish(clientID, string(jsonMessage), 3)
 	} else {
 		logger.Infof("sending instruction data to %s: %s", clientID, fmt.Sprint(message.Contents))
 		handler.Communicator.Publish(clientID, string(jsonMessage), 3)
