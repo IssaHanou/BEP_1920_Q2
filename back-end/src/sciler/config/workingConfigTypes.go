@@ -169,7 +169,7 @@ func (r *Rule) Finished() bool {
 // Execute performs all actions of a rule
 func (r *Rule) Execute(handler InstructionSender) {
 	for _, action := range r.Actions {
-		go action.Execute(handler)
+		action.Execute(handler)
 	}
 	r.Executed++
 	logger.Infof("Executed rule %s", r.ID)

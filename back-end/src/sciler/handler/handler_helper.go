@@ -47,6 +47,12 @@ func (handler *Handler) SendComponentInstruction(clientID string, instructions [
 		Type:     "instruction",
 		Contents: instructions,
 	}
+	// If the instruction is to reset the status of a front-end button, update its status in the config.
+	if clientID == "front-end" {
+		for _, instruction := range instructions {
+			handler.Config.Devices["front-end"].Status[instruction.ComponentID] = instruction.Value
+		}
+	}
 	jsonMessage, _ := json.Marshal(&message)
 	delayDur, err := time.ParseDuration(delay)
 	if err == nil {

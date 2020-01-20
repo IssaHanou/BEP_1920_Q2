@@ -29,7 +29,7 @@ export class Devices {
    */
   updateDevice(id, status) {
     if (this.all.has("front-end")) {
-      let newStatus = {};
+      const newStatus = {};
       newStatus[id] = status;
       this.all.get("front-end").updateStatus(newStatus);
     }
