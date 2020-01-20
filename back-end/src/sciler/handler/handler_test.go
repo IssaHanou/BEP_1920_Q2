@@ -210,10 +210,11 @@ func TestSendInstructionDelay(t *testing.T) {
 	})
 	communicatorMock.On("Publish", "display", string(msg), 3)
 	communicatorMock.On("Publish", "display", string(msg2), 3)
-	handler.SendComponentInstruction("display", inst, "")
-	handler.SendComponentInstruction("display", inst2, "5s")
+	go handler.SendComponentInstruction("display", inst, "")
+	go handler.SendComponentInstruction("display", inst2, "1s")
+	time.Sleep(time.Duration(100) * time.Millisecond)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
-	time.Sleep(6 * time.Second)
+	time.Sleep(time.Duration(1) * time.Second)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
 }
 
