@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
+	logger "github.com/sirupsen/logrus"
 	"reflect"
 	"time"
 )
@@ -65,11 +65,11 @@ func (t *Timer) Start(handler InstructionSender) error {
 	t.Ending = func() {
 		t.State = "stateExpired"
 		t.Finished = true
-		logrus.Infof("timer %v finished", t.ID)
+		logger.Infof("timer %v finished", t.ID)
 		handler.HandleEvent(t.ID)
 	}
 	t.T = time.AfterFunc(t.Duration, t.Ending)
-	logrus.Infof("timer %v started for %v", t.ID, t.Duration)
+	logger.Infof("timer %v started for %v", t.ID, t.Duration)
 	return nil
 }
 
@@ -82,7 +82,7 @@ func (t *Timer) Pause() error {
 	t.T.Stop()
 	t.Duration, _ = t.GetTimeLeft()
 	t.State = "stateIdle"
-	logrus.Infof("timer paused with %v left", t.Duration)
+	logger.Infof("timer paused with %v left", t.Duration)
 	return nil
 }
 
@@ -93,11 +93,11 @@ func (t *Timer) AddSubTime(handler InstructionSender, time time.Duration, add bo
 	if t.State == "stateIdle" {
 		if add {
 			t.Duration = t.Duration + time
-			logrus.Infof("timer %v added %v to duration and now has a duration of %v", t.ID, time, t.Duration)
+			logger.Infof("timer %v added %v to duration and now has a duration of %v", t.ID, time, t.Duration)
 		} else {
 			if t.Duration > time {
 				t.Duration = t.Duration - time
-				logrus.Infof("timer %v subtracted %v to duration and now has a duration of %v", t.ID, time, t.Duration)
+				logger.Infof("timer %v subtracted %v to duration and now has a duration of %v", t.ID, time, t.Duration)
 			} else {
 				return fmt.Errorf("timer %v could not subtract %v since there is only %v left", t.ID, time, t.Duration)
 			}
@@ -127,7 +127,7 @@ func (t *Timer) Stop() error {
 	}
 	t.State = "stateExpired"
 
-	logrus.Infof("timer %v stopped and set to Expired without handling it's actions", t.ID)
+	logger.Infof("timer %v stopped and set to Expired without handling it's actions", t.ID)
 	return nil
 }
 
@@ -139,7 +139,7 @@ func (t *Timer) Done() error {
 	}
 	t.Ending()
 	t.T.Stop()
-	logrus.Infof("timer %v stopped and set to Expired, actions are being handled", t.ID)
+	logger.Infof("timer %v stopped and set to Expired, actions are being handled", t.ID)
 	return nil
 }
 
@@ -169,10 +169,10 @@ func (r *Rule) Finished() bool {
 // Execute performs all actions of a rule
 func (r *Rule) Execute(handler InstructionSender) {
 	for _, action := range r.Actions {
-		action.Execute(handler)
+		go action.Execute(handler)
 	}
 	r.Executed++
-	logrus.Infof("Executed rule %s", r.ID)
+	logger.Infof("Executed rule %s", r.ID)
 	handler.HandleEvent(r.ID)
 }
 
@@ -242,6 +242,11 @@ func compare(param1 interface{}, param2 interface{}, comparision string) bool {
 		return numericToFloat64(param1) >= numericToFloat64(param2)
 	case "contains":
 		return contains(param1, param2)
+	case "not":
+		if reflect.TypeOf(param1).Kind() == reflect.Int || reflect.TypeOf(param2).Kind() == reflect.Int {
+			return numericToFloat64(param1) != numericToFloat64(param2)
+		}
+		return !reflect.DeepEqual(param1, param2)
 	default:
 		// This case is already handled to give error in checkConstraint
 		return false
@@ -336,7 +341,7 @@ func (constraint Constraint) checkConstraints(condition Condition, config Workin
 							if !CheckValidComparison(comparison) {
 								return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
 							}
-							if comparison != "eq" {
+							if comparison != "eq" && comparison != "not" {
 								return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on a string", ruleID, comparison)}
 							}
 						}
@@ -372,7 +377,7 @@ func (constraint Constraint) checkConstraints(condition Condition, config Workin
 							if !CheckValidComparison(comparison) {
 								return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
 							}
-							if comparison != "contains" && comparison != "eq" {
+							if comparison != "contains" && comparison != "eq" && comparison != "not" {
 								return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on an array", ruleID, comparison)}
 							}
 						}
@@ -429,7 +434,7 @@ func (constraint Constraint) checkConstraints(condition Condition, config Workin
 
 // CheckValidComparison checks if the comparison is a valid one
 func CheckValidComparison(comparison string) bool {
-	comparisonTypesAllowed := []string{"eq", "lt", "gt", "lte", "gte", "contains"}
+	comparisonTypesAllowed := []string{"eq", "lt", "gt", "lte", "gte", "contains", "not"}
 	for _, comp := range comparisonTypesAllowed {
 		if comp == comparison {
 			return true

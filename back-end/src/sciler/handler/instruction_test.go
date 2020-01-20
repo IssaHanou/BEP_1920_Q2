@@ -372,6 +372,7 @@ func TestOnInstructionMsgFinishRule(t *testing.T) {
 	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)
 	communicatorMock.On("Publish", "display", string(instHintMessage), 3)
 	handler.onInstructionMsg(msg)
+	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
 }
 
@@ -390,17 +391,6 @@ func TestOnInstructionMsgFinishRuleLabel(t *testing.T) {
 		Config:       config.ReadFile("../../../resources/testing/test_instruction_label.json"),
 		Communicator: communicatorMock,
 	}
-	returnMessage, _ := json.Marshal(Message{
-		DeviceID: "back-end",
-		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "event status",
-		Contents: []map[string]interface{}{{
-			"id":     "rule",
-			"status": true},
-			{"id": "rule2",
-				"status": false},
-		},
-	})
 	instMessage, _ := json.Marshal(Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
@@ -412,9 +402,10 @@ func TestOnInstructionMsgFinishRuleLabel(t *testing.T) {
 		},
 	},
 	)
-	communicatorMock.On("Publish", "display2", string(instMessage), 3)
-	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)
+	communicatorMock.On("Publish", "display2", string(instMessage), 3).Once()
+	communicatorMock.On("Publish", "front-end", mock.Anything, 3).Once()
 	handler.onInstructionMsg(msg)
+	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
 }
 
@@ -675,9 +666,10 @@ func TestSendInstructionDelay(t *testing.T) {
 	})
 	communicatorMock.On("Publish", "display", string(msg), 3)
 	communicatorMock.On("Publish", "display", string(msg2), 3)
-	handler.SendComponentInstruction("display", inst, "")
-	handler.SendComponentInstruction("display", inst2, "5s")
+	go handler.SendComponentInstruction("display", inst, "")
+	go handler.SendComponentInstruction("display", inst2, "1s")
+	time.Sleep(100 * time.Millisecond)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
-	time.Sleep(6 * time.Second)
+	time.Sleep(1 * time.Second)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
 }

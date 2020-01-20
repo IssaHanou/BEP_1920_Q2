@@ -395,6 +395,7 @@ func TestHandleSingleEvent(t *testing.T) {
 	communicatorMock.On("Publish", "front-end", string(messageStatus), 3)
 	communicatorMock.On("Publish", "controlBoard", string(messageInstruction), 3)
 	handler.msgMapper(msg)
+	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 4)
 	// if this test becomes flaky (only when this test takes longer then 1 second),
 	// (message expected includes time...), replace the messages with 'mock.Anything'
@@ -443,6 +444,7 @@ func TestHandleDoubleEvent(t *testing.T) {
 	communicatorMock.On("Publish", "front-end", mock.Anything, 3)
 	communicatorMock.On("Publish", "controlBoard", string(messageInstruction), 3)
 	handler.msgMapper(msg)
+	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 4)
 	// if this test becomes flaky (only when this test takes longer then 1 second),
 	// (message expected includes time...), replace the messages with 'mock.Anything'

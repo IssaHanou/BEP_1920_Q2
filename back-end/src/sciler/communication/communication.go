@@ -33,11 +33,11 @@ func NewCommunicator(host string, port int, topicsOfInterest []string, handler m
 	opts.SetConnectRetry(false)
 	opts.SetAutoReconnect(true)
 
-	timeout := time.Duration(5) * time.Second
-	opts.SetKeepAlive(timeout)                              // time before sending a PING request to the broker
-	opts.SetPingTimeout(timeout)                            // time after sending a PING request to the broker
-	opts.SetMaxReconnectInterval(timeout)                   // max time before retrying to reconnect
-	opts.SetConnectTimeout(time.Duration(20) * time.Second) // time before timing out and erroring the attempt
+	timeout := 5 * time.Second
+	opts.SetKeepAlive(timeout)               // time before sending a PING request to the broker
+	opts.SetPingTimeout(timeout)             // time after sending a PING request to the broker
+	opts.SetMaxReconnectInterval(timeout)    // max time before retrying to reconnect
+	opts.SetConnectTimeout(20 * time.Second) // time before timing out and erroring the attempt
 
 	opts.SetOnConnectHandler(func(client mqtt.Client) {
 		// on connect subscribe and execute onStart

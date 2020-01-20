@@ -534,6 +534,38 @@ func Test_compare(t *testing.T) {
 				comparison: "eq",
 			},
 			want: false,
+		}, {
+			name: "not string true",
+			args: args{
+				param1:     "test",
+				param2:     "not test",
+				comparison: "not",
+			},
+			want: true,
+		}, {
+			name: "not string false",
+			args: args{
+				param1:     "test",
+				param2:     "test",
+				comparison: "not",
+			},
+			want: false,
+		}, {
+			name: "not int false",
+			args: args{
+				param1:     float64(2),
+				param2:     float64(2),
+				comparison: "not",
+			},
+			want: false,
+		}, {
+			name: "not int true",
+			args: args{
+				param1:     float64(2),
+				param2:     float64(3),
+				comparison: "not",
+			},
+			want: true,
 		},
 	}
 	for _, tt := range tests {
@@ -672,6 +704,20 @@ func Test_ResolveRuleTrue(t *testing.T) {
 	config := ReadFile(filename)
 	config.RuleMap["flipSwitch"].Executed = 1
 	assert.True(t, config.GeneralEvents[0].GetRules()[0].Conditions.Resolve(config))
+}
+
+func Test_ResolveNotRuleTrue(t *testing.T) {
+	filename := "../../../resources/testing/test_resolveTrue.json"
+	config := ReadFile(filename)
+	config.Devices["controlBoard"].Status["slider1"] = 40
+	assert.True(t, config.GeneralEvents[2].GetRules()[0].Conditions.Resolve(config))
+}
+
+func Test_ResolveNotRuleFalse(t *testing.T) {
+	filename := "../../../resources/testing/test_resolveFalse.json"
+	config := ReadFile(filename)
+	config.Devices["controlBoard"].Status["slider1"] = 30
+	assert.False(t, config.GeneralEvents[2].GetRules()[0].Conditions.Resolve(config))
 }
 
 func Test_ResolveRuleFalse(t *testing.T) {
