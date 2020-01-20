@@ -3,7 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/sirupsen/logrus"
+	logger "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -29,7 +29,7 @@ func (handler *Handler) SendSetup() {
 	}
 	jsonMessage, _ := json.Marshal(&message)
 	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
-	logrus.Info("published setup data to front-end")
+	logger.Info("published setup data to front-end")
 	handler.sendStatus("general")
 	for _, value := range handler.Config.Devices {
 		handler.sendStatus(value.ID)
@@ -49,14 +49,12 @@ func (handler *Handler) SendComponentInstruction(clientID string, instructions [
 	jsonMessage, _ := json.Marshal(&message)
 	delayDur, err := time.ParseDuration(delay)
 	if err == nil {
-		go func() {
-			logrus.Infof("waiting %s to send instruction data to %s: %s", delay, clientID, fmt.Sprint(message.Contents))
-			time.Sleep(delayDur)
-			logrus.Infof("sending instruction data to %s after waiting %s: %s", clientID, delay, fmt.Sprint(message.Contents))
-			handler.Communicator.Publish(clientID, string(jsonMessage), 3)
-		}()
+		logger.Infof("waiting %s to send instruction data to %s: %s", delay, clientID, fmt.Sprint(message.Contents))
+		time.Sleep(delayDur)
+		logger.Infof("sending instruction data to %s after waiting %s: %s", clientID, delay, fmt.Sprint(message.Contents))
+		handler.Communicator.Publish(clientID, string(jsonMessage), 3)
 	} else {
-		logrus.Infof("sending instruction data to %s: %s", clientID, fmt.Sprint(message.Contents))
+		logger.Infof("sending instruction data to %s: %s", clientID, fmt.Sprint(message.Contents))
 		handler.Communicator.Publish(clientID, string(jsonMessage), 3)
 	}
 }
@@ -80,7 +78,7 @@ func (handler *Handler) SendInstruction(clientID string, instructions []map[stri
 		Contents: instructions,
 	}
 	jsonMessage, _ := json.Marshal(&message)
-	logrus.Infof("sending instruction data to %s: %s", clientID, fmt.Sprint(message.Contents))
+	logger.Infof("sending instruction data to %s: %s", clientID, fmt.Sprint(message.Contents))
 	handler.Communicator.Publish(clientID, string(jsonMessage), 3)
 }
 
@@ -88,17 +86,17 @@ func (handler *Handler) SendInstruction(clientID string, instructions []map[stri
 func (handler *Handler) updateStatus(raw Message) {
 	contents := raw.Contents.(map[string]interface{})
 	if device, ok := handler.Config.Devices[raw.DeviceID]; ok {
-		logrus.Info("status message received from: " + raw.DeviceID + ", status: " + fmt.Sprint(raw.Contents))
+		logger.Info("status message received from: " + raw.DeviceID + ", status: " + fmt.Sprint(raw.Contents))
 		for k, v := range contents {
 			err := handler.checkStatusType(*device, v, k)
 			if err != nil {
-				logrus.Error(err)
+				logger.Error(err)
 			} else {
 				handler.Config.Devices[raw.DeviceID].Status[k] = v
 			}
 		}
 	} else {
-		logrus.Error("status message received from device ", raw.DeviceID, ", which is not in the config")
+		logger.Error("status message received from device ", raw.DeviceID, ", which is not in the config")
 	}
 }
 
@@ -130,11 +128,11 @@ func (handler *Handler) sendStatus(deviceID string) {
 			},
 		}
 	} else {
-		logrus.Errorf("error occurred while sending status of %s, since it is not recognised as a device or timer", deviceID)
+		logger.Errorf("error occurred while sending status of %s, since it is not recognised as a device or timer", deviceID)
 		return
 	}
 	jsonMessage, _ := json.Marshal(&message)
-	logrus.Info("sending status data to front-end: " + fmt.Sprint(message.Contents))
+	logger.Info("sending status data to front-end: " + fmt.Sprint(message.Contents))
 	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 }
 
@@ -159,7 +157,7 @@ func (handler *Handler) sendEventStatus() {
 		Contents: status,
 	}
 	jsonMessage, _ := json.Marshal(&message)
-	logrus.Info("sending event status to front-end")
+	logger.Info("sending event status to front-end")
 	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 }
 
@@ -217,7 +215,7 @@ func (handler *Handler) GetStatus(deviceID string) {
 		},
 	}
 	jsonMessage, _ := json.Marshal(&message)
-	logrus.Info("sending status request to client computer: ", deviceID, fmt.Sprint(message.Contents))
+	logger.Info("sending status request to client computer: ", deviceID, fmt.Sprint(message.Contents))
 	handler.Communicator.Publish(deviceID, string(jsonMessage), 3)
 }
 
@@ -252,7 +250,7 @@ func (handler *Handler) SetTimer(timerID string, instructions config.ComponentIn
 	}
 
 	if err != nil {
-		logrus.Error(err)
+		logger.Error(err)
 	}
 	handler.sendStatus(timerID)
 }
@@ -263,7 +261,7 @@ func (handler *Handler) SetTimer(timerID string, instructions config.ComponentIn
 func (handler *Handler) processConfig(configToRead interface{}, action string, fileName string) {
 	jsonBytes, err := json.Marshal(configToRead)
 	if err != nil { //TODO test
-		logrus.Error(err)
+		logger.Error(err)
 	}
 	newConfig, errorList := config.ReadJSON(jsonBytes)
 	message := Message{
@@ -284,12 +282,12 @@ func (handler *Handler) processConfig(configToRead interface{}, action string, f
 	if action == "use" && len(errorList) == 0 {
 		dir, dirErr := os.Getwd()
 		if dirErr != nil { //TODO test
-			logrus.Error(dirErr)
+			logger.Error(dirErr)
 		}
 		fullFileName := filepath.Join(dir, "back-end", "resources", "production", fileName)
 		err = ioutil.WriteFile(fullFileName, jsonBytes, 0644)
 		if err != nil {
-			logrus.Error(err)
+			logger.Error(err)
 		}
 		handler.Config = newConfig
 		handler.ConfigFile = fullFileName

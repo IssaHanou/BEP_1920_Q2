@@ -7,6 +7,7 @@ import (
 	logger "github.com/sirupsen/logrus"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sciler/communication"
 	"sciler/config"
 	"sciler/handler"
@@ -16,6 +17,9 @@ import (
 var topics = []string{"back-end"}
 
 func main() {
+	// set maximum number of cores
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
 	dir, dirErr := os.Getwd()
 	if dirErr != nil {
 		logger.Fatal(dirErr)
@@ -28,7 +32,7 @@ func main() {
 	for _, level := range logger.AllLevels {
 		pathMap[level] = writeFile
 	}
-	// create a hook for file for logrus
+	// create a hook for file for logger
 	hook := lfshook.NewHook(pathMap, &logger.TextFormatter{
 		FullTimestamp:   true,
 		DisableColors:   true,

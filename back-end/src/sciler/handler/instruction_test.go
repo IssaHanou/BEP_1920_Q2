@@ -326,6 +326,7 @@ func TestOnInstructionMsgFinishRule(t *testing.T) {
 	communicatorMock.On("Publish", "front-end", string(instMessage), 3)
 	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)
 	handler.onInstructionMsg(msg)
+	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
 }
 
@@ -355,9 +356,10 @@ func TestOnInstructionMsgFinishRuleLabel(t *testing.T) {
 		},
 	},
 	)
-	communicatorMock.On("Publish", "display2", string(instMessage), 3)
-	communicatorMock.On("Publish", "front-end", mock.Anything, 3)
+	communicatorMock.On("Publish", "display2", string(instMessage), 3).Once()
+	communicatorMock.On("Publish", "front-end", mock.Anything, 3).Once()
 	handler.onInstructionMsg(msg)
+	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
 }
 

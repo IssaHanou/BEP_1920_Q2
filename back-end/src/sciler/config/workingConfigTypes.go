@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
+	logger "github.com/sirupsen/logrus"
 	"reflect"
 	"time"
 )
@@ -64,11 +64,11 @@ func (t *Timer) Start(handler InstructionSender) error {
 	t.Ending = func() {
 		t.State = "stateExpired"
 		t.Finished = true
-		logrus.Infof("timer %v finished", t.ID)
+		logger.Infof("timer %v finished", t.ID)
 		handler.HandleEvent(t.ID)
 	}
 	t.T = time.AfterFunc(t.Duration, t.Ending)
-	logrus.Infof("timer %v started for %v", t.ID, t.Duration)
+	logger.Infof("timer %v started for %v", t.ID, t.Duration)
 	return nil
 }
 
@@ -81,7 +81,7 @@ func (t *Timer) Pause() error {
 	t.T.Stop()
 	t.Duration, _ = t.GetTimeLeft()
 	t.State = "stateIdle"
-	logrus.Infof("timer paused with %v left", t.Duration)
+	logger.Infof("timer paused with %v left", t.Duration)
 	return nil
 }
 
@@ -92,11 +92,11 @@ func (t *Timer) AddSubTime(handler InstructionSender, time time.Duration, add bo
 	if t.State == "stateIdle" {
 		if add {
 			t.Duration = t.Duration + time
-			logrus.Infof("timer %v added %v to duration and now has a duration of %v", t.ID, time, t.Duration)
+			logger.Infof("timer %v added %v to duration and now has a duration of %v", t.ID, time, t.Duration)
 		} else {
 			if t.Duration > time {
 				t.Duration = t.Duration - time
-				logrus.Infof("timer %v subtracted %v to duration and now has a duration of %v", t.ID, time, t.Duration)
+				logger.Infof("timer %v subtracted %v to duration and now has a duration of %v", t.ID, time, t.Duration)
 			} else {
 				return fmt.Errorf("timer %v could not subtract %v since there is only %v left", t.ID, time, t.Duration)
 			}
@@ -126,7 +126,7 @@ func (t *Timer) Stop() error {
 	}
 	t.State = "stateExpired"
 
-	logrus.Infof("timer %v stopped and set to Expired without handling it's actions", t.ID)
+	logger.Infof("timer %v stopped and set to Expired without handling it's actions", t.ID)
 	return nil
 }
 
@@ -138,7 +138,7 @@ func (t *Timer) Done() error {
 	}
 	t.Ending()
 	t.T.Stop()
-	logrus.Infof("timer %v stopped and set to Expired, actions are being handled", t.ID)
+	logger.Infof("timer %v stopped and set to Expired, actions are being handled", t.ID)
 	return nil
 }
 
@@ -168,10 +168,10 @@ func (r *Rule) Finished() bool {
 // Execute performs all actions of a rule
 func (r *Rule) Execute(handler InstructionSender) {
 	for _, action := range r.Actions {
-		action.Execute(handler)
+		go action.Execute(handler)
 	}
 	r.Executed++
-	logrus.Infof("Executed rule %s", r.ID)
+	logger.Infof("Executed rule %s", r.ID)
 	handler.HandleEvent(r.ID)
 }
 

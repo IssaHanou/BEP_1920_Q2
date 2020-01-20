@@ -257,10 +257,11 @@ func TestSendInstructionDelay(t *testing.T) {
 	})
 	communicatorMock.On("Publish", "display", string(msg), 3)
 	communicatorMock.On("Publish", "display", string(msg2), 3)
-	handler.SendComponentInstruction("display", inst, "")
-	handler.SendComponentInstruction("display", inst2, "5s")
+	go handler.SendComponentInstruction("display", inst, "")
+	go handler.SendComponentInstruction("display", inst2, "1s")
+	time.Sleep(100 * time.Millisecond)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
-	time.Sleep(6 * time.Second)
+	time.Sleep(1 * time.Second)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
 }
 
@@ -454,6 +455,7 @@ func TestHandleSingleEvent(t *testing.T) {
 	communicatorMock.On("Publish", "front-end", string(messageStatus), 3)
 	communicatorMock.On("Publish", "controlBoard", string(messageInstruction), 3)
 	handler.msgMapper(msg)
+	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
 	// if this test becomes flaky (only when this test takes longer then 1 second),
 	// (message expected includes time...), replace the messages with 'mock.Anything'
@@ -502,6 +504,7 @@ func TestHandleDoubleEvent(t *testing.T) {
 	communicatorMock.On("Publish", "front-end", mock.Anything, 3)
 	communicatorMock.On("Publish", "controlBoard", string(messageInstruction), 3)
 	handler.msgMapper(msg)
+	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
 	// if this test becomes flaky (only when this test takes longer then 1 second),
 	// (message expected includes time...), replace the messages with 'mock.Anything'

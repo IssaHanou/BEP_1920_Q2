@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/sirupsen/logrus"
+	logger "github.com/sirupsen/logrus"
 	"reflect"
 	"sciler/config"
 )
@@ -34,7 +34,7 @@ type Handler struct {
 func (handler *Handler) NewHandler(client mqtt.Client, message mqtt.Message) {
 	var raw Message
 	if err := json.Unmarshal(message.Payload(), &raw); err != nil {
-		logrus.Errorf("invalid JSON received: %v", err)
+		logger.Errorf("invalid JSON received: %v", err)
 	}
 	handler.msgMapper(raw)
 }
@@ -63,11 +63,10 @@ func (handler *Handler) msgMapper(raw Message) {
 		}
 	default:
 		{
-			logrus.Error("message received from ", raw.DeviceID,
+			logger.Error("message received from ", raw.DeviceID,
 				", but no message type could be found for: ", raw.Type)
 		}
 	}
-
 }
 
 // onConnectionMsg is the function to process connection messages.
@@ -75,16 +74,16 @@ func (handler *Handler) onConnectionMsg(raw Message) {
 	contents := raw.Contents.(map[string]interface{})
 	device, ok := handler.Config.Devices[raw.DeviceID]
 	if !ok {
-		logrus.Error("connection message received from device " + raw.DeviceID + ", which is not in the config")
+		logger.Error("connection message received from device " + raw.DeviceID + ", which is not in the config")
 	} else {
-		logrus.Info("connection message received from: ", raw.DeviceID)
+		logger.Info("connection message received from: ", raw.DeviceID)
 		value, ok2 := contents["connection"]
 		if !ok2 || reflect.TypeOf(value).Kind() != reflect.Bool {
-			logrus.Error("received improperly structured connection message from device " + raw.DeviceID)
+			logger.Error("received improperly structured connection message from device " + raw.DeviceID)
 		} else {
 			device.Connection = value.(bool)
 			handler.Config.Devices[raw.DeviceID] = device
-			logrus.Info("setting connection status of ", raw.DeviceID, " to ", value)
+			logger.Info("setting connection status of ", raw.DeviceID, " to ", value)
 			handler.sendStatus(raw.DeviceID)
 			if raw.DeviceID == "front-end" && !value.(bool) { // when a front-end disconnect, check if another front-end is connected (maybe multiple front-ends are running
 				handler.SendSetup()
@@ -98,18 +97,18 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 	contents := raw.Contents.(map[string]interface{})
 	value, ok := contents["completed"]
 	if !ok || reflect.TypeOf(value).Kind() != reflect.Bool {
-		logrus.Errorf("received improperly structured confirmation message from device " + raw.DeviceID)
+		logger.Errorf("received improperly structured confirmation message from device " + raw.DeviceID)
 		return
 	}
 	original, ok := contents["instructed"]
 	if !ok {
-		logrus.Errorf("received improperly structured confirmation message from device " + raw.DeviceID)
+		logger.Errorf("received improperly structured confirmation message from device " + raw.DeviceID)
 		return
 	}
 	msg := original.(map[string]interface{})
 	instructionContents, err := getMapSlice(msg["contents"])
 	if err != nil {
-		logrus.Errorf(err.Error())
+		logger.Errorf(err.Error())
 		return
 	}
 
@@ -121,21 +120,21 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 		if instruction["instructed_by"] == "front-end" {
 			jsonMessage, _ := json.Marshal(raw)
 			handler.Communicator.Publish("front-end", string(jsonMessage), 3)
-			logrus.Infof("sending confirmation to front-end for instruction %v", instruction["instruction"])
+			logger.Infof("sending confirmation to front-end for instruction %v", instruction["instruction"])
 		}
 	}
 
 	if !value.(bool) {
-		logrus.Warn("device " + raw.DeviceID + " did not complete instructions: " +
+		logger.Warn("device " + raw.DeviceID + " did not complete instructions: " +
 			instructionString + " at " + raw.TimeSent)
 	} else {
-		logrus.Info("device " + raw.DeviceID + " completed instructions: " +
+		logger.Info("device " + raw.DeviceID + " completed instructions: " +
 			instructionString + " at " + raw.TimeSent)
 	}
 
 	con, ok := handler.Config.Devices[raw.DeviceID]
 	if !ok {
-		logrus.Errorf("device %s was not found in config", raw.DeviceID)
+		logger.Errorf("device %s was not found in config", raw.DeviceID)
 	} else {
 		con.Connection = true
 		handler.Config.Devices[raw.DeviceID] = con
@@ -144,11 +143,11 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 
 // onInstructionMsg is the function to process instruction messages.
 func (handler *Handler) onInstructionMsg(raw Message) {
-	logrus.Info("instruction message received from: ", raw.DeviceID)
+	logger.Info("instruction message received from: ", raw.DeviceID)
 
 	instructions, err := getMapSlice(raw.Contents)
 	if err != nil {
-		logrus.Error(err)
+		logger.Error(err)
 		return
 	}
 
@@ -201,7 +200,7 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 					ruleToFinish := instruction["rule"].(string)
 					rule, ok := handler.Config.RuleMap[ruleToFinish]
 					if !ok {
-						logrus.Errorf("could not find rule with id %s in map", ruleToFinish)
+						logger.Errorf("could not find rule with id %s in map", ruleToFinish)
 					}
 					rule.Execute(handler)
 					handler.sendEventStatus()
@@ -224,7 +223,7 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 				}
 			}
 		} else {
-			logrus.Warnf("%s, tried to instruct the back-end, only the front-end is allowed to instruct the back-end", raw.DeviceID)
+			logger.Warnf("%s, tried to instruct the back-end, only the front-end is allowed to instruct the back-end", raw.DeviceID)
 		}
 	}
 }
