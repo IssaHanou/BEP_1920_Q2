@@ -77,7 +77,7 @@ func (handler *Handler) onConnectionMsg(raw Message) {
 	if !ok {
 		logger.Warnf("connection message received from device %s which is not in the config", raw.DeviceID)
 	} else {
-		logger.Infof("connection message received from: ", raw.DeviceID)
+		logger.Infof("connection message received from: %s", raw.DeviceID)
 		value, ok2 := contents["connection"]
 		if !ok2 || reflect.TypeOf(value).Kind() != reflect.Bool {
 			logger.Errorf("received improperly structured connection message from device %s", raw.DeviceID)
