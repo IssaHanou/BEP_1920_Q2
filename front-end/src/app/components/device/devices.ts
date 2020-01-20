@@ -24,6 +24,18 @@ export class Devices {
   }
 
   /**
+   * Update the status of device front-end.
+   * Update the component with id to status.
+   */
+  updateDevice(id, status) {
+    if (this.all.has("front-end")) {
+      let newStatus = {};
+      newStatus[id] = status;
+      this.all.get("front-end").updateStatus(newStatus);
+    }
+  }
+
+  /**
    * getDevice is a getter for devices
    * @param dev device id
    */

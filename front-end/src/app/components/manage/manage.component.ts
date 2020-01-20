@@ -19,6 +19,7 @@ export class ManageComponent implements OnInit {
     for (const btn of this.app.manageButtons.all.values()) {
       buttons.push(btn);
     }
+    buttons.sort((a, b) => a.id.localeCompare(b.id));
     return buttons;
   }
 
@@ -33,23 +34,12 @@ export class ManageComponent implements OnInit {
 
   /**
    * When clicking a button in the front-end manage section,
+   * update the status of clicked button and
    * send updated data to the back-end.
-   * All buttons have a boolean type, only update the pressed button.
    * @param btnID the button that is pressed
    */
   onClickCustomButton(btnID) {
-    const device = this.app.deviceList.getDevice("front-end");
-    if (device != null) {
-      const status = device.status;
-      const statusMsg = {};
-      for (const component of this.app.manageButtons.all.values()) {
-        let statusToSet = status.get(component.id);
-        if (btnID === component.id) {
-          statusToSet = !statusToSet;
-        }
-        statusMsg[component.id] = statusToSet;
-      }
-      this.app.sendStatus(statusMsg);
-    }
+    this.app.deviceList.updateDevice(btnID, true);
+    this.app.sendStatusFrontEnd();
   }
 }

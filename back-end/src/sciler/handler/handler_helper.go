@@ -341,7 +341,7 @@ func (handler *Handler) processConfig(configToRead interface{}, action string, f
 			fullFileName := filepath.Join(dir, "back-end", "resources", "production", fileName)
 			err = ioutil.WriteFile(fullFileName, jsonBytes, 0644)
 			if err != nil {
-				logrus.Error(err)
+				logger.Error(err)
 			}
 			handler.Config = newConfig
 			handler.ConfigFile = fullFileName

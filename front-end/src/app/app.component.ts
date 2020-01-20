@@ -264,7 +264,31 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
           this.openSnackbar("performing instruction test", "");
           break;
         }
+        case "change status": {
+          this.deviceList.updateDevice(action.component_id, action.value);
+          this.sendStatusFrontEnd();
+          break;
+        }
+        default: {
+          this.logger.log("warning", "received unknown instruction: " + action.instruction);
+          break;
+        }
       }
+    }
+  }
+
+  /**
+   * Get all the front-end's components' status (all buttons) and send message to back-end.
+   */
+  sendStatusFrontEnd() {
+    const device = this.deviceList.getDevice("front-end");
+    if (device != null) {
+      const status = device.status;
+      const statusMsg = {};
+      for (const component of this.manageButtons.all.values()) {
+        statusMsg[component.id] = status.get(component.id);
+      }
+      this.sendStatus(statusMsg);
     }
   }
 

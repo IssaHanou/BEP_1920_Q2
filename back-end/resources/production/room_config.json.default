@@ -21,6 +21,44 @@
   ],
   "devices": [
     {
+      "description": "4 spotlights",
+      "id": "hue_lights",
+      "input": {},
+      "output": {
+        "all": {
+          "instructions": {
+            "manual": "array",
+            "scene": "string"
+          },
+          "type": "string"
+        },
+        "spot1": {
+          "instructions": {
+            "manual": "array"
+          },
+          "type": "string"
+        },
+        "spot2": {
+          "instructions": {
+            "manual": "array"
+          },
+          "type": "string"
+        },
+        "spot3": {
+          "instructions": {
+            "manual": "array"
+          },
+          "type": "string"
+        },
+        "spot4": {
+          "instructions": {
+            "manual": "array"
+          },
+          "type": "string"
+        }
+      }
+    },
+    {
       "id": "controlBoard",
       "description": "Control board with three switches, three slides with lights and one main switch.",
       "input": {
@@ -880,9 +918,9 @@
         }
       ]
     },
-    {
-      "id": "pause",
-      "description": "Als pauze wordt gedrukt, stopt de tijd en wordt de volgende keer weer hervat",
+   {
+      "id": "pauze",
+      "description": "Als pauze wordt gedrukt, stopt de tijd",
       "limit": 0,
       "conditions": {
         "operator": "AND",
@@ -895,6 +933,33 @@
               "comparison": "eq",
               "value": true
             }
+          },
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "stop",
+              "comparison": "eq",
+              "value": false
+            }
+          },
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "verder gaan",
+              "comparison": "eq",
+              "value": false
+            }
+          },
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "pauze",
+              "comparison": "eq",
+              "value": false
+            }
           }
         ]
       },
@@ -905,6 +970,106 @@
           "message": [
             {
               "instruction": "pause"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "verder gaan",
+      "description": "Als pauze is gedrukt, kun je weer verder gaan",
+      "limit": 0,
+      "conditions": {
+        "operator": "AND",
+        "list": [
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "start",
+              "comparison": "eq",
+              "value": true
+            }
+          },
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "stop",
+              "comparison": "eq",
+              "value": false
+            }
+          },
+         {
+           "type": "device",
+           "type_id": "front-end",
+           "constraints": {
+             "component_id": "pauze",
+             "comparison": "eq",
+             "value": true
+           }
+         }
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "verder gaan",
+              "comparison": "eq",
+              "value": false
+            }
+          }
+        ]
+      },
+      "actions": [
+        {
+          "type": "timer",
+          "type_id": "general",
+          "message": [
+            {
+              "instruction": "start"
+            }
+          ]
+        },
+        {
+          "type": "device",
+          "type_id": "front-end",
+          "message": [
+            {
+              "instruction": "change status",
+              "component_id": "pauze",
+              "value": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "licht aan",
+      "description": "Als de mainSwitch goed staat, kun je het witte licht aanzetten met de knop",
+      "limit": 0,
+      "conditions": {
+        "operator": "AND",
+        "list": [
+          {
+            "type": "device",
+            "type_id": "controlBoard",
+            "constraints": {
+              "component_id": "mainSwitch",
+              "comparison": "eq",
+              "value": true
+            }
+          }
+        ]
+      },
+      "actions": [
+        {
+          "type": "device",
+          "type_id": "hue_lights",
+          "message": [
+            {
+              "component_id": "all",
+              "instruction": "scene",
+              "value": "xAgrIMeKpZD8Gla"
             }
           ]
         }
