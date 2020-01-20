@@ -20,7 +20,7 @@ func ReadFile(filename string) WorkingConfig {
 	config, jsonErrors := ReadJSON(dat)
 	errorList = append(errorList, jsonErrors...)
 	if len(errorList) > 0 {
-		panic(errorList[0])
+		panic(errorList)
 	}
 	return config
 }

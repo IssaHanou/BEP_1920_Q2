@@ -50,12 +50,12 @@ func (handler *Handler) SendComponentInstruction(clientID string, instructions [
 	jsonMessage, _ := json.Marshal(&message)
 	delayDur, err := time.ParseDuration(delay)
 	if err == nil {
-		logger.Infof("waiting %s to send instruction data to %s: %s", delay, clientID, fmt.Sprint(message.Contents))
+		logger.Infof("waiting %s to send instructions to %s: %s", delay, clientID, fmt.Sprint(message.Contents))
 		time.Sleep(delayDur)
-		logger.Infof("sending instruction data to %s after waiting %s: %s", clientID, delay, fmt.Sprint(message.Contents))
+		logger.Infof("sending instructions to %s after waiting %s: %s", clientID, delay, fmt.Sprint(message.Contents))
 		handler.Communicator.Publish(clientID, string(jsonMessage), 3)
 	} else {
-		logger.Infof("sending instruction data to %s: %s", clientID, fmt.Sprint(message.Contents))
+		logger.Infof("sending instructions to %s: %s", clientID, fmt.Sprint(message.Contents))
 		handler.Communicator.Publish(clientID, string(jsonMessage), 3)
 	}
 }
@@ -79,7 +79,7 @@ func (handler *Handler) SendInstruction(clientID string, instructions []map[stri
 		Contents: instructions,
 	}
 	jsonMessage, _ := json.Marshal(&message)
-	logger.Infof("sending instruction data to %s: %s", clientID, fmt.Sprint(message.Contents))
+	logger.Infof("sending instructions to %s: %s", clientID, fmt.Sprint(message.Contents))
 	handler.Communicator.Publish(clientID, string(jsonMessage), 3)
 }
 
@@ -90,7 +90,7 @@ func (handler *Handler) updateStatus(raw Message) {
 		if device.ID == "front-end" {
 			handler.handleFrontEndStatus(contents)
 		}
-		logger.Info("status message received from: " + raw.DeviceID + ", status: " + fmt.Sprint(raw.Contents))
+		logger.Infof("status message received from: %s", raw.DeviceID)
 		for k, v := range contents {
 			err := handler.checkStatusType(*device, v, k)
 			if err != nil {
@@ -100,7 +100,7 @@ func (handler *Handler) updateStatus(raw Message) {
 			}
 		}
 	} else {
-		logger.Error("status message received from device ", raw.DeviceID, ", which is not in the config")
+		logger.Warnf("status message received from device %s which is not in the config", raw.DeviceID)
 	}
 }
 
@@ -136,7 +136,7 @@ func (handler *Handler) sendStatus(deviceID string) {
 		return
 	}
 	jsonMessage, _ := json.Marshal(&message)
-	logger.Info("sending status data to front-end: " + fmt.Sprint(message.Contents))
+	logger.Infof("sending status data to front-end: %v", message.Contents)
 	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 }
 
@@ -161,7 +161,7 @@ func (handler *Handler) sendEventStatus() {
 		Contents: status,
 	}
 	jsonMessage, _ := json.Marshal(&message)
-	logger.Info("sending event status to front-end")
+	logger.Infof("sending event status to front-end")
 	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 }
 
@@ -188,7 +188,7 @@ func (handler *Handler) sendFrontEndStatus(message Message) {
 		Contents: returnMsg,
 	}
 	jsonMessage, _ := json.Marshal(&newMessage)
-	logger.Info("sending front-end button status")
+	logger.Infof("sending front-end button status")
 	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 }
 
@@ -272,7 +272,7 @@ func (handler *Handler) GetStatus(deviceID string) {
 		},
 	}
 	jsonMessage, _ := json.Marshal(&message)
-	logger.Info("sending status request to client computer: ", deviceID, fmt.Sprint(message.Contents))
+	logger.Infof("sending status request to client computer: %s", deviceID)
 	handler.Communicator.Publish(deviceID, string(jsonMessage), 3)
 }
 
@@ -341,7 +341,7 @@ func (handler *Handler) processConfig(configToRead interface{}, action string, f
 			fullFileName := filepath.Join(dir, "back-end", "resources", "production", fileName)
 			err = ioutil.WriteFile(fullFileName, jsonBytes, 0644)
 			if err != nil {
-				logrus.Error(err)
+				logger.Error(err)
 			}
 			handler.Config = newConfig
 			handler.ConfigFile = fullFileName

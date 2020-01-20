@@ -172,7 +172,7 @@ func (r *Rule) Execute(handler InstructionSender) {
 		go action.Execute(handler)
 	}
 	r.Executed++
-	logger.Infof("Executed rule %s", r.ID)
+	logger.Infof("executed actions of rule with id %s", r.ID)
 	handler.HandleEvent(r.ID)
 }
 

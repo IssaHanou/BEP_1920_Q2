@@ -49,11 +49,11 @@ func main() {
 	// setting up (non colored) file output
 	logger.AddHook(hook)
 
-	logger.Info("writing logs to both console and " + writeFile)
+	logger.Infof("writing logs to both console and %v", writeFile)
 
 	filename := filepath.Join(dir, "back-end", "resources", "production", "room_config.json")
 	configurations := config.ReadFile(filename)
-	logger.Info("configurations read from: " + filename)
+	logger.Infof("configurations read from: %v", filename)
 	host := configurations.General.Host
 	port := configurations.General.Port
 
