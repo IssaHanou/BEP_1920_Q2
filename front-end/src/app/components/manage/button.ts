@@ -8,7 +8,17 @@ export class Button {
     this.disabled = jsonData.disabled;
   }
 
+  /**
+   * Update with new disabled value.
+   */
   updateDisabled(newValue) {
     this.disabled = newValue;
+  }
+
+  /**
+   * Return the disabled value of the button.
+   */
+  getValue() {
+    return this.disabled;
   }
 }

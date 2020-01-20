@@ -12,7 +12,7 @@ export class Buttons {
 
   /**
    * For every button in the data, update its disabled valued.
-   * @param jsonData
+   * @param jsonData of all button object
    */
   setButtons(jsonData) {
     for (const object of jsonData) {
@@ -29,18 +29,6 @@ export class Buttons {
       this.all.get(jsonData.id).updateDisabled(jsonData.disabled);
     } else {
       this.all.set(jsonData.id, new Button(jsonData));
-    }
-  }
-
-  /**
-   * getButton is a getter for buttons
-   * @param btn button id
-   */
-  getButton(btn: string) {
-    if (this.all.has(btn)) {
-      return this.all.get(btn);
-    } else {
-      return null;
     }
   }
 }

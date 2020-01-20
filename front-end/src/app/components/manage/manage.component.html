@@ -2,8 +2,8 @@
   <h3 class="header">Acties</h3>
   <div class="contents">
     <div>
-      <button mat-raised-button color=primary (click)="onClickTestButton()">test</button>
-      <button mat-raised-button color=primary (click)="onClickResetButton()">reset</button>
+      <button mat-raised-button class="test" color=primary (click)="onClickTestButton()">test</button>
+      <button mat-raised-button class="reset" color=primary (click)="onClickResetButton()">reset</button>
     </div>
     <div>
       <ng-container *ngFor="let btn of getButtons()">

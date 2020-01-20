@@ -272,7 +272,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
    * Update the device list with front-end start-up status: all buttons are not clicked.
    */
   private resetFrontEndStatus() {
-    let statusMsg = new Map<string, boolean>();
+    const statusMsg = new Map<string, boolean>();
     for (const key of this.manageButtons.all.keys()) {
       statusMsg.set(key, false);
     }
