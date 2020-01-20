@@ -241,6 +241,11 @@ func compare(param1 interface{}, param2 interface{}, comparision string) bool {
 		return numericToFloat64(param1) >= numericToFloat64(param2)
 	case "contains":
 		return contains(param1, param2)
+	case "not":
+		if reflect.TypeOf(param1).Kind() == reflect.Int || reflect.TypeOf(param2).Kind() == reflect.Int {
+			return numericToFloat64(param1) != numericToFloat64(param2)
+		}
+		return !reflect.DeepEqual(param1, param2)
 	default:
 		// This case is already handled to give error in checkConstraint
 		return false
@@ -335,7 +340,7 @@ func (constraint Constraint) checkConstraints(condition Condition, config Workin
 							if !CheckValidComparison(comparison) {
 								return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
 							}
-							if comparison != "eq" {
+							if comparison != "eq" && comparison != "not" {
 								return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on a string", ruleID, comparison)}
 							}
 						}
@@ -371,7 +376,7 @@ func (constraint Constraint) checkConstraints(condition Condition, config Workin
 							if !CheckValidComparison(comparison) {
 								return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
 							}
-							if comparison != "contains" && comparison != "eq" {
+							if comparison != "contains" && comparison != "eq" && comparison != "not" {
 								return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on an array", ruleID, comparison)}
 							}
 						}
@@ -428,7 +433,7 @@ func (constraint Constraint) checkConstraints(condition Condition, config Workin
 
 // CheckValidComparison checks if the comparison is a valid one
 func CheckValidComparison(comparison string) bool {
-	comparisonTypesAllowed := []string{"eq", "lt", "gt", "lte", "gte", "contains"}
+	comparisonTypesAllowed := []string{"eq", "lt", "gt", "lte", "gte", "contains", "not"}
 	for _, comp := range comparisonTypesAllowed {
 		if comp == comparison {
 			return true
