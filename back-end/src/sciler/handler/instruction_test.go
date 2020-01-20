@@ -344,17 +344,6 @@ func TestOnInstructionMsgFinishRuleLabel(t *testing.T) {
 		Config:       config.ReadFile("../../../resources/testing/test_instruction_label.json"),
 		Communicator: communicatorMock,
 	}
-	returnMessage, _ := json.Marshal(Message{
-		DeviceID: "back-end",
-		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "event status",
-		Contents: []map[string]interface{}{{
-			"id":     "rule",
-			"status": true},
-			{"id": "rule2",
-				"status": false},
-		},
-	})
 	instMessage, _ := json.Marshal(Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
@@ -367,7 +356,7 @@ func TestOnInstructionMsgFinishRuleLabel(t *testing.T) {
 	},
 	)
 	communicatorMock.On("Publish", "display2", string(instMessage), 3)
-	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)
+	communicatorMock.On("Publish", "front-end", mock.Anything, 3)
 	handler.onInstructionMsg(msg)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
 }

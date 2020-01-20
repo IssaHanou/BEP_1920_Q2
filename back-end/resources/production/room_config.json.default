@@ -790,7 +790,12 @@
                       "value": true
                     },
                     {
-                      "comparison": "eq",
+                      "comparison": "gte",
+                      "component_id": "slider3",
+                      "value": 90
+                    },
+                    {
+                      "comparison": "not",
                       "component_id": "slider3",
                       "value": 100
                     }
