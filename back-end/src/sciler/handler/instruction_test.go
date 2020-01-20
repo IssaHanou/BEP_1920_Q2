@@ -330,6 +330,49 @@ func TestOnInstructionMsgFinishRule(t *testing.T) {
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
 }
 
+func TestOnInstructionMsgFinishRuleLabel(t *testing.T) {
+	msg := Message{
+		DeviceID: "front-end",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "instruction",
+		Contents: []map[string]interface{}{{
+			"instruction": "finish rule",
+			"rule":        "rule"},
+		},
+	}
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_instruction_label.json"),
+		Communicator: communicatorMock,
+	}
+	returnMessage, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "event status",
+		Contents: []map[string]interface{}{{
+			"id":     "rule",
+			"status": true},
+			{"id": "rule2",
+				"status": false},
+		},
+	})
+	instMessage, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{{
+			"value":        "test",
+			"component_id": "display1",
+			"instruction":  "hint"},
+		},
+	},
+	)
+	communicatorMock.On("Publish", "display2", string(instMessage), 3)
+	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)
+	handler.onInstructionMsg(msg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
+}
+
 func TestOnInstructionMsgHint(t *testing.T) {
 	msg := Message{
 		DeviceID: "front-end",

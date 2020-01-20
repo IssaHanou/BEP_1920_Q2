@@ -184,6 +184,53 @@ func TestSendInstruction(t *testing.T) {
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
 }
 
+func TestSendLabelInstruction(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_instruction_label.json"),
+		Communicator: communicatorMock,
+	}
+	inst := []config.ComponentInstruction{
+		{"", "hint", "my hint"},
+	}
+	instMsg := []config.ComponentInstruction{
+		{"display1", "hint", "my hint"},
+	}
+	msg, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: instMsg,
+	})
+	communicatorMock.On("Publish", "display2", string(msg), 3)
+	handler.SendLabelInstruction("display-label1", inst, "")
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+}
+
+func TestSendLabelInstruction_2(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_instruction_label.json"),
+		Communicator: communicatorMock,
+	}
+	inst := []config.ComponentInstruction{
+		{"", "hint", "my hint"},
+	}
+	instMsg := []config.ComponentInstruction{
+		{"display2", "hint", "my hint"},
+	}
+	msg, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: instMsg,
+	})
+	communicatorMock.On("Publish", "display1", string(msg), 3)
+	communicatorMock.On("Publish", "display2", string(msg), 3)
+	handler.SendLabelInstruction("display-label2", inst, "")
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
+}
+
 func TestSendInstructionDelay(t *testing.T) {
 	communicatorMock := new(CommunicatorMock)
 	handler := Handler{

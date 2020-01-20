@@ -108,13 +108,13 @@ type Action struct {
 	Type    string                 `json:"type"`
 	TypeID  string                 `json:"type_id"`
 	Message []ComponentInstruction `json:"message"`
-	Delay   string                 `json: delay`
+	Delay   string                 `json:"delay"`
 }
 
 // Execute is a method that performs the action
 // TODO test this
 func (action Action) Execute(handler InstructionSender) {
-	switch action.Type { // this cannot be any other Type than device or timer, (checked in checkActions function)
+	switch action.Type { // this cannot be any other Type than device, timer or label, (checked in checkActions function)
 	case "device":
 		{
 			handler.SendComponentInstruction(action.TypeID, action.Message, action.Delay)
@@ -123,7 +123,12 @@ func (action Action) Execute(handler InstructionSender) {
 		{
 			handler.SetTimer(action.TypeID, action.Message[0])
 		}
+	case "label":
+		{
+			handler.SendLabelInstruction(action.TypeID, action.Message, action.Delay)
+		}
 	}
+
 }
 
 // ComponentInstruction can be sent across clients of the brokers.
@@ -137,4 +142,5 @@ type ComponentInstruction struct {
 type OutputObject struct {
 	Type         string            `json:"type"`
 	Instructions map[string]string `json:"instructions"`
+	Label        []string          `json:"label"`
 }
