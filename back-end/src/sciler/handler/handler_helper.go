@@ -232,7 +232,7 @@ func (handler *Handler) getHints() map[string][]string {
 // getEventDescriptions returns a map of hints with puzzle name as key and list of hints for that puzzle as value
 func (handler *Handler) getEventDescriptions() map[string]string {
 	events := make(map[string]string)
-	for _, rule := range handler.Config.RuleMap {
+	for _, rule := range handler.getPuzzleRules() {
 		events[rule.ID] = rule.Description
 	}
 	return events
