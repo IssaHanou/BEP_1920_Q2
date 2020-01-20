@@ -74,7 +74,7 @@ Rules are defined by:
 - `id`: this is the id of a rule. Write it in camelCase, e.g. "solvingControlBoard". This id should be unique compared to other rule ids and also the device ids as well as the timer ids.
 - `description`: this is optional and can contain more information about the rule. 
 This can be displayed in the front-end, so should be readable and in Dutch.
-- `limit`: this sets the number of times this rule can be triggered. 
+- `limit`: this sets the number of times this rule can be triggered. If this is `0`, it means unlimited.  
 - `conditions`: this is either a logical operator (i) defined by `operator` (either `AND` or `OR`) and `list` which is a list of conditions or other logical operators **or** this is a condition (ii) defined by `type`, `type_id` and `constraint`
     
     1. Logical operator

@@ -254,10 +254,7 @@ func (handler *Handler) getCameras() []map[string]string {
 func (handler *Handler) getButtons() []map[string]interface{} {
 	var buttons []map[string]interface{}
 	for _, btn := range handler.Config.ButtonEvents {
-		rule, ok := handler.Config.RuleMap[btn.ID]
-		if !ok {
-			logrus.Errorf("rule with id %s not found in rule map for button %s", rule.ID, btn.ID)
-		}
+		rule, _ := handler.Config.RuleMap[btn.ID]
 		button := make(map[string]interface{})
 		button["id"] = btn.ID
 		button["disabled"] = !btn.Conditions.Resolve(handler.Config) || rule.Finished()

@@ -1,8 +1,11 @@
 package handler
 
 import (
+	"encoding/json"
 	"github.com/stretchr/testify/assert"
+	"sciler/config"
 	"testing"
+	"time"
 )
 
 ////////////////////////////// Status tests //////////////////////////////
@@ -124,6 +127,34 @@ func TestOnStatusMsgWrongComponent(t *testing.T) {
 	_, ok := handler.Config.Devices["TestDevice"].Status["wrongComponent"]
 	assert.Equal(t, false, ok,
 		"Component should not exist in device because it was not in config")
+}
+
+func TestOnStatusMsgFrontEnd(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_status.json"),
+		Communicator: communicatorMock,
+	}
+	msg := Message{
+		DeviceID: "front-end",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "status",
+		Contents: map[string]interface{}{
+			"stop": true},
+	}
+	timerGeneralMessage, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "time",
+		Contents: map[string]interface{}{
+			"state":    "stateExpired",
+			"duration": 0,
+			"id":       "general",
+		},
+	})
+	communicatorMock.On("Publish", "front-end", string(timerGeneralMessage), 3)
+	handler.updateStatus(msg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
 }
 
 func TestOnStatusMsgWrongType(t *testing.T) {

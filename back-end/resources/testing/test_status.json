@@ -1,0 +1,62 @@
+{
+  "general": {
+    "name": "Escape X",
+    "duration": "1m",
+    "host": "localhost",
+    "port": 1883
+  },
+  "cameras": [
+    {"name": "camera1", "link": "https://raccoon.games"},
+    {"name": "camera2", "link": "https://debrouwerij.io"}
+  ],
+  "devices": [
+    {
+      "id": "telephone",
+      "description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
+      "input": {
+        "turningWheel": "array"
+      },
+      "output": {
+        "audio": {
+          "type": "string",
+          "instructions": {
+            "play": "string"
+          }
+        },
+        "ringTone": {
+          "type": "string",
+          "instructions": {
+            "play": "string"
+          }
+        }
+      }
+    }
+  ],
+  "timers": [],
+  "puzzles": [
+  ],
+  "general_events": [
+  ],
+  "button_events": [
+    {
+      "id": "stop",
+      "description": "Als het spel start, moeten alle rode leds aan gaan en de groene uit",
+      "limit": 2,
+      "conditions": {
+        "list": [],
+        "operator": "AND"
+      },
+      "actions": [
+        {
+          "type": "timer",
+          "type_id": "general",
+          "message": [
+            {
+              "instruction": "stop"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

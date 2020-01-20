@@ -79,17 +79,17 @@
     {
       "id": "start",
       "description": "Als het spel start, moeten alle rode leds aan gaan en de groene uit",
-      "limit": 1,
+      "limit": 2,
       "conditions": {
-        "operator": "OR",
+        "operator": "AND",
         "list": [
           {
             "type": "device",
             "type_id": "front-end",
             "constraints": {
-              "component_id": "start",
-              "comparison": "gte",
-              "value": 1
+              "component_id": "stop",
+              "comparison": "eq",
+              "value": false
             }
           }
         ]
@@ -156,15 +156,15 @@
       "description": "Als het spel stopt, moeten alle lichten uitgaan",
       "limit": 1,
       "conditions": {
-        "operator": "OR",
+        "operator": "AND",
         "list": [
           {
             "type": "device",
             "type_id": "front-end",
             "constraints": {
-              "component_id": "stop",
+              "component_id": "start",
               "comparison": "eq",
-              "value": 1
+              "value": true
             }
           }
         ]
