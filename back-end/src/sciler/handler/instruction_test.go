@@ -344,17 +344,6 @@ func TestOnInstructionMsgFinishRuleLabel(t *testing.T) {
 		Config:       config.ReadFile("../../../resources/testing/test_instruction_label.json"),
 		Communicator: communicatorMock,
 	}
-	//returnMessage, _ := json.Marshal(Message{
-	//	DeviceID: "back-end",
-	//	TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-	//	Type:     "event status",
-	//	Contents: []map[string]interface{}{
-	//		{"id": "rule2",
-	//			"status": false}, {
-	//			"id":     "rule",
-	//			"status": true},
-	//	},
-	//})
 	instMessage, _ := json.Marshal(Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
