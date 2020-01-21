@@ -93,9 +93,16 @@ func generateDevices(devices []ReadDevice, config *WorkingConfig) {
 		ID:          "front-end",
 		Description: "The operator webapp for managing a escape room",
 		Input:       input,
-		Output:      nil,
-		Status:      status,
-		Connection:  false,
+		Output: map[string]OutputObject{
+			"gameState": {
+				Type: "string",
+				Instructions: map[string]string{
+					"setState": "string",
+				},
+			},
+		},
+		Status:     status,
+		Connection: false,
 	})
 }
 
@@ -226,6 +233,14 @@ func checkConfig(config WorkingConfig) []string {
 			errList = append(errList, checkActions(rule.Actions, config)...)
 		}
 	}
+
+	for _, rule := range config.ButtonEvents {
+		if err := rule.Conditions.checkConstraints(config, rule.ID); err != nil {
+			errList = append(errList, err...)
+		}
+		errList = append(errList, checkActions(rule.Actions, config)...)
+	}
+
 	// todo check uniqueness of all device_id, timer_id and rule_id
 	return errList
 }
