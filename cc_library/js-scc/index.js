@@ -160,7 +160,7 @@ class SccLib {
       const retryCooldown = 10 * 1000; // 10 seconds before retrying to connect
       this.log(
         "error",
-        "connecting failed, retry in " + retryCooldown + " seconds",
+        "connecting failed, retry in " + retryCooldown + " milliseconds",
       );
       setTimeout(() => {
         this.connect();
