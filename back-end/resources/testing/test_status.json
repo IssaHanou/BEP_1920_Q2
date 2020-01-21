@@ -41,7 +41,7 @@
     {
       "id": "stop",
       "description": "Als het spel start, moeten alle rode leds aan gaan en de groene uit",
-      "limit": 2,
+      "limit": 0,
       "conditions": {
         "list": [],
         "operator": "AND"
