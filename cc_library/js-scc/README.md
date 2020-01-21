@@ -1,4 +1,4 @@
-## js-scc
+## js-scc [(see npm)](https://www.npmjs.com/package/js-scc)
 
 ### Installation
 - npm install with ```npm install js-scc```
