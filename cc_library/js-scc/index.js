@@ -68,9 +68,10 @@ class Device {
 
   /**
    * start starts the device
+   * @param onStart function that gets called on successful connect or reconnect
    */
-  start() {
-    this.scclib.connect();
+  start(onStart) {
+    this.scclib.connect(onStart);
   }
 }
 
@@ -156,14 +157,14 @@ class SccLib {
      * it will log an error and try to reconnect on a regular interval till it succeeds
      * @private
      */
-    this._onConnectFailure = function() {
+    this._onConnectFailure = function(onStart) {
       const retryCooldown = 10 * 1000; // 10 seconds before retrying to connect
       this.log(
         "error",
         "connecting failed, retry in " + retryCooldown + " milliseconds"
       );
       setTimeout(() => {
-        this.connect();
+        this.connect(onStart);
       }, retryCooldown);
     };
 
@@ -294,7 +295,7 @@ class SccLib {
    * sets up handlers for connection and connection failure
    * sets up automatic reconnect
    */
-  connect() {
+  connect(onStart) {
     const will = new Paho.Message(
       JSON.stringify(
         new Message(this.name, "connection", {
@@ -306,10 +307,10 @@ class SccLib {
     this.client.connect({
       onSuccess: () => {
         this._onConnect();
-        console.log("CONNECTED!");
+        onStart();
       },
       onFailure: () => {
-        this._onConnectFailure();
+        this._onConnectFailure(onStart);
       },
       willMessage: will,
       reconnect: true,
