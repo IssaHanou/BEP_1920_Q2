@@ -881,8 +881,8 @@
       ]
     },
     {
-      "id": "pause",
-      "description": "Als pauze wordt gedrukt, stopt de tijd en wordt de volgende keer weer hervat",
+      "id": "pauze",
+      "description": "Als pauze wordt gedrukt, stopt de tijd",
       "limit": 0,
       "conditions": {
         "operator": "AND",
@@ -895,6 +895,24 @@
               "comparison": "eq",
               "value": true
             }
+          },
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "stop",
+              "comparison": "eq",
+              "value": false
+            }
+          },
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "pauze",
+              "comparison": "eq",
+              "value": false
+            }
           }
         ]
       },
@@ -905,6 +923,85 @@
           "message": [
             {
               "instruction": "pause"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "verder gaan",
+      "description": "Als pauze is gedrukt, kun je weer verder gaan",
+      "limit": 0,
+      "conditions": {
+        "operator": "AND",
+        "list": [
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "start",
+              "comparison": "eq",
+              "value": true
+            }
+          },
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "stop",
+              "comparison": "eq",
+              "value": false
+            }
+          },
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "verder gaan",
+              "comparison": "eq",
+              "value": false
+            }
+          },
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "pauze",
+              "comparison": "eq",
+              "value": true
+            }
+          }
+        ]
+      },
+      "actions": [
+        {
+          "type": "timer",
+          "type_id": "general",
+          "message": [
+            {
+              "instruction": "start"
+            }
+          ]
+        },
+        {
+          "type": "device",
+          "type_id": "front-end",
+          "message": [
+            {
+              "instruction": "change status",
+              "component_id": "verder gaan",
+              "value": false
+            }
+          ]
+        },
+        {
+          "type": "device",
+          "type_id": "front-end",
+          "message": [
+            {
+              "instruction": "change status",
+              "component_id": "pauze",
+              "value": false
             }
           ]
         }

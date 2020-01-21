@@ -47,6 +47,12 @@ func (handler *Handler) SendComponentInstruction(clientID string, instructions [
 		Type:     "instruction",
 		Contents: instructions,
 	}
+	// If the instruction is to reset the status of a front-end button, update its status in the config.
+	if clientID == "front-end" {
+		for _, instruction := range instructions {
+			handler.Config.Devices["front-end"].Status[instruction.ComponentID] = instruction.Value
+		}
+	}
 	jsonMessage, _ := json.Marshal(&message)
 	delayDur, err := time.ParseDuration(delay)
 	if err == nil {
@@ -87,10 +93,11 @@ func (handler *Handler) SendInstruction(clientID string, instructions []map[stri
 func (handler *Handler) updateStatus(raw Message) {
 	contents := raw.Contents.(map[string]interface{})
 	if device, ok := handler.Config.Devices[raw.DeviceID]; ok {
+		logger.Infof("status message received from: %s", raw.DeviceID)
 		if device.ID == "front-end" {
 			handler.handleFrontEndStatus(contents)
 		}
-		logger.Infof("status message received from: %s", raw.DeviceID)
+
 		for k, v := range contents {
 			err := handler.checkStatusType(*device, v, k)
 			if err != nil {
@@ -166,13 +173,13 @@ func (handler *Handler) sendEventStatus() {
 }
 
 // Handles status updates from front-end specifically as these will only be affected by button events,
-// which are handled differently.
-// The rule that belongs to the pressed button (with updated status) is executed
+// which are handled differently. If the button is pressed (new status = true) and its status was false,
+// the rule that belongs to the pressed button is executed
 func (handler *Handler) handleFrontEndStatus(contents map[string]interface{}) {
 	device, _ := handler.Config.Devices["front-end"]
 	for component, status := range device.Status {
 		rule, _ := handler.Config.RuleMap[component]
-		if status != contents[component].(bool) {
+		if contents[component].(bool) && !status.(bool) {
 			rule.Execute(handler)
 		}
 	}
