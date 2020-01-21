@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"io/ioutil"
 	"sciler/config"
 	"testing"
@@ -222,11 +223,12 @@ func TestOnInstructionMsgResetAll(t *testing.T) {
 	jsonInstructionMsg, _ := json.Marshal(&responseMsg)
 	jsonStatusMsg, _ := json.Marshal(&statusMsg)
 
-	communicatorMock.On("Publish", "client-computers", string(jsonInstructionMsg), 3)
-	communicatorMock.On("Publish", "front-end", string(jsonInstructionMsg), 3)
-	communicatorMock.On("Publish", "front-end", string(jsonStatusMsg), 3)
+	communicatorMock.On("Publish", "client-computers", string(jsonInstructionMsg), 3).Once()
+	communicatorMock.On("Publish", "front-end", string(jsonInstructionMsg), 3).Once()
+	communicatorMock.On("Publish", "front-end", string(jsonStatusMsg), 3).Once()
+	communicatorMock.On("Publish", mock.AnythingOfType("string"), mock.AnythingOfType("string"), 3) // all calls from sendStatus update (tested in another test)
 	handler.msgMapper(instructionMsg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 13)
 }
 
 func TestOnInstructionMsgTestAll(t *testing.T) {
@@ -311,9 +313,54 @@ func TestOnInstructionMsgFinishRule(t *testing.T) {
 			"status": true},
 		},
 	})
+	instMessage, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "time",
+		Contents: map[string]interface{}{
+			"duration": 10000,
+			"id":       "timer1",
+			"state":    "stateIdle",
+		},
+	})
+	communicatorMock.On("Publish", "front-end", string(instMessage), 3)
 	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)
 	handler.onInstructionMsg(msg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
+}
+
+func TestOnInstructionMsgFinishRuleLabel(t *testing.T) {
+	msg := Message{
+		DeviceID: "front-end",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "instruction",
+		Contents: []map[string]interface{}{{
+			"instruction": "finish rule",
+			"rule":        "rule"},
+		},
+	}
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_instruction_label.json"),
+		Communicator: communicatorMock,
+	}
+	instMessage, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{{
+			"value":        "test",
+			"component_id": "display1",
+			"instruction":  "hint"},
+		},
+	},
+	)
+	communicatorMock.On("Publish", "display2", string(instMessage), 3).Once()
+	communicatorMock.On("Publish", "front-end", mock.Anything, 3).Once()
+	handler.onInstructionMsg(msg)
+	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
 }
 
 func TestOnInstructionMsgHint(t *testing.T) {
@@ -471,19 +518,9 @@ func TestInstructionUseConfig(t *testing.T) {
 		Type:     "new config",
 		Contents: map[string]interface{}{"name": "new_file.json"},
 	}
-	timerGeneralMessage, _ := json.Marshal(Message{
-		DeviceID: "back-end",
-		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "time",
-		Contents: map[string]interface{}{
-			"state":    "stateIdle",
-			"duration": 1800000,
-			"id":       "general",
-		},
-	})
 	jsonMessage, _ := json.Marshal(&returnMsg)
-	communicatorMock.On("Publish", "front-end", string(timerGeneralMessage), 3)
-	communicatorMock.On("Publish", "front-end", string(jsonMessage), 3)
+	communicatorMock.On("Publish", "front-end", string(jsonMessage), 3).Once()
+	communicatorMock.On("Publish", mock.AnythingOfType("string"), mock.AnythingOfType("string"), 3) // sendSetup tested in another test
 	handler.msgMapper(instructionMsg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 12)
 }

@@ -2,5 +2,8 @@
   <h3 class="header">Tijd</h3>
   <div class="contents">
     <h1 class="timer">{{ getDisplayTime() }}</h1>
+    <ng-container *ngIf="getDoneTime() != null">
+      <h4>{{ getDoneTime() }}</h4>
+    </ng-container>
   </div>
 </div>

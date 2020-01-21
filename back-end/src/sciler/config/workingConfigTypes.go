@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
+	logger "github.com/sirupsen/logrus"
 	"reflect"
 	"time"
 )
@@ -17,6 +17,7 @@ type WorkingConfig struct {
 	Timers        map[string]*Timer
 	StatusMap     map[string][]*Rule
 	RuleMap       map[string]*Rule
+	LabelMap      map[string][]*Component
 }
 
 // Timer is a timer in the escape game
@@ -27,7 +28,7 @@ type Timer struct {
 	T         *time.Timer
 	State     string
 	Ending    func()
-	Finish    bool
+	Finished  bool
 }
 
 // newTimer create a new timer
@@ -35,12 +36,8 @@ func newTimer(id string, d time.Duration) *Timer {
 	t := new(Timer)
 	t.ID = id
 	t.Duration = d
-	t.Finish = false
+	t.Finished = false
 	t.State = "stateIdle"
-	t.Ending = func() { // TODO test
-		t.State = "stateExpired"
-		t.Finish = true
-	}
 	return t
 }
 
@@ -50,56 +47,99 @@ func (t *Timer) GetTimeLeft() (time.Duration, string) {
 	if t.State == "stateActive" {
 		dif := time.Now().Sub(t.StartedAt)
 		left = t.Duration - dif
-	} else {
+	} else if t.State == "stateIdle" {
 		left = t.Duration
 	}
 	return left, t.State
 }
 
-// Start starts Timer that will send the current time on its channel after at least duration d.
-func (t *Timer) Start(handler InstructionSender) bool {
+// Start starts Timer that executes handler.HandleEvent(t.ID) after duration d.
+// Can not start if timer is not state Idle
+func (t *Timer) Start(handler InstructionSender) error {
 	if t.State != "stateIdle" {
-		return false
+		return fmt.Errorf("timer %v does not have an Idle state and can not be started", t.ID)
 	}
 	t.StartedAt = time.Now()
 	t.State = "stateActive"
 	t.Ending = func() {
 		t.State = "stateExpired"
-		t.Finish = true
-		logrus.Info("timer finished", t.ID)
+		t.Finished = true
+		logger.Infof("timer %v finished", t.ID)
 		handler.HandleEvent(t.ID)
 	}
 	t.T = time.AfterFunc(t.Duration, t.Ending)
-	logrus.Info("timer started for ", t.Duration)
-	return true
+	logger.Infof("timer %v started for %v", t.ID, t.Duration)
+	return nil
 }
 
-// Pause make a timer pause
-func (t *Timer) Pause() bool {
+// Pause sets the timer to Idle and sets new duration to the time left
+// can not pause if timer is not state Active
+func (t *Timer) Pause() error {
 	if t.State != "stateActive" {
-		return false
+		return fmt.Errorf("timer %v does not have a Active state and can not be paused", t.ID)
 	}
-	if !t.T.Stop() { //TODO test
-		t.State = "stateExpired"
-		return false
-	}
+	t.T.Stop()
+	t.Duration, _ = t.GetTimeLeft()
 	t.State = "stateIdle"
-	dur := time.Now().Sub(t.StartedAt)
-	t.Duration = t.Duration - dur
-	logrus.Info("timer paused with ", t.Duration, " left")
-	return true
+	logger.Infof("timer paused with %v left", t.Duration)
+	return nil
+}
+
+// AddSubTime add or subtract time to a timer
+// can only subtract if that time is equally left
+// can only add or subtract time if the state is not Expired
+func (t *Timer) AddSubTime(handler InstructionSender, time time.Duration, add bool) error {
+	if t.State == "stateIdle" {
+		if add {
+			t.Duration = t.Duration + time
+			logger.Infof("timer %v added %v to duration and now has a duration of %v", t.ID, time, t.Duration)
+		} else {
+			if t.Duration > time {
+				t.Duration = t.Duration - time
+				logger.Infof("timer %v subtracted %v to duration and now has a duration of %v", t.ID, time, t.Duration)
+			} else {
+				return fmt.Errorf("timer %v could not subtract %v since there is only %v left", t.ID, time, t.Duration)
+			}
+		}
+		return nil
+	} else if t.State == "stateActive" {
+		t.Pause()
+		err := t.AddSubTime(handler, time, add)
+		t.Start(handler)
+		return err
+	} else if t.State == "stateExpired" {
+		return fmt.Errorf("timer %v could not be edited since it is already Expired", t.ID)
+	}
+	return fmt.Errorf("timer %v could not be edited because there is something wrong with its state: %v", t.ID, t.State)
 }
 
 // Stop make a timer stop
-func (t *Timer) Stop() bool {
-	if t.State != "stateActive" {
-		return false
+// can not stop timer that has state Expired
+func (t *Timer) Stop() error {
+	if t.State == "stateExpired" {
+		return fmt.Errorf("timer %v is already Expired and can not be stopped again", t.ID)
 	}
-	t.StartedAt = time.Now()
+	if t.State == "stateIdle" {
+		t.Duration = 0 * time.Second
+	} else {
+		t.T.Stop()
+	}
 	t.State = "stateExpired"
+
+	logger.Infof("timer %v stopped and set to Expired without handling it's actions", t.ID)
+	return nil
+}
+
+// Done finishes the timer as if it ran out of time
+// can not finish a timer that is already Expired
+func (t *Timer) Done() error {
+	if t.State == "stateExpired" {
+		return fmt.Errorf("timer %v is already Expired and can not be finished again", t.ID)
+	}
+	t.Ending()
 	t.T.Stop()
-	logrus.Info("timer stopped")
-	return true
+	logger.Infof("timer %v stopped and set to Expired, actions are being handled", t.ID)
+	return nil
 }
 
 // Rule is a struct that describes how action flow is handled in the escape room.
@@ -114,9 +154,10 @@ type Rule struct {
 
 // InstructionSender is an interface needed for preventing cyclic imports
 type InstructionSender interface {
-	SendComponentInstruction(string, []ComponentInstruction)
+	SendComponentInstruction(string, []ComponentInstruction, string)
 	SetTimer(string, ComponentInstruction)
 	HandleEvent(string)
+	SendLabelInstruction(string, []ComponentInstruction, string)
 }
 
 // Finished is a method that checks is the a rule have been finished, meaning if it reached its maximum number of executions
@@ -125,13 +166,12 @@ func (r *Rule) Finished() bool {
 }
 
 // Execute performs all actions of a rule
-// TODO test this
 func (r *Rule) Execute(handler InstructionSender) {
 	for _, action := range r.Actions {
-		action.Execute(handler)
+		go action.Execute(handler)
 	}
 	r.Executed++
-	logrus.Infof("Executed rule %s", r.ID)
+	logger.Infof("Executed rule %s", r.ID)
 	handler.HandleEvent(r.ID)
 }
 
@@ -201,6 +241,11 @@ func compare(param1 interface{}, param2 interface{}, comparision string) bool {
 		return numericToFloat64(param1) >= numericToFloat64(param2)
 	case "contains":
 		return contains(param1, param2)
+	case "not":
+		if reflect.TypeOf(param1).Kind() == reflect.Int || reflect.TypeOf(param2).Kind() == reflect.Int {
+			return numericToFloat64(param1) != numericToFloat64(param2)
+		}
+		return !reflect.DeepEqual(param1, param2)
 	default:
 		// This case is already handled to give error in checkConstraint
 		return false
@@ -247,6 +292,12 @@ type Condition struct {
 	Constraints LogicalConstraint
 }
 
+// Component is a struct that links a component id with a device id
+type Component struct {
+	ID     string
+	Device *Device
+}
+
 // GetConditionIDs returns a slice of all condition type IDs in the LogicalCondition
 func (condition Condition) GetConditionIDs() []string {
 	return []string{condition.TypeID}
@@ -289,7 +340,7 @@ func (constraint Constraint) checkConstraints(condition Condition, config Workin
 							if !CheckValidComparison(comparison) {
 								return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
 							}
-							if comparison != "eq" {
+							if comparison != "eq" && comparison != "not" {
 								return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on a string", ruleID, comparison)}
 							}
 						}
@@ -325,7 +376,7 @@ func (constraint Constraint) checkConstraints(condition Condition, config Workin
 							if !CheckValidComparison(comparison) {
 								return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
 							}
-							if comparison != "contains" && comparison != "eq" {
+							if comparison != "contains" && comparison != "eq" && comparison != "not" {
 								return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on an array", ruleID, comparison)}
 							}
 						}
@@ -382,7 +433,7 @@ func (constraint Constraint) checkConstraints(condition Condition, config Workin
 
 // CheckValidComparison checks if the comparison is a valid one
 func CheckValidComparison(comparison string) bool {
-	comparisonTypesAllowed := []string{"eq", "lt", "gt", "lte", "gte", "contains"}
+	comparisonTypesAllowed := []string{"eq", "lt", "gt", "lte", "gte", "contains", "not"}
 	for _, comp := range comparisonTypesAllowed {
 		if comp == comparison {
 			return true
@@ -408,7 +459,7 @@ func (constraint Constraint) Resolve(condition Condition, config WorkingConfig) 
 	case "timer":
 		{
 			timer := config.Timers[condition.TypeID]
-			return compare(timer.Finish, constraint.Value, constraint.Comparison)
+			return compare(timer.Finished, constraint.Value, constraint.Comparison)
 
 		}
 	default:

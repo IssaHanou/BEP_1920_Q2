@@ -370,6 +370,36 @@
           ]
         }
       ]
+    },
+    { "name":  "Test",
+      "rules" :[
+        {"id": "test",
+        "description":  "slider is not 30",
+        "limit": 2,
+        "conditions": {
+          "type": "device",
+          "type_id": "controlBoard",
+          "constraints": {
+            "comparison": "not",
+            "value": 30,
+            "component_id": "slider1"
+          }
+        },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "controlBoard",
+              "message": [
+                {
+                  "component_id": "redLight1",
+                  "instruction": "state",
+                  "value": "aan"
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 }

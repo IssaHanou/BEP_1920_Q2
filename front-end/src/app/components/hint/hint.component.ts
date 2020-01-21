@@ -13,6 +13,9 @@ export class HintComponent {
 
   constructor(private app: AppComponent) {}
 
+  /**
+   * List of puzzle names to use as dividers in the selection box for predefined hints.
+   */
   getPuzzleList(): Hint[] {
     const list = [];
     for (const hint of this.app.hintList) {
@@ -21,6 +24,10 @@ export class HintComponent {
     return list;
   }
 
+  /**
+   * Hint list used for selection of predefined hints.
+   * This is generated each time from the app hint list, to ensure updated version.
+   */
   getHintList(puzzle: string): string[] {
     const list = [];
     for (const obj of this.app.hintList) {
@@ -33,6 +40,10 @@ export class HintComponent {
     }
   }
 
+  /**
+   * When predefined hint has been chosen and the accompanying "stuur" button is clicked,
+   * the chosen hint is sent as instruction to hint devices.
+   */
   onPredefinedHint() {
     if (
       this.predefinedHint !== undefined &&
@@ -46,6 +57,10 @@ export class HintComponent {
     }
   }
 
+  /**
+   * When custom hint has been typed and the accompanying "stuur" button is clicked,
+   * the typed hint is sent as instruction to hint devices.
+   */
   onCustomHint() {
     if (this.customHint !== undefined && this.customHint !== "") {
       this.app.sendInstruction([

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"sciler/communication"
@@ -15,7 +14,7 @@ type CommunicatorMock struct {
 	mock.Mock
 }
 
-func (communicatorMock *CommunicatorMock) Start(handler mqtt.MessageHandler, onStart func()) {
+func (communicatorMock *CommunicatorMock) Start() {
 	// do nothing
 }
 
@@ -40,7 +39,7 @@ func getTestHandler() *Handler {
 				T:         nil,
 				State:     "stateIdle",
 				Ending:    nil,
-				Finish:    false,
+				Finished:  false,
 			}),
 		},
 		GeneralEvents: nil,
@@ -67,9 +66,11 @@ func getTestHandler() *Handler {
 			}),
 		},
 	}
+	messageHandler := Handler{Config: workingConfig, ConfigFile: "fake file name"}
 	communicator := communication.NewCommunicator(workingConfig.General.Host,
-		workingConfig.General.Port, []string{"back-end", "test"})
-	return &Handler{workingConfig, "fake file name", communicator}
+		workingConfig.General.Port, []string{"back-end", "test"}, messageHandler.NewHandler, func() {})
+	messageHandler.Communicator = communicator
+	return &messageHandler
 }
 
 ////////////////////////////// Helper method tests //////////////////////////////
@@ -79,13 +80,12 @@ func TestHandler_SetTimer_Start(t *testing.T) {
 	assert.Equal(t, "stateIdle", handler.Config.Timers["TestTimer"].State)
 	handler.SetTimer("TestTimer", content)
 	assert.Equal(t, "stateActive", handler.Config.Timers["TestTimer"].State)
-
 }
 
 func TestHandler_SetTimer_Stop(t *testing.T) {
 	handler := getTestHandler()
 	content := config.ComponentInstruction{Instruction: "stop"}
-	handler.Config.Timers["TestTimer"].Start(nil)
+	handler.Config.Timers["TestTimer"].Start(handler)
 	assert.Equal(t, "stateActive", handler.Config.Timers["TestTimer"].State)
 	handler.SetTimer("TestTimer", content)
 	assert.Equal(t, "stateExpired", handler.Config.Timers["TestTimer"].State)
@@ -94,10 +94,55 @@ func TestHandler_SetTimer_Stop(t *testing.T) {
 func TestHandler_SetTimer_Pause(t *testing.T) {
 	handler := getTestHandler()
 	content := config.ComponentInstruction{Instruction: "pause"}
-	handler.Config.Timers["TestTimer"].Start(nil)
+	handler.Config.Timers["TestTimer"].Start(handler)
 	assert.Equal(t, "stateActive", handler.Config.Timers["TestTimer"].State)
 	handler.SetTimer("TestTimer", content)
 	assert.Equal(t, "stateIdle", handler.Config.Timers["TestTimer"].State)
+}
+
+func TestHandler_SetTimer_Add(t *testing.T) {
+	handler := getTestHandler()
+	content := config.ComponentInstruction{Instruction: "add", Value: "5s"}
+	assert.Equal(t, 5, int(handler.Config.Timers["TestTimer"].Duration.Seconds()))
+	handler.SetTimer("TestTimer", content)
+	assert.Equal(t, 10, int(handler.Config.Timers["TestTimer"].Duration.Seconds()))
+
+}
+
+func TestHandler_SetTimer_Add_Parse_error(t *testing.T) {
+	handler := getTestHandler()
+	content := config.ComponentInstruction{Instruction: "add", Value: "5"}
+	assert.Equal(t, 5, int(handler.Config.Timers["TestTimer"].Duration.Seconds()))
+	handler.SetTimer("TestTimer", content)
+	assert.Equal(t, 5, int(handler.Config.Timers["TestTimer"].Duration.Seconds()))
+
+}
+
+func TestHandler_SetTimer_Subtract(t *testing.T) {
+	handler := getTestHandler()
+	content := config.ComponentInstruction{Instruction: "subtract", Value: "3s"}
+	assert.Equal(t, 5, int(handler.Config.Timers["TestTimer"].Duration.Seconds()))
+	handler.SetTimer("TestTimer", content)
+	assert.Equal(t, 2, int(handler.Config.Timers["TestTimer"].Duration.Seconds()))
+
+}
+
+func TestHandler_SetTimer_Subtract_Parse_Error(t *testing.T) {
+	handler := getTestHandler()
+	content := config.ComponentInstruction{Instruction: "subtract", Value: "3"}
+	assert.Equal(t, 5, int(handler.Config.Timers["TestTimer"].Duration.Seconds()))
+	handler.SetTimer("TestTimer", content)
+	assert.Equal(t, 5, int(handler.Config.Timers["TestTimer"].Duration.Seconds()))
+
+}
+
+func TestHandler_SetTimer_Done(t *testing.T) {
+	handler := getTestHandler()
+	content := config.ComponentInstruction{Instruction: "done"}
+	handler.Config.Timers["TestTimer"].Start(handler)
+	assert.Equal(t, "stateActive", handler.Config.Timers["TestTimer"].State)
+	handler.SetTimer("TestTimer", content)
+	assert.Equal(t, "stateExpired", handler.Config.Timers["TestTimer"].State)
 }
 
 func TestGetStatus(t *testing.T) {
@@ -135,8 +180,89 @@ func TestSendInstruction(t *testing.T) {
 		Contents: inst,
 	})
 	communicatorMock.On("Publish", "display", string(msg), 3)
-	handler.SendComponentInstruction("display", inst)
+	handler.SendComponentInstruction("display", inst, "")
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+}
+
+func TestSendLabelInstruction(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_instruction_label.json"),
+		Communicator: communicatorMock,
+	}
+	inst := []config.ComponentInstruction{
+		{"", "hint", "my hint"},
+	}
+	instMsg := []config.ComponentInstruction{
+		{"display1", "hint", "my hint"},
+	}
+	msg, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: instMsg,
+	})
+	communicatorMock.On("Publish", "display2", string(msg), 3)
+	handler.SendLabelInstruction("display-label1", inst, "")
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+}
+
+func TestSendLabelInstruction_2(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_instruction_label.json"),
+		Communicator: communicatorMock,
+	}
+	inst := []config.ComponentInstruction{
+		{"", "hint", "my hint"},
+	}
+	instMsg := []config.ComponentInstruction{
+		{"display2", "hint", "my hint"},
+	}
+	msg, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: instMsg,
+	})
+	communicatorMock.On("Publish", "display1", string(msg), 3)
+	communicatorMock.On("Publish", "display2", string(msg), 3)
+	handler.SendLabelInstruction("display-label2", inst, "")
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
+}
+
+func TestSendInstructionDelay(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_instruction.json"),
+		Communicator: communicatorMock,
+	}
+	inst := []config.ComponentInstruction{
+		{"display", "hint", "my hint"},
+	}
+	inst2 := []config.ComponentInstruction{
+		{"display", "hint", "my hint 2"},
+	}
+	msg, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: inst,
+	})
+	msg2, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: inst2,
+	})
+	communicatorMock.On("Publish", "display", string(msg), 3)
+	communicatorMock.On("Publish", "display", string(msg2), 3)
+	go handler.SendComponentInstruction("display", inst, "")
+	go handler.SendComponentInstruction("display", inst2, "1s")
+	time.Sleep(100 * time.Millisecond)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+	time.Sleep(1 * time.Second)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
 }
 
 ////////////////////////////// Connection tests //////////////////////////////
@@ -329,6 +455,7 @@ func TestHandleSingleEvent(t *testing.T) {
 	communicatorMock.On("Publish", "front-end", string(messageStatus), 3)
 	communicatorMock.On("Publish", "controlBoard", string(messageInstruction), 3)
 	handler.msgMapper(msg)
+	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
 	// if this test becomes flaky (only when this test takes longer then 1 second),
 	// (message expected includes time...), replace the messages with 'mock.Anything'
@@ -377,6 +504,7 @@ func TestHandleDoubleEvent(t *testing.T) {
 	communicatorMock.On("Publish", "front-end", mock.Anything, 3)
 	communicatorMock.On("Publish", "controlBoard", string(messageInstruction), 3)
 	handler.msgMapper(msg)
+	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
 	// if this test becomes flaky (only when this test takes longer then 1 second),
 	// (message expected includes time...), replace the messages with 'mock.Anything'

@@ -3,7 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/sirupsen/logrus"
+	logger "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -29,7 +29,7 @@ func (handler *Handler) SendSetup() {
 	}
 	jsonMessage, _ := json.Marshal(&message)
 	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
-	logrus.Info("published setup data to front-end")
+	logger.Info("published setup data to front-end")
 	handler.sendStatus("general")
 	for _, value := range handler.Config.Devices {
 		handler.sendStatus(value.ID)
@@ -38,8 +38,8 @@ func (handler *Handler) SendSetup() {
 	handler.sendEventStatus()
 }
 
-// SendComponentInstruction sends a list of instructions to a client
-func (handler *Handler) SendComponentInstruction(clientID string, instructions []config.ComponentInstruction) {
+// SendComponentInstruction sends a list of instructions to a client, with a delay if given a valid duration.
+func (handler *Handler) SendComponentInstruction(clientID string, instructions []config.ComponentInstruction, delay string) {
 	message := Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
@@ -47,8 +47,26 @@ func (handler *Handler) SendComponentInstruction(clientID string, instructions [
 		Contents: instructions,
 	}
 	jsonMessage, _ := json.Marshal(&message)
-	logrus.Infof("sending instruction data to %s: %s", clientID, fmt.Sprint(message.Contents))
-	handler.Communicator.Publish(clientID, string(jsonMessage), 3)
+	delayDur, err := time.ParseDuration(delay)
+	if err == nil {
+		logger.Infof("waiting %s to send instruction data to %s: %s", delay, clientID, fmt.Sprint(message.Contents))
+		time.Sleep(delayDur)
+		logger.Infof("sending instruction data to %s after waiting %s: %s", clientID, delay, fmt.Sprint(message.Contents))
+		handler.Communicator.Publish(clientID, string(jsonMessage), 3)
+	} else {
+		logger.Infof("sending instruction data to %s: %s", clientID, fmt.Sprint(message.Contents))
+		handler.Communicator.Publish(clientID, string(jsonMessage), 3)
+	}
+}
+
+// SendLabelInstruction provides the action with a componentID from de LabelMap and a device to send it to
+func (handler *Handler) SendLabelInstruction(labelID string, instructions []config.ComponentInstruction, delay string) {
+	for _, instruction := range instructions {
+		for _, comp := range handler.Config.LabelMap[labelID] {
+			instruction.ComponentID = comp.ID
+			handler.SendComponentInstruction(comp.Device.ID, []config.ComponentInstruction{instruction}, delay)
+		}
+	}
 }
 
 // SendInstruction sends a list of instructions to a client
@@ -60,7 +78,7 @@ func (handler *Handler) SendInstruction(clientID string, instructions []map[stri
 		Contents: instructions,
 	}
 	jsonMessage, _ := json.Marshal(&message)
-	logrus.Infof("sending instruction data to %s: %s", clientID, fmt.Sprint(message.Contents))
+	logger.Infof("sending instruction data to %s: %s", clientID, fmt.Sprint(message.Contents))
 	handler.Communicator.Publish(clientID, string(jsonMessage), 3)
 }
 
@@ -68,17 +86,17 @@ func (handler *Handler) SendInstruction(clientID string, instructions []map[stri
 func (handler *Handler) updateStatus(raw Message) {
 	contents := raw.Contents.(map[string]interface{})
 	if device, ok := handler.Config.Devices[raw.DeviceID]; ok {
-		logrus.Info("status message received from: " + raw.DeviceID + ", status: " + fmt.Sprint(raw.Contents))
+		logger.Info("status message received from: " + raw.DeviceID + ", status: " + fmt.Sprint(raw.Contents))
 		for k, v := range contents {
 			err := handler.checkStatusType(*device, v, k)
 			if err != nil {
-				logrus.Error(err)
+				logger.Error(err)
 			} else {
 				handler.Config.Devices[raw.DeviceID].Status[k] = v
 			}
 		}
 	} else {
-		logrus.Error("status message received from device ", raw.DeviceID, ", which is not in the config")
+		logger.Error("status message received from device ", raw.DeviceID, ", which is not in the config")
 	}
 }
 
@@ -110,11 +128,11 @@ func (handler *Handler) sendStatus(deviceID string) {
 			},
 		}
 	} else {
-		logrus.Errorf("error occurred while sending status of %s, since it is not recognised as a device or timer", deviceID)
+		logger.Errorf("error occurred while sending status of %s, since it is not recognised as a device or timer", deviceID)
 		return
 	}
 	jsonMessage, _ := json.Marshal(&message)
-	logrus.Info("sending status data to front-end: " + fmt.Sprint(message.Contents))
+	logger.Info("sending status data to front-end: " + fmt.Sprint(message.Contents))
 	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 }
 
@@ -139,7 +157,7 @@ func (handler *Handler) sendEventStatus() {
 		Contents: status,
 	}
 	jsonMessage, _ := json.Marshal(&message)
-	logrus.Info("sending event status to front-end")
+	logger.Info("sending event status to front-end")
 	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 }
 
@@ -197,23 +215,42 @@ func (handler *Handler) GetStatus(deviceID string) {
 		},
 	}
 	jsonMessage, _ := json.Marshal(&message)
-	logrus.Info("sending status request to client computer: ", deviceID, fmt.Sprint(message.Contents))
+	logger.Info("sending status request to client computer: ", deviceID, fmt.Sprint(message.Contents))
 	handler.Communicator.Publish(deviceID, string(jsonMessage), 3)
 }
 
 // SetTimer starts given timer
 func (handler *Handler) SetTimer(timerID string, instructions config.ComponentInstruction) {
+	err := error(nil)
 	switch instructions.Instruction {
 	case "start":
-		handler.Config.Timers[timerID].Start(handler)
+		err = handler.Config.Timers[timerID].Start(handler)
 	case "pause":
-		handler.Config.Timers[timerID].Pause()
-	case "add": // TODO: implement timer Add
-	case "subtract": // TODO: implement timer subtract
+		err = handler.Config.Timers[timerID].Pause()
+	case "add":
+		time, durErr := time.ParseDuration(fmt.Sprintf("%v", instructions.Value))
+		if durErr == nil {
+			err = handler.Config.Timers[timerID].AddSubTime(handler, time, true)
+		} else {
+			err = fmt.Errorf("could not parse %v to duration to add for timer %v", instructions.Value, timerID)
+		}
+	case "subtract":
+		time, durErr := time.ParseDuration(fmt.Sprintf("%v", instructions.Value))
+		if durErr == nil {
+			err = handler.Config.Timers[timerID].AddSubTime(handler, time, false)
+		} else {
+			err = fmt.Errorf("could not parse %v to duration to subtract for timer %v", instructions.Value, timerID)
+		}
 	case "stop":
-		handler.Config.Timers[timerID].Stop()
+		err = handler.Config.Timers[timerID].Stop()
+	case "done":
+		err = handler.Config.Timers[timerID].Done()
 	default:
-		logrus.Warnf("error occurred while reading timer instruction message: %v", instructions.Instruction)
+		err = fmt.Errorf("error occurred while reading timer instruction message: %v", instructions.Instruction)
+	}
+
+	if err != nil {
+		logger.Error(err)
 	}
 	handler.sendStatus(timerID)
 }
@@ -224,7 +261,7 @@ func (handler *Handler) SetTimer(timerID string, instructions config.ComponentIn
 func (handler *Handler) processConfig(configToRead interface{}, action string, fileName string) {
 	jsonBytes, err := json.Marshal(configToRead)
 	if err != nil { //TODO test
-		logrus.Error(err)
+		logger.Error(err)
 	}
 	newConfig, errorList := config.ReadJSON(jsonBytes)
 	message := Message{
@@ -234,21 +271,27 @@ func (handler *Handler) processConfig(configToRead interface{}, action string, f
 		Contents: map[string][]string{},
 	}
 	if action == "check" {
+		if newConfig.General.Host != handler.Config.General.Host {
+			errorList = append(errorList, "host: different host from front and back-end")
+		}
+		if newConfig.General.Port != handler.Config.General.Port {
+			errorList = append(errorList, "port: different port from front and back-end")
+		}
 		message.Contents = map[string][]string{"errors": errorList}
 	}
 	if action == "use" && len(errorList) == 0 {
 		dir, dirErr := os.Getwd()
 		if dirErr != nil { //TODO test
-			logrus.Error(dirErr)
+			logger.Error(dirErr)
 		}
-		fullFileName := filepath.Join(dir, "back-end", "resources", fileName)
+		fullFileName := filepath.Join(dir, "back-end", "resources", "production", fileName)
 		err = ioutil.WriteFile(fullFileName, jsonBytes, 0644)
 		if err != nil {
-			logrus.Error(err)
+			logger.Error(err)
 		}
 		handler.Config = newConfig
 		handler.ConfigFile = fullFileName
-		handler.sendStatus("general")
+		handler.SendSetup()
 		message.Type = "new config"
 		message.Contents = map[string]string{"name": fileName}
 

@@ -1,0 +1,122 @@
+{
+  "general": {
+    "name": "Escape X",
+    "duration": "30m",
+    "host": "localhost",
+    "port": 1883
+  },
+  "timers": [],
+  "devices": [
+    {
+      "id": "display1",
+      "description": "Laat hint zien",
+      "input": {
+        "display": "string"
+      },
+      "output": {
+        "display2": {
+          "type": "string",
+          "instructions": {
+            "hint": "string"
+          },
+          "label": [
+            "display-label2",
+            "display-label2"
+          ]
+        }
+      }
+    },
+    {
+      "id": "display2",
+      "description": "Laat hint zien",
+      "input": {
+        "display": "string"
+      },
+      "output": {
+        "display1": {
+          "type": "string",
+          "instructions": {
+            "hint": "string"
+          },
+          "label": [
+            "display-label1"
+          ]
+        },
+        "display2": {
+          "type": "string",
+          "instructions": {
+            "hint": "string"
+          },
+          "label": [
+            "display-label2"
+          ]
+        }
+      }
+    }
+  ],
+  "puzzles": [
+    {
+      "name": "Puzzle1",
+      "rules": [
+        {
+          "id": "rule",
+          "description": "My rule",
+          "limit": 1,
+          "conditions": {
+            "type": "device",
+            "type_id": "display2",
+            "constraints": {
+              "component_id": "display",
+              "value": "test",
+              "comparison": "eq"
+            }
+          },
+          "actions": [
+            {
+              "type": "label",
+              "type_id": "display-label1",
+              "message": [
+                {
+                  "instruction": "hint",
+                  "value": "test"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Puzzle2",
+      "rules": [
+        {
+          "id": "rule2",
+          "description": "My rule 2",
+          "limit": 1,
+          "conditions": {
+            "type": "device",
+            "type_id": "display1",
+            "constraints": {
+              "component_id": "display",
+              "value": "test",
+              "comparison": "eq"
+            }
+          },
+          "actions": [
+            {
+              "type": "label",
+              "type_id": "display-label2",
+              "message": [
+                {
+                  "instruction": "hint",
+                  "value": "test"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "general_events": []
+}
