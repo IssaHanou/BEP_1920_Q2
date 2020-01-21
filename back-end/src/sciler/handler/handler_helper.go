@@ -178,6 +178,7 @@ func (handler *Handler) HandleEvent(id string) {
 }
 
 // sendEventStatus sends the status of events to the front-end
+// The status contents is a list of eventIDs with a boolean finish status
 func (handler *Handler) sendEventStatus() {
 	status := handler.getEventStatus()
 	message := Message{
@@ -213,7 +214,7 @@ func (handler *Handler) getHints() map[string][]string {
 	return hints
 }
 
-// getEventDescriptions returns map of hints with puzzle name as key and list of hints for that puzzle as value
+// getEventDescriptions returns map of descriptions with rule name as key and a descriptions as value
 func (handler *Handler) getEventDescriptions() map[string]string {
 	events := make(map[string]string)
 	for _, rule := range handler.Config.RuleMap {
@@ -235,6 +236,7 @@ func (handler *Handler) getCameras() []map[string]string {
 }
 
 // GetStatus asks devices to send status
+// An "instruction": "status update" is published to the topic deviceID
 func (handler *Handler) GetStatus(deviceID string) {
 	message := Message{
 		DeviceID: "back-end",
@@ -249,7 +251,9 @@ func (handler *Handler) GetStatus(deviceID string) {
 	handler.Communicator.Publish(deviceID, string(jsonMessage), 3)
 }
 
-// SetTimer starts given timer
+// SetTimer processes timer actions
+// param timerID is the ID of the timer that needs to change state
+// param instructions has a instructions.Instruction and instructions.Value to do the instruction
 func (handler *Handler) SetTimer(timerID string, instructions config.ComponentInstruction) {
 	err := error(nil)
 	switch instructions.Instruction {
@@ -365,6 +369,9 @@ func compareType(valueType reflect.Kind, inputType string) error {
 }
 
 // checkStatusType checks if the type of the status change is correct for the component
+// param device the config device where component is located
+// param status the incoming status needed to be type-checked
+// param component the component that should get that status
 func (handler *Handler) checkStatusType(device config.Device, status interface{}, component string) error {
 	valueType := reflect.TypeOf(status).Kind()
 	if inputType, ok := device.Input[component]; ok {
@@ -381,9 +388,10 @@ func (handler *Handler) checkStatusType(device config.Device, status interface{}
 	return nil
 }
 
+// dirty trick to go from interface{} to []map[string]interface{}
 func getMapSlice(input interface{}) ([]map[string]interface{}, error) {
 	bytes, _ := json.Marshal(input)
-	var output []map[string]interface{} // dirty trick to go from interface{} to []map[string]interface{}
+	var output []map[string]interface{}
 	err := json.Unmarshal(bytes, &output)
 	if err != nil {
 		return nil, err

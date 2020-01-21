@@ -145,6 +145,15 @@ func TestHandler_SetTimer_Done(t *testing.T) {
 	assert.Equal(t, "stateExpired", handler.Config.Timers["TestTimer"].State)
 }
 
+func TestHandler_SetTimer_Instruction_Error(t *testing.T) {
+	handler := getTestHandler()
+	handler2 := getTestHandler()
+	content := config.ComponentInstruction{Instruction: "non-existing"}
+	handler.SetTimer("TestTimer", content)
+	assert.Equal(t, handler2.Config.Timers["TestTimer"].Duration, handler.Config.Timers["TestTimer"].Duration)
+
+}
+
 func TestGetStatus(t *testing.T) {
 	msg, _ := json.Marshal(Message{
 		DeviceID: "back-end",
