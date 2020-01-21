@@ -262,8 +262,6 @@ func (handler *Handler) getButtons() []map[string]interface{} {
 		button := make(map[string]interface{})
 		button["id"] = btn.ID
 		button["disabled"] = !btn.Conditions.Resolve(handler.Config) || rule.Finished()
-		logger.Infof("front-end: %v", handler.Config.Devices["front-end"].Status)
-		logger.Infof("btn: %s conditions: %v and finished: %v", btn.ID, !btn.Conditions.Resolve(handler.Config), rule.Finished())
 		buttons = append(buttons, button)
 	}
 	return buttons

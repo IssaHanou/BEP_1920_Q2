@@ -925,17 +925,6 @@
               "instruction": "pause"
             }
           ]
-        },
-        {
-          "type": "device",
-          "type_id": "front-end",
-          "message": [
-            {
-              "instruction": "change status",
-              "component_id": "verder gaan",
-              "value": false
-            }
-          ]
         }
       ]
     },
@@ -991,6 +980,17 @@
           "message": [
             {
               "instruction": "start"
+            }
+          ]
+        },
+        {
+          "type": "device",
+          "type_id": "front-end",
+          "message": [
+            {
+              "instruction": "change status",
+              "component_id": "verder gaan",
+              "value": false
             }
           ]
         },
