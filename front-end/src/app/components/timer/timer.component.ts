@@ -1,7 +1,10 @@
 import { Component, OnInit } from "@angular/core";
 import { AppComponent } from "../../app.component";
-import { formatMS, formatTime } from "./timer";
+import { formatTime } from "./timer";
 
+/**
+ * The timer component is shown on the front-page in the "Tijd" box.
+ */
 @Component({
   selector: "app-timer",
   templateUrl: "./timer.component.html",
@@ -16,6 +19,10 @@ export class TimerComponent implements OnInit {
     return this.app.displayTime;
   }
 
+  /**
+   * The done time is displayed when the game has started.
+   * It shows when the game will finish, depending on the current time and the duration of the game.
+   */
   getDoneTime() {
     const device = this.app.deviceList.getDevice("front-end");
     if (device !== null) {

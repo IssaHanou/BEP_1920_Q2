@@ -1,10 +1,17 @@
+/**
+ * Class that can be extended to implement full screen abilities.
+ * The setFullScreen method will be called by a button and determines whether to close or open accordingly.
+ * This class uses the HTML5 full screen API.
+ * Currently extended by app and camera components.
+ */
 export class FullScreen {
   fullScreen = false;
 
   constructor() {}
 
   /**
-   * Uses HTML5 API to open the full screen.
+   * Open the full element as full screen.
+   * @element the element to put into full screen.
    */
   openFullScreen(element) {
     const docElmWithBrowsersFullScreenFunctions = element as HTMLElement & {
@@ -29,7 +36,7 @@ export class FullScreen {
   }
 
   /**
-   * Uses HTML5 API to close the full screen.
+   * Close the full screen, the whole document should no longer be full screen.
    */
   closeFullScreen() {
     const docWithBrowsersExitFunctions = document as Document & {
@@ -55,6 +62,7 @@ export class FullScreen {
 
   /**
    * Determine whether to open of close full screen.
+   * The default open is the full document element, but this can be overridden to open a certain element in full screen.
    */
   setFullScreen() {
     this.checkFullScreenEsc();
@@ -67,8 +75,9 @@ export class FullScreen {
   }
 
   /**
-   * When the full screen is opened with the button, but closed with Esc,
-   * the full screen boolean is not reset, so do it manually.
+   * The full screen can be opened with a button (which sets the global fullScreen attribute of this class).
+   * It can be closed again with the button, but also with the Esc key, which does not affect the attribute.
+   * So, if the full screen boolean was not reset, do it manually.
    */
   checkFullScreenEsc() {
     const docWithBrowsersExitFunctions = document as Document & {

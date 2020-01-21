@@ -1,3 +1,6 @@
+/**
+ * Puzzle object, which has an id, status (boolean whether it has been solved) and description.
+ */
 export class Puzzle {
   id: string;
   status: boolean;
