@@ -1,5 +1,5 @@
 # BEP_1920_Q2
-[![BCH compliance](https://bettercodehub.com/edge/badge/IssaHanou/BEP_1920_Q2?branch=172-sig)](https://bettercodehub.com/)
+[![BCH compliance](https://bettercodehub.com/edge/badge/IssaHanou/BEP_1920_Q2?branch=develop-sprint-7)](https://bettercodehub.com/)
 
 The front-end will be developed in Angular with TypeScript, all source code can be found in `front-end/`.
 

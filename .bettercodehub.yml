@@ -7,3 +7,5 @@ languages:
   - script
 exclude:
   - /cc_library/example-scripts-js-scc/.*
+  - /cc_library/py-scc/src/sciler/scripts/.*
+  - /front-end/karma.conf.js
