@@ -48,12 +48,23 @@ class Device(ABC):
         self.scclib = SccLib(config, self)
 
     def status_changed(self):
+        """
+        Passes the request to send status too the back-end to the message sender
+        """
         self.scclib.status_changed()
 
     def start(self, loop=None, stop=None):
+        """
+        Passes the request to start the message sender
+        """
         self.scclib.start(loop, stop)
 
     def log(self, msg, level=logging.INFO):
+        """
+        Use the logger to log messages
+        :param msg: massage to log
+        :param level: level of message
+        """
         self.scclib.log(level, msg)
 
     @abstractmethod
