@@ -24,9 +24,9 @@ class Device {
    * @constructor
    * @param config dictionary following the format described in the readme
    * @param logger function(date, level, message) where
-   *     date is an Date object
-   *     level one of the following strings: 'debug', 'info', 'warn', 'error', 'fatal'
-   *     message custom string containing more information
+   *     date is a Date object
+   *     level is one of the following strings: 'debug', 'info', 'warn', 'error', 'fatal'
+   *     message is a custom string containing more information
    */
   constructor(config, logger) {
     this.scclib = new SccLib(config, this, logger);
