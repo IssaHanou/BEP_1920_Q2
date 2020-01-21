@@ -19,6 +19,15 @@ class Message {
  * @Abstract
  */
 class Device {
+  /** Constructor for Device
+   *
+   * @constructor
+   * @param config dictionary following the format described in the readme
+   * @param logger function(date, level, message) where
+   *     date is an Date object
+   *     level one of the following strings: 'debug', 'info', 'warn', 'error', 'fatal'
+   *     message custom string containing more information
+   */
   constructor(config, logger) {
     this.scclib = new SccLib(config, this, logger);
 
@@ -81,7 +90,7 @@ class Device {
 class SccLib {
   constructor(config, device, logger) {
     // type check config
-    const configProperties = ["id", "description", "host", "port", "labels"];
+    const configProperties = ["id", "description", "host", "port", "labels", "input", "output"];
     for (const configProperty of configProperties) {
       if (!config.hasOwnProperty(configProperty)) {
         throw new TypeError(
