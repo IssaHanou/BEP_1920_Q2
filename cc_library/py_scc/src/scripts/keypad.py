@@ -1,5 +1,5 @@
 import os
-from cc_library.src.sciler.scclib.device import Device
+from scclib.device import Device
 
 
 try:

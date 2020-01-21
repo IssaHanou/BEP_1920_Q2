@@ -1,7 +1,7 @@
 import os
 import time
 
-from cc_library.src.sciler.scclib.device import Device
+from scclib.device import Device
 
 try:
     import RPi.GPIO as GPIO

@@ -1,7 +1,7 @@
 import os
 import time
 
-from cc_library.src.sciler.scclib.device import Device
+from scclib.device import Device
 from Adafruit_ADS1x15 import ADS1115 as ADC
 
 try:

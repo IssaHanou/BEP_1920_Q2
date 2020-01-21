@@ -5,10 +5,10 @@ matrix:
     - language: python
       python: 3.7
       install:
-        - pip install -r cc_library/py-scc/requirements.txt
+        - pip install -r cc_library/py_scc/requirements.txt
         - pip install fake_rpi
       script:
-        - flake8 cc_library/py-scc
+        - flake8 cc_library/py_scc
         - python -m unittest discover
 
       # https://medium.com/faun/configuring-travis-ci-for-angular-application-34afee1715f

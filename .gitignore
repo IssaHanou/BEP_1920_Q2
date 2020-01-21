@@ -9,7 +9,7 @@ back-end/src/*
 back-end/resources/production/*.json
 !back-end/src/sciler
 */debug.log
-/cc_library/py-scc/src/scripts/logs/
+/cc_library/py_scc/src/scripts/logs/
 /cc_library/venv
 /cc_library/src
 front-end/src/app/assets/config.json
