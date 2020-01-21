@@ -24,7 +24,7 @@
             - `output`: defines type of values to be expected as output as a map. There can be one key `value`, or the keys can be component ids. 
                 The value is a map with the `type` property. This is defined as a string and can "string", "boolean", "array", "integer" or a custom name.
                 It can also carry the `instruction` property which defines a map with custom instruction for the device. 
-            - `label`: *To be added later*
+            - `labels`: these are the labels to which this device should also subscribe, labels is an array of strings, 
         - logger is a function(date, level, message) in which an own logger is implemented where
              - date is an Date object
              - level one of the following strings: 'debug', 'info', 'warn', 'error', 'fatal'
