@@ -70,7 +70,9 @@ $(document).ready(function() {
   // get config file from server
   $.get("/display_config.json", function(config) {
       display = new Display(JSON.parse(config));
-      display.start();
+      display.start(() => {
+          console.log("connected");
+      });
   });
 });
 
@@ -90,11 +92,21 @@ class Message {
 }
 
 /**
- * Abstract device class from which all custom devices should inherit.
- * Defines all required methods needer for communication to S.C.I.L.E.R.
+ * Abstract device class from which all custom devices should inherit
+ * Defines all required methods needed for communication to SCILER
+ * In order to add an device to SCILER, extend this class
  * @Abstract
  */
 class Device {
+  /** Constructor for Device
+   *
+   * @constructor
+   * @param config dictionary following the format described in the readme
+   * @param logger function(date, level, message) where
+   *     date is an Date object
+   *     level one of the following strings: 'debug', 'info', 'warn', 'error', 'fatal'
+   *     message custom string containing more information
+   */
   constructor(config, logger) {
     this.scclib = new SccLib(config, this, logger);
 
@@ -106,27 +118,28 @@ class Device {
     }
 
     // make sure abstract method getStatus is implemented when extending from Device
-    if (typeof this.getStatus != "function") {
+    if (typeof this.getStatus !== "function") {
       throw new TypeError("abstract method 'getStatus' not implemented");
     }
     // make sure abstract method performInstruction is implemented when extending from Device
-    if (typeof this.performInstruction != "function") {
+    if (typeof this.performInstruction !== "function") {
       throw new TypeError(
         "abstract method 'performInstruction' not implemented"
       );
     }
     // make sure abstract method test is implemented when extending from Device
-    if (typeof this.test != "function") {
+    if (typeof this.test !== "function") {
       throw new TypeError("abstract method 'test' not implemented");
     }
     // make sure abstract method reset is implemented when extending from Device
-    if (typeof this.reset != "function") {
+    if (typeof this.reset !== "function") {
       throw new TypeError("abstract method 'reset' not implemented");
     }
   }
 
   /**
    * statusChanged should be called whenever the status of a device changes
+   * It retrieves the status and communicates that status back to sciler
    */
   statusChanged() {
     this.scclib.statusChanged();
@@ -143,9 +156,10 @@ class Device {
 
   /**
    * start starts the device
+   * @param onStart function that gets called on successful connect or reconnect
    */
-  start() {
-    this.scclib.connect();
+  start(onStart) {
+    this.scclib.connect(onStart);
   }
 }
 
@@ -155,8 +169,8 @@ class Device {
 class SccLib {
   constructor(config, device, logger) {
     // type check config
-    const configProperties = ["id", "description", "host", "port", "labels"];
-    for (let configProperty of configProperties) {
+    const configProperties = ["id", "description", "host", "port", "labels", "input", "output"];
+    for (const configProperty of configProperties) {
       if (!config.hasOwnProperty(configProperty)) {
         throw new TypeError(
           config + " should have a property: " + configProperty
@@ -208,7 +222,7 @@ class SccLib {
      */
     this._onConnect = function() {
       // subscripe to all labels and standard topics
-      for(let i = 0; i < this.labels.length; i++) {
+      for (let i = 0; i < this.labels.length; i++) {
         this.client.subscribe(this.labels[i]);
       }
       this.client.subscribe("client-computers");
@@ -231,14 +245,14 @@ class SccLib {
      * it will log an error and try to reconnect on a regular interval till it succeeds
      * @private
      */
-    this._onConnectFailure = function() {
-      let retryCooldown = 10 * 1000; // 10 seconds before retrying to connect
+    this._onConnectFailure = function(onStart) {
+      const retryCooldown = 10 * 1000; // 10 seconds before retrying to connect
       this.log(
         "error",
-        "connecting failed, retry in " + retryCooldown + " seconds"
+        "connecting failed, retry in " + retryCooldown + " milliseconds"
       );
       setTimeout(() => {
-        this.connect();
+        this.connect(onStart);
       }, retryCooldown);
     };
 
@@ -273,7 +287,7 @@ class SccLib {
         "received non-instruction message of type: " + message.type
       );
     } else {
-      let success = this._checkMessage(message.contents);
+      const success = this._checkMessage(message.contents);
       const confirmation = new Message(this.name, "confirmation", {
         completed: success,
         instructed: message
@@ -341,7 +355,24 @@ class SccLib {
    * @private
    */
   _sendMessage(topic, message) {
-    let msg = new Paho.Message(JSON.stringify(message));
+    const retryCooldown = 50; // milliseconds
+    if (!this.client.isConnected()) {
+      this.log(
+        "error",
+        "can't send " +
+          message.type +
+          " message: " +
+          JSON.stringify(message.contents) +
+          ", device not connected, retry in " +
+          retryCooldown +
+          "ms"
+      );
+      setTimeout(() => {
+        this._sendMessage(topic, message);
+      }, 50);
+      return;
+    }
+    const msg = new Paho.Message(JSON.stringify(message));
     msg.destinationName = topic;
     this.client.send(msg);
   }
@@ -352,8 +383,8 @@ class SccLib {
    * sets up handlers for connection and connection failure
    * sets up automatic reconnect
    */
-  connect() {
-    let will = new Paho.Message(
+  connect(onStart) {
+    const will = new Paho.Message(
       JSON.stringify(
         new Message(this.name, "connection", {
           connection: false
@@ -364,9 +395,10 @@ class SccLib {
     this.client.connect({
       onSuccess: () => {
         this._onConnect();
+        onStart();
       },
       onFailure: () => {
-        this._onConnectFailure();
+        this._onConnectFailure(onStart);
       },
       willMessage: will,
       reconnect: true,
@@ -374,6 +406,10 @@ class SccLib {
     });
   }
 
+  /**
+   * statusChanged should be called whenever the status of a device changes
+   * It retrieves the status and communicates that status back to sciler
+   */
   statusChanged() {
     this._sendMessage(
       "back-end",
@@ -382,6 +418,12 @@ class SccLib {
   }
 }
 
+/**
+ * formatDate is a helper function for setting date in the right format dd-mm-yyyy hh:mm:ss
+ * @private
+ * @param date { Date } the date to format
+ * @returns {string} the formatted date
+ */
 const formatDate = function(date) {
   return (
     date.getDate() +
