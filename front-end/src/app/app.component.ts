@@ -329,6 +329,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
         this.manageButtons.setButton(btn);
       }
     }
+    this.resetFrontEndStatus();
 
     const rules = jsonData.events;
     this.puzzleList = new Puzzles();

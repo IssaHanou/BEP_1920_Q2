@@ -93,10 +93,10 @@ func (handler *Handler) SendInstruction(clientID string, instructions []map[stri
 func (handler *Handler) updateStatus(raw Message) {
 	contents := raw.Contents.(map[string]interface{})
 	if device, ok := handler.Config.Devices[raw.DeviceID]; ok {
+		logger.Info("status message received from: " + raw.DeviceID + ", status: " + fmt.Sprint(raw.Contents))
 		if device.ID == "front-end" {
 			handler.handleFrontEndStatus(contents)
 		}
-		logger.Info("status message received from: " + raw.DeviceID + ", status: " + fmt.Sprint(raw.Contents))
 		for k, v := range contents {
 			err := handler.checkStatusType(*device, v, k)
 			if err != nil {
@@ -172,13 +172,13 @@ func (handler *Handler) sendEventStatus() {
 }
 
 // Handles status updates from front-end specifically as these will only be affected by button events,
-// which are handled differently.
-// The rule that belongs to the pressed button (with updated status) is executed
+// which are handled differently. If the button is pressed (new status = true) and its status was false,
+// the rule that belongs to the pressed button is executed
 func (handler *Handler) handleFrontEndStatus(contents map[string]interface{}) {
 	device, _ := handler.Config.Devices["front-end"]
 	for component, status := range device.Status {
 		rule, _ := handler.Config.RuleMap[component]
-		if status != contents[component].(bool) {
+		if contents[component].(bool) && !status.(bool) {
 			rule.Execute(handler)
 		}
 	}
@@ -262,6 +262,8 @@ func (handler *Handler) getButtons() []map[string]interface{} {
 		button := make(map[string]interface{})
 		button["id"] = btn.ID
 		button["disabled"] = !btn.Conditions.Resolve(handler.Config) || rule.Finished()
+		logger.Infof("front-end: %v", handler.Config.Devices["front-end"].Status)
+		logger.Infof("btn: %s conditions: %v and finished: %v", btn.ID, !btn.Conditions.Resolve(handler.Config), rule.Finished())
 		buttons = append(buttons, button)
 	}
 	return buttons

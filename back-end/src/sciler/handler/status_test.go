@@ -153,7 +153,8 @@ func TestOnStatusMsgFrontEnd(t *testing.T) {
 		},
 	})
 	communicatorMock.On("Publish", "front-end", string(timerGeneralMessage), 3)
-	handler.updateStatus(msg)
+	go handler.updateStatus(msg)
+	time.Sleep(100 * time.Millisecond)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
 }
 
