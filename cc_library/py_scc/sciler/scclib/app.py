@@ -13,6 +13,8 @@ class SccLib:
     def __init__(self, config, device):
         """
         Initialize device with its configuration json file and python script.
+        :param config: configuration json file
+        :param device: self of device
         """
         self.device = device
         self.config = json.load(config)
@@ -49,19 +51,27 @@ class SccLib:
 
     def __on_log(self, level, buf):
         """
-        MQTT Client method.
+         MQTT Client method.
         Broker logger that logs everything happening with the mqtt client.
+        :param level: level of message
+        :param buf: message to be logged
         """
-
         msg = self.name, ", broker log: ", level, ", ", buf
         logging.info(msg)
 
     def log(self, level, msg):
+        """
+        log method to make a log with the logging packege
+        :param level: level of message
+        :param msg: message to be logged
+        """
         logging.log(level=level, msg=msg)
 
     def start(self, loop=None, stop=None):
         """
         Starting method to call from the starting script.
+        :param loop: possible event loop
+        :param stop: possible end function
         """
         self.__connect()
         try:
@@ -82,6 +92,8 @@ class SccLib:
     def __stop(self):
         """
         Stop method to call from the starting script.
+        A connection status false is send to the back-end
+        mqtt client is disconnected and logging is turned off
         """
         msg_dict = {
             "device_id": self.name,
@@ -96,6 +108,11 @@ class SccLib:
         logging.shutdown()
 
     def __send_message(self, topic, json_message):
+        """
+        send_message publishes messages to mqtt topics
+        :param topic: topic to publish to
+        :param json_message: message to publish in json formatting
+        """
         # TODO what to do when publish fails
         self.client.publish(topic, json_message, 1)
         message_type = topic + " message published"
@@ -104,10 +121,6 @@ class SccLib:
     def __connect(self):
         """
         Connect method to set up the connection to the broker.
-        When connected:
-        sends message to topic connection to say its connected,
-        subscribes to topic "test"
-        starts loop_forever
         """
         try:
             self.client.connect(self.host, self.port, keepalive=10)
@@ -122,9 +135,10 @@ class SccLib:
         MQTT Client method.
         When trying to connect to the broker,
         on_connect will return the result of this action.
-        userdata:   the private user data as set in Client() or userdata_set()
-        flags:      response flags sent by the broker
-        rc:         the connection result
+        :param client: mqtt client
+        :param userdata: the private user data as set in Client() or userdata_set()
+        :param flags: response flags sent by the broker
+        :param rc:  the connection result
         """
         if rc == 0:
             client.connected_flag = True  # set flag
@@ -150,6 +164,9 @@ class SccLib:
         """
         MQTT Client method.
         When disconnecting from the broker, on_disconnect prints the reason.
+        param client: mqtt client
+        :param userdata: the private user data as set in Client() or userdata_set()
+        :param rc: the connection result
         """
         msg_dict = {
             "device_id": self.name,
@@ -177,6 +194,7 @@ class SccLib:
         Method to send status messages to the topic status.
         msg should be a dictionary/json with components
          as keys and its status as value
+         @:param msg: message with all component status
         """
         json_msg = {
             "device_id": self.name,
@@ -193,6 +211,9 @@ class SccLib:
         This method is called when the client receives
          a message from the broken for a subscribed topic.
         The message is printed and send through to the handler.
+        :param client: mqtt client
+        :param userdata: the private user data as set in Client() or userdata_set()
+        :param message: message from the back-end
         """
         logging.info(
             (
@@ -207,8 +228,9 @@ class SccLib:
     def __handle(self, message):
         """
         Interpreter of incoming messages.
-        Correct sciler mapper is called with the content of the message.
+        Correct  mapper is called with the content of the message.
         Send confirmation message
+        :param message: message from the back-end
         """
         message = message.payload.decode("utf-8")
         message = json.loads(message)
@@ -228,6 +250,10 @@ class SccLib:
             self.__send_message("back-end", msg)
 
     def __check_message(self, contents):
+        """
+        check_Message executes all instructions in a message
+        :param contents: contents list of instruction from the original instruction message
+        """
         for action in contents:
             instruction = action.get("instruction")
             if instruction == "test":
@@ -267,6 +293,7 @@ class SccLib:
         """
         Method to call to subscribe to a topic which the
         sciler system wants to receive from the broker.
+        @:param topic: topic to subscribe too
         """
         self.client.subscribe(topic=topic)
         logging.info(("subscribed to topic", topic))
