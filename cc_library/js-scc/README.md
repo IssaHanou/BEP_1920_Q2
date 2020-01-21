@@ -5,12 +5,12 @@
 
 ### Using this library
 - import lib with ```const Device = require("js-scc");```
-- create class that extends `Device`, in order to do this:
+- create a class that extends `Device`, in order to do this:
     - implement getStatus() which should return a dictionary of the current status
-    - implement performInstruction(action) which should return a boolean of whether the instruction could be performed, action has:
-        - instruction: string with the name of the instruction
-        - value: any with a value specific for this instruction
-        - component_id: string with the name of the component for which the instruction is meant (can be undefined) 
+    - implement performInstruction(action) which should return a boolean of whether the instruction can be performed, where action has:
+        - `instruction`: string with the name of the instruction
+        - `value`: any type with a value specific for this instruction
+        - `component_id`: string with the name of the component for which the instruction is meant (can be undefined) 
     - implement test() which returns nothing, this method should do something visible so the operator can test this device works correctly
     - implement reset() which returns nothing, this method should make the device return to its starting state so that the escape room can be started again
     - create a constructor which calls the constructor of `Device` with `super(config, logger)` where:
@@ -26,10 +26,10 @@
                 It can also carry the `instruction` property which defines a map with custom instruction for the device. 
             - `labels`: these are the labels to which this device should also subscribe, labels is an array of strings, 
         - logger is a function(date, level, message) in which an own logger is implemented where
-             - date is an Date object
-             - level one of the following strings: 'debug', 'info', 'warn', 'error', 'fatal'
-             - message custom string containing more information
-- Now on your class which implements `Device`, you can call:
+             - `date` is an Date object
+             - `level` is one of the following strings: 'debug', 'info', 'warn', 'error', 'fatal'
+             - `message` is a custom string containing more information
+- Now in your class which implements `Device`, you can call:
     - start(onStart) which connects the device where onStart is a function that will be called once the device is connected
     - log(level, message) which logs using the logger provided in `Device` where level one of the following strings: 'debug', 'info', 'warn', 'error', 'fatal' and message custom string containing more information
     - statusChanged() which can be called to signal to `Device` that the status is changed, this will send a new status to SCILER
