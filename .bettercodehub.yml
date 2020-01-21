@@ -1,0 +1,9 @@
+component_depth: 1
+languages:
+  - python
+  - go
+  - typescript
+  - javascript
+  - script
+exclude:
+  - /cc_library/example-scripts-js-scc/.*
