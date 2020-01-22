@@ -186,6 +186,8 @@ func (handler *Handler) handleInstruction(instruction map[string]interface{}, in
 		handler.processConfig(instruction["config"], "check", "")
 	case "use config":
 		handler.processConfig(instruction["config"], "use", instruction["file"].(string))
+	default:
+		logger.Warnf("%s is an unknown instruction", instruction["instruction"])
 	}
 }
 
@@ -235,8 +237,9 @@ func (handler *Handler) onFinishRule(ruleID string) {
 	rule, ok := handler.Config.RuleMap[ruleID]
 	if !ok {
 		logger.Errorf("could not find rule with id %s in map", ruleID)
+	} else {
+		rule.Execute(handler)
 	}
-	rule.Execute(handler)
 	handler.sendEventStatus()
 }
 

@@ -607,6 +607,31 @@ func TestInstructionFromWrongDevice(t *testing.T) {
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 0)
 }
 
+func TestInstructionUnknownInstruction(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	workingConfig := config.ReadFile("../../../resources/testing/test_config.json")
+	handler := Handler{
+		Config:       workingConfig,
+		ConfigFile:   "../../../resources/testing/test_config.json",
+		Communicator: communicatorMock,
+	}
+	instructionMsg := Message{
+		DeviceID: "front-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{
+				"instruction": "unknown instruction",
+				"value":       "some value",
+			},
+		},
+	}
+	jsonHintMessage, _ := json.Marshal(&instructionMsg)
+	communicatorMock.On("Publish", "hint", string(jsonHintMessage), 3)
+	handler.msgMapper(instructionMsg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 0)
+}
+
 func TestSendStatusUnknownDevice(t *testing.T) {
 	communicatorMock := new(CommunicatorMock)
 	workingConfig := config.ReadFile("../../../resources/testing/test_config.json")
