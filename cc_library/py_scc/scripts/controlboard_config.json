@@ -3,58 +3,5 @@
   "description": "Control board with three switches, three slides with lights and one main switch.",
   "host": "192.168.178.82",
   "port": 1883,
-  "labels": [],
-  "input": {
-    "redSwitch": "boolean",
-    "orangeSwitch": "boolean",
-    "greenSwitch": "boolean",
-    "slider1": "numeric",
-    "slider2": "numeric",
-    "slider3": "numeric",
-    "mainSwitch": "numeric"
-  },
-  "output": {
-    "greenLight1": {
-      "type": "string",
-      "instructions": {
-        "blink": "array",
-        "turnOnOff": "boolean"
-      }
-    },
-    "greenLight2": {
-      "type": "string",
-      "instructions": {
-        "blink": "array",
-        "turnOnOff": "boolean"
-      }
-    },
-    "greenLight3": {
-      "type": "string",
-      "instructions": {
-        "blink": "array",
-        "turnOnOff": "boolean"
-      }
-    },
-    "redLight1": {
-      "type": "string",
-      "instructions": {
-        "blink": "array",
-        "turnOnOff": "boolean"
-      }
-    },
-    "redLight2": {
-      "type": "string",
-      "instructions": {
-        "blink": "array",
-        "turnOnOff": "boolean"
-      }
-    },
-    "redLight3": {
-      "type": "string",
-      "instructions": {
-        "blink": "array",
-        "turnOnOff": "boolean"
-      }
-    }
-  }
+  "labels": []
 }

@@ -26,7 +26,7 @@ class HueLights(Device):
         config = open(file=abs_file_path)
         super().__init__(config)
         self.scene = "none"
-        self.hue_bridge = "http://192.168.178.128/"
+        self.hue_bridge = "http://192.168.178.20/"
         self.hue_user = "JQrPwJNthHtfPEG9vhW3mqwIVuFo3ESLD3gvkZOB"
         self.group = "Spotlights"
         self.header = {"Content-type": "application/json"}

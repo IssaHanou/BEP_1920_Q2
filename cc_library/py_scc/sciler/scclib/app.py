@@ -18,11 +18,13 @@ class SccLib:
         """
         self.device = device
         self.config = json.load(config)
-        self.name = self.config.get("id")
-        self.info = self.config.get("description")
-        self.host = self.config.get("host")
-        self.port = self.config.get("port")
-        self.labels = self.config.get("labels")
+        self.name = self.config.get("id", "not-existent")
+        self.host = self.config.get("host", "not-existent")
+        self.port = self.config.get("port", "not-existent")
+        self.labels = self.config.get("labels", "not-existent")
+        if [self.host, self.name, self.port, self.labels].count(
+                "not-existent") != 0:
+            raise Exception("your config file is missing attributes, make sure it contains all keys from the manual")
 
         if not os.path.exists("logs"):
             os.mkdir("logs")

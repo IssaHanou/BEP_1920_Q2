@@ -3,15 +3,5 @@
   "description": "Display can print hints",
   "host": "192.168.178.82",
   "labels": ["hint"],
-  "port": 1883,
-  "input": {},
-  "output": {
-    "display": {
-      "type": "string",
-      "instructions": {
-        "hint": "string",
-        "text": "string"
-      }
-    }
-  }
+  "port": 1883
 }

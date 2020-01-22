@@ -90,7 +90,7 @@ class Device {
 class SccLib {
   constructor(config, device, logger) {
     // type check config
-    const configProperties = ["id", "description", "host", "port", "labels", "input", "output"];
+    const configProperties = ["id", "host", "port", "labels"];
     for (const configProperty of configProperties) {
       if (!config.hasOwnProperty(configProperty)) {
         throw new TypeError(
@@ -113,7 +113,6 @@ class SccLib {
 
     this.device = device;
     this.name = config.id;
-    this.info = config.description;
     this.host = config.host;
     this.port = config.port;
     this.labels = config.labels;

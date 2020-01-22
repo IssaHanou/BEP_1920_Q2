@@ -44,6 +44,7 @@ class Device(ABC):
     def __init__(self, config):
         """
         The init of the subclass should call this method and also initialize all class attributes.
+        :param config: the config directory
         """
         self.scclib = SccLib(config, self)
 
@@ -56,6 +57,8 @@ class Device(ABC):
     def start(self, loop=None, stop=None):
         """
         Passes the request to start the message sender
+        :param loop: possible event loop
+        :param stop: possible end function
         """
         self.scclib.start(loop, stop)
 
