@@ -315,60 +315,50 @@ func checkActionDevice(action Action, config WorkingConfig) []string {
 	if device, ok := config.Devices[action.TypeID]; ok { // checks if device can be found in the map, if so, it is stored in variable device
 		for _, actionMessage := range action.Message {
 			if outputObject, ok := device.Output[actionMessage.ComponentID]; ok {
-				valueType := reflect.TypeOf(actionMessage.Value).Kind()
 				if instructionType, ok := outputObject.Instructions[actionMessage.Instruction]; ok {
-					switch instructionType {
-					case "string":
-						{
-							if valueType != reflect.String {
-								errorList = append(errorList,
-									fmt.Sprintf("instruction type string expected but %s found as type of value %v",
-										valueType.String(), actionMessage.Value))
-							}
-						}
-					case "boolean":
-						{
-							if valueType != reflect.Bool {
-								errorList = append(errorList,
-									fmt.Sprintf("instruction type boolean expected but %s found as type of value %v",
-										valueType.String(), actionMessage.Value))
-							}
-						}
-					case "numeric":
-						{
-							if valueType != reflect.Int && valueType != reflect.Float64 {
-								errorList = append(errorList,
-									fmt.Sprintf("instruction type numeric expected but %s found as type of value %v",
-										valueType.String(), actionMessage.Value))
-							}
-						}
-					case "array":
-						{
-							if valueType != reflect.Slice {
-								errorList = append(errorList,
-									fmt.Sprintf("instruction type array/slice expected but %s found as type of value %v",
-										valueType.String(), actionMessage.Value))
-							}
-						}
-					default:
-						// todo custom types
-						errorList = append(errorList,
-							fmt.Sprintf("custom types like: %s, are not yet implemented", instructionType))
+					if err := checkActionInstructionType(reflect.TypeOf(actionMessage.Value).Kind(), instructionType, actionMessage.Value); err != nil {
+						errorList = append(errorList, err.Error())
 					}
 				} else {
-					errorList = append(errorList,
-						fmt.Sprintf("instruction %s not found in map", actionMessage.Instruction))
+					errorList = append(errorList, fmt.Sprintf("instruction %s not found in map", actionMessage.Instruction))
 				}
 			} else {
-				errorList = append(errorList,
-					fmt.Sprintf("component with id %s not found in map", actionMessage.ComponentID))
+				errorList = append(errorList, fmt.Sprintf("component with id %s not found in map", actionMessage.ComponentID))
 			}
 		}
 	} else {
-		errorList = append(errorList,
-			fmt.Sprintf("device with id %s not found in map", action.TypeID))
+		errorList = append(errorList, fmt.Sprintf("device with id %s not found in map", action.TypeID))
 	}
 	return errorList
+}
+
+// checkActionInstructionType checks if the type op the value of an instruction is the same as the type the instruction requires according to the config
+func checkActionInstructionType(valueType reflect.Kind, instructionType string, value interface{}) error {
+	switch instructionType {
+	case "string":
+		if valueType != reflect.String {
+			return fmt.Errorf("instruction type string expected but %s found as type of value %v",
+				valueType.String(), value)
+		}
+	case "boolean":
+		if valueType != reflect.Bool {
+			return fmt.Errorf("instruction type boolean expected but %s found as type of value %v",
+				valueType.String(), value)
+		}
+	case "numeric":
+		if valueType != reflect.Int && valueType != reflect.Float64 {
+			return fmt.Errorf("instruction type numeric expected but %s found as type of value %v",
+				valueType.String(), value)
+		}
+	case "array":
+		if valueType != reflect.Slice {
+			return fmt.Errorf("instruction type array/slice expected but %s found as type of value %v",
+				valueType.String(), value)
+		}
+	default:
+		return fmt.Errorf("custom types like: %s, are not yet implemented", instructionType)
+	}
+	return nil
 }
 
 // checkActionLabel checks if there is a label with this ID,
