@@ -1,5 +1,4 @@
 export class Button {
-
   id: string;
   disabled: boolean;
 

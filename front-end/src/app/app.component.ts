@@ -291,7 +291,10 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
           break;
         }
         default: {
-          this.logger.log("warning", "received unknown instruction: " + action.instruction);
+          this.logger.log(
+            "warning",
+            "received unknown instruction: " + action.instruction
+          );
           break;
         }
       }
