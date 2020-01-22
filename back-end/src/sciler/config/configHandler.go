@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	logger "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"reflect"
 	"time"
@@ -20,7 +21,10 @@ func ReadFile(filename string) WorkingConfig {
 	config, jsonErrors := ReadJSON(dat)
 	errorList = append(errorList, jsonErrors...)
 	if len(errorList) > 0 {
-		panic(errorList[0])
+		for _, errInList := range errorList {
+			logger.Error(errInList)
+		}
+		panic("errors found in config")
 	}
 	return config
 }
