@@ -48,15 +48,15 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 	// Copy information from read config to working config.
 	config.General = readConfig.General
 	config.Cameras = readConfig.Cameras
+	config.Devices = generateDevices(readConfig.Devices, &config)
 	newPuzzles, puzzleErrors := generatePuzzles(readConfig.Puzzles, &config)
 	config.Puzzles = newPuzzles
 	newEvents, eventErrors := generateGeneralEvents(readConfig.GeneralEvents, &config)
 	config.GeneralEvents = newEvents
 	newButtonEvents, buttonEventErrors := generateButtonEvents(readConfig.ButtonEvents, &config)
 	config.ButtonEvents = newButtonEvents
-
-	generateDevices(readConfig.Devices, &config)
-	timerErrors := generateTimers(readConfig.Timers, &config)
+	newTimers, timerErrors := generateTimers(readConfig.Timers, &config)
+	config.Timers = newTimers
 	errorList = append(errorList, append(buttonEventErrors, append(puzzleErrors, append(eventErrors, timerErrors...)...)...)...)
 
 	if len(errorList) == 0 {
@@ -74,10 +74,10 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 // generateDevices creates the config devices map which points device id to a device in the WorkingConfig.
 // Creates front end device manually as its information is not in `devices` in the configuration file.
 // The components are defined as the custom buttons, with boolean status of clicked or not.
-func generateDevices(devices []ReadDevice, config *WorkingConfig) {
-	config.Devices = make(map[string]*Device)
+func generateDevices(devices []ReadDevice, config *WorkingConfig) map[string]*Device {
+	newDevices := make(map[string]*Device)
 	for _, readDevice := range devices {
-		config.Devices[readDevice.ID] = &(Device{
+		newDevices[readDevice.ID] = &(Device{
 			readDevice.ID,
 			readDevice.Description,
 			readDevice.Input,
@@ -94,7 +94,7 @@ func generateDevices(devices []ReadDevice, config *WorkingConfig) {
 		status[btn.ID] = false
 	}
 	status["gameState"] = "gereed"
-	config.Devices["front-end"] = &(Device{
+	newDevices["front-end"] = &(Device{
 		ID:          "front-end",
 		Description: "The operator webapp for managing a escape room",
 		Input:       input,
@@ -109,29 +109,30 @@ func generateDevices(devices []ReadDevice, config *WorkingConfig) {
 		Status:     status,
 		Connection: false,
 	})
+	return newDevices
 }
 
 // generateTimers creates map with id pointing to timer object for all timer objects and general timer.
 // check that all durations are of proper format.
-// return error list
-func generateTimers(timers []ReadTimer, config *WorkingConfig) []string {
+// return the created map and error list
+func generateTimers(timers []ReadTimer, config *WorkingConfig) (map[string]*Timer, []string) {
 	errorList := make([]string, 0)
-	config.Timers = make(map[string]*Timer)
+	newTimers := make(map[string]*Timer)
 	for _, readTimer := range timers {
 		duration, err := time.ParseDuration(readTimer.Duration)
 		if err != nil {
 			errorList = append(errorList, err.Error())
 		} else {
-			config.Timers[readTimer.ID] = newTimer(readTimer.ID, duration)
+			newTimers[readTimer.ID] = newTimer(readTimer.ID, duration)
 		}
 	}
 	duration, err := time.ParseDuration(config.General.Duration)
 	if err != nil {
 		errorList = append(errorList, err.Error())
 	} else {
-		config.Timers["general"] = newTimer("general", duration)
+		newTimers["general"] = newTimer("general", duration)
 	}
-	return errorList
+	return newTimers, errorList
 }
 
 // getAllRules creates rule list of the rule pointers belonging to all events, except button events,

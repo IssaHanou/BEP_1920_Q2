@@ -96,7 +96,7 @@ are specific defined depending on the sender and receiver.
             - `instruction`
             - `instructed_by`
     - If type is `instruction`, then the then the message contents have
-             - `instruction` with value `reset` or `status update` or `test`
+             - `instruction` with value `reset` or `status update` or `test` or `setState`
     - If type is `status`, then the message contents has
         - `id` of device
         - `status` has a map of `component_id` keys and `status` values
@@ -105,6 +105,9 @@ are specific defined depending on the sender and receiver.
         - `id` of rule
         - `description` of rule
         - `status` of rule describes whether rule is finished or not
+    - If type is `front-end status`, then the message contents has a list of objects with:
+        - `id` of button
+        - `disabled` status of button
     - If type is `time`, then the then the message contents have
         - `id` of timer
         - `duration` has a number of the duration left in milliseconds
