@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { AppComponent } from "../../app.component";
-import {Device} from "../device/device";
-import {Button} from "./button";
+import { Device } from "../device/device";
+import { Button } from "./button";
 
 /**
  * The manage component controls the button section in the "Acties" box on the home page.
@@ -12,7 +12,6 @@ import {Button} from "./button";
   styleUrls: ["./manage.component.css", "../../../assets/css/main.css"]
 })
 export class ManageComponent implements OnInit {
-
   constructor(private app: AppComponent) {}
 
   ngOnInit() {}
