@@ -136,7 +136,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * Send an instruction to the broker, over `back-end` topic.
+   * Send an instruction to the broker, over topic `back-end`.
    * @param instructions to be sent.
    */
   public sendInstruction(instructions: any[]) {
@@ -158,7 +158,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * Send a status to the broker, over `back-end` topic.
+   * Send a status to the broker, over topic `back-end`.
    * @param start start status to be sent.
    * @param stop stop status to be sent.
    */
@@ -176,7 +176,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * Send a connection update to the broker, over `back-end` topic.
+   * Send a connection update to the broker, over topic `back-end`.
    * @param connected connection status to be sent.
    */
   public sendConnection(connected: boolean) {
