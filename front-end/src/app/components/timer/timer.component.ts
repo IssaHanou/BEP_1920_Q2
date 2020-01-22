@@ -26,7 +26,7 @@ export class TimerComponent implements OnInit {
   getDoneTime() {
     const general = this.app.timerList.getTimer("general");
     if (general !== null) {
-      if (general.getState() == "stateActive") {
+      if (general.getState() === "stateActive") {
         const date = new Date();
         const timeDiff =
           date.getTime() + this.app.timerList.getTimer("general").duration;
