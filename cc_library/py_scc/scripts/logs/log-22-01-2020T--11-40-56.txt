@@ -1,6 +1,0 @@
-2020-01-22 11:40:56,940 [INFO ]  Start of log for device: keypad
-2020-01-22 11:40:56,966 [INFO ]  connected to broker
-2020-01-22 11:40:56,968 [INFO ]  ('back-end message published', '{"device_id": "keypad", "time_sent": "22-01-2020 11:40:56", "type": "connection", "contents": {"connection": false}}')
-2020-01-22 11:40:56,968 [INFO ]  cleanly exited ControlBoard program and client
-2020-01-22 11:40:56,968 [INFO ]  ('back-end message published', '{"device_id": "keypad", "time_sent": "22-01-2020 11:40:56", "type": "connection", "contents": {"connection": false}}')
-2020-01-22 11:40:56,968 [INFO ]  disconnecting, reason  0

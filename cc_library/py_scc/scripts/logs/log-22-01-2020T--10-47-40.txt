@@ -1,2 +1,0 @@
-2020-01-22 10:47:40,819 [INFO ]  Start of log for device: hue_lights
-2020-01-22 10:47:40,841 [INFO ]  connected to broker

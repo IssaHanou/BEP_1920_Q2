@@ -1,8 +1,0 @@
-2020-01-22 10:26:36,378 [INFO ]  Start of log for device: hue_lights
-2020-01-22 10:26:36,409 [INFO ]  connected to broker
-2020-01-22 10:26:36,410 [INFO ]  ('subscribed to topic', 'lamp')
-2020-01-22 10:26:36,410 [INFO ]  ('subscribed to topic', 'client-computers')
-2020-01-22 10:26:36,411 [INFO ]  ('subscribed to topic', 'hue_lights')
-2020-01-22 10:26:36,411 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "22-01-2020 10:26:36", "type": "connection", "contents": {"connection": true}}')
-2020-01-22 10:26:36,411 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "22-01-2020 10:26:36", "type": "status", "contents": {"all": "none"}}')
-2020-01-22 10:26:36,412 [INFO ]  connected OK

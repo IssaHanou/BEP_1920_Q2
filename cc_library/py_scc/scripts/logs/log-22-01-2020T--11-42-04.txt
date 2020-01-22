@@ -1,1 +1,0 @@
-2020-01-22 11:42:04,716 [INFO ]  Start of log for device: controlBoard

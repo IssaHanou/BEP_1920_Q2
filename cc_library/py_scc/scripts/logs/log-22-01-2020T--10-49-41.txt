@@ -1,3 +1,0 @@
-2020-01-22 10:49:41,791 [INFO ]  Start of log for device: hue_lights
-2020-01-22 10:49:41,794 [INFO ]  your config is missing attributes, because of this the device might not work
-2020-01-22 10:49:41,814 [INFO ]  connected to broker

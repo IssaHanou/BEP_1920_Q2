@@ -1,4 +1,0 @@
-2020-01-22 11:05:26,805 [INFO ]  Start of log for device: hue_lights
-2020-01-22 11:05:26,817 [INFO ]  connected to broker
-2020-01-22 13:03:52,123 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "22-01-2020 13:03:51", "type": "connection", "contents": {"connection": false}}')
-2020-01-22 13:03:52,128 [WARNI]  disconnecting, reason 1
