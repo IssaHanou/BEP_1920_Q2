@@ -96,51 +96,6 @@
       },
       "actions": [
         {
-          "type": "device",
-          "type_id": "controlBoard",
-          "message": [
-            {
-              "component_id": "redLight1",
-              "instruction": "turnOnOff",
-              "value": true
-            },
-            {
-              "component_id": "redLight2",
-              "instruction": "turnOnOff",
-              "value": true
-            },
-            {
-              "component_id": "redLight3",
-              "instruction": "turnOnOff",
-              "value": true
-            },
-            {
-              "component_id": "greenLight1",
-              "instruction": "turnOnOff",
-              "value": false
-            },
-            {
-              "component_id": "greenLight2",
-              "instruction": "turnOnOff",
-              "value": false
-            },
-            {
-              "component_id": "greenLight3",
-              "instruction": "turnOnOff",
-              "value": false
-            }
-          ]
-        },
-        {
-          "type": "timer",
-          "type_id": "timer2",
-          "message": [
-            {
-              "instruction": "start"
-            }
-          ]
-        },
-        {
           "type": "timer",
           "type_id": "general",
           "message": [
@@ -176,42 +131,6 @@
           "message": [
             {
               "instruction": "pause"
-            }
-          ]
-        },
-        {
-          "type": "device",
-          "type_id": "controlBoard",
-          "message": [
-            {
-              "component_id": "redLight1",
-              "instruction": "turnOnOff",
-              "value": false
-            },
-            {
-              "component_id": "redLight2",
-              "instruction": "turnOnOff",
-              "value": false
-            },
-            {
-              "component_id": "redLight3",
-              "instruction": "turnOnOff",
-              "value": false
-            },
-            {
-              "component_id": "greenLight1",
-              "instruction": "turnOnOff",
-              "value": false
-            },
-            {
-              "component_id": "greenLight2",
-              "instruction": "turnOnOff",
-              "value": false
-            },
-            {
-              "component_id": "greenLight3",
-              "instruction": "turnOnOff",
-              "value": false
             }
           ]
         }
