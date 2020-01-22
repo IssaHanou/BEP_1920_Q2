@@ -577,6 +577,13 @@ func Test_compare(t *testing.T) {
 	}
 }
 
+func Test_CheckConstraintOutputString(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckConstraintOutputString.json"
+	assert.NotPanics(t,
+		func() { ReadFile(filename) },
+		"When input is specified as a string, the value of a condition should be a string in order to be able to do a comparison")
+}
+
 func Test_CheckConstraintInputString(t *testing.T) {
 	filename := "../../../resources/testing/wrong-types/testCheckConstraintInputString.json"
 	assert.Panics(t,

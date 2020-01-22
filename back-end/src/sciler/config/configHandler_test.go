@@ -199,3 +199,10 @@ func Test_CheckActionArray(t *testing.T) {
 		func() { ReadFile(filename) },
 		"instruction type does not match given value in an action")
 }
+
+func Test_GenerateEmptyConditions(t *testing.T) {
+	filename := "../../../resources/testing/testEmptyConditions.json"
+	assert.NotPanics(t,
+		func() { ReadFile(filename) },
+		"empty conditions should not panic")
+}

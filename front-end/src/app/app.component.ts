@@ -207,7 +207,6 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
       }
       case "front-end status": {
         this.manageButtons.setButtons(msg.contents);
-        // this.deviceList.setDevice(msg.contents.gameState);
         break;
       }
       case "time": {
@@ -249,6 +248,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
 
   /**
    * Process instruction messages. Two types exist: reset and status update.
+   * The setState will update the gameState of the front-end
    */
   private processInstruction(jsonData) {
     for (const action of jsonData) {
@@ -287,12 +287,10 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
     const device = this.deviceList.getDevice("front-end");
     if (device != null) {
       const status = device.status;
-      console.log(status);
       const statusMsg = {};
-      for (const component of this.manageButtons.all.values()) {
-        statusMsg[component.id] = status.get(component.id);
+      for (const key of status.keys()) {
+        statusMsg[key] = status.get(key);
       }
-      statusMsg["gameState"] = status.get("gameState");
       this.sendStatus(statusMsg);
     }
   }
@@ -311,12 +309,6 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
       connection: true,
       status: statusMsg
     });
-    this.sendStatusFrontEnd();
-    // this.deviceList.setDevice({
-    //     id: "front-end",
-    //     connection: true,
-    //     status: {  }
-    // });
   }
 
   /**
@@ -399,10 +391,10 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
    * @param action: button to display
    */
   public openSnackbar(message: string, action: string) {
-    const config = new MatSnackBarConfig();
-    config.duration = 3000;
-    config.panelClass = ["custom-snack-bar"];
-    this.snackBar.open(message, action, config);
+    const snackbar = new MatSnackBarConfig();
+    snackbar.duration = 3000;
+    snackbar.panelClass = ["custom-snack-bar"];
+    this.snackBar.open(message, action, snackbar);
   }
 
   /**

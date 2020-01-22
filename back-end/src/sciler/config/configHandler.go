@@ -442,6 +442,7 @@ func generateRules(readRules []ReadRule, config *WorkingConfig) ([]*Rule, []stri
 }
 
 // generateLogicalConditions creates the LogicalCondition tree of all conditions, which are type checked
+// It creates an empty AndConditions if the conditions map in the config is empty.
 func generateLogicalCondition(conditions interface{}) (LogicalCondition, []string) {
 	logic := conditions.(map[string]interface{})
 	errorList := make([]string, 0)

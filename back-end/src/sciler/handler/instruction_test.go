@@ -96,8 +96,9 @@ func TestInstructionSetUp(t *testing.T) {
 			"id":         "front-end",
 			"connection": false,
 			"status": map[string]interface{}{
-				"start": false,
-				"stop":  false},
+				"start":     false,
+				"stop":      false,
+				"gameState": "opgestart"},
 		},
 	})
 	frontEndStatusMessage, _ := json.Marshal(Message{
@@ -170,7 +171,9 @@ func TestOnInstructionMsgSendStatus(t *testing.T) {
 		Contents: map[string]interface{}{
 			"id":         "front-end",
 			"connection": false,
-			"status":     map[string]interface{}{},
+			"status": map[string]interface{}{
+				"gameState": "opgestart",
+			},
 		},
 	})
 	timerMessage, _ := json.Marshal(Message{
@@ -638,6 +641,26 @@ func TestSendLabelInstruction_2(t *testing.T) {
 	communicatorMock.On("Publish", "display2", string(msg), 3)
 	handler.SendLabelInstruction("display-label2", inst, "")
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
+}
+
+func TestSendFrontEndInstruction(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_instruction_frontend.json"),
+		Communicator: communicatorMock,
+	}
+	instMsg := []config.ComponentInstruction{
+		{"gameState", "setState", "newState"},
+	}
+	msg, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: instMsg,
+	})
+	communicatorMock.On("Publish", "front-end", string(msg), 3)
+	handler.SendComponentInstruction("front-end", instMsg, "")
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
 }
 
 func TestSendInstructionDelay(t *testing.T) {
