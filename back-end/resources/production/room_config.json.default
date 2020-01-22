@@ -21,6 +21,44 @@
   ],
   "devices": [
     {
+      "description": "4 spotlights",
+      "id": "hue_lights",
+      "input": {},
+      "output": {
+        "all": {
+          "instructions": {
+            "manual": "array",
+            "scene": "string"
+          },
+          "type": "string"
+        },
+        "spot1": {
+          "instructions": {
+            "manual": "array"
+          },
+          "type": "string"
+        },
+        "spot2": {
+          "instructions": {
+            "manual": "array"
+          },
+          "type": "string"
+        },
+        "spot3": {
+          "instructions": {
+            "manual": "array"
+          },
+          "type": "string"
+        },
+        "spot4": {
+          "instructions": {
+            "manual": "array"
+          },
+          "type": "string"
+        }
+      }
+    },
+    {
       "id": "controlBoard",
       "description": "Control board with three switches, three slides with lights and one main switch.",
       "input": {
@@ -743,20 +781,7 @@
       "id": "start",
       "description": "Als het spel start, moeten alle rode leds aan gaan en de groene uit",
       "limit": 1,
-      "conditions": {
-        "operator": "AND",
-        "list": [
-          {
-            "type": "device",
-            "type_id": "front-end",
-            "constraints": {
-              "component_id": "stop",
-              "comparison": "eq",
-              "value": false
-            }
-          }
-        ]
-      },
+      "conditions": {},
       "actions": [
         {
           "type": "device",
@@ -811,6 +836,17 @@
               "instruction": "start"
             }
           ]
+        },
+        {
+          "type": "device",
+          "type_id": "front-end",
+          "message": [
+            {
+              "instruction": "setState",
+              "component_id": "gameState",
+              "value": "in spel"
+            }
+          ]
         }
       ]
     },
@@ -825,9 +861,9 @@
             "type": "device",
             "type_id": "front-end",
             "constraints": {
-              "component_id": "start",
+              "component_id": "gameState",
               "comparison": "eq",
-              "value": true
+              "value": "in spel"
             }
           }
         ]
@@ -877,6 +913,17 @@
               "value": false
             }
           ]
+        },
+        {
+          "type": "device",
+          "type_id": "front-end",
+          "message": [
+            {
+              "instruction": "setState",
+              "component_id": "gameState",
+              "value": "gestopt"
+            }
+          ]
         }
       ]
     },
@@ -891,27 +938,9 @@
             "type": "device",
             "type_id": "front-end",
             "constraints": {
-              "component_id": "start",
+              "component_id": "gameState",
               "comparison": "eq",
-              "value": true
-            }
-          },
-          {
-            "type": "device",
-            "type_id": "front-end",
-            "constraints": {
-              "component_id": "stop",
-              "comparison": "eq",
-              "value": false
-            }
-          },
-          {
-            "type": "device",
-            "type_id": "front-end",
-            "constraints": {
-              "component_id": "pauze",
-              "comparison": "eq",
-              "value": false
+              "value": "in spel"
             }
           }
         ]
@@ -925,11 +954,22 @@
               "instruction": "pause"
             }
           ]
+        },
+        {
+          "type": "device",
+          "type_id": "front-end",
+          "message": [
+            {
+              "instruction": "setState",
+              "component_id": "gameState",
+              "value": "gepauzeerd"
+            }
+          ]
         }
       ]
     },
     {
-      "id": "verder gaan",
+      "id": "verdergaan",
       "description": "Als pauze is gedrukt, kun je weer verder gaan",
       "limit": 0,
       "conditions": {
@@ -939,36 +979,9 @@
             "type": "device",
             "type_id": "front-end",
             "constraints": {
-              "component_id": "start",
+              "component_id": "gameState",
               "comparison": "eq",
-              "value": true
-            }
-          },
-          {
-            "type": "device",
-            "type_id": "front-end",
-            "constraints": {
-              "component_id": "stop",
-              "comparison": "eq",
-              "value": false
-            }
-          },
-          {
-            "type": "device",
-            "type_id": "front-end",
-            "constraints": {
-              "component_id": "verder gaan",
-              "comparison": "eq",
-              "value": false
-            }
-          },
-          {
-            "type": "device",
-            "type_id": "front-end",
-            "constraints": {
-              "component_id": "pauze",
-              "comparison": "eq",
-              "value": true
+              "value": "gepauzeerd"
             }
           }
         ]
@@ -988,22 +1001,54 @@
           "type_id": "front-end",
           "message": [
             {
-              "instruction": "change status",
-              "component_id": "verder gaan",
-              "value": false
+              "instruction": "setState",
+              "component_id": "gameState",
+              "value": "in spel"
             }
           ]
-        },
+        }
+      ]
+    },
+    {
+      "id": "pre-game",
+      "description": "Voor het spel start, zet spooky lighting",
+      "limit": 1,
+      "conditions": {
+        "operator": "AND",
+        "list": [
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "gameState",
+              "comparison": "eq",
+              "value": "opgestart"
+            }
+          }
+        ]
+      },
+      "actions": [
         {
           "type": "device",
           "type_id": "front-end",
           "message": [
             {
-              "instruction": "change status",
-              "component_id": "pauze",
-              "value": false
+              "instruction": "setState",
+              "component_id": "gameState",
+              "value": "pre-game"
             }
           ]
+        },
+        {
+          "message": [
+            {
+              "component_id": "all",
+              "instruction": "scene",
+              "value": "MBvYmUk1U-EUaGz"
+            }
+          ],
+          "type": "device",
+          "type_id": "hue_lights"
         }
       ]
     }

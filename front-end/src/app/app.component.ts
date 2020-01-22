@@ -12,8 +12,8 @@ import { Camera } from "./camera/camera";
 import { Hint } from "./components/hint/hint";
 import { formatMS, formatTime } from "./components/timer/timer";
 import { FullScreen } from "./fullscreen";
-import {Button} from "./components/manage/button";
-import {Buttons} from "./components/manage/buttons";
+import { Buttons } from "./components/manage/buttons";
+import * as config from "../assets/config.json";
 
 @Component({
   selector: "app-root",
@@ -57,7 +57,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
     }
 
     this.mqttService.onConnect.subscribe(() => {
-      this.logger.log("info", "Connected to broker");
+      this.logger.log("info", "connected to broker on " + config.host);
       this.sendInstruction([{ instruction: "send setup" }]);
       this.sendConnection(true);
       this.initializeTimers();
@@ -207,6 +207,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
       }
       case "front-end status": {
         this.manageButtons.setButtons(msg.contents);
+        // this.deviceList.setDevice(msg.contents.gameState);
         break;
       }
       case "time": {
@@ -264,7 +265,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
           this.openSnackbar("performing instruction test", "");
           break;
         }
-        case "change status": {
+        case "setState": {
           this.deviceList.updateDevice(action.component_id, action.value);
           this.sendStatusFrontEnd();
           break;
@@ -278,16 +279,20 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * Get all the front-end's components' status (all buttons) and send message to back-end.
+   * Get all the front-end's components' status,
+   * which is the status of the buttons (pressed or not) and the game state
+   * and send message to back-end.
    */
   sendStatusFrontEnd() {
     const device = this.deviceList.getDevice("front-end");
     if (device != null) {
       const status = device.status;
+      console.log(status);
       const statusMsg = {};
       for (const component of this.manageButtons.all.values()) {
         statusMsg[component.id] = status.get(component.id);
       }
+      statusMsg["gameState"] = status.get("gameState");
       this.sendStatus(statusMsg);
     }
   }
@@ -296,15 +301,22 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
    * Update the device list with front-end start-up status: all buttons are not clicked.
    */
   private resetFrontEndStatus() {
-    const statusMsg = new Map<string, boolean>();
+    const statusMsg = new Map<string, any>();
     for (const key of this.manageButtons.all.keys()) {
       statusMsg.set(key, false);
     }
+    statusMsg.set("gameState", "opgestart");
     this.deviceList.setDevice({
       id: "front-end",
       connection: true,
       status: statusMsg
     });
+    this.sendStatusFrontEnd();
+    // this.deviceList.setDevice({
+    //     id: "front-end",
+    //     connection: true,
+    //     status: {  }
+    // });
   }
 
   /**

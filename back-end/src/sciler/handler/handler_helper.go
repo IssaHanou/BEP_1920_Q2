@@ -172,26 +172,30 @@ func (handler *Handler) sendEventStatus() {
 }
 
 // Handles status updates from front-end specifically as these will only be affected by button events,
-// which are handled differently. If the button is pressed (new status = true) and its status was false,
+// which are handled differently.
+// For all components of the front-end status, check if the status is not empty, and whether it is a boolean (gameState is string).
+// If the button is pressed (new status = true) and its status was false,
 // the rule that belongs to the pressed button is executed
 func (handler *Handler) handleFrontEndStatus(contents map[string]interface{}) {
 	device, _ := handler.Config.Devices["front-end"]
 	for component, status := range device.Status {
 		rule, _ := handler.Config.RuleMap[component]
-		if contents[component].(bool) && !status.(bool) {
-			rule.Execute(handler)
+		if newStatus, ok := contents[component]; ok && reflect.TypeOf(newStatus).Kind() == reflect.Bool {
+			if newStatus.(bool) && !status.(bool) {
+				rule.Execute(handler)
+			}
 		}
 	}
 }
 
 // Sends the front-end the new status of disabled buttons
 func (handler *Handler) sendFrontEndStatus(message Message) {
-	returnMsg := handler.getButtons()
+	returnButtons := handler.getButtons()
 	newMessage := Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "front-end status",
-		Contents: returnMsg,
+		Contents: returnButtons,
 	}
 	jsonMessage, _ := json.Marshal(&newMessage)
 	logger.Info("sending front-end button status")

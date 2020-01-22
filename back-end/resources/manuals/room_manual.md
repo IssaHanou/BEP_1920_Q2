@@ -68,6 +68,89 @@ The conditions must include the value of the button on which it should execute.
 The can also include extra parameters that the executing of the rule depends on, 
 like stop can only be pressed when start is already pressed.
 
+The buttons to manage the game state are configured in this sections.
+The front-end has output component `gameState` which keeps track of state of the game.
+The button event conditions can depend on the `gameState` and the actions should alter the `gameState`.
+
+The `gamestate` can have several states, which can be defined through the config. 
+Important states are: `opgestart`, `in spel`, `gepauzeerd` and `gestopt`, but more states can be used.
+ 
+An example for `stop` and `start` are given below.
+
+##### example
+      "button_events": [
+        {
+          "id": "start",
+          "description": "Als het spel start, moeten alle rode leds aan gaan en de groene uit",
+          "limit": 1,
+          "conditions": {},
+          "actions": [
+            {
+              "type": "timer",
+              "type_id": "timer2",
+              "message": [
+                {
+                  "instruction": "start"
+                }
+              ]
+            }
+            {
+              "type": "device",
+              "type_id": "front-end",
+              "message": [
+                {
+                  "instruction": "setState",
+                  "component_id": "gameState",
+                  "value": "in spel"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "stop",
+          "description": "Als het spel stopt, moeten alle lichten uitgaan",
+          "limit": 1,
+          "conditions": {
+            "operator": "AND",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "front-end",
+                "constraints": {
+                  "component_id": "gameState",
+                  "comparison": "eq",
+                  "value": "in spel"
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "timer",
+              "type_id": "general",
+              "message": [
+                {
+                  "instruction": "pause"
+                }
+              ]
+            },
+            {
+              "type": "device",
+              "type_id": "front-end",
+              "message": [
+                {
+                  "instruction": "setState",
+                  "component_id": "gameState",
+                  "value": "gestopt"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+
+
 ### Rules
 Rules are defined by:
 

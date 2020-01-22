@@ -41,5 +41,8 @@ export class ManageComponent implements OnInit {
   onClickCustomButton(btnID) {
     this.app.deviceList.updateDevice(btnID, true);
     this.app.sendStatusFrontEnd();
+
+    this.app.deviceList.updateDevice(btnID, false);
+    this.app.sendStatusFrontEnd();
   }
 }

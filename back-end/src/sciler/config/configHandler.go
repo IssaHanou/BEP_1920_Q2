@@ -89,6 +89,7 @@ func generateDevices(devices []ReadDevice, config *WorkingConfig) {
 		input[btn.ID] = "boolean"
 		status[btn.ID] = false
 	}
+	status["gameState"] = "opgestart"
 	config.Devices["front-end"] = &(Device{
 		ID:          "front-end",
 		Description: "The operator webapp for managing a escape room",
@@ -469,9 +470,12 @@ func generateLogicalCondition(conditions interface{}) (LogicalCondition, []strin
 			Constraints: constraints,
 		}
 		return condition, append(errorList, newErrors...)
+	} else if len(logic) == 0 { // When `conditions` in config is empty, create empty condition
+		return AndCondition{}, errorList
+	} else {
+		return nil, append(errorList,
+			fmt.Sprintf("JSON config in wrong condition format, conditions: %v, could not be processed", conditions))
 	}
-	return nil, append(errorList,
-		fmt.Sprintf("JSON config in wrong condition format, conditions: %v, could not be processed", conditions))
 }
 
 // generateLogicalConstraint creates the LogicalContraint tree of all constraints, which are type checked
