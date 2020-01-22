@@ -51,7 +51,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
    * Initialize all the attributes of the application, subscribe to the topics of the broker,
    * and ask for the set-up of the back-end.
    *
-   * @param mqttService for communication with back0end
+   * @param mqttService for communication with back-end
    * @param snackBar material design message pop-up framework
    */
   constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
