@@ -842,7 +842,7 @@
           "type_id": "front-end",
           "message": [
             {
-              "instruction": "setState",
+              "instruction": "set state",
               "component_id": "gameState",
               "value": "in spel"
             }
@@ -928,7 +928,7 @@
           "type_id": "front-end",
           "message": [
             {
-              "instruction": "setState",
+              "instruction": "set state",
               "component_id": "gameState",
               "value": "gestopt"
             }
@@ -969,7 +969,7 @@
           "type_id": "front-end",
           "message": [
             {
-              "instruction": "setState",
+              "instruction": "set state",
               "component_id": "gameState",
               "value": "gepauzeerd"
             }
@@ -1010,7 +1010,7 @@
           "type_id": "front-end",
           "message": [
             {
-              "instruction": "setState",
+              "instruction": "set state",
               "component_id": "gameState",
               "value": "in spel"
             }
@@ -1042,7 +1042,7 @@
           "type_id": "front-end",
           "message": [
             {
-              "instruction": "setState",
+              "instruction": "set state",
               "component_id": "gameState",
               "value": "pre-game"
             }

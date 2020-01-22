@@ -77,7 +77,7 @@
               "type_id": "front-end",
               "message": [
                 {
-                  "instruction": "setState",
+                  "instruction": "set state",
                   "value": "newState",
                   "component_id": "gameState"
                 }

@@ -48,13 +48,13 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 	// Copy information from read config to working config.
 	config.General = readConfig.General
 	config.Cameras = readConfig.Cameras
-	config.Devices = generateDevices(readConfig.Devices, &config)
 	newPuzzles, puzzleErrors := generatePuzzles(readConfig.Puzzles, &config)
 	config.Puzzles = newPuzzles
 	newEvents, eventErrors := generateGeneralEvents(readConfig.GeneralEvents, &config)
 	config.GeneralEvents = newEvents
 	newButtonEvents, buttonEventErrors := generateButtonEvents(readConfig.ButtonEvents, &config)
 	config.ButtonEvents = newButtonEvents
+	config.Devices = generateDevices(readConfig.Devices, &config) // this needs to happen after generateButtonEvents for status map
 	newTimers, timerErrors := generateTimers(readConfig.Timers, &config)
 	config.Timers = newTimers
 	errorList = append(errorList, append(buttonEventErrors, append(puzzleErrors, append(eventErrors, timerErrors...)...)...)...)
@@ -72,7 +72,7 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 }
 
 // generateDevices creates the config devices map which points device id to a device in the WorkingConfig.
-// Creates front end device manually as its information is not in `devices` in the configuration file.
+// Creates front-end device manually as its information is not in `devices` in the configuration file.
 // The components are defined as the custom buttons, with boolean status of clicked or not.
 func generateDevices(devices []ReadDevice, config *WorkingConfig) map[string]*Device {
 	newDevices := make(map[string]*Device)
@@ -102,7 +102,7 @@ func generateDevices(devices []ReadDevice, config *WorkingConfig) map[string]*De
 			"gameState": {
 				Type: "string",
 				Instructions: map[string]string{
-					"setState": "string",
+					"set state": "string",
 				},
 			},
 		},

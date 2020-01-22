@@ -285,7 +285,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
           this.openSnackbar("performing instruction test", "");
           break;
         }
-        case "setState": {
+        case "set state": {
           this.deviceList.updateDevice(action.component_id, action.value);
           this.sendStatusFrontEnd();
           break;

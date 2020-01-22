@@ -96,7 +96,7 @@
           "type_id": "front-end",
           "message": [
             {
-              "instruction": "setState",
+              "instruction": "set state",
               "component_id": "gameState",
               "value": "in spel"
             }
@@ -137,7 +137,7 @@
           "type_id": "front-end",
           "message": [
             {
-              "instruction": "setState",
+              "instruction": "set state",
               "component_id": "gameState",
               "value": "in spel"
             }

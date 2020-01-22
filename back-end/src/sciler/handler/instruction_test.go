@@ -172,7 +172,7 @@ func TestOnInstructionMsgSendStatus(t *testing.T) {
 			"id":         "front-end",
 			"connection": false,
 			"status": map[string]interface{}{
-				"gameState": "opgestart",
+				"gameState": "gereed",
 			},
 		},
 	})
@@ -650,7 +650,7 @@ func TestSendFrontEndInstruction(t *testing.T) {
 		Communicator: communicatorMock,
 	}
 	instMsg := []config.ComponentInstruction{
-		{"gameState", "setState", "newState"},
+		{"gameState", "set state", "newState"},
 	}
 	msg, _ := json.Marshal(Message{
 		DeviceID: "back-end",

@@ -72,10 +72,11 @@ The buttons to manage the game state are configured in this sections.
 The front-end has output component `gameState` which keeps track of state of the game.
 The button event conditions can depend on the `gameState` and the actions should alter the `gameState`.
 
-The `gamestate` can have several states, which can be defined through the config. 
-Important states are: `gereed`, `in spel`, `gepauzeerd` and `gestopt`, but more states can be used.
+The `gameState` can have several states, which can be defined through the config. 
+Example states are: `gereed`, `in spel`, `gepauzeerd` and `gestopt`, but more states can be used.
+Its default start-up status is `gereed`. The instruction for changing the `gameState` is `set state`.
  
-An example for `stop` and `start` are given below.
+An example for `start` is given below.
 
 ##### example
       "button_events": [
@@ -99,7 +100,7 @@ An example for `stop` and `start` are given below.
               "type_id": "front-end",
               "message": [
                 {
-                  "instruction": "setState",
+                  "instruction": "set state",
                   "component_id": "gameState",
                   "value": "in spel"
                 }
