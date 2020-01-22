@@ -1,5 +1,8 @@
 import { Puzzle } from "./puzzle";
 
+/**
+ * Class keeping track of the puzzles, through use of map with puzzle id's.
+ */
 export class Puzzles {
   all: Map<string, Puzzle>;
 
@@ -8,7 +11,8 @@ export class Puzzles {
   }
 
   /**
-   * Receives list of json objects (keys id and status)
+   * Set the new status of a certain puzzle.
+   * If the timer did not yet exist, create a new one with its description.
    */
   updatePuzzles(jsonData) {
     for (const object of jsonData) {

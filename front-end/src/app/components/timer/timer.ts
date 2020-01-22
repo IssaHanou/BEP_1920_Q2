@@ -1,3 +1,6 @@
+/**
+ * Timer object, which has an id, duration (in ms) and state (idle, active, expired).
+ */
 export class Timer {
   id: string;
   duration: number;
@@ -17,6 +20,9 @@ export class Timer {
     return this.duration;
   }
 
+  /**
+   * A tick subtracts 1 second (1000 ms) from its duration.
+   */
   tick() {
     this.duration = this.duration - 1000;
   }

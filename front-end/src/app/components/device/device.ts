@@ -1,5 +1,5 @@
 /**
- * Device has all the information the front-end needs to show of each device
+ * Puzzle object, which has an id, status (can be anything, depending on device implementation) and connection status (boolean).
  */
 export class Device {
   id: string;

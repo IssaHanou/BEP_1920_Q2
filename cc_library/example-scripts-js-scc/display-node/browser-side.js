@@ -69,6 +69,8 @@ $(document).ready(function() {
   // get config file from server
   $.get("/display_config.json", function(config) {
       display = new Display(JSON.parse(config));
-      display.start();
+      display.start(() => {
+          console.log("connected");
+      });
   });
 });
