@@ -3,6 +3,9 @@ import { AppComponent } from "../../app.component";
 import {Device} from "../device/device";
 import {Button} from "./button";
 
+/**
+ * The manage component controls the button section in the "Acties" box on the home page.
+ */
 @Component({
   selector: "app-manage",
   templateUrl: "./manage.component.html",
@@ -14,6 +17,9 @@ export class ManageComponent implements OnInit {
 
   ngOnInit() {}
 
+  /**
+   * Return the buttons for the manage section, in alphabetical order.
+   */
   getButtons() {
     const buttons: Button[] = [];
     for (const btn of this.app.manageButtons.all.values()) {
@@ -23,10 +29,16 @@ export class ManageComponent implements OnInit {
     return buttons;
   }
 
+  /**
+   * When test button is clicked, tell the back-end to let all devices test.
+   */
   onClickTestButton() {
     this.app.sendInstruction([{ instruction: "test all" }]);
   }
 
+  /**
+   * When reset button is clicked, tell the back-end to let all devices reset.
+   */
   onClickResetButton() {
     this.app.sendInstruction([{ instruction: "reset all" }]);
     this.app.sendConnection(true);

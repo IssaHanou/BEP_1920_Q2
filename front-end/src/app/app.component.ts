@@ -15,6 +15,10 @@ import { FullScreen } from "./fullscreen";
 import { Buttons } from "./components/manage/buttons";
 import * as config from "../assets/config.json";
 
+/**
+ * This is the main application, controlling all actions that can happen.
+ * It keeps track of the main data objects and communicates to the back-end.
+ */
 @Component({
   selector: "app-root",
   templateUrl: "./app.component.html",
@@ -45,6 +49,14 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   displayTime: string;
   everySecond: Observable<number> = timer(0, 1000);
 
+  /**
+   * When starting the application the first time, inject the parameters.
+   * Initialize all the attributes of the application, subscribe to the topics of the broker,
+   * and ask for the set-up of the back-end.
+   *
+   * @param mqttService for communication with back-end
+   * @param snackBar material design message pop-up framework
+   */
   constructor(private mqttService: MqttService, private snackBar: MatSnackBar) {
     super();
     this.logger = new Logger();
@@ -70,8 +82,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * Sets connection of all devices
-   * @param connection boolean
+   * Sets connection of all devices, starting as false, until message received telling it's connected.
    */
   private setConnectionAllDevices(connection: boolean) {
     for (const tuple of this.deviceList.all) {
@@ -80,11 +91,12 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Initialize app, also called upon loading new config file.
-   */
   ngOnInit(): void {}
 
+  /**
+   * Set all the variables to their default state, removing old data.
+   * Set the duration timer for the escape room to 0, this will be updated when data is received from back-end.
+   */
   initializeVariables() {
     this.deviceList = new Devices();
     this.puzzleList = new Puzzles();
@@ -96,9 +108,11 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
     const generalTimer = { id: "general", duration: 0, state: "stateIdle" };
     this.timerList.setTimer(generalTimer);
   }
+
   /**
-   * The purpose of this is, when the user leave the app we should cleanup our subscriptions
-   * and close the connection with the broker
+   * When the user leaves the app, tell the back-end about the disconnect.
+   * Then, the broker subscriptions should be cleaned up
+   * and the connection with the broker closed.
    */
   ngOnDestroy(): void {
     this.sendConnection(false);
@@ -106,7 +120,8 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * Subscribe to topics.
+   * Subscribe to a certain topic from the broker.
+   * Also, tell the subscription to process when a message is received on that topic.
    */
   private subscribeNewTopic(topic: string): void {
     this.subscription = this.mqttService
@@ -125,19 +140,19 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * Send an instruction to the broker, over back-end topic.
-   * @param instruction instruction to be sent.
+   * Send an instruction to the broker, over topic `back-end`.
+   * @param instructions to be sent.
    */
-  public sendInstruction(instruction: any[]) {
+  public sendInstruction(instructions: any[]) {
     const msg = new Message(
       "front-end",
       "instruction",
       new Date(),
-      instruction
+      instructions
     );
     let jsonMessage: string = JSON.stringify(this.jsonConvert.serialize(msg));
     this.mqttService.unsafePublish("back-end", jsonMessage);
-    for (const inst of instruction) {
+    for (const inst of instructions) {
       if ("config" in inst) {
         msg.contents = { config: "contents to long to print" };
         jsonMessage = JSON.stringify(this.jsonConvert.serialize(msg));
@@ -147,7 +162,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * Send an status to the broker, over back-end topic.
+   * Send a status to the broker, over topic `back-end`.
    * @param status json data with key is the component (button name) and value is the status (boolean).
    */
   public sendStatus(status) {
@@ -161,7 +176,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * Send an connection update to the broker, over back-end topic.
+   * Send a connection update to the broker, over topic `back-end`.
    * @param connected connection status to be sent.
    */
   public sendConnection(connected: boolean) {
@@ -177,8 +192,8 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * Process incoming message.
-   * @param jsonMessage json message.
+   * Process the incoming message, depending on its type.
+   * @param jsonMessage json message received.
    */
   private processMessage(jsonMessage: string) {
     const msg: Message = Message.deserialize(jsonMessage);
@@ -217,10 +232,12 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
         this.processSetUp(msg.contents);
         break;
       }
+      // when a config is checked by the back-end it returns a list of found errors, these should be displayed
       case "config": {
         this.configErrorList = msg.contents.errors;
         break;
       }
+      // when a config has be checked and put to use (only possible on no errors), notify the user
       case "new config": {
         this.openSnackbar("using new config: " + msg.contents.name, "");
         break;
@@ -233,7 +250,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
 
   /**
    * When the front-end receives confirmation message from client computer
-   * that instruction was completed, show the message to the user.
+   * that an instruction was completed, show the message to the user.
    */
   private processConfirmation(jsonData) {
     for (const instruction of jsonData.contents.instructed.contents) {
@@ -247,8 +264,11 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * Process instruction messages. Two types exist: reset and status update.
-   * The setState will update the gameState of the front-end
+   * Process instruction messages. The types that exist:
+   * reset - reset the front-end's device status
+   * status update - send front-end's connection status to back-end
+   * test - perform a test on the front-end
+   * setState - update the gameState of the front-end and inform the back-end
    */
   private processInstruction(jsonData) {
     for (const action of jsonData) {
@@ -312,8 +332,14 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * The setup contains the name of the room, the map with hints per puzzle and the rule descriptions.
-   * @param jsonData with name, hints, events, cameras and buttons
+   * The setup contain:
+   * the name of the room to display in app
+   * the camera links to select in camera view
+   * the buttons that should be in the front-end
+   * the rule descriptions for in the puzzle table
+   * the map with hints per puzzle to display in hint selection box
+   *
+   * @param jsonData with name, camera, buttons, events, hints
    */
   private processSetUp(jsonData) {
     this.nameOfRoom = jsonData.name;
@@ -359,7 +385,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * Initialize the timers to listen to every second and set their state accordingly.
+   * Initialize the timers to listen to everySecond and set their state accordingly.
    */
   private initializeTimers() {
     this.subscription = this.everySecond.subscribe(seconds => {
@@ -386,9 +412,9 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * Opens snackbar with duration of 2 seconds.
+   * Opens snackbar with duration of 3 seconds.
    * @param message displays this message
-   * @param action: button to display
+   * @param action: button to display - optional use
    */
   public openSnackbar(message: string, action: string) {
     const snackbar = new MatSnackBarConfig();
@@ -406,7 +432,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * Stops timers, then creates new variables and timers
+   * Stops timers, then create new variables and timers
    */
   public resetConfig() {
     this.stopTimers();

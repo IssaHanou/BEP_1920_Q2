@@ -12,6 +12,10 @@ import { DomSanitizer } from "@angular/platform-browser";
 import { FormControl } from "@angular/forms";
 import { FullScreen } from "../fullscreen";
 
+/**
+ * The camera components controls the camera page, selected through the side menu.
+ * It allows for the box to become full screen.
+ */
 @Component({
   selector: "app-camera",
   templateUrl: "./camera.component.html",
@@ -19,6 +23,11 @@ import { FullScreen } from "../fullscreen";
 })
 export class CameraComponent extends FullScreen
   implements OnInit, AfterViewInit, OnDestroy {
+
+  /**
+   * There is a control for each selection dropdown and the src used by each iframe.
+   * The booleans keep track of the second feed (opened or not) and full screen (enabled or not).
+   */
   selectedCameraControl = new FormControl();
   cameraFeedSrc: any;
   selectedCameraControl2 = new FormControl();
@@ -26,6 +35,9 @@ export class CameraComponent extends FullScreen
   openSecond = false;
   fullScreen = false;
 
+  /**
+   * Keeping track of div boxes, for styling.
+   */
   @ViewChild("cameraBox", { static: true }) cameraBox: ElementRef;
   @ViewChild("contents", { static: true }) boxContents: ElementRef;
 
@@ -38,6 +50,12 @@ export class CameraComponent extends FullScreen
     super();
   }
 
+  /**
+   * Upon initializing, make sure to set the feeds of the iframe's to either:
+   * 1. previously selected value
+   * 2. the first value in the list
+   * 3. a blank status to prevent crashes
+   */
   ngOnInit() {
     if (this.app.selectedCamera !== undefined) {
       this.selectedCameraControl.setValue(this.app.selectedCamera);
@@ -66,10 +84,16 @@ export class CameraComponent extends FullScreen
 
   ngAfterViewInit(): void {}
 
+  /**
+   * When switching screens in the menu, have the application keep track of whether or not a second screen was opened.
+   */
   ngOnDestroy(): void {
     this.app.openSecondCamera = this.openSecond;
   }
 
+  /**
+   * Returns the list of cameras.
+   */
   allCameras(): Camera[] {
     return this.app.cameras;
   }
@@ -104,11 +128,14 @@ export class CameraComponent extends FullScreen
     }
   }
 
+  /**
+   * When the camera is opened in full screen, disable the header expansion panel for selecting other feeds.
+   */
   expandPanel(matExpansionPanel, event): void {
-    event.stopPropagation(); // Preventing event bubbling
+    event.stopPropagation();
 
     if (this.fullScreen) {
-      matExpansionPanel.close(); // Here's the magic
+      matExpansionPanel.close();
     }
   }
 
@@ -116,7 +143,6 @@ export class CameraComponent extends FullScreen
    * Sets height of contents box to full and calls super function, to the full screen of camera box.
    */
   openFullScreen() {
-    // Trigger fullscreen
     this.boxContents.nativeElement.style.height = "90vh";
     super.openFullScreen(this.cameraBox.nativeElement);
     this.fullScreen = true;

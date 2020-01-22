@@ -19,13 +19,22 @@ class Message {
  * @Abstract
  */
 class Device {
+  /** Constructor for Device
+   *
+   * @constructor
+   * @param config dictionary following the format described in the readme
+   * @param logger function(date, level, message) where
+   *     date is a Date object
+   *     level is one of the following strings: 'debug', 'info', 'warn', 'error', 'fatal'
+   *     message is a custom string containing more information
+   */
   constructor(config, logger) {
     this.scclib = new SccLib(config, this, logger);
 
     // make sure abstract class Device cannot be instantiated directly
     if (this.constructor === Device) {
       throw new TypeError(
-        "abstract class Device cannot be instantiated directly",
+        "abstract class Device cannot be instantiated directly"
       );
     }
 
@@ -36,7 +45,7 @@ class Device {
     // make sure abstract method performInstruction is implemented when extending from Device
     if (typeof this.performInstruction !== "function") {
       throw new TypeError(
-        "abstract method 'performInstruction' not implemented",
+        "abstract method 'performInstruction' not implemented"
       );
     }
     // make sure abstract method test is implemented when extending from Device
@@ -68,9 +77,10 @@ class Device {
 
   /**
    * start starts the device
+   * @param onStart function that gets called on successful connect or reconnect
    */
-  start() {
-    this.scclib.connect();
+  start(onStart) {
+    this.scclib.connect(onStart);
   }
 }
 
@@ -80,11 +90,11 @@ class Device {
 class SccLib {
   constructor(config, device, logger) {
     // type check config
-    const configProperties = ["id", "description", "host", "port", "labels"];
+    const configProperties = ["id", "description", "host", "port", "labels", "input", "output"];
     for (const configProperty of configProperties) {
       if (!config.hasOwnProperty(configProperty)) {
         throw new TypeError(
-          config + " should have a property: " + configProperty,
+          config + " should have a property: " + configProperty
         );
       }
     }
@@ -97,7 +107,7 @@ class SccLib {
     // type check logger
     if (typeof logger !== "function") {
       throw new TypeError(
-        logger + " should be of type function(date, level, message)",
+        logger + " should be of type function(date, level, message)"
       );
     }
 
@@ -143,8 +153,8 @@ class SccLib {
       this._sendMessage(
         "back-end",
         new Message(this.name, "connection", {
-          connection: true,
-        }),
+          connection: true
+        })
       );
 
       // log successful connection
@@ -156,14 +166,14 @@ class SccLib {
      * it will log an error and try to reconnect on a regular interval till it succeeds
      * @private
      */
-    this._onConnectFailure = function() {
+    this._onConnectFailure = function(onStart) {
       const retryCooldown = 10 * 1000; // 10 seconds before retrying to connect
       this.log(
         "error",
-        "connecting failed, retry in " + retryCooldown + " seconds",
+        "connecting failed, retry in " + retryCooldown + " milliseconds"
       );
       setTimeout(() => {
-        this.connect();
+        this.connect(onStart);
       }, retryCooldown);
     };
 
@@ -179,7 +189,7 @@ class SccLib {
         "message received:\n topic: " +
           message.topic +
           ",\n message: " +
-          message.payloadString,
+          message.payloadString
       );
       this._handle(message.payloadString);
     };
@@ -195,13 +205,13 @@ class SccLib {
     if (message.type !== "instruction") {
       this.log(
         "warn",
-        "received non-instruction message of type: " + message.type,
+        "received non-instruction message of type: " + message.type
       );
     } else {
       const success = this._checkMessage(message.contents);
       const confirmation = new Message(this.name, "confirmation", {
         completed: success,
-        instructed: message,
+        instructed: message
       });
       this._sendMessage("back-end", confirmation);
     }
@@ -226,7 +236,7 @@ class SccLib {
         }
         case "status update": {
           const message = new Message(this.name, "connection", {
-            connection: true,
+            connection: true
           });
           this._sendMessage("back-end", message);
           this.statusChanged();
@@ -246,7 +256,7 @@ class SccLib {
               "instruction " +
                 action.instruction +
                 " could not be performed, " +
-                action,
+                action
             );
             return false;
           } else {
@@ -266,6 +276,23 @@ class SccLib {
    * @private
    */
   _sendMessage(topic, message) {
+    const retryCooldown = 50; // milliseconds
+    if (!this.client.isConnected()) {
+      this.log(
+        "error",
+        "can't send " +
+          message.type +
+          " message: " +
+          JSON.stringify(message.contents) +
+          ", device not connected, retry in " +
+          retryCooldown +
+          "ms"
+      );
+      setTimeout(() => {
+        this._sendMessage(topic, message);
+      }, 50);
+      return;
+    }
     const msg = new Paho.Message(JSON.stringify(message));
     msg.destinationName = topic;
     this.client.send(msg);
@@ -277,25 +304,26 @@ class SccLib {
    * sets up handlers for connection and connection failure
    * sets up automatic reconnect
    */
-  connect() {
+  connect(onStart) {
     const will = new Paho.Message(
       JSON.stringify(
         new Message(this.name, "connection", {
-          connection: false,
-        }),
-      ),
+          connection: false
+        })
+      )
     );
     will.destinationName = "back-end";
     this.client.connect({
       onSuccess: () => {
         this._onConnect();
+        onStart();
       },
       onFailure: () => {
-        this._onConnectFailure();
+        this._onConnectFailure(onStart);
       },
       willMessage: will,
       reconnect: true,
-      keepAliveInterval: 10,
+      keepAliveInterval: 10
     });
   }
 
@@ -306,7 +334,7 @@ class SccLib {
   statusChanged() {
     this._sendMessage(
       "back-end",
-      new Message(this.name, "status", this.device.getStatus()),
+      new Message(this.name, "status", this.device.getStatus())
     );
   }
 }
