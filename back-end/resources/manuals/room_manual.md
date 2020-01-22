@@ -106,47 +106,6 @@ An example for `stop` and `start` are given below.
               ]
             }
           ]
-        },
-        {
-          "id": "stop",
-          "description": "Als het spel stopt, moeten alle lichten uitgaan",
-          "limit": 1,
-          "conditions": {
-            "operator": "AND",
-            "list": [
-              {
-                "type": "device",
-                "type_id": "front-end",
-                "constraints": {
-                  "component_id": "gameState",
-                  "comparison": "eq",
-                  "value": "in spel"
-                }
-              }
-            ]
-          },
-          "actions": [
-            {
-              "type": "timer",
-              "type_id": "general",
-              "message": [
-                {
-                  "instruction": "pause"
-                }
-              ]
-            },
-            {
-              "type": "device",
-              "type_id": "front-end",
-              "message": [
-                {
-                  "instruction": "setState",
-                  "component_id": "gameState",
-                  "value": "gestopt"
-                }
-              ]
-            }
-          ]
         }
       ]
 

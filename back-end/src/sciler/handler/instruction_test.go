@@ -98,7 +98,7 @@ func TestInstructionSetUp(t *testing.T) {
 			"status": map[string]interface{}{
 				"start":     false,
 				"stop":      false,
-				"gameState": "opgestart"},
+				"gameState": "gereed"},
 		},
 	})
 	frontEndStatusMessage, _ := json.Marshal(Message{

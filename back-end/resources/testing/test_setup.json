@@ -80,20 +80,7 @@
       "id": "start",
       "description": "Als het spel start, moeten alle rode leds aan gaan en de groene uit",
       "limit": 2,
-      "conditions": {
-        "operator": "AND",
-        "list": [
-          {
-            "type": "device",
-            "type_id": "front-end",
-            "constraints": {
-              "component_id": "stop",
-              "comparison": "eq",
-              "value": false
-            }
-          }
-        ]
-      },
+      "conditions": {},
       "actions": [
         {
           "type": "timer",
@@ -101,6 +88,17 @@
           "message": [
             {
               "instruction": "start"
+            }
+          ]
+        },
+        {
+          "type": "device",
+          "type_id": "front-end",
+          "message": [
+            {
+              "instruction": "setState",
+              "component_id": "gameState",
+              "value": "in spel"
             }
           ]
         }
@@ -117,9 +115,9 @@
             "type": "device",
             "type_id": "front-end",
             "constraints": {
-              "component_id": "start",
+              "component_id": "gameState",
               "comparison": "eq",
-              "value": true
+              "value": "in spel"
             }
           }
         ]
@@ -131,6 +129,17 @@
           "message": [
             {
               "instruction": "pause"
+            }
+          ]
+        },
+        {
+          "type": "device",
+          "type_id": "front-end",
+          "message": [
+            {
+              "instruction": "setState",
+              "component_id": "gameState",
+              "value": "in spel"
             }
           ]
         }
