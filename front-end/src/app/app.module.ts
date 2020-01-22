@@ -40,6 +40,10 @@ import { HomeComponent } from "./home/home.component";
 import { CameraComponent } from "./camera/camera.component";
 import { ConfigComponent } from "./config/config.component";
 
+/**
+ * These are the parameters used for the MQTT messaging.
+ * The host and port are read from ./../assets/config.json
+ */
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   hostname: config.host,
   port: config.port,
@@ -58,12 +62,21 @@ export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   keepalive: 5
 };
 
+/**
+ * These are the routes used in the application: there is the home page, camera page and config page.
+ */
 export const APP_ROUTES: Routes = [
   { path: "", component: HomeComponent },
   { path: "camera", component: CameraComponent },
   { path: "config", component: ConfigComponent }
 ];
 
+/**
+ * This module runs the application and controls all the imports.
+ * The application is started from the ./../index.html file, which adds contents from the application component.
+ * In the ./../assets/css/main.css file most of the css general to the complete application is located.
+ * Other local css can be found in each component.
+ */
 @NgModule({
   declarations: [
     AppComponent,
