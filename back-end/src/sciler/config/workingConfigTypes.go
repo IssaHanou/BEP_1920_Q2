@@ -18,6 +18,7 @@ type WorkingConfig struct {
 	Timers        map[string]*Timer
 	StatusMap     map[string][]*Rule
 	RuleMap       map[string]*Rule
+	EventRuleMap  map[string]*Rule
 	LabelMap      map[string][]*Component
 }
 

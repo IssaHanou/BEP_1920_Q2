@@ -207,26 +207,13 @@ func (handler *Handler) sendFrontEndStatus(message Message) {
 // status is json object with key ruleName and value true (if executed == limit) or false
 func (handler *Handler) getEventStatus() []map[string]interface{} {
 	var list []map[string]interface{}
-	for _, rule := range handler.getPuzzleRules() {
+	for _, rule := range handler.Config.EventRuleMap {
 		var status = make(map[string]interface{})
 		status["id"] = rule.ID
 		status["status"] = rule.Finished()
 		list = append(list, status)
 	}
 	return list
-}
-
-func (handler *Handler) getPuzzleRules() []*config.Rule {
-	var rules []*config.Rule
-	for _, event := range handler.Config.GeneralEvents {
-		rules = append(rules, event.GetRules()...)
-	}
-
-	for _, event := range handler.Config.Puzzles {
-		rules = append(rules, event.GetRules()...)
-	}
-
-	return rules
 }
 
 // getHints returns a map of hints with puzzle name as key and list of hints for that puzzle as value
@@ -241,7 +228,7 @@ func (handler *Handler) getHints() map[string][]string {
 // getEventDescriptions returns a map of hints with puzzle name as key and list of hints for that puzzle as value
 func (handler *Handler) getEventDescriptions() map[string]string {
 	events := make(map[string]string)
-	for _, rule := range handler.getPuzzleRules() {
+	for _, rule := range handler.Config.EventRuleMap {
 		events[rule.ID] = rule.Description
 	}
 	return events

@@ -64,6 +64,7 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 		// wait with creating maps (which use condition type ids)
 		// and with checking constraint
 		config.StatusMap = generateStatusMap(&config)
+		config.EventRuleMap = generateEventRuleMap(&config)
 		config.RuleMap = generateRuleMap(&config)
 		config.LabelMap = generateLabelMap(&config)
 		errorList = append(errorList, checkConfig(config)...)
@@ -135,7 +136,8 @@ func generateTimers(timers []ReadTimer, config *WorkingConfig) (map[string]*Time
 	return newTimers, errorList
 }
 
-// getAllRules creates rule list of the rule pointers belonging to all events, except button events,
+// getAllRules creates rule list of the rule pointers belonging to all events,
+// except button events,
 // because those should not be added to status map, only to rule map
 func getAllRules(config *WorkingConfig) []*Rule {
 	var rules []*Rule
@@ -150,7 +152,8 @@ func getAllRules(config *WorkingConfig) []*Rule {
 	return rules
 }
 
-// generateRuleMap creates rule map with rule id pointing to rule object pointers for all rules of all events
+// generateRuleMap creates rule map with rule id
+// pointing to rule object pointers for all rules of all events
 func generateRuleMap(config *WorkingConfig) map[string]*Rule {
 	ruleMap := make(map[string]*Rule)
 	rules := getAllRules(config)
@@ -165,7 +168,20 @@ func generateRuleMap(config *WorkingConfig) map[string]*Rule {
 	return ruleMap
 }
 
-// generateLabelMap makes a map from a label to a component by checking all components if they have labels
+// generatePuzzle RuleMap creates rule map with rule id
+// pointing to rule object pointers for rules of all puzzles and general events
+func generateEventRuleMap(config *WorkingConfig) map[string]*Rule {
+	ruleMap := make(map[string]*Rule)
+	rules := getAllRules(config)
+
+	for _, rule := range rules {
+		ruleMap[rule.ID] = rule
+	}
+	return ruleMap
+}
+
+// generateLabelMap makes a map from a label to a component
+// by checking all components if they have labels
 func generateLabelMap(config *WorkingConfig) map[string][]*Component {
 	labelMap := make(map[string][]*Component)
 	devices := config.Devices

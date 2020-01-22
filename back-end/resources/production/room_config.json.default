@@ -148,7 +148,10 @@
           "type": "string",
           "instructions": {
             "hint": "string"
-          }
+          },
+          "label": [
+            "hint"
+          ]
         }
       }
     },
@@ -161,7 +164,10 @@
           "type": "string",
           "instructions": {
             "hint": "string"
-          }
+          },
+          "label": [
+            "hint"
+          ]
         }
       }
     },
@@ -470,8 +476,8 @@
           },
           "actions": [
             {
-              "type": "device",
-              "type_id": "display-angular",
+              "type": "label",
+              "type_id": "hint",
               "message": [
                 {
                   "component_id": "hint",
