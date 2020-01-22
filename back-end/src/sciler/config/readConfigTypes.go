@@ -9,6 +9,7 @@ type ReadConfig struct {
 	Timers        []ReadTimer        `json:"timers"`
 	Puzzles       []ReadPuzzle       `json:"puzzles"`
 	GeneralEvents []ReadGeneralEvent `json:"general_events"`
+	ButtonEvents  []ReadRule         `json:"button_events"`
 }
 
 // General is a struct that describes the configurations of an escape room.
@@ -122,7 +123,6 @@ type Action struct {
 
 // Execute is a method that performs the action
 // Depending on whether the instruction is meant for a device, timer or label it is handled differently
-// TODO test this
 func (action Action) Execute(handler InstructionSender) {
 	switch action.Type { // this cannot be any other Type than device, timer or label, (checked in checkActions function)
 	case "device":

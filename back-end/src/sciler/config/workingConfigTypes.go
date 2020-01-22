@@ -14,10 +14,12 @@ type WorkingConfig struct {
 	Cameras       []Camera
 	Puzzles       []*Puzzle
 	GeneralEvents []*GeneralEvent
+	ButtonEvents  map[string]*Rule
 	Devices       map[string]*Device
 	Timers        map[string]*Timer
 	StatusMap     map[string][]*Rule
 	RuleMap       map[string]*Rule
+	EventRuleMap  map[string]*Rule
 	LabelMap      map[string][]*Component
 }
 
@@ -163,7 +165,7 @@ type InstructionSender interface {
 
 // Finished is a method that checks is the a rule have been finished, meaning if it reached its maximum number of executions
 func (r *Rule) Finished() bool {
-	return r.Executed == r.Limit
+	return r.Executed == r.Limit && r.Limit != 0
 }
 
 // Execute performs all actions of a rule
@@ -172,7 +174,7 @@ func (r *Rule) Execute(handler InstructionSender) {
 		go action.Execute(handler)
 	}
 	r.Executed++
-	logger.Infof("Executed rule %s", r.ID)
+	logger.Infof("executed actions of rule with id %s", r.ID)
 	handler.HandleEvent(r.ID)
 }
 
@@ -330,68 +332,16 @@ func (constraint Constraint) checkConstraints(condition Condition, config Workin
 	case "device":
 		{
 			if device, ok := config.Devices[condition.TypeID]; ok { // checks if device can be found in the map, if so, it is stored in variable device
-
 				valueType := reflect.TypeOf(constraint.Value).Kind()
-				comparison := constraint.Comparison
 				if inputType, ok := device.Input[constraint.ComponentID]; ok {
-					switch inputType {
-					case "string":
-						{
-							if valueType != reflect.String {
-								return []string{fmt.Sprintf("on rule %s: input type string expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
-							}
-							if !CheckValidComparison(comparison) {
-								return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
-							}
-							if comparison != "eq" && comparison != "not" {
-								return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on a string", ruleID, comparison)}
-							}
-						}
-					case "boolean":
-						{
-							if valueType != reflect.Bool {
-								return []string{fmt.Sprintf("on rule %s: input type boolean expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
-							}
-							if !CheckValidComparison(comparison) {
-								return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
-							}
-							if comparison != "eq" {
-								return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on a boolean", ruleID, comparison)}
-							}
-						}
-					case "numeric":
-						{
-							if valueType != reflect.Int && valueType != reflect.Float64 {
-								return []string{fmt.Sprintf("on rule %s: input type numeric expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
-							}
-							if !CheckValidComparison(comparison) {
-								return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
-							}
-							if comparison == "contains" {
-								return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on a numeric", ruleID, comparison)}
-							}
-						}
-					case "array":
-						{
-							if valueType != reflect.Slice {
-								return []string{fmt.Sprintf("on rule %s: input type array/slice expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
-							}
-							if !CheckValidComparison(comparison) {
-								return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
-							}
-							if comparison != "contains" && comparison != "eq" && comparison != "not" {
-								return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on an array", ruleID, comparison)}
-							}
-						}
-					default:
-						// todo custom types
-						return []string{fmt.Sprintf("on rule %s: custom types like: %s, are not yet implemented", ruleID, inputType)}
-					}
+					return checkDeviceConstraint(inputType, valueType, constraint, ruleID)
+				} else if output, ok := device.Output[constraint.ComponentID]; ok {
+					return checkDeviceConstraint(output.Type, valueType, constraint, ruleID)
 				} else {
-					return []string{fmt.Sprintf("on rule %s: component with id %s not found in map", ruleID, constraint.ComponentID)}
+					return []string{fmt.Sprintf("on rule %s: component with id %s not found in input or output map", ruleID, constraint.ComponentID)}
 				}
 			} else {
-				return []string{fmt.Sprintf("on rule %s: device with id %s not found in map", ruleID, condition.TypeID)}
+				return []string{fmt.Sprintf("on rule %s: device with id %s not found in device map", ruleID, condition.TypeID)}
 			}
 		}
 	case "timer":
@@ -399,7 +349,7 @@ func (constraint Constraint) checkConstraints(condition Condition, config Workin
 			valueType := reflect.TypeOf(constraint.Value).Kind()
 			comparison := constraint.Comparison
 			if valueType != reflect.Bool {
-				return []string{fmt.Sprintf("on rule %s: input type boolean expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
+				return []string{fmt.Sprintf("on rule %s: timer input type boolean expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
 			}
 			if !CheckValidComparison(comparison) {
 				return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
@@ -416,7 +366,7 @@ func (constraint Constraint) checkConstraints(condition Condition, config Workin
 			valueType := reflect.TypeOf(constraint.Value).Kind()
 			comparison := constraint.Comparison
 			if valueType != reflect.Int && valueType != reflect.Float64 {
-				return []string{fmt.Sprintf("on rule %s: value type numeric expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
+				return []string{fmt.Sprintf("on rule %s: rule value type numeric expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
 			}
 			if !CheckValidComparison(comparison) {
 				return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
@@ -431,6 +381,66 @@ func (constraint Constraint) checkConstraints(condition Condition, config Workin
 		return []string{fmt.Sprintf("on rule %s: invalid type of condition: %v", ruleID, condition.Type)}
 	}
 	// all cases for errors are already handled
+	return make([]string, 0)
+}
+
+// checkDeviceConstraint checks that the typeToCheck (input or output type that is expected from config for certain component)
+// matches the valueType that was found in the constraint.
+// The constraint comparison is checked to be valid and of the proper type, depending on the typeToCheck
+func checkDeviceConstraint(typeToCheck string, valueType reflect.Kind, constraint Constraint, ruleID string) []string {
+	switch typeToCheck {
+	case "string":
+		{
+			if valueType != reflect.String {
+				return []string{fmt.Sprintf("on rule %s: device input/output type string expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
+			}
+			if !CheckValidComparison(constraint.Comparison) {
+				return []string{fmt.Sprintf("on rule %s: device comparison %s is not valid", ruleID, constraint.Comparison)}
+			}
+			if constraint.Comparison != "eq" && constraint.Comparison != "not" {
+				return []string{fmt.Sprintf("on rule %s: device comparison %s not allowed on a string", ruleID, constraint.Comparison)}
+			}
+		}
+	case "boolean":
+		{
+			if valueType != reflect.Bool {
+				return []string{fmt.Sprintf("on rule %s: device input/output type boolean expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
+			}
+			if !CheckValidComparison(constraint.Comparison) {
+				return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, constraint.Comparison)}
+			}
+			if constraint.Comparison != "eq" {
+				return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on a boolean", ruleID, constraint.Comparison)}
+			}
+		}
+	case "numeric":
+		{
+			if valueType != reflect.Int && valueType != reflect.Float64 {
+				return []string{fmt.Sprintf("on rule %s: device input/output numeric expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
+			}
+			if !CheckValidComparison(constraint.Comparison) {
+				return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, constraint.Comparison)}
+			}
+			if constraint.Comparison == "contains" {
+				return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on a numeric", ruleID, constraint.Comparison)}
+			}
+		}
+	case "array":
+		{
+			if valueType != reflect.Slice {
+				return []string{fmt.Sprintf("on rule %s: device input/output array/slice expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
+			}
+			if !CheckValidComparison(constraint.Comparison) {
+				return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, constraint.Comparison)}
+			}
+			if constraint.Comparison != "contains" && constraint.Comparison != "eq" && constraint.Comparison != "not" {
+				return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on an array", ruleID, constraint.Comparison)}
+			}
+		}
+	default:
+		// todo custom types
+		return []string{fmt.Sprintf("on rule %s: custom types like: %s, are not yet implemented", ruleID, typeToCheck)}
+	}
 	return make([]string, 0)
 }
 

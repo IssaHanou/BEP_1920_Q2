@@ -1,0 +1,10 @@
+2020-01-21 16:02:26,787 [INFO ]  Start of log for device: display
+2020-01-21 16:02:27,750 [INFO ]  connected to broker
+2020-01-21 16:02:27,769 [INFO ]  ('subscribed to topic', 'hint')
+2020-01-21 16:02:27,770 [INFO ]  ('subscribed to topic', 'client-computers')
+2020-01-21 16:02:27,770 [INFO ]  ('subscribed to topic', 'display')
+2020-01-21 16:02:27,770 [INFO ]  ('back-end message published', '{"device_id": "display", "time_sent": "21-01-2020 16:02:27", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 16:02:27,771 [INFO ]  ('back-end message published', '{"device_id": "display", "time_sent": "21-01-2020 16:02:27", "type": "status", "contents": {"hint": ""}}')
+2020-01-21 16:02:27,771 [INFO ]  connected OK
+2020-01-21 17:18:42,041 [INFO ]  ('back-end message published', '{"device_id": "display", "time_sent": "21-01-2020 17:18:42", "type": "connection", "contents": {"connection": false}}')
+2020-01-21 17:18:42,044 [WARNI]  disconnecting, reason 1

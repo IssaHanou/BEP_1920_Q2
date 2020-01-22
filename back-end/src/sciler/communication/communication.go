@@ -25,9 +25,9 @@ func NewCommunicator(host string, port int, topicsOfInterest []string, handler m
 	opts.SetClientID("back-end")
 	opts.SetConnectionLostHandler(func(client mqtt.Client, err error) {
 		if err.Error() == "EOF" {
-			logger.Warnf("connection lost: broker closed connection, (multiple client ID: %s?)", opts.ClientID)
+			logger.Errorf("connection lost: broker closed connection, (multiple client ID: %s?)", opts.ClientID)
 		} else {
-			logger.Warnf("connection lost: %v", err)
+			logger.Errorf("connection lost: %v", err)
 		}
 	})
 	opts.SetConnectRetry(false)
@@ -49,11 +49,11 @@ func NewCommunicator(host string, port int, topicsOfInterest []string, handler m
 			return client.SubscribeMultiple(topics, handler)
 		}, "subscribing", -1)
 
-		logger.Infof("Connected to %s:%d with subscriptions to %s", host, port, topicsOfInterest)
+		logger.Infof("connected to %s:%d with subscriptions to %s", host, port, topicsOfInterest)
 		onStart()
 	})
 	opts.SetReconnectingHandler(func(client mqtt.Client, options *mqtt.ClientOptions) {
-		logger.Info("Trying to reconnect")
+		logger.Warn("trying to reconnect")
 	})
 	will, _ := json.Marshal(map[string]interface{}{
 		"device_id": "back-end",
@@ -96,10 +96,10 @@ func action(action func() mqtt.Token, actionType string, retrials int) {
 	for i := 0; i < retrials || retrials < 0; i++ {
 		token := action()
 		if token.Wait() && token.Error() != nil {
-			logger.Warnf("fail to %s, %v", actionType, token.Error())
+			logger.Errorf("fail to %s, %v", actionType, token.Error())
 			time.Sleep(1 * time.Second)
 
-			logger.Infof("retry %d to %s", i+1, actionType)
+			logger.Warnf("retry %d to %s", i+1, actionType)
 			continue
 		}
 		return

@@ -1,0 +1,23 @@
+2020-01-21 11:52:48,996 [INFO ]  Start of log for device: hue_lights
+2020-01-21 11:52:49,024 [INFO ]  connected to broker
+2020-01-21 11:52:49,025 [INFO ]  ('subscribed to topic', 'lamp')
+2020-01-21 11:52:49,025 [INFO ]  ('subscribed to topic', 'client-computers')
+2020-01-21 11:52:49,025 [INFO ]  ('subscribed to topic', 'hue_lights')
+2020-01-21 11:52:49,025 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 11:52:49", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 11:52:49,026 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 11:52:49", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 11:52:49,026 [INFO ]  connected OK
+2020-01-21 11:55:52,388 [INFO ]  ('message received: topic', 'hue_lights', 'message', '{"device_id":"back-end","time_sent":"21-01-2020 11:55:52","type":"instruction","contents":[{"instruction":"status update"}]}')
+2020-01-21 11:55:52,388 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 11:55:52", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 11:55:52,389 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 11:55:52", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 11:55:52,389 [INFO ]  ('instruction performed', 'status update')
+2020-01-21 11:55:52,390 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 11:55:52", "type": "confirmation", "contents": {"completed": true, "instructed": {"device_id": "back-end", "time_sent": "21-01-2020 11:55:52", "type": "instruction", "contents": [{"instruction": "status update"}]}}}')
+2020-01-21 11:56:58,216 [INFO ]  ('message received: topic', 'hue_lights', 'message', '{"device_id":"back-end","time_sent":"21-01-2020 11:56:58","type":"instruction","contents":[{"instruction":"status update"}]}')
+2020-01-21 11:56:58,217 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 11:56:58", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 11:56:58,217 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 11:56:58", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 11:56:58,217 [INFO ]  ('instruction performed', 'status update')
+2020-01-21 11:56:58,218 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 11:56:58", "type": "confirmation", "contents": {"completed": true, "instructed": {"device_id": "back-end", "time_sent": "21-01-2020 11:56:58", "type": "instruction", "contents": [{"instruction": "status update"}]}}}')
+2020-01-21 12:03:29,233 [INFO ]  ('message received: topic', 'hue_lights', 'message', '{"device_id":"back-end","time_sent":"21-01-2020 12:03:29","type":"instruction","contents":[{"instruction":"status update"}]}')
+2020-01-21 12:03:29,234 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 12:03:29", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 12:03:29,234 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 12:03:29", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 12:03:29,234 [INFO ]  ('instruction performed', 'status update')
+2020-01-21 12:03:29,235 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 12:03:29", "type": "confirmation", "contents": {"completed": true, "instructed": {"device_id": "back-end", "time_sent": "21-01-2020 12:03:29", "type": "instruction", "contents": [{"instruction": "status update"}]}}}')

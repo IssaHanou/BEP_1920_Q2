@@ -1,0 +1,152 @@
+2020-01-21 14:46:28,868 [INFO ]  Start of log for device: hue_lights
+2020-01-21 14:46:28,971 [INFO ]  connected to broker
+2020-01-21 14:46:28,977 [INFO ]  ('subscribed to topic', 'lamp')
+2020-01-21 14:46:28,977 [INFO ]  ('subscribed to topic', 'client-computers')
+2020-01-21 14:46:28,977 [INFO ]  ('subscribed to topic', 'hue_lights')
+2020-01-21 14:46:28,978 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:28", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 14:46:28,978 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:28", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 14:46:28,979 [INFO ]  connected OK
+2020-01-21 14:46:29,985 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:29", "type": "connection", "contents": {"connection": false}}')
+2020-01-21 14:46:29,985 [WARNI]  disconnecting, reason 1
+2020-01-21 14:46:31,011 [INFO ]  ('subscribed to topic', 'lamp')
+2020-01-21 14:46:31,012 [INFO ]  ('subscribed to topic', 'client-computers')
+2020-01-21 14:46:31,012 [INFO ]  ('subscribed to topic', 'hue_lights')
+2020-01-21 14:46:31,015 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:31", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 14:46:31,015 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:31", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 14:46:31,016 [INFO ]  connected OK
+2020-01-21 14:46:32,016 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:32", "type": "connection", "contents": {"connection": false}}')
+2020-01-21 14:46:32,016 [WARNI]  disconnecting, reason 1
+2020-01-21 14:46:33,025 [INFO ]  ('subscribed to topic', 'lamp')
+2020-01-21 14:46:33,026 [INFO ]  ('subscribed to topic', 'client-computers')
+2020-01-21 14:46:33,026 [INFO ]  ('subscribed to topic', 'hue_lights')
+2020-01-21 14:46:33,027 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:33", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 14:46:33,027 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:33", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 14:46:33,027 [INFO ]  connected OK
+2020-01-21 14:46:34,036 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:34", "type": "connection", "contents": {"connection": false}}')
+2020-01-21 14:46:34,037 [WARNI]  disconnecting, reason 1
+2020-01-21 14:46:35,072 [INFO ]  ('subscribed to topic', 'lamp')
+2020-01-21 14:46:35,073 [INFO ]  ('subscribed to topic', 'client-computers')
+2020-01-21 14:46:35,073 [INFO ]  ('subscribed to topic', 'hue_lights')
+2020-01-21 14:46:35,073 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:35", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 14:46:35,074 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:35", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 14:46:35,074 [INFO ]  connected OK
+2020-01-21 14:46:36,084 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:36", "type": "connection", "contents": {"connection": false}}')
+2020-01-21 14:46:36,084 [WARNI]  disconnecting, reason 1
+2020-01-21 14:46:37,118 [INFO ]  ('subscribed to topic', 'lamp')
+2020-01-21 14:46:37,119 [INFO ]  ('subscribed to topic', 'client-computers')
+2020-01-21 14:46:37,119 [INFO ]  ('subscribed to topic', 'hue_lights')
+2020-01-21 14:46:37,119 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:37", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 14:46:37,119 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:37", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 14:46:37,120 [INFO ]  connected OK
+2020-01-21 14:46:38,125 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:38", "type": "connection", "contents": {"connection": false}}')
+2020-01-21 14:46:38,125 [WARNI]  disconnecting, reason 1
+2020-01-21 14:46:39,133 [INFO ]  ('subscribed to topic', 'lamp')
+2020-01-21 14:46:39,133 [INFO ]  ('subscribed to topic', 'client-computers')
+2020-01-21 14:46:39,134 [INFO ]  ('subscribed to topic', 'hue_lights')
+2020-01-21 14:46:39,134 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:39", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 14:46:39,134 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:39", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 14:46:39,135 [INFO ]  connected OK
+2020-01-21 14:46:40,147 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:40", "type": "connection", "contents": {"connection": false}}')
+2020-01-21 14:46:40,147 [WARNI]  disconnecting, reason 1
+2020-01-21 14:46:41,202 [INFO ]  ('subscribed to topic', 'lamp')
+2020-01-21 14:46:41,202 [INFO ]  ('subscribed to topic', 'client-computers')
+2020-01-21 14:46:41,203 [INFO ]  ('subscribed to topic', 'hue_lights')
+2020-01-21 14:46:41,203 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:41", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 14:46:41,204 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:41", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 14:46:41,204 [INFO ]  connected OK
+2020-01-21 14:46:42,214 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:42", "type": "connection", "contents": {"connection": false}}')
+2020-01-21 14:46:42,214 [WARNI]  disconnecting, reason 1
+2020-01-21 14:46:43,597 [INFO ]  ('subscribed to topic', 'lamp')
+2020-01-21 14:46:43,598 [INFO ]  ('subscribed to topic', 'client-computers')
+2020-01-21 14:46:43,598 [INFO ]  ('subscribed to topic', 'hue_lights')
+2020-01-21 14:46:43,599 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:43", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 14:46:43,599 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:43", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 14:46:43,599 [INFO ]  connected OK
+2020-01-21 14:46:44,628 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:44", "type": "connection", "contents": {"connection": false}}')
+2020-01-21 14:46:44,628 [WARNI]  disconnecting, reason 1
+2020-01-21 14:46:45,636 [INFO ]  ('subscribed to topic', 'lamp')
+2020-01-21 14:46:45,636 [INFO ]  ('subscribed to topic', 'client-computers')
+2020-01-21 14:46:45,636 [INFO ]  ('subscribed to topic', 'hue_lights')
+2020-01-21 14:46:45,637 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:45", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 14:46:45,637 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:45", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 14:46:45,637 [INFO ]  connected OK
+2020-01-21 14:46:46,648 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:46", "type": "connection", "contents": {"connection": false}}')
+2020-01-21 14:46:46,648 [WARNI]  disconnecting, reason 1
+2020-01-21 14:46:47,669 [INFO ]  ('subscribed to topic', 'lamp')
+2020-01-21 14:46:47,670 [INFO ]  ('subscribed to topic', 'client-computers')
+2020-01-21 14:46:47,671 [INFO ]  ('subscribed to topic', 'hue_lights')
+2020-01-21 14:46:47,672 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:47", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 14:46:47,673 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:47", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 14:46:47,673 [INFO ]  connected OK
+2020-01-21 14:46:48,681 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:48", "type": "connection", "contents": {"connection": false}}')
+2020-01-21 14:46:48,682 [WARNI]  disconnecting, reason 1
+2020-01-21 14:46:49,696 [INFO ]  ('subscribed to topic', 'lamp')
+2020-01-21 14:46:49,696 [INFO ]  ('subscribed to topic', 'client-computers')
+2020-01-21 14:46:49,696 [INFO ]  ('subscribed to topic', 'hue_lights')
+2020-01-21 14:46:49,697 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:49", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 14:46:49,697 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:49", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 14:46:49,697 [INFO ]  connected OK
+2020-01-21 14:46:50,714 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:50", "type": "connection", "contents": {"connection": false}}')
+2020-01-21 14:46:50,714 [WARNI]  disconnecting, reason 1
+2020-01-21 14:46:51,722 [INFO ]  ('subscribed to topic', 'lamp')
+2020-01-21 14:46:51,723 [INFO ]  ('subscribed to topic', 'client-computers')
+2020-01-21 14:46:51,723 [INFO ]  ('subscribed to topic', 'hue_lights')
+2020-01-21 14:46:51,723 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:51", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 14:46:51,723 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:51", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 14:46:51,724 [INFO ]  connected OK
+2020-01-21 14:46:52,739 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:52", "type": "connection", "contents": {"connection": false}}')
+2020-01-21 14:46:52,739 [WARNI]  disconnecting, reason 1
+2020-01-21 14:46:53,760 [INFO ]  ('subscribed to topic', 'lamp')
+2020-01-21 14:46:53,761 [INFO ]  ('subscribed to topic', 'client-computers')
+2020-01-21 14:46:53,761 [INFO ]  ('subscribed to topic', 'hue_lights')
+2020-01-21 14:46:53,762 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:53", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 14:46:53,763 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:53", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 14:46:53,763 [INFO ]  connected OK
+2020-01-21 14:46:54,770 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:54", "type": "connection", "contents": {"connection": false}}')
+2020-01-21 14:46:54,771 [WARNI]  disconnecting, reason 1
+2020-01-21 14:46:55,786 [INFO ]  ('subscribed to topic', 'lamp')
+2020-01-21 14:46:55,787 [INFO ]  ('subscribed to topic', 'client-computers')
+2020-01-21 14:46:55,788 [INFO ]  ('subscribed to topic', 'hue_lights')
+2020-01-21 14:46:55,789 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:55", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 14:46:55,790 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:55", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 14:46:55,790 [INFO ]  connected OK
+2020-01-21 14:46:56,814 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:56", "type": "connection", "contents": {"connection": false}}')
+2020-01-21 14:46:56,815 [WARNI]  disconnecting, reason 1
+2020-01-21 14:46:57,829 [INFO ]  ('subscribed to topic', 'lamp')
+2020-01-21 14:46:57,829 [INFO ]  ('subscribed to topic', 'client-computers')
+2020-01-21 14:46:57,829 [INFO ]  ('subscribed to topic', 'hue_lights')
+2020-01-21 14:46:57,830 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:57", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 14:46:57,830 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:57", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 14:46:57,830 [INFO ]  connected OK
+2020-01-21 14:46:58,836 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:58", "type": "connection", "contents": {"connection": false}}')
+2020-01-21 14:46:58,836 [WARNI]  disconnecting, reason 1
+2020-01-21 14:46:59,854 [INFO ]  ('subscribed to topic', 'lamp')
+2020-01-21 14:46:59,855 [INFO ]  ('subscribed to topic', 'client-computers')
+2020-01-21 14:46:59,856 [INFO ]  ('subscribed to topic', 'hue_lights')
+2020-01-21 14:46:59,856 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:59", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 14:46:59,857 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:46:59", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 14:46:59,858 [INFO ]  connected OK
+2020-01-21 14:47:00,872 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:47:00", "type": "connection", "contents": {"connection": false}}')
+2020-01-21 14:47:00,873 [WARNI]  disconnecting, reason 1
+2020-01-21 14:47:01,893 [INFO ]  ('subscribed to topic', 'lamp')
+2020-01-21 14:47:01,894 [INFO ]  ('subscribed to topic', 'client-computers')
+2020-01-21 14:47:01,894 [INFO ]  ('subscribed to topic', 'hue_lights')
+2020-01-21 14:47:01,895 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:47:01", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 14:47:01,896 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:47:01", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 14:47:01,896 [INFO ]  connected OK
+2020-01-21 14:47:02,904 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:47:02", "type": "connection", "contents": {"connection": false}}')
+2020-01-21 14:47:02,905 [WARNI]  disconnecting, reason 1
+2020-01-21 14:47:03,917 [INFO ]  ('subscribed to topic', 'lamp')
+2020-01-21 14:47:03,918 [INFO ]  ('subscribed to topic', 'client-computers')
+2020-01-21 14:47:03,918 [INFO ]  ('subscribed to topic', 'hue_lights')
+2020-01-21 14:47:03,919 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:47:03", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 14:47:03,920 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:47:03", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 14:47:03,920 [INFO ]  connected OK
+2020-01-21 14:47:04,925 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:47:04", "type": "connection", "contents": {"connection": false}}')
+2020-01-21 14:47:04,926 [WARNI]  disconnecting, reason 1
+2020-01-21 14:47:05,973 [INFO ]  ('subscribed to topic', 'lamp')
+2020-01-21 14:47:05,974 [INFO ]  ('subscribed to topic', 'client-computers')
+2020-01-21 14:47:05,975 [INFO ]  ('subscribed to topic', 'hue_lights')
+2020-01-21 14:47:05,975 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:47:05", "type": "connection", "contents": {"connection": true}}')
+2020-01-21 14:47:05,975 [INFO ]  ('back-end message published', '{"device_id": "hue_lights", "time_sent": "21-01-2020 14:47:05", "type": "status", "contents": {"all": "none"}}')
+2020-01-21 14:47:05,976 [INFO ]  connected OK

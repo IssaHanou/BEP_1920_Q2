@@ -1,0 +1,1 @@
+2020-01-22 10:44:12,369 [INFO ]  Start of log for device: hue_lights

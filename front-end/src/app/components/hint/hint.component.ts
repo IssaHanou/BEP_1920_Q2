@@ -2,13 +2,23 @@ import { Component } from "@angular/core";
 import { AppComponent } from "../../app.component";
 import { Hint } from "./hint";
 
+/**
+ * The hint component controls the sending of hints in the "Hint" box on the home pgae.
+ */
 @Component({
   selector: "app-hint",
   templateUrl: "./hint.component.html",
   styleUrls: ["./hint.component.css", "../../../assets/css/main.css"]
 })
 export class HintComponent {
+  /**
+   * The contents of the hint text field.
+   */
   customHint: string;
+
+  /**
+   * The contents of the hint selection box.
+   */
   predefinedHint: string;
 
   constructor(private app: AppComponent) {}
@@ -41,8 +51,8 @@ export class HintComponent {
   }
 
   /**
-   * When predefined hint has been chosen and the accompanying "stuur" button is clicked,
-   * the chosen hint is sent as instruction to hint devices.
+   * When predefined hint has been chosen and the accompanying "Stuur" button is clicked,
+   * the selected hint is sent as instruction to hint devices.
    */
   onPredefinedHint() {
     if (
@@ -58,7 +68,7 @@ export class HintComponent {
   }
 
   /**
-   * When custom hint has been typed and the accompanying "stuur" button is clicked,
+   * When custom hint has been typed and the accompanying "Stuur" button is clicked,
    * the typed hint is sent as instruction to hint devices.
    */
   onCustomHint() {

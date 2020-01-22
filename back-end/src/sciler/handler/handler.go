@@ -37,8 +37,9 @@ func (handler *Handler) NewHandler(client mqtt.Client, message mqtt.Message) {
 	var raw Message
 	if err := json.Unmarshal(message.Payload(), &raw); err != nil {
 		logger.Errorf("invalid JSON received: %v", err)
+	} else {
+		handler.msgMapper(raw)
 	}
-	handler.msgMapper(raw)
 }
 
 // msgMapper sends the message through to the right function, filtering on Message.Type
@@ -53,6 +54,7 @@ func (handler *Handler) msgMapper(raw Message) {
 		{
 			handler.updateStatus(raw)
 			handler.sendStatus(raw.DeviceID)
+			handler.sendFrontEndStatus(raw)
 			handler.HandleEvent(raw.DeviceID)
 			handler.sendEventStatus()
 		}
@@ -66,8 +68,7 @@ func (handler *Handler) msgMapper(raw Message) {
 		}
 	default:
 		{
-			logger.Error("message received from ", raw.DeviceID,
-				", but no message type could be found for: ", raw.Type)
+			logger.Errorf("message received from %s, but no message type could be found for: %v", raw.DeviceID, raw.Type)
 		}
 	}
 }
@@ -80,16 +81,16 @@ func (handler *Handler) onConnectionMsg(raw Message) {
 	contents := raw.Contents.(map[string]interface{})
 	device, ok := handler.Config.Devices[raw.DeviceID]
 	if !ok {
-		logger.Error("connection message received from device " + raw.DeviceID + ", which is not in the config")
+		logger.Warnf("connection message received from device %s which is not in the config", raw.DeviceID)
 	} else {
-		logger.Info("connection message received from: ", raw.DeviceID)
+		logger.Infof("connection message received from: %s", raw.DeviceID)
 		value, ok2 := contents["connection"]
 		if !ok2 || reflect.TypeOf(value).Kind() != reflect.Bool {
-			logger.Error("received improperly structured connection message from device " + raw.DeviceID)
+			logger.Errorf("received improperly structured connection message from device %s", raw.DeviceID)
 		} else {
 			device.Connection = value.(bool)
 			handler.Config.Devices[raw.DeviceID] = device
-			logger.Info("setting connection status of ", raw.DeviceID, " to ", value)
+			logger.Infof("setting connection status of %s to %v", raw.DeviceID, value)
 			handler.sendStatus(raw.DeviceID)
 			if raw.DeviceID == "front-end" && !value.(bool) { // when a front-end disconnect, check if another front-end is connected (maybe multiple front-ends are running
 				handler.SendSetup()
@@ -104,12 +105,12 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 	contents := raw.Contents.(map[string]interface{})
 	value, ok := contents["completed"]
 	if !ok || reflect.TypeOf(value).Kind() != reflect.Bool {
-		logger.Errorf("received improperly structured confirmation message from device " + raw.DeviceID)
+		logger.Errorf("received improperly structured confirmation message from device %s (no completed tag/boolean value)", raw.DeviceID)
 		return
 	}
 	original, ok := contents["instructed"]
 	if !ok {
-		logger.Errorf("received improperly structured confirmation message from device " + raw.DeviceID)
+		logger.Errorf("received improperly structured confirmation message from device %s (no structured tag)", raw.DeviceID)
 		return
 	}
 	msg := original.(map[string]interface{})
@@ -133,17 +134,17 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 	}
 
 	if !value.(bool) {
-		logger.Warn("device " + raw.DeviceID + " did not complete instructions: " +
-			instructionString + " at " + raw.TimeSent)
+		logger.Warnf("device %s did not complete instructions: %v at %v", raw.DeviceID,
+			instructionString, raw.TimeSent)
 	} else {
-		logger.Info("device " + raw.DeviceID + " completed instructions: " +
-			instructionString + " at " + raw.TimeSent)
+		logger.Infof("device %s completed instructions: %v at %v", raw.DeviceID,
+			instructionString, raw.TimeSent)
 	}
 
 	// If a message is received from a device, it can be concluded that the device has positive connection status, and thus it's connection status is set to true
 	con, ok := handler.Config.Devices[raw.DeviceID]
 	if !ok {
-		logger.Errorf("device %s was not found in config", raw.DeviceID)
+		logger.Warnf("device %s was not found in config", raw.DeviceID)
 	} else {
 		con.Connection = true
 		handler.Config.Devices[raw.DeviceID] = con
@@ -155,7 +156,7 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 // Currently, only instructions messages from the front-end are supported
 // The actions to take are decided by Message.Contents.instruction
 func (handler *Handler) onInstructionMsg(raw Message) {
-	logger.Info("instruction message received from: ", raw.DeviceID)
+	logger.Infof("instruction message received from: %s", raw.DeviceID)
 
 	instructions, err := getMapSlice(raw.Contents)
 	if err != nil {

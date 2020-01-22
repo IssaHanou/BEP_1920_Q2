@@ -1,11 +1,12 @@
-/*Global variables - don't work*/
+/*Global variables - don't work - but keep track of general colors and fonts used.*/
 :root {
   --mat-primary: #3f51b5;
+  --mat-secondary: #EEEEEE;
   --mat-font: Roboto, "Helvetica Neue", sans-serif;
 }
 
 
-/*General styling*/
+/*General styling, setting background colors.*/
 body { /*body of the index.html*/
   background-color: #3f51b5;
   min-width: 350px;
@@ -20,6 +21,7 @@ body { /*body of the index.html*/
   padding: 10px;
 }
 
+/**Menu styling, such that the menu is always the same size, which exactly fits three items.*/
 .menu {
   background-color: #EEEEEE;
   height: 155px;
@@ -46,7 +48,7 @@ body { /*body of the index.html*/
 }
 
 
-/*Other components*/
+/*Other components throughout the application*/
 .custom-md-button, button {
   margin: 5px;
   font-size: 16px;
@@ -55,7 +57,8 @@ body { /*body of the index.html*/
 
 
 
-/*Boxes on home page*/
+/*Boxes on home page, which contain a header and contents box,
+ and should be spaced apart from each other.*/
 .home-box {
   font-family: Roboto, "Helvetica Neue", sans-serif;
   margin: 0 30px 0;
@@ -78,7 +81,7 @@ body { /*body of the index.html*/
 
 
 
-/*Small screens should have small margin*/
+/*Small screens should have little 'white space'*/
 @media only screen and (max-width: 800px) {
   @media only screen and (min-width: 650px) {
     .left {
