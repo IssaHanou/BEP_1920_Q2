@@ -67,8 +67,19 @@
           },
           "actions": [
             {
+              "type": "device",
+              "type_id": "display",
+              "message": [
+                {
+                  "component_id": "display",
+                  "instruction": "hint",
+                  "value": "it tested!"
+                }
+              ]
+            },
+            {
               "type": "timer",
-              "type_id": "timer1",
+              "type_id": "general",
               "message": [
                 {
                   "instruction": "pause"

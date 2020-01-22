@@ -23,7 +23,6 @@ import { FullScreen } from "../fullscreen";
 })
 export class CameraComponent extends FullScreen
   implements OnInit, AfterViewInit, OnDestroy {
-
   /**
    * There is a control for each selection dropdown and the src used by each iframe.
    * The booleans keep track of the second feed (opened or not) and full screen (enabled or not).
