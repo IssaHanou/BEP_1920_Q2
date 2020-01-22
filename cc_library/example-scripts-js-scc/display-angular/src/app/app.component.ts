@@ -18,6 +18,8 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.display.start();
+    this.display.start( () => {
+      console.log("CONNECTED");
+    });
   }
 }
