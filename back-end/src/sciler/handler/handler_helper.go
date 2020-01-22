@@ -46,8 +46,8 @@ func (handler *Handler) SendSetup() {
 }
 
 // SendComponentInstruction sends a list of instructions to a client, with a delay if given a valid duration.
-// This function is called in reaction to a execution of a rule
-// param cliendID  is the target for the message (topic to publish to)
+// This function is called in response to the execution of a rule
+// param clientID  is the target for the message (topic to publish to)
 // param instructions are the contends with instructions for the device
 // param delay is the possible delay it will wait to send the message
 // if delay is not properly structured (XhXmXs), no error will be given, the function will continue as if no delay was given
@@ -80,7 +80,7 @@ func (handler *Handler) SendComponentInstruction(clientID string, instructions [
 }
 
 // SendLabelInstruction provides the action with a componentID from de LabelMap and a device to send it to
-// This function is called in reaction to a execution of a rule
+// This function is called in response to the execution of a rule
 // SendComponentInstruction is called for each component in the LabelMap under labelID
 // Each instruction needs a componentID to execute on the device,
 // this is why the original instructions can not be immediately passed to the SendComponentInstruction function
