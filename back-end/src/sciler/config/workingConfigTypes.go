@@ -338,18 +338,16 @@ func (constraint Constraint) checkConstraints(condition Condition, config Workin
 // checkConstraintsDevice is a method that check all types and comparators of a constraint on a device
 func checkConstraintsDevice(condition Condition, config WorkingConfig, ruleID string, constraint Constraint) []string {
 	if device, ok := config.Devices[condition.TypeID]; ok { // checks if device can be found in the map, if so, it is stored in variable device
-		valueType := reflect.TypeOf(constraint.Value).Kind()
-		comparison := constraint.Comparison
 		if inputType, ok := device.Input[constraint.ComponentID]; ok {
 			switch inputType {
 			case "string":
-				return checkConstraintsDeviceStringInput(inputType, valueType, ruleID, comparison, constraint.Value)
+				return checkConstraintsDeviceStringInput(ruleID, constraint)
 			case "boolean":
-				return checkConstraintsDeviceBooleanInput(inputType, valueType, ruleID, comparison, constraint.Value)
+				return checkConstraintsDeviceBooleanInput(ruleID, constraint)
 			case "numeric":
-				return checkConstraintsDeviceNumericInput(inputType, valueType, ruleID, comparison, constraint.Value)
+				return checkConstraintsDeviceNumericInput(ruleID, constraint)
 			case "array":
-				return checkConstraintsDeviceArrayInput(inputType, valueType, ruleID, comparison, constraint.Value)
+				return checkConstraintsDeviceArrayInput(ruleID, constraint)
 			default:
 				return []string{fmt.Sprintf("on rule %s: custom types like: %s, are not yet implemented", ruleID, inputType)}
 			}
@@ -362,9 +360,11 @@ func checkConstraintsDevice(condition Condition, config WorkingConfig, ruleID st
 }
 
 // checkConstraintsDeviceStringInput is a method that returns all error (if any) in a constraint of a device with string input
-func checkConstraintsDeviceStringInput(inputType string, valueType reflect.Kind, ruleID string, comparison string, value interface{}) []string {
+func checkConstraintsDeviceStringInput(ruleID string, constraint Constraint) []string {
+	valueType := reflect.TypeOf(constraint.Value).Kind()
+	comparison := constraint.Comparison
 	if valueType != reflect.String {
-		return []string{fmt.Sprintf("on rule %s: input type string expected but %s found as type of value %v", ruleID, valueType.String(), value)}
+		return []string{fmt.Sprintf("on rule %s: input type string expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
 	}
 	if !CheckValidComparison(comparison) {
 		return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
@@ -377,9 +377,11 @@ func checkConstraintsDeviceStringInput(inputType string, valueType reflect.Kind,
 }
 
 // checkConstraintsDeviceBooleanInput is a method that returns all error (if any) in a constraint of a device with boolean input
-func checkConstraintsDeviceBooleanInput(inputType string, valueType reflect.Kind, ruleID string, comparison string, value interface{}) []string {
+func checkConstraintsDeviceBooleanInput(ruleID string, constraint Constraint) []string {
+	valueType := reflect.TypeOf(constraint.Value).Kind()
+	comparison := constraint.Comparison
 	if valueType != reflect.Bool {
-		return []string{fmt.Sprintf("on rule %s: input type boolean expected but %s found as type of value %v", ruleID, valueType.String(), value)}
+		return []string{fmt.Sprintf("on rule %s: input type boolean expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
 	}
 	if !CheckValidComparison(comparison) {
 		return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
@@ -392,9 +394,11 @@ func checkConstraintsDeviceBooleanInput(inputType string, valueType reflect.Kind
 }
 
 // checkConstraintsDeviceNumericInput is a method that returns all error (if any) in a constraint of a device with numeric input
-func checkConstraintsDeviceNumericInput(inputType string, valueType reflect.Kind, ruleID string, comparison string, value interface{}) []string {
+func checkConstraintsDeviceNumericInput(ruleID string, constraint Constraint) []string {
+	valueType := reflect.TypeOf(constraint.Value).Kind()
+	comparison := constraint.Comparison
 	if valueType != reflect.Int && valueType != reflect.Float64 {
-		return []string{fmt.Sprintf("on rule %s: input type numeric expected but %s found as type of value %v", ruleID, valueType.String(), value)}
+		return []string{fmt.Sprintf("on rule %s: input type numeric expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
 	}
 	if !CheckValidComparison(comparison) {
 		return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
@@ -407,9 +411,11 @@ func checkConstraintsDeviceNumericInput(inputType string, valueType reflect.Kind
 }
 
 // checkConstraintsDeviceArrayInput is a method that returns all error (if any) in a constraint of a device with array input
-func checkConstraintsDeviceArrayInput(inputType string, valueType reflect.Kind, ruleID, comparison string, value interface{}) []string {
+func checkConstraintsDeviceArrayInput(ruleID string, constraint Constraint) []string {
+	valueType := reflect.TypeOf(constraint.Value).Kind()
+	comparison := constraint.Comparison
 	if valueType != reflect.Slice {
-		return []string{fmt.Sprintf("on rule %s: input type array/slice expected but %s found as type of value %v", ruleID, valueType.String(), value)}
+		return []string{fmt.Sprintf("on rule %s: input type array/slice expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
 	}
 	if !CheckValidComparison(comparison) {
 		return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
