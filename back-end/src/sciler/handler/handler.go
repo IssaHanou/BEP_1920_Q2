@@ -48,10 +48,7 @@ func (handler *Handler) msgMapper(raw Message) {
 		}
 	case "status":
 		{
-			handler.updateStatus(raw)
-			handler.sendStatus(raw.DeviceID)
-			handler.HandleEvent(raw.DeviceID)
-			handler.sendEventStatus()
+			handler.onStatusMsg(raw)
 		}
 	case "confirmation":
 		{
@@ -67,6 +64,14 @@ func (handler *Handler) msgMapper(raw Message) {
 				", but no message type could be found for: ", raw.Type)
 		}
 	}
+}
+
+// onStatusMsg is the function to process status messages.
+func (handler *Handler) onStatusMsg(raw Message) {
+	handler.updateStatus(raw)
+	handler.sendStatus(raw.DeviceID)
+	handler.HandleEvent(raw.DeviceID)
+	handler.sendEventStatus()
 }
 
 // onConnectionMsg is the function to process connection messages.
@@ -144,7 +149,6 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 // onInstructionMsg is the function to process instruction messages.
 func (handler *Handler) onInstructionMsg(raw Message) {
 	logger.Info("instruction message received from: ", raw.DeviceID)
-
 	instructions, err := getMapSlice(raw.Contents)
 	if err != nil {
 		logger.Error(err)
@@ -153,77 +157,93 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 
 	for _, instruction := range instructions {
 		if raw.DeviceID == "front-end" {
-			switch instruction["instruction"] {
-			case "send setup":
-				{
-					handler.SendSetup()
-				}
-			case "send status":
-				{
-					for _, device := range handler.Config.Devices {
-						handler.sendStatus(device.ID)
-					}
-					for _, timer := range handler.Config.Timers {
-						handler.sendStatus(timer.ID)
-					}
-					handler.sendEventStatus()
-				}
-			case "reset all":
-				{
-					handler.SendInstruction("client-computers", []map[string]string{{
-						"instruction":   "reset",
-						"instructed_by": raw.DeviceID,
-					}})
-					handler.SendInstruction("front-end", []map[string]string{{
-						"instruction":   "reset",
-						"instructed_by": raw.DeviceID,
-					}})
-					handler.Config = config.ReadFile(handler.ConfigFile)
-					handler.SendSetup()
-				}
-			case "test all":
-				{
-					handler.SendInstruction("client-computers", []map[string]string{{
-						"instruction":   "test",
-						"instructed_by": raw.DeviceID,
-					}})
-				}
-			case "test device":
-				{
-					handler.SendInstruction(instruction["device"].(string), []map[string]string{{
-						"instruction":   "test",
-						"instructed_by": raw.DeviceID,
-					}})
-				}
-			case "finish rule":
-				{
-					ruleToFinish := instruction["rule"].(string)
-					rule, ok := handler.Config.RuleMap[ruleToFinish]
-					if !ok {
-						logger.Errorf("could not find rule with id %s in map", ruleToFinish)
-					}
-					rule.Execute(handler)
-					handler.sendEventStatus()
-				}
-			case "hint":
-				{
-					handler.SendInstruction("hint", []map[string]string{{
-						"instruction":   "hint",
-						"value":         instruction["value"].(string),
-						"instructed_by": raw.DeviceID,
-					}})
-				}
-			case "check config":
-				{
-					handler.processConfig(instruction["config"], "check", "")
-				}
-			case "use config":
-				{
-					handler.processConfig(instruction["config"], "use", instruction["file"].(string))
-				}
-			}
+			handler.handleInstruction(instruction, "front-end")
 		} else {
 			logger.Warnf("%s, tried to instruct the back-end, only the front-end is allowed to instruct the back-end", raw.DeviceID)
 		}
 	}
+}
+
+// handleInstruction is the function to process an instruction given the ID of the instructor
+func (handler *Handler) handleInstruction(instruction map[string]interface{}, instructor string) {
+	switch instruction["instruction"] {
+	case "send setup":
+		handler.SendSetup()
+	case "send status":
+		handler.onSendStatus()
+	case "reset all":
+		handler.onResetAll(instructor)
+	case "test all":
+		handler.onTestAll(instructor)
+	case "test device":
+		handler.onTestDevice(instruction["device"].(string), instructor)
+	case "finish rule":
+		handler.onFinishRule(instruction["rule"].(string))
+	case "hint":
+		handler.onHint(instruction["value"].(string), instructor)
+	case "check config":
+		handler.processConfig(instruction["config"], "check", "")
+	case "use config":
+		handler.processConfig(instruction["config"], "use", instruction["file"].(string))
+	}
+}
+
+// onSendStatus is the function to process the instruction `send status`
+func (handler *Handler) onSendStatus() {
+	for _, device := range handler.Config.Devices {
+		handler.sendStatus(device.ID)
+	}
+	for _, timer := range handler.Config.Timers {
+		handler.sendStatus(timer.ID)
+	}
+	handler.sendEventStatus()
+}
+
+// onResetAll is the function to process the instruction `reset all`
+func (handler *Handler) onResetAll(deviceID string) {
+	handler.SendInstruction("client-computers", []map[string]string{{
+		"instruction":   "reset",
+		"instructed_by": deviceID,
+	}})
+	handler.SendInstruction("front-end", []map[string]string{{
+		"instruction":   "reset",
+		"instructed_by": deviceID,
+	}})
+	handler.Config = config.ReadFile(handler.ConfigFile)
+	handler.SendSetup()
+}
+
+// onTestAll is the function to process the instruction `test all`
+func (handler *Handler) onTestAll(instructor string) {
+	handler.SendInstruction("client-computers", []map[string]string{{
+		"instruction":   "test",
+		"instructed_by": instructor,
+	}})
+}
+
+// onTestDevice is the function to process the instruction `test device`
+func (handler *Handler) onTestDevice(deviceID string, instructor string) {
+	handler.SendInstruction(deviceID, []map[string]string{{
+		"instruction":   "test",
+		"instructed_by": instructor,
+	}})
+}
+
+// onResetAll is the function to process the instruction `finish rule`
+func (handler *Handler) onFinishRule(ruleID string) {
+	rule, ok := handler.Config.RuleMap[ruleID]
+	if !ok {
+		logger.Errorf("could not find rule with id %s in map", ruleID)
+	}
+	rule.Execute(handler)
+	handler.sendEventStatus()
+}
+
+// onHint is the function to process the instruction `hint`
+func (handler *Handler) onHint(hint string, instructor string) {
+	handler.SendInstruction("hint", []map[string]string{{
+		"instruction":   "hint",
+		"value":         hint,
+		"instructed_by": instructor,
+	}})
 }
