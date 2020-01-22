@@ -7,10 +7,12 @@ An example can be seen in `example.config.json`. The same format
 There are three main components to the file:
 
 - `general`
+- `cameras`
 - `devices`
 - `timers`
 - `puzzles` 
 - `general_events`
+- `button_events`
 - `rules` which are defined for puzzles
 
 ### General
@@ -20,6 +22,12 @@ This is the general information of the escape room. It includes the following ta
 - `duration`: this is the duration of the escape room, which should be a string in the format "hh:mm:ss".
 - `host`: this is the IP address of the broker through which clients and back-end connect, formatted as a string.
 - `port`: this is the port on which the broker runs, formatted as integer. 
+
+### Cameras
+This will be a list of camera objects, that are set up in the room. An object has two properties:
+
+- `name`: the name of the camera
+- `link`: the link to the camera's IP address
 
 ### Devices
 This will be a list of all devices in the room. Each device is defined as a JSON object with the following properties:
@@ -53,13 +61,63 @@ General events have the following properties:
 - `name`: name of event, for example "start"
 - `rules`: array of rule objects (see below)
 
+### Button Events
+Button events are events that happen on the click of a button in the front-end. 
+The event in the config is a rule, as defined below.
+The conditions must include the value of the button on which it should execute. 
+The can also include extra parameters that the executing of the rule depends on, 
+like stop can only be pressed when start is already pressed.
+
+The buttons to manage the game state are configured in this sections.
+The front-end has output component `gameState` which keeps track of state of the game.
+The button event conditions can depend on the `gameState` and the actions should alter the `gameState`.
+
+The `gameState` can have several states, which can be defined through the config. 
+Example states are: `gereed`, `in spel`, `gepauzeerd` and `gestopt`, but more states can be used.
+Its default start-up status is `gereed`. The instruction for changing the `gameState` is `set state`.
+ 
+An example for `start` is given below.
+
+##### example
+      "button_events": [
+        {
+          "id": "start",
+          "description": "Als het spel start, moeten alle rode leds aan gaan en de groene uit",
+          "limit": 1,
+          "conditions": {},
+          "actions": [
+            {
+              "type": "timer",
+              "type_id": "timer2",
+              "message": [
+                {
+                  "instruction": "start"
+                }
+              ]
+            }
+            {
+              "type": "device",
+              "type_id": "front-end",
+              "message": [
+                {
+                  "instruction": "set state",
+                  "component_id": "gameState",
+                  "value": "in spel"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+
+
 ### Rules
 Rules are defined by:
 
 - `id`: this is the id of a rule. Write it in camelCase, e.g. "solvingControlBoard". This id should be unique compared to other rule ids and also the device ids as well as the timer ids.
 - `description`: this is optional and can contain more information about the rule. 
 This can be displayed in the front-end, so should be readable and in Dutch.
-- `limit`: this sets the number of times this rule can be triggered. 
+- `limit`: this sets the number of times this rule can be triggered. If this is `0`, it means unlimited.  
 - `conditions`: this is either a logical operator (i) defined by `operator` (either `AND` or `OR`) and `list` which is a list of conditions or other logical operators **or** this is a condition (ii) defined by `type`, `type_id` and `constraint`
     
     1. Logical operator

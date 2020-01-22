@@ -1,0 +1,92 @@
+{
+  "general": {
+    "name": "Escape X",
+    "duration": "30m",
+    "host": "localhost",
+    "port": 1883
+  },
+  "timers": [],
+  "devices": [
+    {
+      "id": "display1",
+      "description": "Laat hint zien",
+      "input": {
+        "display": "string"
+      },
+      "output": {
+        "display2": {
+          "type": "string",
+          "instructions": {
+            "hint": "string"
+          },
+          "label": [
+            "display-label2",
+            "display-label2"
+          ]
+        }
+      }
+    },
+    {
+      "id": "display2",
+      "description": "Laat hint zien",
+      "input": {
+        "display": "string"
+      },
+      "output": {
+        "display1": {
+          "type": "string",
+          "instructions": {
+            "hint": "string"
+          },
+          "label": [
+            "display-label1"
+          ]
+        },
+        "display2": {
+          "type": "string",
+          "instructions": {
+            "hint": "string"
+          },
+          "label": [
+            "display-label2"
+          ]
+        }
+      }
+    }
+  ],
+  "puzzles": [
+    {
+      "name": "Puzzle2",
+      "rules": [
+        {
+          "id": "rule2",
+          "description": "My rule 2",
+          "limit": 1,
+          "conditions": {
+            "type": "device",
+            "type_id": "display1",
+            "constraints": {
+              "component_id": "display",
+              "value": "test",
+              "comparison": "eq"
+            }
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "front-end",
+              "message": [
+                {
+                  "instruction": "set state",
+                  "value": "newState",
+                  "component_id": "gameState"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "general_events": []
+}
