@@ -5,34 +5,40 @@
 
 ### Using this library
 - import lib with ```const Device = require("js-scc");```
-- create a class that extends `Device`, in order to do this:
-    - implement getStatus() which should return a dictionary of the current status
-    - implement performInstruction(action) which should return a boolean of whether the instruction can be performed, where action has:
-        - `instruction`: string with the name of the instruction
-        - `value`: any type with a value specific for this instruction
-        - `component_id`: string with the name of the component for which the instruction is meant (can be undefined) 
-    - implement test() which returns nothing, this method should do something visible so the operator can test this device works correctly
-    - implement reset() which returns nothing, this method should make the device return to its starting state so that the escape room can be started again
-    - create a constructor which calls the constructor of `Device` with `super(config, logger)` where:
-        - config is a dictionary which has keys:
-            - `id`: this is the id of a device. Write it in camelCase, e.g. "controlBoard".
-            - `description`: this is optional and can contain more information about the device. This can be displayed in the front-end, so should be readable and in Dutch. 
-            - `host`: the IP address of the host for the broker, formatted as a string.
-            - `port` the port of the host for the broker, formatted as a number.
-            - `input`: defines type of values to be expected as input as a map. There can be one key `value`, or the keys can be component ids. 
-                The value is a map with the `type` property. This is defined as a string and can "string", "boolean", "array", "integer" or a custom name. 
-            - `output`: defines type of values to be expected as output as a map. There can be one key `value`, or the keys can be component ids. 
-                The value is a map with the `type` property. This is defined as a string and can "string", "boolean", "array", "integer" or a custom name.
-                It can also carry the `instruction` property which defines a map with custom instruction for the device. 
-            - `labels`: these are the labels to which this device should also subscribe, labels is an array of strings, 
-        - logger is a function(date, level, message) in which an own logger is implemented where
-             - `date` is an Date object
-             - `level` is one of the following strings: 'debug', 'info', 'warn', 'error', 'fatal'
-             - `message` is a custom string containing more information
-- Now in your class which implements `Device`, you can call:
-    - start(onStart) which connects the device where onStart is a function that will be called once the device is connected
-    - log(level, message) which logs using the logger provided in `Device` where level one of the following strings: 'debug', 'info', 'warn', 'error', 'fatal' and message custom string containing more information
-    - statusChanged() which can be called to signal to `Device` that the status is changed, this will send a new status to SCILER
+- create a class that extends `Device`, in order to do this, implement the following methods:
+
+    | method                       | parameters                       |                                                                                                                  | returns                                                                                                                              |
+    |------------------------------|----------------------------------|------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+    | `getStatus()`                | none                             |                                                                                                                  | a dictionary of current status of the device, this should include all input and output as defined in the room_config for the backend |
+    | `performInstruction(action)` | action (a dictionary with keys:) | `instruction` (string with the name of the instruction)                                                          | boolean of  whether the instruction could be performed                                                                               |
+    |                              |                                  | `value` (any type with a value specific for this instruction)                                                    |                                                                                                                                      |
+    |                              |                                  | `component_id` (string with the name of the component for which the instruction is meant, this can be undefined) |                                                                                                                                      |
+    | `test()`                     | none                             |                                                                                                                  | void                                                                                                                                 |
+    | `reset()`                    | none                             |                                                                                                                  | void                                                                                                                                 |
+
+- create a constructor which calls the constructor of `Device` with `super(config, logger)` where:
+    - config is a dictionary which has keys:
+    
+   | key      | explanation                                                                |
+   |----------|----------------------------------------------------------------------------|
+   | `id`     | string with the id of a device. Write it in camelCase, e.g. "controlBoard" |
+   | `host`   | string with the IP address of the host for the broker                      |
+   | `port`   | int with the port of the host for the broker                               |
+   | `labels` | array of strings with all labels this device should also subscribe to      |
+   
+    - logger is a function(date, level, message) in which an own logger is implemented where
+         - `date` is an Date object
+         - `level` is one of the following strings: 'debug', 'info', 'warn', 'error', 'fatal'
+         - `message` is a custom string containing more information
+- Now on the instantiation of your class which implements `Device`, you can call:
+
+    | function              | arguments                                                                         | returns | usecase                                                                          |
+    |-----------------------|-----------------------------------------------------------------------------------|---------|----------------------------------------------------------------------------------|
+    | `start(onStart)`      | onStart (a function that gets called once the device is connected or reconnected) | void    | call this function in order to connect to sciler                                 |
+    | `log(level, message)` | level (one of the following strings: 'debug', 'info', 'warn', 'error', 'fatal')   | void    | this method can be used to log in the same logger as the library does            |
+    |                       | message (custom string containing more information)                               |         |                                                                                  |
+    | `statusChanged()`     | none                                                                              | void    | call this function to signal that you updated a status so sciler can be notified |
+
 - in case of:
     - angular: add `js-scc` to dependencies in `package.json`
     - browser javascript: (example nodejs serving web page with javascript which includes this library), [Browserify](http://browserify.org/) your javascript which includes this library.
@@ -45,96 +51,102 @@ $(document).ready(function() {
   let display;
 
   class Display extends Device {
-      constructor(config) {
-          super(config, function (date, level, message) {
-              const formatDate = function (date) {
-                  return (
-                      date.getDate() +
-                      "-" +
-                      date.getMonth() +
-                      1 +
-                      "-" +
-                      date.getFullYear() +
-                      " " +
-                      date.getHours() +
-                      ":" +
-                      date.getMinutes() +
-                      ":" +
-                      date.getSeconds()
-                  );
-              };
-              console.log(
-                  "time=" + formatDate(date) + " level=" + level + " msg=" + message
-              ); // call own logger);
-          });
-          this.hint = "";
-      }
+    constructor(config) {
+      super(config, timedLogger);
+      this.hint = "";
+      this.button = false;
+    }
 
-      getStatus() {
-          return {
-              "hint": this.hint
-          }
-      }
+    // required method for extending Device
+    getStatus() {
+      return {
+        button: this.button,
+        hint: this.hint
+      };
+    }
 
-      performInstruction(action) {
-          switch (action.instruction) {
-              case "hint": {
-                  this.hint = action.value;
-                  displayText(this.hint);
-                  this.statusChanged();
-                  break;
-              }
-              default: {
-                  return false;
-              }
-          }
-          return true;
-      }
-
-      test() {
-          this.hint = "test";
-          displayText(this.hint);
-      }
-
-      reset() {
-          this.hint = "";
+    // required method for extending Device
+    performInstruction(action) {
+      switch (action.instruction) {
+        case "hint": {
+          this.hint = action.value;
           displayText(this.hint);
           this.statusChanged();
+          break;
+        }
+        default: {
+          return false;
+        }
       }
+      return true;
+    }
+
+    // required method for extending Device
+    test() {
+      this.hint = "test";
+      displayText(this.hint);
+    }
+
+    // required method for extending Device
+    reset() {
+      this.hint = "";
+      this.button = false;
+      displayText(this.hint);
+      this.statusChanged();
+    }
   }
 
+  // custom logger used in constructor
+  function timedLogger(date, level, message) {
+    const formatDate = function(date) {
+      return (
+        date.getDate() +
+        "-" +
+        date.getMonth() +
+        1 +
+        "-" +
+        date.getFullYear() +
+        " " +
+        date.getHours() +
+        ":" +
+        date.getMinutes() +
+        ":" +
+        date.getSeconds()
+      );
+    };
+    console.log(
+      "time=" + formatDate(date) + " level=" + level + " msg=" + message
+    ); // call own logger);
+  }
+
+  // edit the DOM using JQuery to display text
   function displayText(text) {
-      $("#hint").text(text);
+    $("#hint").text(text);
   }
 
+  // when the button is click update status and notify sciler
+  $("#button").on("click", function() {
+    display.button = true;
+    display.statusChanged();
+  });
 
   // get config file from server
   $.get("/display_config.json", function(config) {
-      display = new Display(JSON.parse(config));
-      display.start(() => {
-          console.log("connected");
-      });
+    display = new Display(JSON.parse(config)); // create new Display object
+    // connect
+    display.start(() => {
+      console.log("connected"); // when connected, do something
+    });
   });
 });
-
 ```
 Where `display_config.json` is:
 ```json
 {
   "id": "display-node",
-  "description": "Display can print hints",
   "host": "192.168.178.49",
   "labels": ["hint"],
-  "port": 8083,
-  "input": {},
-  "output": {
-    "display": {
-      "type": "string",
-      "instructions": {
-        "hint": "string"
-      }
-    }
-  }
+  "port": 8083
 }
 ```
 And where `index.html` is:
@@ -149,13 +161,41 @@ And where `index.html` is:
     <script type="text/javascript" src="bundle.js"></script>
 </head>
 <body>
-<p id="hint"></p>
+hint: <p id="hint"></p>
+<button id="button">button</button>
 </body>
 </html>
-
-
 ```
-
+And where the `room_config.json` looks something like: 
+```json
+{
+  "general": { },
+  "cameras": [ ],
+  "general_events": [ ],
+  "button_events": [ ],
+  "puzzles": [ ],
+  "timers": [ ],
+  "devices": [
+    { },
+    {
+      "id": "display-node",
+      "description": "displays messages",
+      "input": {
+        "button": "boolean"
+      },
+      "output": {
+        "display": {
+          "type": "string",
+          "instructions": {
+            "hint": "string"
+          }
+        }
+      }
+    },
+    { }
+  ]
+}
+```
 
 ### Tip reading in config.json in Angular:
 When reading in a json file
@@ -163,7 +203,7 @@ When reading in a json file
 import * as data from './data.json';
 ```
 
-make sure `tsconfig.json` hase `resolveJsonModule: true`:
+make sure `tsconfig.json` has `resolveJsonModule: true`:
 ```
 {
   "compilerOptions": {

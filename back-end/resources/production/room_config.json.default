@@ -109,15 +109,17 @@
       }
     },
     {
-      "description": "displays messages",
       "id": "display-node",
-      "input": {},
+      "description": "displays messages",
+      "input": {
+        "button": "boolean"
+      },
       "output": {
-        "hint": {
+        "display": {
+          "type": "string",
           "instructions": {
             "hint": "string"
-          },
-          "type": "string"
+          }
         }
       }
     },
