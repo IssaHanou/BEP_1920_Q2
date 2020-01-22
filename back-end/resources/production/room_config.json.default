@@ -889,7 +889,7 @@
           "type_id": "general",
           "message": [
             {
-              "instruction": "pause"
+              "instruction": "stop"
             }
           ]
         },

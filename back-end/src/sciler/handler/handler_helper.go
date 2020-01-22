@@ -179,10 +179,10 @@ func (handler *Handler) sendEventStatus() {
 // the rule that belongs to the pressed button is executed
 func (handler *Handler) handleFrontEndStatus(contents map[string]interface{}) {
 	device, _ := handler.Config.Devices["front-end"]
-	for component := range device.Status {
+	for component, status := range device.Status {
 		rule, _ := handler.Config.RuleMap[component]
 		if newStatus, ok := contents[component]; ok && reflect.TypeOf(newStatus).Kind() == reflect.Bool {
-			if newStatus.(bool) {
+			if newStatus.(bool) && !status.(bool) {
 				rule.Execute(handler)
 			}
 		}
