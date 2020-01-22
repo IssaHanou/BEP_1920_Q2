@@ -323,7 +323,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
     for (const key of this.manageButtons.all.keys()) {
       statusMsg.set(key, false);
     }
-    statusMsg.set("gameState", "opgestart");
+    statusMsg.set("gameState", "gereed");
     this.deviceList.setDevice({
       id: "front-end",
       connection: true,

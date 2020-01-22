@@ -93,7 +93,7 @@ func generateDevices(devices []ReadDevice, config *WorkingConfig) {
 		input[btn.ID] = "boolean"
 		status[btn.ID] = false
 	}
-	status["gameState"] = "opgestart"
+	status["gameState"] = "gereed"
 	config.Devices["front-end"] = &(Device{
 		ID:          "front-end",
 		Description: "The operator webapp for managing a escape room",

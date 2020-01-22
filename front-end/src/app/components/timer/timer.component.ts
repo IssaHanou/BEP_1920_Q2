@@ -27,7 +27,7 @@ export class TimerComponent implements OnInit {
     const device = this.app.deviceList.getDevice("front-end");
     if (device !== null) {
       const status = device.status;
-      if (status.get("start") > 0 && status.get("stop") === 0) {
+      if (status.get("gameState") == "in spel") {
         const date = new Date();
         const timeDiff =
           date.getTime() + this.app.timerList.getTimer("general").duration;

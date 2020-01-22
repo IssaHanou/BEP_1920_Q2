@@ -73,7 +73,7 @@ The front-end has output component `gameState` which keeps track of state of the
 The button event conditions can depend on the `gameState` and the actions should alter the `gameState`.
 
 The `gamestate` can have several states, which can be defined through the config. 
-Important states are: `opgestart`, `in spel`, `gepauzeerd` and `gestopt`, but more states can be used.
+Important states are: `gereed`, `in spel`, `gepauzeerd` and `gestopt`, but more states can be used.
  
 An example for `stop` and `start` are given below.
 
