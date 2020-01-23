@@ -82,6 +82,7 @@ func (communicator *Communicator) Start() {
 }
 
 // Publish is a method that will send a message to a specific topic
+// retrials is the maximum number of times the action re-executed when failing, when retrials < 0, it is tried forever
 func (communicator *Communicator) Publish(topic string, message string, retrials int) {
 	action(func() mqtt.Token {
 		return communicator.client.Publish(topic, byte(0), false, message)

@@ -7,7 +7,8 @@ import (
 	"time"
 )
 
-// WorkingConfig has additional fields to ReadConfig, with lists of conditions, constraints and actions.
+// WorkingConfig has additional includes all information necessary in an escape room
+// some maps are also cached in order to assure faster message handling
 type WorkingConfig struct {
 	General       General
 	Cameras       []Camera
@@ -223,6 +224,7 @@ type Event interface {
 	GetRules() []*Rule
 }
 
+// compare is a method used to perform a comparison between to variables and a comparator string
 func compare(param1 interface{}, param2 interface{}, comparision string) bool {
 	if param1 == nil {
 		return false
@@ -254,7 +256,7 @@ func compare(param1 interface{}, param2 interface{}, comparision string) bool {
 	}
 }
 
-// numericToFloat64 checks if numeric value is in or float64 and returns float64
+// numericToFloat64 checks if numeric value is int or float64 and converts it to a float64 (if it wasn't already)
 func numericToFloat64(input interface{}) float64 {
 	switch input.(type) {
 	case float64:
@@ -267,6 +269,7 @@ func numericToFloat64(input interface{}) float64 {
 	}
 }
 
+// contains is a function that checks if a slice contains an element
 func contains(list interface{}, element interface{}) bool {
 	slice := reflect.ValueOf(list)
 	for i := 0; i < slice.Len(); i++ {

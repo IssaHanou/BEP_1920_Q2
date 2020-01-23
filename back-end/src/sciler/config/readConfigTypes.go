@@ -1,6 +1,7 @@
 package config
 
 // ReadConfig specifies all configuration elements of an escape room.
+// this struct is in a format that can be unmarshalled
 type ReadConfig struct {
 	General       General            `json:"general"`
 	Cameras       []Camera           `json:"cameras"`
@@ -26,6 +27,7 @@ type Camera struct {
 }
 
 // ReadDevice is a struct that describes the configurations of a device in the room.
+// this struct is in a format that can be unmarshalled
 type ReadDevice struct {
 	ID          string                  `json:"id"`
 	Description string                  `json:"description"`
@@ -34,12 +36,14 @@ type ReadDevice struct {
 }
 
 // ReadTimer is a struct that describes time and id of timers
+// this struct is in a format that can be unmarshalled
 type ReadTimer struct {
 	ID       string `json:"id"`
 	Duration string `json:"duration"`
 }
 
 // ReadPuzzle is a struct that describes contents of a puzzle.
+// this struct is in a format that can be unmarshalled
 type ReadPuzzle struct {
 	Name  string     `json:"name"`
 	Rules []ReadRule `json:"rules"`
@@ -57,6 +61,7 @@ func (r ReadPuzzle) GetRules() []ReadRule {
 }
 
 // ReadGeneralEvent defines a general event, like start.
+// this struct is in a format that can be unmarshalled
 type ReadGeneralEvent struct {
 	Name  string     `json:"name"`
 	Rules []ReadRule `json:"rules"`
@@ -73,18 +78,21 @@ func (r ReadGeneralEvent) GetRules() []ReadRule {
 }
 
 // ReadEvent is an interface that both ReadPuzzle and ReadGeneralEvent implement
+// this struct is in a format that can be unmarshalled
 type ReadEvent interface {
 	GetName() string
 	GetRules() []ReadRule
 }
 
 // ReadOperator defines a object that takes an operator and combines a logics of other operators or conditions
+// this struct is in a format that can be unmarshalled
 type ReadOperator struct {
 	Operator string        `json:"operator"`
 	List     []interface{} `json:"logics"`
 }
 
 // ReadRule is a struct that describes how action flow is handled in the escape room.
+// this struct is in a format that can be unmarshalled
 type ReadRule struct {
 	ID          string      `json:"id"`
 	Description string      `json:"description"`
@@ -94,6 +102,7 @@ type ReadRule struct {
 }
 
 // ReadCondition is a struct that determines when rules are fired.
+// this struct is in a format that can be unmarshalled
 type ReadCondition struct {
 	Type        string           `json:"type"`
 	TypeID      string           `json:"type_id"`
@@ -113,6 +122,7 @@ type Action struct {
 }
 
 // Execute is a method that performs the action
+// Depending on whether the instruction is meant for a device, timer or label it is handled differently
 func (action Action) Execute(handler InstructionSender) {
 	switch action.Type { // this cannot be any other Type than device, timer or label, (checked in checkActions function)
 	case "device":
