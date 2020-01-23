@@ -289,7 +289,7 @@ func checkActions(actions []Action, config WorkingConfig) []string {
 	return errorList
 }
 
-// checkActionTimer is a method that checks the current config for mistakes in the action of a timer
+// checkActionTimer is a method that checks the config in use for mistakes in the action of a timer
 // if the config does not follow the manual, a non-empty list of mistakes is returned
 func checkActionTimer(action Action, config WorkingConfig) []string {
 	errorList := make([]string, 0)
