@@ -448,10 +448,6 @@ func TestHandleDoubleEvent(t *testing.T) {
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 4)
 	// if this test becomes flaky (only when this test takes longer then 1 second),
 	// (message expected includes time...), replace the messages with 'mock.Anything'
-
-	// TODO: to restore test so that the message are checked again:
-	//  - duplicate the publish front-end line,
-	//  - replace 'mock.Anything' with the correct messages
 }
 
 ////////////////////////////// Error/irregular behavior tests //////////////////////////////

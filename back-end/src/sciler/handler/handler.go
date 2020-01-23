@@ -9,7 +9,7 @@ import (
 	"sciler/config"
 )
 
-// Message is a type that follows the structure all messages have, described in resources/message_manual.md
+// Message is a type that follows the structure all messages have, described in resources/manuals/message_manual.md
 type Message struct {
 	DeviceID string      `json:"device_id"`
 	TimeSent string      `json:"time_sent"`
@@ -17,20 +17,22 @@ type Message struct {
 	Contents interface{} `json:"contents"`
 }
 
-// Communicator interface is an interface for mqtt communication
+// Communicator interface is an interface for communication.Communicator, it had the methods needed in the handler
 type Communicator interface {
 	Publish(topic string, message string, retrials int)
 	Start()
 }
 
-// Handler is a type that mqqt handlers have
+// Handler is the mqtt.MessageHandler used in the whole S.C.I.L.E.R. system
 type Handler struct {
 	Config       config.WorkingConfig
 	ConfigFile   string
 	Communicator Communicator
 }
 
-// NewHandler is the actual MessageHandler
+// NewHandler is the actual MessageHandler called when a message is received
+// The function processes the JSON payload and logs and error if this fails
+// The Message Mapper is called if the JSON is correct to process the contents
 func (handler *Handler) NewHandler(client mqtt.Client, message mqtt.Message) {
 	var raw Message
 	if err := json.Unmarshal(message.Payload(), &raw); err != nil {
@@ -40,7 +42,8 @@ func (handler *Handler) NewHandler(client mqtt.Client, message mqtt.Message) {
 	}
 }
 
-// msgMapper sends the right message through to the right function
+// msgMapper sends the message through to the right function, filtering on Message.Type
+// If the type is not instruction, status, confirmation, or connection, an error is logged
 func (handler *Handler) msgMapper(raw Message) {
 	switch raw.Type {
 	case "instruction":
@@ -75,7 +78,10 @@ func (handler *Handler) onStatusMsg(raw Message) {
 	handler.sendEventStatus()
 }
 
-// onConnectionMsg is the function to process connection messages.
+// onConnectionMsg is the function to process connection messages from devices
+// If the device is in the config, and the message is properly structured, the connection status of the device is updated
+// After updating the connection status, the new status is send to the front-end
+// If the message is from the front-end, the SendSetup function is called
 func (handler *Handler) onConnectionMsg(raw Message) {
 	contents := raw.Contents.(map[string]interface{})
 	device, ok := handler.Config.Devices[raw.DeviceID]
@@ -99,6 +105,7 @@ func (handler *Handler) onConnectionMsg(raw Message) {
 }
 
 // onConfirmationMsg is the function to process confirmation messages.
+// If the message is properly structured, the success status of the instruction is logged
 func (handler *Handler) onConfirmationMsg(raw Message) {
 	contents := raw.Contents.(map[string]interface{})
 	value, ok := contents["completed"]
@@ -120,6 +127,7 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 
 	var instructionString string
 	for _, instruction := range instructionContents {
+		// Each instruction is added to a string for proper logging
 		instructionString += fmt.Sprintf("%s", instruction["instruction"])
 		// If original message to which device responded with confirmation was sent by front-end,
 		// pass confirmation through
@@ -138,6 +146,7 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 			instructionString, raw.TimeSent)
 	}
 
+	// If a message is received from a device, it can be concluded that the device has positive connection status, and thus it's connection status is set to true
 	con, ok := handler.Config.Devices[raw.DeviceID]
 	if !ok {
 		logger.Warnf("device %s was not found in config", raw.DeviceID)
@@ -147,7 +156,10 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 	}
 }
 
-// onInstructionMsg is the function to process instruction messages.
+// onInstructionMsg is the function to process instruction messages
+// If the message is properly structured, the instruction in the message is followed
+// Currently, only instructions messages from the front-end are supported
+// The actions to take are decided by Message.Contents.instruction
 func (handler *Handler) onInstructionMsg(raw Message) {
 	logger.Infof("instruction message received from: %s", raw.DeviceID)
 	instructions, err := getMapSlice(raw.Contents)
@@ -192,6 +204,7 @@ func (handler *Handler) handleInstruction(instruction map[string]interface{}, in
 }
 
 // onSendStatus is the function to process the instruction `send status`
+// send status is instructed when the front-end starts
 func (handler *Handler) onSendStatus() {
 	for _, device := range handler.Config.Devices {
 		handler.sendStatus(device.ID)
@@ -203,12 +216,13 @@ func (handler *Handler) onSendStatus() {
 }
 
 // onResetAll is the function to process the instruction `reset all`
+// reset all is instructed when the reset button is clicked in the front-end
 func (handler *Handler) onResetAll(deviceID string) {
-	handler.SendInstruction("client-computers", []map[string]string{{
+	handler.sendInstruction("client-computers", []map[string]string{{
 		"instruction":   "reset",
 		"instructed_by": deviceID,
 	}})
-	handler.SendInstruction("front-end", []map[string]string{{
+	handler.sendInstruction("front-end", []map[string]string{{
 		"instruction":   "reset",
 		"instructed_by": deviceID,
 	}})
@@ -217,22 +231,25 @@ func (handler *Handler) onResetAll(deviceID string) {
 }
 
 // onTestAll is the function to process the instruction `test all`
+// test all is instructed when the test button is clicked in the front-end
 func (handler *Handler) onTestAll(instructor string) {
-	handler.SendInstruction("client-computers", []map[string]string{{
+	handler.sendInstruction("client-computers", []map[string]string{{
 		"instruction":   "test",
 		"instructed_by": instructor,
 	}})
 }
 
 // onTestDevice is the function to process the instruction `test device`
+// test device is instructed when the test button of a device is clicked in the front-end
 func (handler *Handler) onTestDevice(deviceID string, instructor string) {
-	handler.SendInstruction(deviceID, []map[string]string{{
+	handler.sendInstruction(deviceID, []map[string]string{{
 		"instruction":   "test",
 		"instructed_by": instructor,
 	}})
 }
 
 // onResetAll is the function to process the instruction `finish rule`
+// finish rule is instructed then the "voer uit" button of a rule is clicked in the front-end
 func (handler *Handler) onFinishRule(ruleID string) {
 	rule, ok := handler.Config.RuleMap[ruleID]
 	if !ok {
@@ -244,8 +261,9 @@ func (handler *Handler) onFinishRule(ruleID string) {
 }
 
 // onHint is the function to process the instruction `hint`
+// hint in instructed when the front-end submits a hint
 func (handler *Handler) onHint(hint string, instructor string) {
-	handler.SendInstruction("hint", []map[string]string{{
+	handler.sendInstruction("hint", []map[string]string{{
 		"instruction":   "hint",
 		"value":         hint,
 		"instructed_by": instructor,
