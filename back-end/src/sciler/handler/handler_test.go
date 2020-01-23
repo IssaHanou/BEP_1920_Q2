@@ -68,8 +68,7 @@ func getTestHandler() *Handler {
 		},
 	}
 	messageHandler := Handler{Config: workingConfig, ConfigFile: "fake file name"}
-	communicator := communication.NewCommunicator(workingConfig.General.Host,
-		workingConfig.General.Port, []string{"back-end", "test"}, messageHandler.NewHandler, func() {})
+	communicator := communication.NewCommunicator(workingConfig, messageHandler.NewHandler, func() {})
 	messageHandler.Communicator = communicator
 	return &messageHandler
 }

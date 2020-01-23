@@ -14,8 +14,6 @@ import (
 	"time"
 )
 
-var topics = []string{"back-end"}
-
 func main() {
 	// set maximum number of cores
 	runtime.GOMAXPROCS(runtime.NumCPU())
@@ -54,15 +52,13 @@ func main() {
 	filename := filepath.Join(dir, "back-end", "resources", "production", "room_config.json")
 	configurations := config.ReadFile(filename)
 	logger.Infof("configurations read from: %v", filename)
-	host := configurations.General.Host
-	port := configurations.General.Port
 
 	messageHandler := handler.Handler{Config: configurations, ConfigFile: filename}
-	messageHandler.Communicator = communication.NewCommunicator(host, port, topics, messageHandler.NewHandler, func() {
+	messageHandler.Communicator = communication.NewCommunicator(configurations, messageHandler.NewHandler, func() {
 		messageHandler.SendSetup()
 	})
 
-	logger.Infof("attempting to connect to broker at %s on port %v", host, port)
+	logger.Infof("attempting to connect to broker at %s on port %v", configurations.General.Host, configurations.General.Port)
 	messageHandler.Communicator.Start()
 
 	// prevent exit

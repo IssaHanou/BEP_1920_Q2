@@ -5,6 +5,7 @@ import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	logger "github.com/sirupsen/logrus"
+	"sciler/config"
 	"time"
 )
 
@@ -19,17 +20,23 @@ type Communicator struct {
 // topicsOfInterest []string all topic to which to subscribe to
 // handler function(Client, Message) function that handles all incoming messages
 // onStart function() function that will be performed on startup
-func NewCommunicator(host string, port int, topicsOfInterest []string, handler mqtt.MessageHandler, onStart func()) *Communicator {
+func NewCommunicator(config config.WorkingConfig, messageHandler mqtt.MessageHandler, onStart func()) *Communicator {
 	opts := mqtt.NewClientOptions()
-	opts.AddBroker(fmt.Sprintf("%s://%s:%d", "tcp", host, port))
+	opts.AddBroker(fmt.Sprintf("%s://%s:%d", "tcp", config.General.Host, config.General.Port))
 	opts.SetClientID("back-end")
-	opts.SetConnectionLostHandler(func(client mqtt.Client, err error) {
-		if err.Error() == "EOF" {
-			logger.Errorf("connection lost: broker closed connection, (multiple client ID: %s?)", opts.ClientID)
-		} else {
-			logger.Errorf("connection lost: %v", err)
-		}
-	})
+
+	configureConnectionOptions(opts)
+	setHandlers(opts, messageHandler, onStart)
+	configureLWT(opts)
+
+	client := mqtt.NewClient(opts)
+	return &Communicator{client}
+}
+
+// configureConnectionOptions is a method that will set options that:
+// make sure that a connection failure is detected fast
+// a reconnection attempt is attempted
+func configureConnectionOptions(opts *mqtt.ClientOptions) {
 	opts.SetConnectRetry(false)
 	opts.SetAutoReconnect(true)
 
@@ -38,23 +45,32 @@ func NewCommunicator(host string, port int, topicsOfInterest []string, handler m
 	opts.SetPingTimeout(timeout)             // time after sending a PING request to the broker
 	opts.SetMaxReconnectInterval(timeout)    // max time before retrying to reconnect
 	opts.SetConnectTimeout(20 * time.Second) // time before timing out and erroring the attempt
+}
 
-	opts.SetOnConnectHandler(func(client mqtt.Client) {
-		// on connect subscribe and execute onStart
-		topics := make(map[string]byte)
-		for _, topic := range topicsOfInterest {
-			topics[topic] = byte(0)
-		}
+// setHandlers is a method that configures what will be done on connect, disconnect and reconnect
+func setHandlers(opts *mqtt.ClientOptions, messageHandler mqtt.MessageHandler, onStart func()) {
+	opts.SetOnConnectHandler(func(client mqtt.Client) { // on connect subscribe and execute onStart
 		action(func() mqtt.Token {
-			return client.SubscribeMultiple(topics, handler)
+			return client.Subscribe("back-end", 2, messageHandler)
 		}, "subscribing", -1)
-
-		logger.Infof("connected to %s:%d with subscriptions to %s", host, port, topicsOfInterest)
+		logger.Infof("connected")
 		onStart()
 	})
-	opts.SetReconnectingHandler(func(client mqtt.Client, options *mqtt.ClientOptions) {
+	opts.SetConnectionLostHandler(func(client mqtt.Client, err error) { // on connection failure, log error
+		if err.Error() == "EOF" {
+			logger.Errorf("connection lost: broker closed connection, (multiple client ID: %s?)", opts.ClientID)
+		} else {
+			logger.Errorf("connection lost: %v", err)
+		}
+	})
+	opts.SetReconnectingHandler(func(client mqtt.Client, options *mqtt.ClientOptions) { // on reconnect, log warning
 		logger.Warn("trying to reconnect")
 	})
+}
+
+// configureLWT is a method that sets a Last Will and Testament such that when the back-end disconnects,
+// the front-end will receive a connection message
+func configureLWT(opts *mqtt.ClientOptions) {
 	will, _ := json.Marshal(map[string]interface{}{
 		"device_id": "back-end",
 		"time_sent": time.Now().Format("02-01-2006 15:04:05"),
@@ -65,9 +81,7 @@ func NewCommunicator(host string, port int, topicsOfInterest []string, handler m
 			"connection": false,
 		},
 	})
-	opts.SetWill("front-end", string(will), 0, false)
-	client := mqtt.NewClient(opts)
-	return &Communicator{client}
+	opts.SetWill("front-end", string(will), 2, false)
 }
 
 // setClient is a setter for client
