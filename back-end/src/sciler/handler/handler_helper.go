@@ -439,7 +439,7 @@ func (handler *Handler) checkStatusType(device config.Device, status interface{}
 	return nil
 }
 
-// dirty trick to go from interface{} to []map[string]interface{}
+// getMapSlice is a dirty trick to go from `interface{}` to `[]map[string]interface{}`
 func getMapSlice(input interface{}) ([]map[string]interface{}, error) {
 	bytes, _ := json.Marshal(input)
 	var output []map[string]interface{}
