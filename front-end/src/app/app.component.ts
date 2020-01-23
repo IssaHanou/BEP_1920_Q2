@@ -354,39 +354,65 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   private processSetUp(jsonData) {
     this.nameOfRoom = jsonData.name;
 
-    const cameraData = jsonData.cameras;
+    this.setupCameras(jsonData.cameras);
+    this.setupButtons(jsonData.buttons);
+    this.resetFrontEndStatus();
+    this.setupPuzzles(jsonData.events);
+    this.setupHints(jsonData.hints);
+    console.log(jsonData.hints);
+  }
+
+  /**
+   * Sets cameras up given new cameraData
+   * @param cameraData Camera array
+   */
+  private setupCameras(cameraData: Camera[]) {
     this.cameras = [];
     if (cameraData !== null) {
       for (const cam of cameraData) {
         this.cameras.push(new Camera(cam));
       }
     }
+  }
 
-    const buttonData = jsonData.buttons;
+  /**
+   * Sets buttons up given new buttonData
+   * @param buttonData json containing list with buttons
+   */
+  private setupButtons(buttonData) {
     this.manageButtons = new Buttons();
     if (buttonData !== null) {
       for (const btn of buttonData) {
         this.manageButtons.setButton(btn);
       }
     }
-    this.resetFrontEndStatus();
+  }
 
-    const rules = jsonData.events;
+  /**
+   * Sets puzzles up given new rules
+   * @param rules json containing list of events
+   */
+  private setupPuzzles(rules) {
     this.puzzleList = new Puzzles();
     for (const rule in rules) {
       if (rules.hasOwnProperty(rule)) {
         this.puzzleList.addPuzzle(rule, rules[rule]);
       }
     }
+  }
 
-    const allHints = jsonData.hints;
+  /**
+   * Sets hints up given all puzzles
+   * @param puzzles json containing list of puzzles
+   */
+  private setupHints(puzzles) {
     this.hintList = [];
-    for (const puzzle in allHints) {
-      if (allHints.hasOwnProperty(puzzle)) {
+    for (const puzzle in puzzles) {
+      if (puzzles.hasOwnProperty(puzzle)) {
         const hints = [];
-        for (const index in allHints[puzzle]) {
-          if (allHints[puzzle].hasOwnProperty(index)) {
-            hints.push(allHints[puzzle][index]);
+        for (const index in puzzles[puzzle]) {
+          if (puzzles[puzzle].hasOwnProperty(index)) {
+            hints.push(puzzles[puzzle][index]);
           }
         }
         this.hintList.push(new Hint(puzzle, hints));
