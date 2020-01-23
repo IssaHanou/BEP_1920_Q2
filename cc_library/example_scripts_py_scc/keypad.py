@@ -18,7 +18,7 @@ class Keypad(Device):
         Returns status of all custom components, in json format.
         """
         if self.currentValue == "":
-            return {}
+            return {"code": 0}
 
         return {"code": int(self.currentValue)}
 
@@ -43,6 +43,7 @@ class Keypad(Device):
         Defines a reset sequence for device.
         """
         self.currentValue = ""
+        self.status_changed()
         self.log("reset")
 
     def __init__(self):

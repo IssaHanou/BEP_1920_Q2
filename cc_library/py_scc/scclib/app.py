@@ -1,8 +1,9 @@
-from datetime import datetime
-import os
 import json
-import paho.mqtt.client as mqtt
 import logging
+import os
+from datetime import datetime
+
+import paho.mqtt.client as mqtt
 
 
 class SccLib:
@@ -24,7 +25,8 @@ class SccLib:
         self.labels = self.config.get("labels", "not-existent")
         if [self.host, self.name, self.port, self.labels].count(
                 "not-existent") != 0:
-            raise Exception("your config file is missing attributes, make sure it contains all keys from the manual")
+            raise Exception("your config file is missing attributes, "
+                            "make sure it contains all keys from the manual")
 
         if not os.path.exists("logs"):
             os.mkdir("logs")
@@ -196,7 +198,7 @@ class SccLib:
         Method to send status messages to the topic status.
         msg should be a dictionary/json with components
          as keys and its status as value
-         @:param msg: message with all component status
+        :param msg: message with all component status
         """
         json_msg = {
             "device_id": self.name,
@@ -295,7 +297,7 @@ class SccLib:
         """
         Method to call to subscribe to a topic which the
         sciler system wants to receive from the broker.
-        @:param topic: topic to subscribe too
+        :param topic: topic to subscribe too
         """
         self.client.subscribe(topic=topic)
         logging.info(("subscribed to topic", topic))
