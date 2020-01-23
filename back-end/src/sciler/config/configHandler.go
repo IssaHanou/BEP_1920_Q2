@@ -360,50 +360,61 @@ func generateLogicalCondition(conditions interface{}) (LogicalCondition, []strin
 // if the config does not follow the manual, a non-empty list of mistakes is returned
 func generateLogicalConstraint(constraints interface{}) (LogicalConstraint, []string) {
 	logic := constraints.(map[string]interface{})
-	errorList := make([]string, 0)
 	if logic["operator"] != nil { // operator
-		if logic["operator"] == "AND" {
-			and := AndConstraint{}
-			for _, constraint := range logic["list"].([]interface{}) {
-				newConstraint, newErrors := generateLogicalConstraint(constraint)
-				and.logics = append(and.logics, newConstraint)
-				errorList = append(errorList, newErrors...)
-			}
-			return and, errorList
-		} else if logic["operator"] == "OR" {
-			or := OrConstraint{}
-			for _, constraint := range logic["list"].([]interface{}) {
-				newConstraint, newErrors := generateLogicalConstraint(constraint)
-				or.logics = append(or.logics, newConstraint)
-				errorList = append(errorList, newErrors...)
-			}
-			return or, errorList
-		} else {
-			return nil, append(errorList,
-				fmt.Sprintf("JSON config in wrong format, operator: %v, could not be processed", logic["operator"]))
-		}
+		return generateLogicalConstraintOperator(logic)
 	} else if logic["comparison"] != nil && reflect.TypeOf(logic["comparison"]).Kind() == reflect.String {
-		var constraint Constraint
-		if logic["component_id"] != nil && reflect.TypeOf(logic["component_id"]).Kind() == reflect.String {
-			constraint = Constraint{
-				Comparison:  logic["comparison"].(string),
-				ComponentID: logic["component_id"].(string),
-				Value:       logic["value"],
-			}
-		} else if logic["component_id"] == nil {
-			constraint = Constraint{
-				Comparison:  logic["comparison"].(string),
-				ComponentID: "",
-				Value:       logic["value"],
-			}
-		} else {
-			errorList = append(errorList,
-				fmt.Sprintf("JSON config in wrong format, component_id should be of type string, %v is of type %s",
-					logic["component_id"], reflect.TypeOf(logic["component_id"]).Kind().String()))
-		}
-
-		return constraint, errorList
+		return generateConstraint(logic)
 	}
-	return nil, append(errorList,
-		fmt.Sprintf("JSON config in wrong constraint format, conditions: %v, could not be processed", constraints))
+	return nil, []string{fmt.Sprintf("JSON config in wrong constraint format, conditions: %v, could not be processed", constraints)}
+}
+
+// generateLogicalConstraintOperator generates a logical operator (and / or) from logic where the operator field is present in the config
+// if the config does not follow the manual, a non-empty list of mistakes is returned
+func generateLogicalConstraintOperator(logic map[string]interface{}) (LogicalConstraint, []string) {
+	errorList := make([]string, 0)
+	if logic["operator"] == "AND" {
+		and := AndConstraint{}
+		for _, constraint := range logic["list"].([]interface{}) {
+			newConstraint, newErrors := generateLogicalConstraint(constraint)
+			and.logics = append(and.logics, newConstraint)
+			errorList = append(errorList, newErrors...)
+		}
+		return and, errorList
+	} else if logic["operator"] == "OR" {
+		or := OrConstraint{}
+		for _, constraint := range logic["list"].([]interface{}) {
+			newConstraint, newErrors := generateLogicalConstraint(constraint)
+			or.logics = append(or.logics, newConstraint)
+			errorList = append(errorList, newErrors...)
+		}
+		return or, errorList
+	} else {
+		return nil, append(errorList,
+			fmt.Sprintf("JSON config in wrong format, operator: %v, could not be processed", logic["operator"]))
+	}
+}
+
+// generateConstraint generates a constraint from logic where the comparator field is present in the config
+// if the config does not follow the manual, a non-empty list of mistakes is returned
+func generateConstraint(logic map[string]interface{}) (LogicalConstraint, []string) {
+	var constraint Constraint
+	errorList := make([]string, 0)
+	if logic["component_id"] != nil && reflect.TypeOf(logic["component_id"]).Kind() == reflect.String {
+		constraint = Constraint{
+			Comparison:  logic["comparison"].(string),
+			ComponentID: logic["component_id"].(string),
+			Value:       logic["value"],
+		}
+	} else if logic["component_id"] == nil {
+		constraint = Constraint{
+			Comparison:  logic["comparison"].(string),
+			ComponentID: "",
+			Value:       logic["value"],
+		}
+	} else {
+		errorList = append(errorList,
+			fmt.Sprintf("JSON config in wrong format, component_id should be of type string, %v is of type %s",
+				logic["component_id"], reflect.TypeOf(logic["component_id"]).Kind().String()))
+	}
+	return constraint, errorList
 }

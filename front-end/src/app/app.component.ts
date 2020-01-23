@@ -197,7 +197,6 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
    */
   private processMessage(jsonMessage: string) {
     const msg: Message = Message.deserialize(jsonMessage);
-
     switch (msg.type) {
       case "confirmation": {
         this.processConfirmation(msg);
@@ -208,12 +207,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
         break;
       }
       case "status": {
-        this.deviceList.setDevice(msg.contents);
-
-        // When the back-end/front-end disconnects, all devices are disconnected
-        if (msg.contents.id === "front-end" && !msg.contents.connection) {
-          this.setConnectionAllDevices(false);
-        }
+        this.processStatus(msg);
         break;
       }
       case "event status": {
@@ -298,6 +292,19 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
           break;
         }
       }
+    }
+  }
+
+  /**
+   * Process status messages.
+   * @param msg the status message
+   */
+  private processStatus(msg: Message) {
+    this.deviceList.setDevice(msg.contents);
+
+    // When the back-end/front-end disconnects, all devices are disconnected
+    if (msg.contents.id === "front-end" && !msg.contents.connection) {
+      this.setConnectionAllDevices(false);
     }
   }
 
