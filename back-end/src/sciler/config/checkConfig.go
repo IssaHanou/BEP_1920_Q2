@@ -68,15 +68,13 @@ func checkActionTimer(action Action, config WorkingConfig) []string {
 		for _, actionMessage := range action.Message {
 			switch actionMessage.Instruction {
 			case "add", "subtract":
-				{
-					valueType := reflect.TypeOf(actionMessage.Value).Kind()
-					if valueType != reflect.String {
-						errorList = append(errorList,
-							fmt.Sprintf("input type string expected but %s found as type of value %v",
-								valueType.String(), actionMessage.Value))
-					}
-					break
+				valueType := reflect.TypeOf(actionMessage.Value).Kind()
+				if valueType != reflect.String {
+					errorList = append(errorList,
+						fmt.Sprintf("input type string expected but %s found as type of value %v",
+							valueType.String(), actionMessage.Value))
 				}
+				break
 			case "start", "pause", "stop", "done":
 				break
 			default:

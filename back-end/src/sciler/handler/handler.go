@@ -287,33 +287,34 @@ func (handler *Handler) onCheckConfig(configToRead interface{}) {
 // processConfig reads the config in.
 // If action is "use" then the message must tell the config a new config is now used and put it to use
 func (handler *Handler) onUseConfig(configToRead interface{}, fileName string) {
-	jsonBytes, err := json.Marshal(configToRead)
-	if err != nil {
-		logger.Error(err)
-	} else {
-		newConfig, _ := config.ReadJSON(jsonBytes)
+	// check if the config can be used, if so use and send message
+	if len(handler.checkConfig(configToRead)) == 0 {
+		handler.useConfig(configToRead, fileName)
 		message := Message{
 			DeviceID: "back-end",
 			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-			Type:     "config",
-			Contents: map[string][]string{},
-		}
-		if len(handler.checkConfig(configToRead)) == 0 {
-			dir, _ := os.Getwd()
-			fullFileName := filepath.Join(dir, "back-end", "resources", "production", fileName)
-			err = ioutil.WriteFile(fullFileName, jsonBytes, 0644)
-			if err != nil {
-				logger.Error(err)
-			}
-			handler.Config = newConfig
-			handler.ConfigFile = fullFileName
-			handler.SendSetup()
-			message.Type = "new config"
-			message.Contents = map[string]string{"name": fileName}
+			Type:     "new config",
+			Contents: map[string]string{"name": fileName},
 		}
 		jsonMessage, _ := json.Marshal(&message)
 		handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 	}
+}
+
+// useConfig uses new config and save this config to file
+// warning this config should be checked first before using the config
+func (handler *Handler) useConfig(configToRead interface{}, fileName string) {
+	jsonBytes, _ := json.Marshal(configToRead)
+	newConfig, _ := config.ReadJSON(jsonBytes)
+	dir, _ := os.Getwd()
+	fullFileName := filepath.Join(dir, "back-end", "resources", "production", fileName)
+	err := ioutil.WriteFile(fullFileName, jsonBytes, 0644)
+	if err != nil {
+		logger.Error(err)
+	}
+	handler.Config = newConfig
+	handler.ConfigFile = fullFileName
+	handler.SendSetup()
 }
 
 // connected is a method that sets a device to connected

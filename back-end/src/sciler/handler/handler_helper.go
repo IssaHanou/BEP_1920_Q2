@@ -400,28 +400,20 @@ func (handler *Handler) processConfig(configToRead interface{}, action string, f
 func compareType(valueType reflect.Kind, inputType string) error {
 	switch inputType {
 	case "string":
-		{
-			if valueType != reflect.String {
-				return fmt.Errorf("status type string expected but %s found as type", valueType.String())
-			}
+		if valueType != reflect.String {
+			return fmt.Errorf("status type string expected but %s found as type", valueType.String())
 		}
 	case "boolean":
-		{
-			if valueType != reflect.Bool {
-				return fmt.Errorf("status type boolean expected but %s found as type", valueType.String())
-			}
+		if valueType != reflect.Bool {
+			return fmt.Errorf("status type boolean expected but %s found as type", valueType.String())
 		}
 	case "numeric":
-		{
-			if valueType != reflect.Int && valueType != reflect.Float64 {
-				return fmt.Errorf("status type numeric expected but %s found as type", valueType.String())
-			}
+		if valueType != reflect.Int && valueType != reflect.Float64 {
+			return fmt.Errorf("status type numeric expected but %s found as type", valueType.String())
 		}
 	case "array":
-		{
-			if valueType != reflect.Slice {
-				return fmt.Errorf("status type array/slice expected but %s found as type", valueType.String())
-			}
+		if valueType != reflect.Slice {
+			return fmt.Errorf("status type array/slice expected but %s found as type", valueType.String())
 		}
 	default:
 		return fmt.Errorf("custom types like: %s, are not yet implemented", inputType)
