@@ -47,3 +47,48 @@ msg = json.dumps(conf_msg_dict)
 client.publish("back-end", msg, 1)
 ```
        
+status message: 
+```json
+{ 
+    "device_id": "controlBoard",
+    "time_sent": "17-1-2019 16:20:20",
+    "type": "status",
+    "contents": {
+        "redSwitch": true,
+        "blueSwitch": false
+        }
+}
+```
+connection message: 
+```json
+{ 
+    "device_id": "controlBoard",
+    "time_sent": "17-1-2019 16:20:20",
+    "type": "connection",
+    "contents": {
+        "connection": true 
+        }
+}
+```
+confirmation message:
+```json
+{ 
+    "device_id": "controlBoard",
+    "time_sent": "17-1-2019 16:20:21",
+    "type": "confirmation",
+    "contents": {
+        "completed": true, 
+        "instructed": { 
+          "device_id": "back-end",
+          "time_sent": "17-1-2019 16:19:70",
+          "type": "instruction",
+           "contents": [
+              {
+              "instruction":"test",
+              "instructed_by": "front-end" 
+              }
+           ]
+        }
+    }
+    }
+```
