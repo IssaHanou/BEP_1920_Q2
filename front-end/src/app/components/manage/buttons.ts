@@ -15,8 +15,10 @@ export class Buttons {
    * @param jsonData of all button object
    */
   setButtons(jsonData) {
-    for (const object of jsonData) {
-      this.setButton(object);
+    if (jsonData !== null) {
+      for (const object of jsonData) {
+        this.setButton(object);
+      }
     }
   }
 

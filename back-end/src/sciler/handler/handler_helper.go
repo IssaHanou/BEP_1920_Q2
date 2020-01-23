@@ -140,34 +140,46 @@ func (handler *Handler) updateStatus(raw Message) {
 // For devices the status of components and the connection status is send
 // For timers the duration left and the state are send
 // param deviceID can be the ID of a device or a timer
-func (handler *Handler) sendStatus(deviceID string) {
-	var message Message
-	if device, ok := handler.Config.Devices[deviceID]; ok {
-		message = Message{
-			DeviceID: "back-end",
-			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-			Type:     "status",
-			Contents: map[string]interface{}{
-				"id":         device.ID,
-				"status":     device.Status,
-				"connection": device.Connection,
-			},
-		}
-	} else if timer, ok2 := handler.Config.Timers[deviceID]; ok2 {
-		duration, _ := timer.GetTimeLeft()
-		message = Message{
-			DeviceID: "back-end",
-			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-			Type:     "time",
-			Contents: map[string]interface{}{
-				"id":       timer.ID,
-				"duration": duration.Milliseconds(),
-				"state":    timer.State,
-			},
-		}
+func (handler *Handler) sendStatus(ID string) {
+	if device, ok := handler.Config.Devices[ID]; ok {
+		handler.sendStatusDevice(device)
+	} else if timer, ok2 := handler.Config.Timers[ID]; ok2 {
+		handler.sendStatusTimer(timer)
 	} else {
-		logger.Errorf("error occurred while sending status of %s, since it is not recognised as a device or timer", deviceID)
+		logger.Errorf("error occurred while sending status of %s, since it is not recognised as a device or timer", ID)
 		return
+	}
+}
+
+// sendStatusDevice sends status of a device to the front-end
+func (handler *Handler) sendStatusDevice(device *config.Device) {
+	message := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "status",
+		Contents: map[string]interface{}{
+			"id":         device.ID,
+			"status":     device.Status,
+			"connection": device.Connection,
+		},
+	}
+	jsonMessage, _ := json.Marshal(&message)
+	logger.Infof("sending status data to front-end: %v", message.Contents)
+	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+}
+
+// sendStatusTimer sends status of a timer to the front-end
+func (handler *Handler) sendStatusTimer(timer *config.Timer) {
+	duration, _ := timer.GetTimeLeft()
+	message := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "time",
+		Contents: map[string]interface{}{
+			"id":       timer.ID,
+			"duration": duration.Milliseconds(),
+			"state":    timer.State,
+		},
 	}
 	jsonMessage, _ := json.Marshal(&message)
 	logger.Infof("sending status data to front-end: %v", message.Contents)
@@ -337,7 +349,6 @@ func (handler *Handler) SetTimer(timerID string, instructions config.ComponentIn
 	default:
 		err = fmt.Errorf("error occurred while reading timer instruction message: %v", instructions.Instruction)
 	}
-
 	if err != nil {
 		logger.Error(err)
 	}
@@ -345,7 +356,6 @@ func (handler *Handler) SetTimer(timerID string, instructions config.ComponentIn
 }
 
 // processConfig reads the config in.
-// If action is "check" then the return message must contain the possible errors
 // If action is "use" then the message must tell the config a new config is now used and put it to use
 func (handler *Handler) processConfig(configToRead interface{}, action string, fileName string) {
 	jsonBytes, err := json.Marshal(configToRead)

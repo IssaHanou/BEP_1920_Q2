@@ -690,6 +690,5 @@ func TestOnInstructionMsgInvalidConfig(t *testing.T) {
 	}
 	configToTest := math.Inf(1)
 	communicatorMock.On("Publish", "front-end", mock.Anything, 3)
-	handler.processConfig(configToTest, "check", fileName)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 0)
+	assert.False(t, len(handler.checkConfig(configToTest)) == 0)
 }

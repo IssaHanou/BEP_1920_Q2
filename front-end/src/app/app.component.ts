@@ -223,7 +223,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
         break;
       }
       case "setup": {
-        this.proccessSetup(msg.contents);
+        this.processSetup(msg.contents);
         break;
       }
       // when a config is checked by the back-end it returns a list of found errors, these should be displayed
@@ -351,15 +351,15 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
    *
    * @param jsonData with name, camera, buttons, events, hints
    */
-  private proccessSetup(jsonData) {
+  private processSetup(jsonData) {
     this.nameOfRoom = jsonData.name;
 
     this.setupCameras(jsonData.cameras);
+    console.log(jsonData);
     this.setupButtons(jsonData.buttons);
     this.resetFrontEndStatus();
     this.setupPuzzles(jsonData.events);
     this.setupHints(jsonData.hints);
-    console.log(jsonData.hints);
   }
 
   /**
@@ -380,6 +380,8 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
    * @param buttonData json containing list with buttons
    */
   private setupButtons(buttonData) {
+    console.log("buttons:");
+    console.log(buttonData);
     this.manageButtons = new Buttons();
     if (buttonData !== null) {
       for (const btn of buttonData) {

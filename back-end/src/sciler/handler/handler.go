@@ -5,8 +5,12 @@ import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	logger "github.com/sirupsen/logrus"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"reflect"
 	"sciler/config"
+	"time"
 )
 
 // Message is a type that follows the structure all messages have, described in resources/manuals/message_manual.md
@@ -192,9 +196,9 @@ func (handler *Handler) handleInstruction(instruction map[string]interface{}, in
 	case "hint":
 		handler.onHint(instruction["value"].(string), instructor)
 	case "check config":
-		handler.processConfig(instruction["config"], "check", "")
+		handler.onCheckConfig(instruction["config"])
 	case "use config":
-		handler.processConfig(instruction["config"], "use", instruction["file"].(string))
+		handler.onUseConfig(instruction["config"], instruction["file"].(string))
 	default:
 		logger.Warnf("%s is an unknown instruction", instruction["instruction"])
 	}
@@ -267,6 +271,51 @@ func (handler *Handler) onHint(hint string, instructor string) {
 	}})
 }
 
+// onCheckConfig is the function to process the instruction `check config`
+// check the config and sends a message containing all errors it could find
+func (handler *Handler) onCheckConfig(configToRead interface{}) {
+	message := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "config",
+		Contents: map[string][]string{"errors": handler.checkConfig(configToRead)},
+	}
+	jsonMessage, _ := json.Marshal(&message)
+	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+}
+
+// processConfig reads the config in.
+// If action is "use" then the message must tell the config a new config is now used and put it to use
+func (handler *Handler) onUseConfig(configToRead interface{}, fileName string) {
+	jsonBytes, err := json.Marshal(configToRead)
+	if err != nil {
+		logger.Error(err)
+	} else {
+		newConfig, _ := config.ReadJSON(jsonBytes)
+		message := Message{
+			DeviceID: "back-end",
+			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+			Type:     "config",
+			Contents: map[string][]string{},
+		}
+		if len(handler.checkConfig(configToRead)) == 0 {
+			dir, _ := os.Getwd()
+			fullFileName := filepath.Join(dir, "back-end", "resources", "production", fileName)
+			err = ioutil.WriteFile(fullFileName, jsonBytes, 0644)
+			if err != nil {
+				logger.Error(err)
+			}
+			handler.Config = newConfig
+			handler.ConfigFile = fullFileName
+			handler.SendSetup()
+			message.Type = "new config"
+			message.Contents = map[string]string{"name": fileName}
+		}
+		jsonMessage, _ := json.Marshal(&message)
+		handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+	}
+}
+
 // connected is a method that sets a device to connected
 func (handler *Handler) connected(deviceID string) {
 	device, ok := handler.Config.Devices[deviceID]
@@ -276,4 +325,26 @@ func (handler *Handler) connected(deviceID string) {
 		device.Connection = true
 		handler.Config.Devices[deviceID] = device
 	}
+}
+
+// checkConfig checks the config, if it finds any errors in processing the config,
+// it will return a list of all found errors, if this slice is empty,
+// the config contains no errors and can be used safely
+func (handler *Handler) checkConfig(configToRead interface{}) []string {
+	errors := make([]string, 0)
+	jsonBytes, err := json.Marshal(configToRead)
+	if err != nil {
+		errors = append(errors, fmt.Sprintf("could not unmarshal json, %v", err))
+	} else {
+		newConfig, errorList := config.ReadJSON(jsonBytes)
+
+		if newConfig.General.Host != handler.Config.General.Host {
+			errorList = append(errorList, "host: different from current host for front and back-end")
+		}
+		if newConfig.General.Port != handler.Config.General.Port {
+			errorList = append(errorList, "port: different from current port for front and back-end")
+		}
+		errors = append(errors, errorList...)
+	}
+	return errors
 }
