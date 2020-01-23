@@ -1,56 +1,59 @@
 {
-  "general": {
-    "name": "Sport Heroes",
-    "duration": "30m",
-    "host": "localhost",
-    "port": 1883
-  },
   "cameras": [
     {
-      "name": "muppets",
-      "link": "https://www.youtube.com/embed/tgbNymZ7vqY"
+      "link": "https://www.youtube.com/embed/tgbNymZ7vqY",
+      "name": "muppets"
     }
   ],
   "devices": [
     {
-      "id": "start-beeldscherm",
       "description": "filmpjes",
+      "id": "start-beeldscherm",
       "input": {},
       "output": {
         "film": {
-          "type": "string",
           "instructions": {
             "bestand": "string"
           },
-          "label": ["start", "beeldscherm"]
+          "label": [
+            "start",
+            "beeldscherm"
+          ],
+          "type": "string"
         }
       }
     },
     {
-      "id": "start-deur",
       "description": "deur heeft een ledstrip",
+      "id": "start-deur",
       "input": {},
       "output": {
         "ledstrip": {
-          "type": "string",
           "instructions": {
             "aan": "boolean"
           },
-          "label": ["post-start", "licht"]
+          "label": [
+            "post-start",
+            "licht"
+          ],
+          "type": "string"
         }
       }
     },
     {
-      "id": "uv-licht",
       "description": "UV licht in de kamer",
+      "id": "uv-licht",
       "input": {},
       "output": {
         "uv": {
-          "type": "boolean",
           "instructions": {
             "aan": "boolean"
           },
-          "label" : ["bar-puzzle", "uv"]
+          "label": [
+            "bar-puzzle",
+            "uv"
+          ],
+          "type": "boolean"
         }
       }
     },
@@ -64,190 +67,247 @@
             "manual": "array",
             "scene": "string"
           },
-          "type": "string",
-          "label": ["groot-licht"]
+          "label": [
+            "groot-licht"
+          ],
+          "type": "string"
         },
         "spot1": {
           "instructions": {
             "manual": "array"
           },
-          "type": "string",
-          "label": ["spot", "licht"]
+          "label": [
+            "spot",
+            "licht"
+          ],
+          "type": "string"
         },
         "spot2": {
           "instructions": {
             "manual": "array"
           },
-          "type": "string",
-          "label": ["spot", "licht"]
+          "label": [
+            "spot",
+            "licht"
+          ],
+          "type": "string"
         },
         "spot3": {
           "instructions": {
             "manual": "array"
           },
-          "type": "string",
-          "label": ["spot", "licht"]
+          "label": [
+            "spot",
+            "licht"
+          ],
+          "type": "string"
         },
         "spot4": {
           "instructions": {
             "manual": "array"
           },
-          "type": "string",
-          "label": ["spot", "licht"]
+          "label": [
+            "spot",
+            "licht"
+          ],
+          "type": "string"
         },
         "spot5": {
           "instructions": {
             "manual": "array"
           },
-          "type": "string",
-          "label": ["spot", "licht"]
+          "label": [
+            "spot",
+            "licht"
+          ],
+          "type": "string"
         },
         "spot6": {
           "instructions": {
             "manual": "array"
           },
-          "type": "string",
-          "label": ["spot", "licht"]
+          "label": [
+            "spot",
+            "licht"
+          ],
+          "type": "string"
         }
       }
     },
     {
-      "id": "boxen",
       "description": "geluid afspelen",
+      "id": "boxen",
       "input": {},
       "output": {
         "box": {
-          "type": "string",
           "instructions": {
             "bestand": "string"
           },
-          "label": ["geluid"]
+          "label": [
+            "geluid"
+          ],
+          "type": "string"
         }
       }
     },
     {
-      "id": "tablet_boxen",
       "description": "whatsapp geluid afspelen",
+      "id": "tablet_boxen",
       "input": {},
       "output": {
         "box": {
-          "type": "string",
           "instructions": {
             "bestand": "string"
           },
-          "label": ["geluid", "whatsapp"]
+          "label": [
+            "geluid",
+            "whatsapp"
+          ],
+          "type": "string"
         }
       }
     },
     {
-      "id": "Whatsapp",
       "description": "Whatsapp van de spelers",
+      "id": "Whatsapp",
       "input": {
-        "typing": "string",
         "currentPerson": "string",
         "messages": "array",
-        "speler-bericht": "string"
+        "speler-bericht": "string",
+        "submit": "boolean",
+        "typing": "string"
       },
       "output": {
         "hint": {
-          "type": "string",
           "instructions": {
             "hint": "string"
           },
-          "label": ["hint", "whatsapp"]
+          "label": [
+            "hint",
+            "whatsapp"
+          ],
+          "type": "string"
         },
         "person": {
-          "type": "string",
           "instructions": {
             "tekst": "string"
           },
-          "label": ["whatsapp"]
+          "label": [
+            "whatsapp"
+          ],
+          "type": "string"
         }
       }
     },
     {
-      "id": "playlist-beeldscherm",
       "description": "Beeldscherm met spotify playlist",
+      "id": "playlist-beeldscherm",
       "input": {
+        "wachtwoord": "numeric",
+        "mouseOver": "string",
         "playlist": "string",
-        "kabel": "boolean",
-        "knoppen status": "string"
+        "submit": "boolean"
       },
       "output": {
-        "nakijk": {
-        "type": "boolean",
-        "instructions": {
-          "correct": "boolean"
+        "nakijkCode": {
+          "instructions": {
+            "correct": "boolean"
+          },
+          "label": [
+            "playlist-puzzel"
+          ],
+          "type": "boolean"
         },
-        "label": ["playlist-puzzel"]
-      }
-
+        "nakijkPlaylist": {
+          "instructions": {
+            "correct": "boolean"
+          },
+          "label": [
+            "playlist-puzzel"
+          ],
+          "type": "boolean"
+        }
       }
     },
     {
-      "id": "koelkast",
-      "description": "koelkast waar een drankje met chip in komt",
+      "description": "soundboard",
+      "id": "SoundBoard",
       "input": {
-        "chip": "string",
-        "deur": "boolean"
+        "knop1 kleur": "string",
+        "knop2 kleur": "string",
+        "knop3 kleur": "string",
+        "knop4 kleur": "string",
+        "knop5 kleur": "string",
+        "knop6 kleur": "string",
+        "knop7 kleur": "string",
+        "knop8 kleur": "string"
       },
       "output": {
+        "ready": {
+          "instructions": {
+            "start": "string",
+            "correct": "boolean"
+          },
+          "type": "string"
+        },
+        "voorzeggen": {
+          "instructions" : {
+            "voorzeggen": "string"
+          }
+        }
       }
+    },
+    {
+      "description": "koelkast waar een drankje met chip in komt",
+      "id": "koelkast",
+      "input": {
+        "chip": "string",
+        "submit": "boolean"
+      },
+      "output": {}
     }
   ],
-  "timers": [
-    {
-      "id": "tijdStartFilm",
-      "duration": "1m30s"
-    }
+  "general": {
+    "duration": "30m",
+    "host": "192.168.178.102",
+    "name": "Sport Heroes",
+    "port": 1883
+  },
+  "general_events": [
   ],
   "puzzles": [
     {
+      "hints": [
+        "doe beter je best"
+      ],
       "name": "Start kamer",
       "rules": [
         {
-          "id": "Start kamer: deur open",
-          "description": "het filmpje is afgelopen",
-          "limit": 1,
-          "conditions": {
-            "operator": "AND",
-            "list": [
-              {
-                "type": "timer",
-                "type_id": "tijdStartFilm",
-                "constraints": {
-                  "comparison": "eq",
-                  "value": true
-                }
-              }
-            ]
-          },
           "actions": [
             {
-              "type": "device",
-              "type_id": "start-deur",
               "message": [
                 {
                   "component_id": "ledstrip",
                   "instruction": "aan",
                   "value": true
                 }
-              ]
+              ],
+              "type": "device",
+              "type_id": "start-deur"
             },
             {
-              "type": "device",
-              "type_id": "hue_lights",
               "message": [
                 {
                   "component_id": "all",
                   "instruction": "scene",
                   "value": "highlight-spellenkast-tablet"
                 }
-              ]
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
             },
             {
-              "type": "device",
-              "type_id": "boxen",
+              "delay": "5s",
               "message": [
                 {
                   "component_id": "box",
@@ -255,11 +315,11 @@
                   "value": "whatapp-geluid"
                 }
               ],
-              "delay": "5s"
+              "type": "device",
+              "type_id": "boxen"
             },
             {
-              "type": "device",
-              "type_id": "Whatsapp",
+              "delay": "5s",
               "message": [
                 {
                   "component_id": "person",
@@ -267,56 +327,50 @@
                   "value": "Zijn nu hier, welk hok zijn jullie?"
                 }
               ],
-              "delay": "5s"
+              "type": "device",
+              "type_id": "Whatsapp"
             }
-          ]
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "comparison": "eq",
+                  "value": true
+                },
+                "type": "timer",
+                "type_id": "tijdStartFilm"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "het filmpje is afgelopen",
+          "id": "Start kamer: deur open",
+          "limit": 1
         }
-      ],
-      "hints": [
-        "doe beter je best"
       ]
     },
     {
+      "hints": [
+        "doe beter je best"
+      ],
       "name": "Locatie puzzel",
       "rules": [
         {
-          "id": "Locatie puzzel: Goede locatie",
-          "description": "er is een goede locatie gestuurd",
-          "limit": 1,
-          "conditions": {
-            "operator": "AND",
-            "list": [
-              {
-                "type": "device",
-                "type_id": "Whatsapp",
-                "constraints": {
-                  "operator": "AND",
-                  "list": [
-                    {
-                      "component_id": "speler-bericht",
-                      "comparison": "eq",
-                      "value": "goede locatie"
-                    }
-                  ]
-                }
-              }
-            ]
-          },
           "actions": [
             {
-              "type": "device",
-              "type_id": "hue_lights",
               "message": [
                 {
                   "component_id": "all",
                   "instruction": "scene",
                   "value": "highlight-playlists"
                 }
-              ]
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
             },
             {
-              "type": "device",
-              "type_id": "boxen",
+              "delay": "2s",
               "message": [
                 {
                   "component_id": "box",
@@ -324,49 +378,49 @@
                   "value": "whatapp-geluid"
                 }
               ],
-              "delay": "2s"
+              "type": "device",
+              "type_id": "boxen"
             },
             {
-              "type": "device",
-              "type_id": "Whatsapp",
+              "delay": "2s",
               "message": [
                 {
                   "component_id": "person",
                   "instruction": "tekst",
-                  "value": "Zetten jullie de muziek aan? 4291"
+                  "value": "Zetten jullie de muziek aan? 4083"
                 }
               ],
-              "delay": "2s"
+              "type": "device",
+              "type_id": "Whatsapp"
             }
-          ]
-        },
-        {
-          "id": "Locatie puzzel: Foute locatie",
-          "description": "er is een foute locatie gestuurd",
-          "limit": 100,
+          ],
           "conditions": {
-            "operator": "AND",
             "list": [
               {
-                "type": "device",
-                "type_id": "Whatsapp",
                 "constraints": {
-                  "operator": "AND",
                   "list": [
                     {
-                      "component_id": "speler-bericht",
                       "comparison": "eq",
-                      "value": "foute locatie"
+                      "component_id": "speler-bericht",
+                      "value": "goede locatie"
                     }
-                  ]
-                }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "Whatsapp"
               }
-            ]
+            ],
+            "operator": "AND"
           },
+          "description": "er is een goede locatie gestuurd",
+          "id": "Locatie puzzel: Goede locatie",
+          "limit": 1
+        },
+        {
           "actions": [
             {
-              "type": "device",
-              "type_id": "boxen",
+              "delay": "2s",
               "message": [
                 {
                   "component_id": "box",
@@ -374,11 +428,11 @@
                   "value": "whatapp-geluid"
                 }
               ],
-              "delay": "2s"
+              "type": "device",
+              "type_id": "boxen"
             },
             {
-              "type": "device",
-              "type_id": "Whatsapp",
+              "delay": "2s",
               "message": [
                 {
                   "component_id": "person",
@@ -386,56 +440,124 @@
                   "value": "Weet je dat zeker? Die ken ik helemaal niet"
                 }
               ],
-              "delay": "2s"
+              "type": "device",
+              "type_id": "Whatsapp"
             }
-          ]
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "component_id": "speler-bericht",
+                      "value": "foute locatie"
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "submit",
+                      "value": true
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "Whatsapp"
+              },
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "lt",
+                      "value": 1
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "rule",
+                "type_id": "Locatie puzzel: Goede locatie"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "er is een foute locatie gestuurd",
+          "id": "Locatie puzzel: Foute locatie",
+          "limit": 100
         }
-      ],
-      "hints": [
-        "doe beter je best"
       ]
     },
     {
+      "hints": [
+        "doe beter je best"
+      ],
       "name": "Playlist puzzel",
       "rules": [
         {
-          "id": "Playlist puzzel: Goede playlist",
-          "description": "er is een goede playlist aangeklikt",
-          "limit": 1,
-          "conditions": {
-            "operator": "AND",
-            "list": [
-              {
-                "type": "device",
-                "type_id": "playlist-beeldscherm",
-                "constraints": {
-                  "operator": "AND",
-                  "list": [
-                    {
-                      "component_id": "playlist",
-                      "comparison": "eq",
-                      "value": "juiste playlist"
-                    }
-                  ]
-                }
-              }
-            ]
-          },
           "actions": [
             {
+              "message": [
+                {
+                  "instruction": "start"
+                }
+              ],
               "type": "device",
-              "type_id": "hue_lights",
+              "type_id": "SoundBoard"
+            },
+            {
+              "message": [
+                {
+                  "instruction": "nakijkCode",
+                  "value": true
+                }
+              ],
+              "type": "device",
+              "type_id": "playlist-beeldscherm"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "component_id": "code",
+                      "value": "4083"
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "submit",
+                      "value": true
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "playlist-beeldscherm"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "code is ingevuld op beeldscherm",
+          "id": "Playlist puzzel: Goede code",
+          "limit": 1
+        },
+        {
+          "actions": [
+            {
               "message": [
                 {
                   "component_id": "all",
                   "instruction": "scene",
                   "value": "disco-scene"
                 }
-              ]
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
             },
             {
-              "type": "device",
-              "type_id": "hue_lights",
+              "delay": "15s",
               "message": [
                 {
                   "component_id": "all",
@@ -443,33 +565,45 @@
                   "value": "gedimt"
                 }
               ],
-              "delay": "30s"
+              "type": "device",
+              "type_id": "hue_lights"
             },
             {
-              "type": "device",
-              "type_id": "boxen",
               "message": [
                 {
                   "component_id": "box",
                   "instruction": "bestand",
                   "value": "playlist-muziek"
                 }
-              ]
+              ],
+              "type": "device",
+              "type_id": "boxen"
             },
             {
+              "message": [
+                {
+                  "component_id": "box",
+                  "instruction": "bestand",
+                  "value": "spannend"
+                }
+              ],
+              "delay": "15s",
               "type": "device",
-              "type_id": "uv-licht",
+              "type_id": "boxen"
+            },
+            {
               "message": [
                 {
                   "component_id": "uv",
                   "instruction": "aan",
                   "value": true
                 }
-              ]
+              ],
+              "type": "device",
+              "type_id": "uv-licht"
             },
             {
-              "type": "device",
-              "type_id": "boxen",
+              "delay": "5s",
               "message": [
                 {
                   "component_id": "box",
@@ -477,11 +611,11 @@
                   "value": "whatapp-geluid"
                 }
               ],
-              "delay": "5s"
+              "type": "device",
+              "type_id": "boxen"
             },
             {
-              "type": "device",
-              "type_id": "Whatsapp",
+              "delay": "5s",
               "message": [
                 {
                   "component_id": "person",
@@ -489,37 +623,42 @@
                   "value": "Klinkt lekker! Zetten jullie de drank koud?"
                 }
               ],
-              "delay": "5s"
+              "type": "device",
+              "type_id": "Whatsapp"
             }
-          ]
-        },
-        {
-          "id": "Playlist puzzel: Foute playlist",
-          "description": "er is een foute playlist aangeklikt",
-          "limit": 1,
+          ],
           "conditions": {
-            "operator": "AND",
             "list": [
               {
-                "type": "device",
-                "type_id": "playlist-beeldscherm",
                 "constraints": {
-                  "operator": "AND",
                   "list": [
                     {
+                      "comparison": "eq",
                       "component_id": "playlist",
-                      "comparison": "not",
-                      "value": "goede playlist"
+                      "value": "juiste playlist"
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "submit",
+                      "value": true
                     }
-                  ]
-                }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "playlist-beeldscherm"
               }
-            ]
+            ],
+            "operator": "AND"
           },
+          "description": "er is een goede playlist aangeklikt",
+          "id": "Playlist puzzel: Goede playlist",
+          "limit": 1
+        },
+        {
           "actions": [
             {
-              "type": "device",
-              "type_id": "boxen",
+              "delay": "5s",
               "message": [
                 {
                   "component_id": "box",
@@ -527,11 +666,11 @@
                   "value": "whatsapp-geluid"
                 }
               ],
-              "delay": "5s"
+              "type": "device",
+              "type_id": "boxen"
             },
             {
-              "type": "device",
-              "type_id": "Whatsapp",
+              "delay": "5s",
               "message": [
                 {
                   "component_id": "person",
@@ -539,83 +678,96 @@
                   "value": "Wat een slechte muziek zeg! Kan er andere muziek aan?"
                 }
               ],
-              "delay": "5s"
+              "type": "device",
+              "type_id": "Whatsapp"
             },
             {
-              "type": "device",
-              "type_id": "boxen",
               "message": [
                 {
                   "component_id": "box",
                   "instruction": "bestand",
                   "value": "slechte-muziek"
                 }
-              ]
+              ],
+              "type": "device",
+              "type_id": "boxen"
             }
-          ]
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "not",
+                      "component_id": "playlist",
+                      "value": "juiste playlist"
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "submit",
+                      "value": true
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "playlist-beeldscherm"
+              },
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "lt",
+                      "value": 1
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "rule",
+                "type_id": "Playlist puzzel: Goede playlist"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "er is een foute playlist aangeklikt",
+          "id": "Playlist puzzel: Foute playlist",
+          "limit": 1
         }
-      ],
-      "hints": [
-        "doe beter je best"
       ]
     },
     {
+      "hints": [
+        "doe beter je best"
+      ],
       "name": "Drank puzzel",
       "rules": [
         {
-          "id": "Drank puzzel: Bier1",
-          "description": "er is bier in de koelkast gedaan",
-          "limit": 1,
-          "conditions": {
-            "operator": "AND",
-            "list": [
-              {
-                "type": "device",
-                "type_id": "koelkast",
-                "constraints": {
-                  "operator": "AND",
-                  "list": [
-                    {
-                      "component_id": "chip",
-                      "comparison": "eq",
-                      "value": "bier"
-                    },
-                    {
-                      "component_id": "deur",
-                      "comparison": "eq",
-                      "value": true
-                    }
-                  ]
-                }
-              }
-            ]
-          },
           "actions": [
             {
-              "type": "device",
-              "type_id": "hue_lights",
               "message": [
                 {
                   "component_id": "all",
                   "instruction": "scene",
                   "value": "bier-scene"
                 }
-              ]
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
             },
             {
-              "type": "device",
-              "type_id": "boxen",
               "message": [
                 {
                   "component_id": "box",
                   "instruction": "bestand",
                   "value": "bier-stress"
                 }
-              ]
+              ],
+              "type": "device",
+              "type_id": "boxen"
             },
             {
-              "type": "device",
-              "type_id": "boxen",
+              "delay": "5s",
               "message": [
                 {
                   "component_id": "box",
@@ -623,11 +775,11 @@
                   "value": "whatsapp-geluid"
                 }
               ],
-              "delay": "5s"
+              "type": "device",
+              "type_id": "boxen"
             },
             {
-              "type": "device",
-              "type_id": "Whatsapp",
+              "delay": "5s",
               "message": [
                 {
                   "component_id": "person",
@@ -635,353 +787,391 @@
                   "value": "niks was de afspraak he"
                 }
               ],
-              "delay": "5s"
+              "type": "device",
+              "type_id": "Whatsapp"
             }
-          ]
-        },
-        {
-          "id": "Drank puzzel: Bier2",
-          "description": "er is bier in de koelkast gedaan",
-          "limit": 1,
+          ],
           "conditions": {
-            "operator": "AND",
             "list": [
               {
-                "type": "device",
-                "type_id": "koelkast",
                 "constraints": {
-                  "operator": "AND",
                   "list": [
                     {
-                      "component_id": "chip",
                       "comparison": "eq",
+                      "component_id": "chip",
                       "value": "bier"
                     },
                     {
-                      "component_id": "deur",
                       "comparison": "eq",
+                      "component_id": "submit",
                       "value": true
                     }
-                  ]
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "koelkast"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "er is bier in de koelkast gedaan",
+          "id": "Drank puzzel: Bier1",
+          "limit": 1
+        },
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "all",
+                  "instruction": "scene",
+                  "value": "bier-scene"
                 }
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
+            },
+            {
+              "message": [
+                {
+                  "component_id": "box",
+                  "instruction": "bestand",
+                  "value": "bier-stress"
+                }
+              ],
+              "type": "device",
+              "type_id": "boxen"
+            },
+            {
+              "delay": "5s",
+              "message": [
+                {
+                  "component_id": "box",
+                  "instruction": "bestand",
+                  "value": "whatsapp-geluid"
+                }
+              ],
+              "type": "device",
+              "type_id": "boxen"
+            },
+            {
+              "delay": "5s",
+              "message": [
+                {
+                  "component_id": "person",
+                  "instruction": "tekst",
+                  "value": "niks was de afspraak he"
+                }
+              ],
+              "type": "device",
+              "type_id": "Whatsapp"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "component_id": "chip",
+                      "value": "bier"
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "submit",
+                      "value": true
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "koelkast"
               },
               {
-                "type": "rule",
-                "type_id": "Drank puzzel: Bier1",
                 "constraints": {
-                  "operator": "AND",
                   "list": [
                     {
                       "comparison": "eq",
                       "value": 1
                     }
-                  ]
-                }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "rule",
+                "type_id": "Drank puzzel: Bier1"
               }
-            ]
+            ],
+            "operator": "AND"
           },
-          "actions": [
-            {
-              "type": "device",
-              "type_id": "hue_lights",
-              "message": [
-                {
-                  "component_id": "all",
-                  "instruction": "scene",
-                  "value": "bier-scene"
-                }
-              ]
-            },
-            {
-              "type": "device",
-              "type_id": "boxen",
-              "message": [
-                {
-                  "component_id": "box",
-                  "instruction": "bestand",
-                  "value": "bier-stress"
-                }
-              ]
-            },
-            {
-              "type": "device",
-              "type_id": "boxen",
-              "message": [
-                {
-                  "component_id": "box",
-                  "instruction": "bestand",
-                  "value": "whatsapp-geluid"
-                }
-              ],
-              "delay": "5s"
-            },
-            {
-              "type": "device",
-              "type_id": "Whatsapp",
-              "message": [
-                {
-                  "component_id": "person",
-                  "instruction": "tekst",
-                  "value": "niks was de afspraak he"
-                }
-              ],
-              "delay": "5s"
-            }
-          ]
+          "description": "er is bier in de koelkast gedaan",
+          "id": "Drank puzzel: Bier2",
+          "limit": 1
         },
         {
-          "id": "Drank puzzel: Fris",
-          "description": "er is fris in de koelkast gedaan",
-          "limit": 1,
-          "conditions": {
-            "operator": "AND",
-            "list": [
-              {
-                "type": "device",
-                "type_id": "koelkast",
-                "constraints": {
-                  "operator": "AND",
-                  "list": [
-                    {
-                      "component_id": "chip",
-                      "comparison": "eq",
-                      "value": "fris"
-                    }
-                  ]
-                }
-              }
-            ]
-          },
           "actions": [
             {
-              "type": "device",
-              "type_id": "hue_lights",
               "message": [
                 {
                   "component_id": "all",
                   "instruction": "scene",
                   "value": "feest-scene"
                 }
-              ]
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
             },
             {
-              "type": "device",
-              "type_id": "boxen",
               "message": [
                 {
                   "component_id": "box",
                   "instruction": "bestand",
                   "value": "feest-muziek"
                 }
-              ]
+              ],
+              "type": "device",
+              "type_id": "boxen"
             }
-          ]
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "component_id": "chip",
+                      "value": "fris"
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "submit",
+                      "value": true
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "koelkast"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "er is fris in de koelkast gedaan",
+          "id": "Drank puzzel: Fris",
+          "limit": 1
         }
-      ],
-      "hints": [
-        "doe beter je best"
       ]
     }
   ],
-  "general_events": [
+  "timers": [
     {
-      "name": "Start knop",
-      "rules": [
+      "duration": "1m30s",
+      "id": "tijdStartFilm"
+    }
+  ],
+  "button_events": [
+    {
+      "id": "start",
+      "description": "Als het spel start, moeten alle rode leds aan gaan en de groene uit",
+      "limit": 1,
+      "conditions": {},
+      "actions": [
         {
-          "id": "start",
-          "description": "Als het spel start, moeten alle rode leds aan gaan en de groene uit",
-          "limit": 1,
-          "conditions": {
-            "operator": "OR",
-            "list": [
-              {
-                "type": "device",
-                "type_id": "front-end",
-                "constraints": {
-                  "component_id": "start",
-                  "comparison": "gte",
-                  "value": 1
-                }
-              }
-            ]
-          },
-          "actions": [
+          "type": "timer",
+          "type_id": "general",
+          "message": [
             {
-              "type": "timer",
-              "type_id": "general",
-              "message": [
-                {
-                  "instruction": "start"
-                }
-              ]
-            },
+              "instruction": "start"
+            }
+          ]
+        },
+        {
+          "type": "device",
+          "type_id": "front-end",
+          "message": [
             {
-              "type": "device",
-              "type_id": "hue_lights",
-              "message": [
-                {
-                  "component_id": "all",
-                  "instruction": "scene",
-                  "value": "lichten-uit"
-                }
-              ]
-            },
-            {
-              "type": "device",
-              "type_id": "boxen",
-              "message": [
-                {
-                  "component_id": "box",
-                  "instruction": "bestand",
-                  "value": "start-filmpje"
-                }
-              ],
-              "delay": "2s"
-            },
-            {
-              "type": "device",
-              "type_id": "start-beeldscherm",
-              "message": [
-                {
-                  "component_id": "film",
-                  "instruction": "bestand",
-                  "value": "start-filmpje"
-                }
-              ],
-              "delay": "2s"
-            },
-            {
-              "type": "timer",
-              "type_id": "tijdStartFilm",
-              "message": [
-                {
-                  "instruction": "start"
-                }
-              ]
+              "instruction": "set state",
+              "component_id": "gameState",
+              "value": "in spel"
             }
           ]
         }
       ]
     },
     {
-      "name": "Stop Time up",
-      "rules": [
-        {
-          "id": "time up",
-          "description": "Na de duration van het spel faalt de groep",
-          "limit": 1,
-          "conditions": {
-            "type": "timer",
-            "type_id": "general",
+      "id": "stop",
+      "description": "Als het spel stopt, moeten alle lichten uitgaan",
+      "limit": 1,
+      "conditions": {
+        "operator": "OR",
+        "list": [
+          {
+            "type": "device",
+            "type_id": "front-end",
             "constraints": {
+              "component_id": "gameState",
               "comparison": "eq",
-              "value": true
+              "value": "in spel"
             }
           },
-          "actions": [
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "gameState",
+              "comparison": "eq",
+              "value": "gepauzeerd"
+            }
+          }
+        ]
+      },
+      "actions": [
+        {
+          "type": "timer",
+          "type_id": "general",
+          "message": [
             {
-              "type": "device",
-              "type_id": "Whatsapp",
-              "message": [
-                {
-                  "component_id": "person",
-                  "instruction": "tekst",
-                  "value": "tijd-op-stress"
-                }
-              ]
-            },
+              "instruction": "stop"
+            }
+          ]
+        },
+        {
+          "type": "device",
+          "type_id": "front-end",
+          "message": [
             {
-              "type": "device",
-              "type_id": "hue_lights",
-              "message": [
-                {
-                  "component_id": "all",
-                  "instruction": "scene",
-                  "value": "tijd-op-stress"
-                }
-              ]
-            },
-            {
-              "type": "device",
-              "type_id": "boxen",
-              "message": [
-                {
-                  "component_id": "box",
-                  "instruction": "bestand",
-                  "value": "tijd-op-stress"
-                }
-              ]
+              "instruction": "set state",
+              "component_id": "gameState",
+              "value": "gestopt"
             }
           ]
         }
       ]
     },
     {
-      "name": "Stop Done",
-      "rules": [
+      "id": "pauze",
+      "description": "Als pauze wordt gedrukt, stopt de tijd",
+      "limit": 0,
+      "conditions": {
+        "operator": "AND",
+        "list": [
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "gameState",
+              "comparison": "eq",
+              "value": "in spel"
+            }
+          }
+        ]
+      },
+      "actions": [
         {
-          "id": "puzzels done",
-          "description": "puzzels zijn opgelost dus time stop",
-          "limit": 1,
-          "conditions": {
-            "operator": "AND",
-            "list": [
-              {
-                "type": "rule",
-                "type_id": "Drank puzzel: Fris",
-                "constraints": {
-                  "comparison": "eq",
-                  "value": 1
-                }
-              }
-            ]
-          },
-          "actions": [
+          "type": "timer",
+          "type_id": "general",
+          "message": [
             {
-              "type": "timer",
-              "type_id": "general",
-              "message": [
-                {
-                  "instruction": "pause"
-                }
-              ]
+              "instruction": "pause"
+            }
+          ]
+        },
+        {
+          "type": "device",
+          "type_id": "front-end",
+          "message": [
+            {
+              "instruction": "set state",
+              "component_id": "gameState",
+              "value": "gepauzeerd"
             }
           ]
         }
       ]
     },
     {
-      "name": "Stop knop",
-      "rules": [
+      "id": "verdergaan",
+      "description": "Als pauze is gedrukt, kun je weer verder gaan",
+      "limit": 0,
+      "conditions": {
+        "operator": "AND",
+        "list": [
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "gameState",
+              "comparison": "eq",
+              "value": "gepauzeerd"
+            }
+          }
+        ]
+      },
+      "actions": [
         {
-          "id": "stop",
-          "description": "Als het spel stopt, moeten alle lichten uitgaan",
-          "limit": 1,
-          "conditions": {
-            "operator": "OR",
-            "list": [
-              {
-                "type": "device",
-                "type_id": "front-end",
-                "constraints": {
-                  "component_id": "stop",
-                  "comparison": "eq",
-                  "value": 1
-                }
-              }
-            ]
-          },
-          "actions": [
+          "type": "timer",
+          "type_id": "general",
+          "message": [
             {
-              "type": "timer",
-              "type_id": "general",
-              "message": [
-                {
-                  "instruction": "stop"
-                }
-              ]
+              "instruction": "start"
             }
           ]
+        },
+        {
+          "type": "device",
+          "type_id": "front-end",
+          "message": [
+            {
+              "instruction": "set state",
+              "component_id": "gameState",
+              "value": "in spel"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pre-game",
+      "description": "Voor het spel start, zet spooky lighting",
+      "limit": 1,
+      "conditions": {
+        "operator": "AND",
+        "list": [
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "gameState",
+              "comparison": "eq",
+              "value": "gereed"
+            }
+          }
+        ]
+      },
+      "actions": [
+        {
+          "type": "device",
+          "type_id": "front-end",
+          "message": [
+            {
+              "instruction": "set state",
+              "component_id": "gameState",
+              "value": "pre-game"
+            }
+          ]
+        },
+        {
+          "message": [
+            {
+              "component_id": "all",
+              "instruction": "scene",
+              "value": "MBvYmUk1U-EUaGz"
+            }
+          ],
+          "type": "device",
+          "type_id": "hue_lights"
         }
       ]
     }
