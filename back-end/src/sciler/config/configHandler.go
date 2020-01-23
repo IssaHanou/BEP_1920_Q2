@@ -456,7 +456,7 @@ func generateButtonEvents(buttonEvents []ReadRule, config *WorkingConfig) (map[s
 
 // generateRules transforms readRules to rules
 // it generates conditions and copies the rest
-// if the config does not follow the manual, a non-empty list of mistakes is returned>>>>>>> develop-sprint-7
+// if the config does not follow the manual, a non-empty list of mistakes is returned
 func generateRules(readRules []ReadRule, config *WorkingConfig) ([]*Rule, []string) {
 	var rules []*Rule
 	errorList := make([]string, 0)
