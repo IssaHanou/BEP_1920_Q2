@@ -4,7 +4,7 @@
 This is the library to create devices to work together with the SCILER system 
 
 ### Installation
-- npm install with ```pip install scclib```
+- pip install with ```pip install scclib```
 
 ### Using this library
 - import lib with `from scclib.device import Device`
