@@ -4,12 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	logger "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"reflect"
 	"time"
 )
 
 // ReadFile reads filename and call readJSON on contents.
+// When an error occurs during the reading and processing of this file, it panics
 func ReadFile(filename string) WorkingConfig {
 	dat, err := ioutil.ReadFile(filename)
 	errorList := make([]string, 0)
@@ -20,12 +22,16 @@ func ReadFile(filename string) WorkingConfig {
 	config, jsonErrors := ReadJSON(dat)
 	errorList = append(errorList, jsonErrors...)
 	if len(errorList) > 0 {
-		panic(errorList[0])
+		for _, errInList := range errorList {
+			logger.Error(errInList)
+		}
+		panic("errors found in config")
 	}
 	return config
 }
 
 // ReadJSON transforms json file into config object.
+// The string array contains all errors that are found during the transformation.
 func ReadJSON(input []byte) (WorkingConfig, []string) {
 	var config ReadConfig
 	jsonErr := json.Unmarshal(input, &config)
@@ -36,8 +42,7 @@ func ReadJSON(input []byte) (WorkingConfig, []string) {
 	return newConfig, configErr
 }
 
-// Creates additional structures: forms device and rule maps;
-// and maps for actions and constraints (retrieved from puzzles and general events), with condition pointer as key
+// generateDataStructures creates the working config, with maps to easily lookup objects.
 func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 	var config WorkingConfig
 	errorList := make([]string, 0)
@@ -48,41 +53,19 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 	config.Puzzles = newPuzzles
 	newEvents, eventErrors := generateGeneralEvents(readConfig.GeneralEvents, &config)
 	config.GeneralEvents = newEvents
-	errorList = append(errorList, append(puzzleErrors, eventErrors...)...)
+	newButtonEvents, buttonEventErrors := generateButtonEvents(readConfig.ButtonEvents, &config)
+	config.ButtonEvents = newButtonEvents
+	config.Devices = generateDevices(readConfig.Devices, &config) // this needs to happen after generateButtonEvents for status map
+	newTimers, timerErrors := generateTimers(readConfig.Timers, &config)
+	config.Timers = newTimers
+	errorList = append(errorList, append(buttonEventErrors, append(puzzleErrors, append(eventErrors, timerErrors...)...)...)...)
 
-	config.Devices = make(map[string]*Device)
-	for _, readDevice := range readConfig.Devices {
-		config.Devices[readDevice.ID] = &(Device{readDevice.ID, readDevice.Description, readDevice.Input,
-			readDevice.Output, make(map[string]interface{}), false})
-	}
-	config.Devices["front-end"] = &(Device{
-		ID:          "front-end",
-		Description: "The operator webapp for managing a escape room",
-		Input:       map[string]string{"start": "numeric", "stop": "numeric"},
-		Output:      nil,
-		Status:      map[string]interface{}{"start": 0, "stop": 0},
-		Connection:  false,
-	})
-	config.Timers = make(map[string]*Timer)
-	for _, readTimer := range readConfig.Timers {
-		duration, err := time.ParseDuration(readTimer.Duration)
-		if err != nil {
-			errorList = append(errorList, err.Error())
-		} else {
-			config.Timers[readTimer.ID] = newTimer(readTimer.ID, duration)
-		}
-	}
-	duration, err := time.ParseDuration(config.General.Duration)
-	if err != nil {
-		errorList = append(errorList, err.Error())
-	} else {
-		config.Timers["general"] = newTimer("general", duration)
-	}
 	if len(errorList) == 0 {
 		// if there are errors in config format,
 		// wait with creating maps (which use condition type ids)
 		// and with checking constraint
 		config.StatusMap = generateStatusMap(&config)
+		config.EventRuleMap = generateEventRuleMap(&config)
 		config.RuleMap = generateRuleMap(&config)
 		config.LabelMap = generateLabelMap(&config)
 		errorList = append(errorList, checkConfig(config)...)
@@ -90,6 +73,73 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 	return config, errorList
 }
 
+// generateDevices creates the config devices map which points device id to a device in the WorkingConfig.
+// Creates front-end device manually as its information is not in `devices` in the configuration file.
+// The components are defined as the custom buttons, with boolean status of clicked or not.
+func generateDevices(devices []ReadDevice, config *WorkingConfig) map[string]*Device {
+	newDevices := make(map[string]*Device)
+	for _, readDevice := range devices {
+		newDevices[readDevice.ID] = &(Device{
+			readDevice.ID,
+			readDevice.Description,
+			readDevice.Input,
+			readDevice.Output,
+			make(map[string]interface{}),
+			false,
+		})
+	}
+
+	input := make(map[string]string)
+	status := make(map[string]interface{})
+	for _, btn := range config.ButtonEvents {
+		input[btn.ID] = "boolean"
+		status[btn.ID] = false
+	}
+	status["gameState"] = "gereed"
+	newDevices["front-end"] = &(Device{
+		ID:          "front-end",
+		Description: "The operator webapp for managing a escape room",
+		Input:       input,
+		Output: map[string]OutputObject{
+			"gameState": {
+				Type: "string",
+				Instructions: map[string]string{
+					"set state": "string",
+				},
+			},
+		},
+		Status:     status,
+		Connection: false,
+	})
+	return newDevices
+}
+
+// generateTimers creates map with id pointing to timer object for all timer objects and general timer.
+// check that all durations are of proper format.
+// return the created map and error list
+func generateTimers(timers []ReadTimer, config *WorkingConfig) (map[string]*Timer, []string) {
+	errorList := make([]string, 0)
+	newTimers := make(map[string]*Timer)
+	for _, readTimer := range timers {
+		duration, err := time.ParseDuration(readTimer.Duration)
+		if err != nil {
+			errorList = append(errorList, err.Error())
+		} else {
+			newTimers[readTimer.ID] = newTimer(readTimer.ID, duration)
+		}
+	}
+	duration, err := time.ParseDuration(config.General.Duration)
+	if err != nil {
+		errorList = append(errorList, err.Error())
+	} else {
+		newTimers["general"] = newTimer("general", duration)
+	}
+	return newTimers, errorList
+}
+
+// getAllRules creates rule list of the rule pointers belonging to all events,
+// except button events,
+// because those should not be added to status map, only to rule map
 func getAllRules(config *WorkingConfig) []*Rule {
 	var rules []*Rule
 	for _, event := range config.GeneralEvents {
@@ -99,10 +149,30 @@ func getAllRules(config *WorkingConfig) []*Rule {
 	for _, event := range config.Puzzles {
 		rules = append(rules, event.GetRules()...)
 	}
+
 	return rules
 }
 
+// generateRuleMap creates rule map with rule id
+// pointing to rule object pointers for all rules of all events
+// this map can be used to easily find (and edit) a rule by its id
 func generateRuleMap(config *WorkingConfig) map[string]*Rule {
+	ruleMap := make(map[string]*Rule)
+	rules := getAllRules(config)
+
+	for _, event := range config.ButtonEvents {
+		rules = append(rules, event)
+	}
+
+	for _, rule := range rules {
+		ruleMap[rule.ID] = rule
+	}
+	return ruleMap
+}
+
+// generatePuzzle RuleMap creates rule map with rule id
+// pointing to rule object pointers for rules of all puzzles and general events
+func generateEventRuleMap(config *WorkingConfig) map[string]*Rule {
 	ruleMap := make(map[string]*Rule)
 	rules := getAllRules(config)
 
@@ -112,7 +182,9 @@ func generateRuleMap(config *WorkingConfig) map[string]*Rule {
 	return ruleMap
 }
 
-// generateLabelMap makes a map from a label to a component by checking all components if they have labels
+// generateLabelMap makes a map from a label to a component
+// by checking all components if they have labels
+// this map can be used to easily find (and edit) all components for a specific label
 func generateLabelMap(config *WorkingConfig) map[string][]*Component {
 	labelMap := make(map[string][]*Component)
 	devices := config.Devices
@@ -127,21 +199,23 @@ func generateLabelMap(config *WorkingConfig) map[string][]*Component {
 	return labelMap
 }
 
+// generateStatusMap creates a map from an id (deviceID, ruleID, timerID) to a list of pointers of all rules with a condition mentioning that id
+// this map can be used to easily find (and edit) all rules for a specific id
 func generateStatusMap(config *WorkingConfig) map[string][]*Rule {
 	statusMap := make(map[string][]*Rule)
 	rules := getAllRules(config)
 
 	for _, rule := range rules {
 		for _, id := range rule.Conditions.GetConditionIDs() {
-			statusMap[id] = appendWhenUnique(statusMap[id], rule)
+			statusMap[id] = appendWhenUniqueRule(statusMap[id], rule)
 		}
 	}
 
 	return statusMap
 }
 
-// todo make this more efficient
-func appendWhenUnique(rules []*Rule, rule *Rule) []*Rule {
+// appendWhenUniqueRule is a method that append a pointer of a rule to a list of rule pointer when this pointer is not in the list
+func appendWhenUniqueRule(rules []*Rule, rule *Rule) []*Rule {
 	for _, existingRule := range rules {
 		if reflect.DeepEqual(*existingRule, *rule) {
 			return rules
@@ -150,6 +224,7 @@ func appendWhenUnique(rules []*Rule, rule *Rule) []*Rule {
 	return append(rules, rule)
 }
 
+// appendWhenUniqueComp is a method that append a pointer of a component to a list of components pointer when this pointer is not in the list
 func appendWhenUniqueComp(comps []*Component, comp *Component) []*Component {
 	for _, existingComp := range comps {
 		if reflect.DeepEqual(*existingComp, *comp) {
@@ -159,7 +234,10 @@ func appendWhenUniqueComp(comps []*Component, comp *Component) []*Component {
 	return append(comps, comp)
 }
 
-// checkConfig is a method that will return an error if the constraints value type is not equal to the device input type specified, the actions type is not equal to the device output type, or some other not allowed json configuration
+// checkConfig is a method that will return an error
+// if the constraints value type is not equal to the device input type specified,
+// the actions type is not equal to the device output type,
+// or some other not allowed json configuration
 func checkConfig(config WorkingConfig) []string {
 	errList := make([]string, 0)
 	for _, puzzle := range config.Puzzles {
@@ -179,11 +257,20 @@ func checkConfig(config WorkingConfig) []string {
 			errList = append(errList, checkActions(rule.Actions, config)...)
 		}
 	}
+
+	for _, rule := range config.ButtonEvents {
+		if err := rule.Conditions.checkConstraints(config, rule.ID); err != nil {
+			errList = append(errList, err...)
+		}
+		errList = append(errList, checkActions(rule.Actions, config)...)
+	}
+
 	// todo check uniqueness of all device_id, timer_id and rule_id
 	return errList
 }
 
-// checkAction is a method that will return an error is the actions value types and instructions are not equal to the device output specifications
+// checkAction is a method that will return an error
+// if the action's value types and instructions are not equal to the unit's output specifications
 func checkActions(actions []Action, config WorkingConfig) []string {
 	errorList := make([]string, 0)
 	for _, action := range actions {
@@ -202,17 +289,27 @@ func checkActions(actions []Action, config WorkingConfig) []string {
 	return errorList
 }
 
+// checkActionTimer is a method that checks the config in use for mistakes in the action of a timer
+// if the config does not follow the manual, a non-empty list of mistakes is returned
 func checkActionTimer(action Action, config WorkingConfig) []string {
 	errorList := make([]string, 0)
 	if _, ok := config.Timers[action.TypeID]; ok { // checks if timer can be found in the map, if so, it is stored in variable device
 		for _, actionMessage := range action.Message {
-			if actionMessage.Instruction == "add" || actionMessage.Instruction == "subtract" {
-				valueType := reflect.TypeOf(actionMessage.Value).Kind()
-				if valueType != reflect.String {
-					errorList = append(errorList,
-						fmt.Sprintf("input type string expected but %s found as type of value %v",
-							valueType.String(), actionMessage.Value))
+			switch actionMessage.Instruction {
+			case "add", "subtract":
+				{
+					valueType := reflect.TypeOf(actionMessage.Value).Kind()
+					if valueType != reflect.String {
+						errorList = append(errorList,
+							fmt.Sprintf("input type string expected but %s found as type of value %v",
+								valueType.String(), actionMessage.Value))
+					}
+					break
 				}
+			case "start", "pause", "stop", "done":
+				break
+			default:
+				errorList = append(errorList, fmt.Sprintf("instruction %s is not defined for a timer", actionMessage.Instruction))
 			}
 		}
 	} else {
@@ -221,6 +318,8 @@ func checkActionTimer(action Action, config WorkingConfig) []string {
 	return errorList
 }
 
+// checkActionDevice is a method that checks the current config for mistakes in the action of a device
+// if the config does not follow the manual, a non-empty list of mistakes is returned
 func checkActionDevice(action Action, config WorkingConfig) []string {
 	errorList := make([]string, 0)
 	if device, ok := config.Devices[action.TypeID]; ok { // checks if device can be found in the map, if so, it is stored in variable device
@@ -284,6 +383,7 @@ func checkActionDevice(action Action, config WorkingConfig) []string {
 
 // checkActionLabel checks if there is a label with this ID,
 // and checks if all components under this label have the correct instructions with a call to checkActionDevice
+// if the config does not follow the manual, a non-empty list of mistakes is returned
 func checkActionLabel(action Action, config WorkingConfig) []string {
 	errorList := make([]string, 0)
 	if _, ok := config.LabelMap[action.TypeID]; ok { // checks if label can be found in the map, if so, it is stored in variable device
@@ -301,6 +401,9 @@ func checkActionLabel(action Action, config WorkingConfig) []string {
 	return errorList
 }
 
+// generatePuzzles transforms readPuzzles to puzzles
+// it generates events and copies the rest
+// if the config does not follow the manual, a non-empty list of mistakes is returned
 func generatePuzzles(readPuzzles []ReadPuzzle, config *WorkingConfig) ([]*Puzzle, []string) {
 	var result []*Puzzle
 	errorList := make([]string, 0)
@@ -316,6 +419,9 @@ func generatePuzzles(readPuzzles []ReadPuzzle, config *WorkingConfig) ([]*Puzzle
 	return result, errorList
 }
 
+// generateGeneralEvents transforms readGeneralEvents to generalEvents
+// it loops through all readGeneralEvents and generates generalEvents for them
+// if the config does not follow the manual, a non-empty list of mistakes is returned
 func generateGeneralEvents(readGeneralEvents []ReadGeneralEvent, config *WorkingConfig) ([]*GeneralEvent, []string) {
 	var result []*GeneralEvent
 	errorList := make([]string, 0)
@@ -327,6 +433,9 @@ func generateGeneralEvents(readGeneralEvents []ReadGeneralEvent, config *Working
 	return result, errorList
 }
 
+// generateGeneralEvent transforms readGeneralEvent to generalEvent
+// it generates rules and copies the rest
+// if the config does not follow the manual, a non-empty list of mistakes is returned
 func generateGeneralEvent(event ReadEvent, config *WorkingConfig) (*GeneralEvent, []string) {
 	rules, errorList := generateRules(event.GetRules(), config)
 	return &GeneralEvent{
@@ -335,6 +444,19 @@ func generateGeneralEvent(event ReadEvent, config *WorkingConfig) (*GeneralEvent
 	}, errorList
 }
 
+// generateButtonEvents creates a list button event objects with properly checked inner values
+func generateButtonEvents(buttonEvents []ReadRule, config *WorkingConfig) (map[string]*Rule, []string) {
+	newEvents := make(map[string]*Rule)
+	rules, errorList := generateRules(buttonEvents, config)
+	for _, rule := range rules {
+		newEvents[rule.ID] = rule
+	}
+	return newEvents, errorList
+}
+
+// generateRules transforms readRules to rules
+// it generates conditions and copies the rest
+// if the config does not follow the manual, a non-empty list of mistakes is returned
 func generateRules(readRules []ReadRule, config *WorkingConfig) ([]*Rule, []string) {
 	var rules []*Rule
 	errorList := make([]string, 0)
@@ -355,6 +477,10 @@ func generateRules(readRules []ReadRule, config *WorkingConfig) ([]*Rule, []stri
 	return rules, errorList
 }
 
+// generateLogicalCondition traverses the conditions tree
+// it generates a logicalCondition which copies this tree
+// this tree includes andConditions, OrConditions and Conditions which put Constraints on a device, rule or timer
+// if the config does not follow the manual, a non-empty list of mistakes is returned
 func generateLogicalCondition(conditions interface{}) (LogicalCondition, []string) {
 	logic := conditions.(map[string]interface{})
 	errorList := make([]string, 0)
@@ -387,11 +513,18 @@ func generateLogicalCondition(conditions interface{}) (LogicalCondition, []strin
 			Constraints: constraints,
 		}
 		return condition, append(errorList, newErrors...)
+	} else if len(logic) == 0 { // When `conditions` in config is empty, create empty condition
+		return AndCondition{}, errorList
+	} else {
+		return nil, append(errorList,
+			fmt.Sprintf("JSON config in wrong condition format, conditions: %v, could not be processed", conditions))
 	}
-	return nil, append(errorList,
-		fmt.Sprintf("JSON config in wrong condition format, conditions: %v, could not be processed", conditions))
 }
 
+// generateLogicalConstraint traverses the constraints tree
+// it generates a logicalConstraint which copies this tree
+// this tree includes andConstraints, OrConstraints and Constraints on device components, rule execution or timer status
+// if the config does not follow the manual, a non-empty list of mistakes is returned
 func generateLogicalConstraint(constraints interface{}) (LogicalConstraint, []string) {
 	logic := constraints.(map[string]interface{})
 	errorList := make([]string, 0)

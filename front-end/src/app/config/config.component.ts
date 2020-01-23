@@ -1,6 +1,9 @@
 import { Component, OnInit } from "@angular/core";
 import { AppComponent } from "../app.component";
 
+/**
+ * The config component controls the configuration page, selected through the side menu.
+ */
 @Component({
   selector: "app-config",
   templateUrl: "./config.component.html",
@@ -15,7 +18,7 @@ export class ConfigComponent implements OnInit {
 
   /**
    * Define listeners for the file reader, which is used in the file reading button.
-   * First resets the errors.
+   * First reset the errors.
    * On reading file, it should check config on back-end.
    * On error, it should add to error list and log the error.
    */
@@ -44,7 +47,7 @@ export class ConfigComponent implements OnInit {
   ngOnInit() {}
 
   /**
-   * When file is submitted, call file reader.
+   * When file is submitted, call the file reader and tell the user the upload was successful.
    */
   checkFile(files: FileList) {
     this.currentFile = files.item(0);
@@ -53,7 +56,7 @@ export class ConfigComponent implements OnInit {
   }
 
   /**
-   * Use the config entered as new configuration for app.
+   * Use the config entered as new configuration for app, by messaging the back-end.
    */
   sendConfig() {
     this.app.resetConfig();
@@ -67,7 +70,7 @@ export class ConfigComponent implements OnInit {
   }
 
   /**
-   * All JSON errors will be shown per one - json unmarshal
+   * All JSON errors will be shown in the box, but one on each line.
    */
   getErrors(): string[] {
     const list = [];
@@ -80,6 +83,9 @@ export class ConfigComponent implements OnInit {
     return list;
   }
 
+  /**
+   * Check whether no errors were found, both through reading and in the back-end.
+   */
   noErrors(): boolean {
     return this.errors.length === 0 && this.app.configErrorList.length === 0;
   }
