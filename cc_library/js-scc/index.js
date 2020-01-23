@@ -226,47 +226,82 @@ class SccLib {
   _checkMessage(contents) {
     for (let i = 0; i < contents.length; i++) {
       const action = contents[i];
-
       const instruction = action.instruction;
       switch (instruction) {
         case "test": {
-          this.device.test();
-          this.log("info", "instruction performed " + instruction);
+          this._doTest();
           break;
         }
         case "status update": {
-          const message = new Message(this.name, "connection", {
-            connection: true
-          });
-          this._sendMessage("back-end", message);
-          this.statusChanged();
-          this.log("info", "instruction performed " + instruction);
+          this._doStatusUpdate();
           break;
         }
         case "reset": {
-          this.device.reset();
-          this.log("info", "instruction performed " + instruction);
+          this._doReset();
           break;
         }
         default: {
-          if (!this.device.performInstruction(action)) {
-            // action NOT successful
-            this.log(
-              "warn",
-              "instruction " +
-                action.instruction +
-                " could not be performed, " +
-                action
-            );
-            return false;
-          } else {
-            this.log("info", "instruction performed " + instruction);
-          }
+          let success = this._doCustomInstruction();
+          if (!success) return false
           break;
         }
       }
     }
     return true;
+  }
+
+  /**
+   * performs instruction `test`
+   * @private
+   */
+  _doTest() {
+    this.device.test();
+    this.log("info", "instruction performed " + instruction);
+  }
+
+  /**
+   * performs instruction `status update`
+   * @private
+   */
+  _doStatusUpdate() {
+    const message = new Message(this.name, "connection", {
+      connection: true
+    });
+    this._sendMessage("back-end", message);
+    this.statusChanged();
+    this.log("info", "instruction performed " + instruction);
+  }
+
+  /**
+   * performs instruction `reset`
+   * @private
+   */
+  _doReset() {
+    this.device.reset();
+    this.log("info", "instruction performed " + instruction);
+  }
+
+  /**
+   * performs custom instruction
+   * @param action the action to be performed
+   * @returns {boolean} whether the action was performed successfully
+   * @private
+   */
+  _doCustomInstruction(action) {
+    if (!this.device.performInstruction(action)) {
+      // action NOT successful
+      this.log(
+          "warn",
+          "instruction " +
+          action.instruction +
+          " could not be performed, " +
+          action
+      );
+      return false;
+    } else {
+      this.log("info", "instruction performed " + instruction);
+      return true
+    }
   }
 
   /**
@@ -333,8 +368,8 @@ class SccLib {
    */
   statusChanged() {
     this._sendMessage(
-      "back-end",
-      new Message(this.name, "status", this.device.getStatus())
+        "back-end",
+        new Message(this.name, "status", this.device.getStatus())
     );
   }
 }
