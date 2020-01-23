@@ -22,6 +22,28 @@ func main() {
 	if dirErr != nil {
 		logger.Fatal(dirErr)
 	}
+
+	// configure logger
+	setupLogger(dir)
+
+	filename := filepath.Join(dir, "back-end", "resources", "production", "room_config.json")
+	configurations := config.ReadFile(filename)
+	logger.Infof("configurations read from: %v", filename)
+
+	messageHandler := handler.Handler{Config: configurations, ConfigFile: filename}
+	messageHandler.Communicator = communication.NewCommunicator(configurations, messageHandler.NewHandler, func() {
+		messageHandler.SendSetup()
+	})
+
+	logger.Infof("attempting to connect to broker at %s on port %v", configurations.General.Host, configurations.General.Port)
+	messageHandler.Communicator.Start()
+
+	// prevent exit
+	select {}
+}
+
+// setupLogger configures the logger such that both to file and console log messages are printed in the correct format
+func setupLogger(dir string) {
 	// Write to both cmd and file
 	writeFile := filepath.Join(dir, "back-end", "output", "log-"+fmt.Sprint(time.Now().Format("02-01-2006--15-04-26"))+".txt")
 
@@ -48,19 +70,4 @@ func main() {
 	logger.AddHook(hook)
 
 	logger.Infof("writing logs to both console and %v", writeFile)
-
-	filename := filepath.Join(dir, "back-end", "resources", "production", "room_config.json")
-	configurations := config.ReadFile(filename)
-	logger.Infof("configurations read from: %v", filename)
-
-	messageHandler := handler.Handler{Config: configurations, ConfigFile: filename}
-	messageHandler.Communicator = communication.NewCommunicator(configurations, messageHandler.NewHandler, func() {
-		messageHandler.SendSetup()
-	})
-
-	logger.Infof("attempting to connect to broker at %s on port %v", configurations.General.Host, configurations.General.Port)
-	messageHandler.Communicator.Start()
-
-	// prevent exit
-	select {}
 }

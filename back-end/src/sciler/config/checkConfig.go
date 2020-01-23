@@ -258,23 +258,9 @@ func checkConstraintsDevice(condition Condition, config WorkingConfig, ruleID st
 // checkConstraintsTimer is a method that check all types and comparators of a constraint on a timer
 func checkConstraintsTimer(condition Condition, config WorkingConfig, ruleID string, constraint Constraint) []string {
 	if _, ok := config.Timers[condition.TypeID]; ok {
-		valueType := reflect.TypeOf(constraint.Value).Kind()
-		comparison := constraint.Comparison
-		if valueType != reflect.Bool {
-			return []string{fmt.Sprintf("on rule %s: input type boolean expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
-		}
-		if !checkValidComparison(comparison) {
-			return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
-		}
-		if comparison != "eq" {
-			return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on a boolean", ruleID, comparison)}
-		}
-
-	} else {
-		return []string{fmt.Sprintf("on rule %s: timer with id %s not found in map", ruleID, condition.TypeID)}
+		return checkConstraintsBooleanInput(ruleID, constraint)
 	}
-	// all cases for errors are already handled
-	return make([]string, 0)
+	return []string{fmt.Sprintf("on rule %s: timer with id %s not found in map", ruleID, condition.TypeID)}
 }
 
 // checkConstrainsRule is a method that check all types and comparators of a constraint on a rule
@@ -304,7 +290,7 @@ func (constraint Constraint) checkConstraintsDeviceType(inputType string, ruleID
 	case "string":
 		return checkConstraintsDeviceStringInput(ruleID, constraint)
 	case "boolean":
-		return checkConstraintsDeviceBooleanInput(ruleID, constraint)
+		return checkConstraintsBooleanInput(ruleID, constraint)
 	case "numeric":
 		return checkConstraintsDeviceNumericInput(ruleID, constraint)
 	case "array":
@@ -331,8 +317,8 @@ func checkConstraintsDeviceStringInput(ruleID string, constraint Constraint) []s
 	return make([]string, 0)
 }
 
-// checkConstraintsDeviceBooleanInput is a method that returns all error (if any) in a constraint of a device with boolean input
-func checkConstraintsDeviceBooleanInput(ruleID string, constraint Constraint) []string {
+// checkConstraintsBooleanInput is a method that returns all error (if any) in a constraint of a device with boolean input
+func checkConstraintsBooleanInput(ruleID string, constraint Constraint) []string {
 	valueType := reflect.TypeOf(constraint.Value).Kind()
 	comparison := constraint.Comparison
 	if valueType != reflect.Bool {

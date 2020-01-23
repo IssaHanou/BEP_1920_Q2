@@ -124,7 +124,14 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 		logger.Errorf(err.Error())
 		return
 	}
+	handler.forwardConfirmation(instructionContents, raw, value.(bool))
 
+	// If a message is received from a device, it can be concluded that the device has positive connection status, and thus it's connection status is set to true
+	handler.connected(raw.DeviceID)
+}
+
+// forwardConfirmation sends a received confirmation message on to the front-end
+func (handler *Handler) forwardConfirmation(instructionContents []map[string]interface{}, raw Message, value bool) {
 	var instructionString string
 	for _, instruction := range instructionContents {
 		// Each instruction is added to a string for proper logging
@@ -137,22 +144,12 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 			logger.Infof("sending confirmation to front-end for instruction %v", instruction["instruction"])
 		}
 	}
-
-	if !value.(bool) {
+	if !value {
 		logger.Warnf("device %s did not complete instructions: %v at %v", raw.DeviceID,
 			instructionString, raw.TimeSent)
 	} else {
 		logger.Infof("device %s completed instructions: %v at %v", raw.DeviceID,
 			instructionString, raw.TimeSent)
-	}
-
-	// If a message is received from a device, it can be concluded that the device has positive connection status, and thus it's connection status is set to true
-	con, ok := handler.Config.Devices[raw.DeviceID]
-	if !ok {
-		logger.Warnf("device %s was not found in config", raw.DeviceID)
-	} else {
-		con.Connection = true
-		handler.Config.Devices[raw.DeviceID] = con
 	}
 }
 
@@ -268,4 +265,15 @@ func (handler *Handler) onHint(hint string, instructor string) {
 		"value":         hint,
 		"instructed_by": instructor,
 	}})
+}
+
+// connected is a method that sets a device to connected
+func (handler *Handler) connected(deviceID string) {
+	device, ok := handler.Config.Devices[deviceID]
+	if !ok {
+		logger.Warnf("device %s was not found in config", deviceID)
+	} else {
+		device.Connection = true
+		handler.Config.Devices[deviceID] = device
+	}
 }

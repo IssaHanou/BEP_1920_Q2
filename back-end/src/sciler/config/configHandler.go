@@ -88,7 +88,13 @@ func generateDevices(devices []ReadDevice, config *WorkingConfig) map[string]*De
 			false,
 		})
 	}
+	// add front-end to the devices
+	newDevices["front-end"] = generateFrontendDevice(config)
+	return newDevices
+}
 
+// generateFrontendDevice setups up a device which represents the front-end
+func generateFrontendDevice(config *WorkingConfig) *Device {
 	input := make(map[string]string)
 	status := make(map[string]interface{})
 	for _, btn := range config.ButtonEvents {
@@ -96,7 +102,7 @@ func generateDevices(devices []ReadDevice, config *WorkingConfig) map[string]*De
 		status[btn.ID] = false
 	}
 	status["gameState"] = "gereed"
-	newDevices["front-end"] = &(Device{
+	return &(Device{
 		ID:          "front-end",
 		Description: "The operator webapp for managing a escape room",
 		Input:       input,
@@ -111,7 +117,6 @@ func generateDevices(devices []ReadDevice, config *WorkingConfig) map[string]*De
 		Status:     status,
 		Connection: false,
 	})
-	return newDevices
 }
 
 // generateTimers creates map with id pointing to timer object for all timer objects and general timer.
@@ -318,27 +323,9 @@ func generateLogicalCondition(conditions interface{}) (LogicalCondition, []strin
 	logic := conditions.(map[string]interface{})
 	errorList := make([]string, 0)
 	if logic["operator"] != nil { // operator
-		if logic["operator"] == "AND" {
-			and := AndCondition{}
-			for _, condition := range logic["list"].([]interface{}) {
-				newCondition, newErrors := generateLogicalCondition(condition)
-				and.logics = append(and.logics, newCondition)
-				errorList = append(errorList, newErrors...)
-			}
-			return and, errorList
-		} else if logic["operator"] == "OR" {
-			or := OrCondition{}
-			for _, condition := range logic["list"].([]interface{}) {
-				newCondition, newErrors := generateLogicalCondition(condition)
-				or.logics = append(or.logics, newCondition)
-				errorList = append(errorList, newErrors...)
-			}
-			return or, errorList
-		} else {
-			return nil, append(errorList,
-				fmt.Sprintf("JSON config in wrong format, operator: %v, could not be processed", logic["operator"]))
-		}
-	} else if logic["type"] != nil && reflect.TypeOf(logic["type"]).Kind() == reflect.String && logic["type_id"] != nil && reflect.TypeOf(logic["type_id"]).Kind() == reflect.String {
+		return generateLogicalConditionOperator(logic)
+	} else if logic["type"] != nil && reflect.TypeOf(logic["type"]).Kind() == reflect.String &&
+		logic["type_id"] != nil && reflect.TypeOf(logic["type_id"]).Kind() == reflect.String {
 		constraints, newErrors := generateLogicalConstraint(logic["constraints"])
 		condition := Condition{
 			Type:        logic["type"].(string),
@@ -351,6 +338,32 @@ func generateLogicalCondition(conditions interface{}) (LogicalCondition, []strin
 	} else {
 		return nil, append(errorList,
 			fmt.Sprintf("JSON config in wrong condition format, conditions: %v, could not be processed", conditions))
+	}
+}
+
+// generateLogicalConstraintOperator generates a logical condition (and / or) from logic where the operator field is present in the config
+// if the config does not follow the manual, a non-empty list of mistakes is returned
+func generateLogicalConditionOperator(logic map[string]interface{}) (LogicalCondition, []string) {
+	errorList := make([]string, 0)
+	if logic["operator"] == "AND" {
+		and := AndCondition{}
+		for _, condition := range logic["list"].([]interface{}) {
+			newCondition, newErrors := generateLogicalCondition(condition)
+			and.logics = append(and.logics, newCondition)
+			errorList = append(errorList, newErrors...)
+		}
+		return and, errorList
+	} else if logic["operator"] == "OR" {
+		or := OrCondition{}
+		for _, condition := range logic["list"].([]interface{}) {
+			newCondition, newErrors := generateLogicalCondition(condition)
+			or.logics = append(or.logics, newCondition)
+			errorList = append(errorList, newErrors...)
+		}
+		return or, errorList
+	} else {
+		return nil, append(errorList,
+			fmt.Sprintf("JSON config in wrong format, operator: %v, could not be processed", logic["operator"]))
 	}
 }
 
