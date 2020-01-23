@@ -441,5 +441,6 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
     this.stopTimers();
     this.initializeVariables();
     this.initializeTimers();
+    this.resetFrontEndStatus();
   }
 }
