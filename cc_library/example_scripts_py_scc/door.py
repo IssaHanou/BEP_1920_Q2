@@ -47,8 +47,8 @@ class Door(Device):
             else:
                 self.turn_on()
         else:
-            return False, action
-        return True, None
+            return False
+        return True
 
     def test(self):
         for i in range(0, 2):

@@ -21,8 +21,8 @@ class Display(Device):
         if instruction == "hint":
             self.show_hint(action)
         else:
-            return False, action
-        return True, None
+            return False
+        return True
 
     def test(self):
         self.hint = "test"

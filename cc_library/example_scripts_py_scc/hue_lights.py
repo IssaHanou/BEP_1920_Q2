@@ -41,8 +41,8 @@ class HueLights(Device):
         if instruction == "manual":
             self.set_manual(action.get("component_id"), action.get("value"))
         else:
-            return False, action
-        return True, None
+            return False
+        return True
 
     def test(self):
         params = json.dumps({"on": True, "bri": 200, "xy": [0.3, 0.3]})

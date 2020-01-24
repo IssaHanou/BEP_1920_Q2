@@ -122,7 +122,7 @@ class ControlBoard(Device):
         elif instruction == "turnOnOff":
             self.turn_on_off(action.get("component_id"), action.get("value"))
         else:
-            return False, action
+            return False
 
         return True, None
 

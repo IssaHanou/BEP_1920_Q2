@@ -307,14 +307,14 @@ class SccLib:
         :param action: dictionary with action details such as instruction, component_id and value
         :return: boolean whether the instruction was performed successfully
         """
-        (success, failed_action) = self.device.perform_instruction(
+        success = self.device.perform_instruction(
             action
-        )  # TODO: remove failed_action as return argument
+        )
         if success:
             logging.info(("instruction performed", action.instruction))
         else:
             logging.warning(
-                ("instruction: " + failed_action + " could not be performed", action,)
+                ("instruction: " + action.instruction + " could not be performed", action,)
             )
             return False
 

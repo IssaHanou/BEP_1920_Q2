@@ -1,4 +1,4 @@
-# scclib
+# Developing with scclib 
 
 ## Client computer library for S.C.I.L.E.R. system
 This is the library to create devices to work together with the SCILER system 
