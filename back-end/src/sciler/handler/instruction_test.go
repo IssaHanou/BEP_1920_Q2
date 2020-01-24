@@ -614,3 +614,22 @@ func TestSendInstructionDelay(t *testing.T) {
 	time.Sleep(1 * time.Second)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
 }
+
+func TestOnInstructionMsgSendStatus(t *testing.T) {
+	msg := Message{
+		DeviceID: "front-end",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "instruction",
+		Contents: []map[string]interface{}{{
+			"instruction": "send status",
+		}},
+	}
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_instruction.json"),
+		Communicator: communicatorMock,
+	}
+	communicatorMock.On("Publish", "front-end", mock.AnythingOfType("string"), 3)
+	handler.onInstructionMsg(msg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 10)
+}

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"math"
@@ -691,4 +692,53 @@ func TestOnInstructionMsgInvalidConfig(t *testing.T) {
 	configToTest := math.Inf(1)
 	communicatorMock.On("Publish", "front-end", mock.Anything, 3)
 	assert.False(t, len(handler.checkConfig(configToTest)) == 0)
+}
+
+type MqttMessageMock struct {
+	mock.Mock
+}
+
+func (m MqttMessageMock) Duplicate() bool {
+	panic("implement me")
+}
+
+func (m MqttMessageMock) Qos() byte {
+	panic("implement me")
+}
+
+func (m MqttMessageMock) Retained() bool {
+	panic("implement me")
+}
+
+func (m MqttMessageMock) Topic() string {
+	panic("implement me")
+}
+
+func (m MqttMessageMock) MessageID() uint16 {
+	panic("implement me")
+}
+
+func (m MqttMessageMock) Payload() []byte {
+	json, _ := json.Marshal(Message{
+		DeviceID: "front-end",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "instruction",
+		Contents: []map[string]interface{}{},
+	})
+	return json
+}
+
+func (m MqttMessageMock) Ack() {
+	panic("implement me")
+}
+
+func TestNewHandler(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_instruction.json"),
+		Communicator: communicatorMock,
+	}
+	communicatorMock.On("Publish", "front-end", mock.AnythingOfType("string"), 3)
+	handler.NewHandler(mqtt.NewClient(mqtt.NewClientOptions()), new(MqttMessageMock))
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 0) // MqttMessageMock has a instruction with an empty list of instructions so no response is expected
 }
