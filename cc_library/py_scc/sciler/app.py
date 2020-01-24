@@ -6,7 +6,7 @@ from datetime import datetime
 import paho.mqtt.client as mqtt
 
 
-class SccLib:
+class Sciler:
     """
     Class SccLib sets up the connection and the right handler
     """
@@ -23,10 +23,11 @@ class SccLib:
         self.host = self.config.get("host", "not-existent")
         self.port = self.config.get("port", "not-existent")
         self.labels = self.config.get("labels", "not-existent")
-        if [self.host, self.name, self.port, self.labels].count(
-                "not-existent") != 0:
-            raise Exception("your config file is missing attributes, "
-                            "make sure it contains all keys from the manual")
+        if [self.host, self.name, self.port, self.labels].count("not-existent") != 0:
+            raise Exception(
+                "your config file is missing attributes, "
+                "make sure it contains all keys from the manual"
+            )
 
         if not os.path.exists("logs"):
             os.mkdir("logs")
@@ -307,14 +308,15 @@ class SccLib:
         :param action: dictionary with action details such as instruction, component_id and value
         :return: boolean whether the instruction was performed successfully
         """
-        success = self.device.perform_instruction(
-            action
-        )
+        success = self.device.perform_instruction(action)
         if success:
             logging.info(("instruction performed", action.instruction))
         else:
             logging.warning(
-                ("instruction: " + action.instruction + " could not be performed", action,)
+                (
+                    "instruction: " + action.instruction + " could not be performed",
+                    action,
+                )
             )
             return False
 

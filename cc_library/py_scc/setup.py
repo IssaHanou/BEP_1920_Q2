@@ -4,8 +4,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="scclib",
-    version="0.1.3",
+    name="sciler",
+    version="0.2.0",
     author="Raccoon Serious Games",
     author_email="BEP@raccoon.games",
     description="Client library for S.C.I.L.E.R.",

@@ -1,7 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
-from scclib.app import SccLib
-
+from sciler.app import Sciler
 
 
 class Device(ABC):
@@ -47,7 +46,7 @@ class Device(ABC):
         The init of the subclass should call this method and also initialize all class attributes.
         :param config: the config directory
         """
-        self.scclib = SccLib(config, self)
+        self.scclib = Sciler(config, self)
 
     def status_changed(self):
         """

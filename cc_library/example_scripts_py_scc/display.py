@@ -1,6 +1,6 @@
 import os
 
-from scclib.device import Device
+from sciler.device import Device
 
 
 class Display(Device):

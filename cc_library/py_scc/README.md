@@ -1,13 +1,13 @@
-# Developing with scclib 
+# Developing with sciler 
 
 ## Client computer library for S.C.I.L.E.R. system
 This is the library to create devices to work together with the SCILER system 
 
 ### Installation
-- pip install with ```pip install scclib```
+- pip install with ```pip install sciler```
 
 ### Using this library
-- import lib with `from scclib.device import Device`
+- import lib with `from sciler.device import Device`
 ##### create a class that extends `Device`
 - in order to do this:
     - implement `getStatus()` which should return a dictionary of the current status
@@ -40,7 +40,7 @@ This is the library to create devices to work together with the SCILER system
 ```python
 import os
 
-from scclib.device import Device
+from sciler.device import Device
 
 
 class Display(Device):

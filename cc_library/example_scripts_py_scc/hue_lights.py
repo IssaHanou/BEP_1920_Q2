@@ -3,7 +3,7 @@ import os
 import time
 
 import requests
-from scclib.device import Device
+from sciler.device import Device
 
 """
 How to use Hue Lights with S.C.I.L.E.R.:

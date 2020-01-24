@@ -1,5 +1,5 @@
 import os
-from scclib.device import Device
+from sciler.device import Device
 
 
 try:
