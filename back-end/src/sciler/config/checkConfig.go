@@ -60,8 +60,8 @@ func checkActions(actions []Action, config WorkingConfig) []string {
 	return errorList
 }
 
-// checkActionTimer is a method that checks the config in use for mistakes in the action of a timer
-// if the config does not follow the manual, a non-empty list of mistakes is returned
+// checkActionTimer is a method that checks the config in use for mistakes in the actions of a timer
+// if the config does not abide by the manual, a non-empty list of mistakes is returned
 func checkActionTimer(action Action, config WorkingConfig) []string {
 	errorList := make([]string, 0)
 	if _, ok := config.Timers[action.TypeID]; ok { // checks if timer can be found in the map, if so, it is stored in variable device
@@ -87,8 +87,8 @@ func checkActionTimer(action Action, config WorkingConfig) []string {
 	return errorList
 }
 
-// checkActionDevice is a method that checks the current config for mistakes in the action of a device
-// if the config does not follow the manual, a non-empty list of mistakes is returned
+// checkActionDevice is a method that checks the current config for mistakes in the actions of a device
+// if the config does not abide by the manual, a non-empty list of mistakes is returned
 func checkActionDevice(action Action, config WorkingConfig) []string {
 	errorList := make([]string, 0)
 	if device, ok := config.Devices[action.TypeID]; ok { // checks if device can be found in the map, if so, it is stored in variable device
@@ -142,7 +142,7 @@ func checkActionInstructionType(valueType reflect.Kind, instructionType string, 
 
 // checkActionLabel checks if there is a label with this ID,
 // and checks if all components under this label have the correct instructions with a call to checkActionDevice
-// if the config does not follow the manual, a non-empty list of mistakes is returned
+// if the config does not abide by the manual, a non-empty list of mistakes is returned
 func checkActionLabel(action Action, config WorkingConfig) []string {
 	errorList := make([]string, 0)
 	if _, ok := config.LabelMap[action.TypeID]; ok { // checks if label can be found in the map, if so, it is stored in variable device
@@ -238,7 +238,7 @@ func (constraint Constraint) checkConstraints(condition Condition, config Workin
 	case "timer":
 		return checkConstraintsTimer(condition, config, ruleID, constraint)
 	case "rule":
-		return checkConstrainsRule(condition, config, ruleID, constraint)
+		return checkConstraintsRule(condition, config, ruleID, constraint)
 	default:
 		return []string{fmt.Sprintf("on rule %s: invalid type of condition: %v", ruleID, condition.Type)}
 	}
@@ -262,13 +262,13 @@ func checkConstraintsDevice(condition Condition, config WorkingConfig, ruleID st
 // checkConstraintsTimer is a method that check all types and comparators of a constraint on a timer
 func checkConstraintsTimer(condition Condition, config WorkingConfig, ruleID string, constraint Constraint) []string {
 	if _, ok := config.Timers[condition.TypeID]; ok {
-		return checkConstraintsBooleanInput(ruleID, constraint)
+		return checkConstraintsBooleanType(ruleID, constraint)
 	}
 	return []string{fmt.Sprintf("on rule %s: timer with id %s not found in map", ruleID, condition.TypeID)}
 }
 
-// checkConstrainsRule is a method that check all types and comparators of a constraint on a rule
-func checkConstrainsRule(condition Condition, config WorkingConfig, ruleID string, constraint Constraint) []string {
+// checkConstraintsRule is a method that check all types and comparators of a constraint on a rule
+func checkConstraintsRule(condition Condition, config WorkingConfig, ruleID string, constraint Constraint) []string {
 	if _, ok := config.RuleMap[condition.TypeID]; ok { // checks if rule can be found in the map, if so, it is stored in variable device
 		valueType := reflect.TypeOf(constraint.Value).Kind()
 		comparison := constraint.Comparison
@@ -288,24 +288,25 @@ func checkConstrainsRule(condition Condition, config WorkingConfig, ruleID strin
 	return make([]string, 0)
 }
 
-// checkConstraintsDeviceType is a method that check the input type and check if the constraint has that value type
-func (constraint Constraint) checkConstraintsDeviceType(inputType string, ruleID string) []string {
-	switch inputType {
+// checkConstraintsDeviceType is a method that checks type defined by the config and check if the constraint has that value type
+func (constraint Constraint) checkConstraintsDeviceType(typeToCheck string, ruleID string) []string {
+	switch typeToCheck {
 	case "string":
-		return checkConstraintsDeviceStringInput(ruleID, constraint)
+		return checkConstraintsDeviceStringType(ruleID, constraint)
 	case "boolean":
-		return checkConstraintsBooleanInput(ruleID, constraint)
+		return checkConstraintsBooleanType(ruleID, constraint)
 	case "numeric":
 		return checkConstraintsDeviceNumericInput(ruleID, constraint)
 	case "array":
-		return checkConstraintsDeviceArrayInput(ruleID, constraint)
+		return checkConstraintsDeviceArrayType(ruleID, constraint)
 	default:
-		return []string{fmt.Sprintf("on rule %s: custom types like: %s, are not yet implemented", ruleID, inputType)}
+		return []string{fmt.Sprintf("on rule %s: custom types like: %s, are not yet implemented", ruleID, typeToCheck)}
 	}
 }
 
-// checkConstraintsDeviceStringInput is a method that returns all error (if any) in a constraint of a device with string input
-func checkConstraintsDeviceStringInput(ruleID string, constraint Constraint) []string {
+// checkConstraintsDeviceStringType is a method that returns all error (if any)
+// in a constraint of a device with string type constraint
+func checkConstraintsDeviceStringType(ruleID string, constraint Constraint) []string {
 	valueType := reflect.TypeOf(constraint.Value).Kind()
 	comparison := constraint.Comparison
 	if valueType != reflect.String {
@@ -321,8 +322,9 @@ func checkConstraintsDeviceStringInput(ruleID string, constraint Constraint) []s
 	return make([]string, 0)
 }
 
-// checkConstraintsBooleanInput is a method that returns all error (if any) in a constraint of a device with boolean input
-func checkConstraintsBooleanInput(ruleID string, constraint Constraint) []string {
+// checkConstraintsBooleanType is a method that returns all error (if any)
+// in a constraint of a device with boolean type constraint
+func checkConstraintsBooleanType(ruleID string, constraint Constraint) []string {
 	valueType := reflect.TypeOf(constraint.Value).Kind()
 	comparison := constraint.Comparison
 	if valueType != reflect.Bool {
@@ -338,7 +340,8 @@ func checkConstraintsBooleanInput(ruleID string, constraint Constraint) []string
 	return make([]string, 0)
 }
 
-// checkConstraintsDeviceNumericInput is a method that returns all error (if any) in a constraint of a device with numeric input
+// checkConstraintsDeviceNumericInput is a method that returns all error (if any)
+// in a constraint of a device with numeric type constraint
 func checkConstraintsDeviceNumericInput(ruleID string, constraint Constraint) []string {
 	valueType := reflect.TypeOf(constraint.Value).Kind()
 	comparison := constraint.Comparison
@@ -355,8 +358,9 @@ func checkConstraintsDeviceNumericInput(ruleID string, constraint Constraint) []
 	return make([]string, 0)
 }
 
-// checkConstraintsDeviceArrayInput is a method that returns all error (if any) in a constraint of a device with array input
-func checkConstraintsDeviceArrayInput(ruleID string, constraint Constraint) []string {
+// checkConstraintsDeviceArrayType is a method that returns all error (if any)
+// in a constraint of a device with array type constraint
+func checkConstraintsDeviceArrayType(ruleID string, constraint Constraint) []string {
 	valueType := reflect.TypeOf(constraint.Value).Kind()
 	comparison := constraint.Comparison
 	if valueType != reflect.Slice {

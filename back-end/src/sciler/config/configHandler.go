@@ -241,7 +241,7 @@ func appendWhenUniqueComp(comps []*Component, comp *Component) []*Component {
 
 // generatePuzzles transforms readPuzzles to puzzles
 // it generates events and copies the rest
-// if the config does not follow the manual, a non-empty list of mistakes is returned
+// if the config does not abide by the manual, a non-empty list of mistakes is returned
 func generatePuzzles(readPuzzles []ReadPuzzle, config *WorkingConfig) ([]*Puzzle, []string) {
 	var result []*Puzzle
 	errorList := make([]string, 0)
@@ -259,7 +259,7 @@ func generatePuzzles(readPuzzles []ReadPuzzle, config *WorkingConfig) ([]*Puzzle
 
 // generateGeneralEvents transforms readGeneralEvents to generalEvents
 // it loops through all readGeneralEvents and generates generalEvents for them
-// if the config does not follow the manual, a non-empty list of mistakes is returned
+// if the config does not abide by the manual, a non-empty list of mistakes is returned
 func generateGeneralEvents(readGeneralEvents []ReadGeneralEvent, config *WorkingConfig) ([]*GeneralEvent, []string) {
 	var result []*GeneralEvent
 	errorList := make([]string, 0)
@@ -273,7 +273,7 @@ func generateGeneralEvents(readGeneralEvents []ReadGeneralEvent, config *Working
 
 // generateGeneralEvent transforms readGeneralEvent to generalEvent
 // it generates rules and copies the rest
-// if the config does not follow the manual, a non-empty list of mistakes is returned
+// if the config does not abide by the manual, a non-empty list of mistakes is returned
 func generateGeneralEvent(event ReadEvent, config *WorkingConfig) (*GeneralEvent, []string) {
 	rules, errorList := generateRules(event.GetRules(), config)
 	return &GeneralEvent{
@@ -294,7 +294,7 @@ func generateButtonEvents(buttonEvents []ReadRule, config *WorkingConfig) (map[s
 
 // generateRules transforms readRules to rules
 // it generates conditions and copies the rest
-// if the config does not follow the manual, a non-empty list of mistakes is returned
+// if the config does not abide by the manual, a non-empty list of mistakes is returned
 func generateRules(readRules []ReadRule, config *WorkingConfig) ([]*Rule, []string) {
 	var rules []*Rule
 	errorList := make([]string, 0)
@@ -318,7 +318,7 @@ func generateRules(readRules []ReadRule, config *WorkingConfig) ([]*Rule, []stri
 // generateLogicalCondition traverses the conditions tree
 // it generates a logicalCondition which copies this tree
 // this tree includes andConditions, OrConditions and Conditions which put Constraints on a device, rule or timer
-// if the config does not follow the manual, a non-empty list of mistakes is returned
+// if the config does not abide by the manual, a non-empty list of mistakes is returned
 func generateLogicalCondition(conditions interface{}) (LogicalCondition, []string) {
 	logic := conditions.(map[string]interface{})
 	errorList := make([]string, 0)
@@ -342,7 +342,7 @@ func generateLogicalCondition(conditions interface{}) (LogicalCondition, []strin
 }
 
 // generateLogicalConstraintOperator generates a logical condition (and / or) from logic where the operator field is present in the config
-// if the config does not follow the manual, a non-empty list of mistakes is returned
+// if the config does not abide by the manual, a non-empty list of mistakes is returned
 func generateLogicalConditionOperator(logic map[string]interface{}) (LogicalCondition, []string) {
 	errorList := make([]string, 0)
 	if logic["operator"] == "AND" {
@@ -370,7 +370,7 @@ func generateLogicalConditionOperator(logic map[string]interface{}) (LogicalCond
 // generateLogicalConstraint traverses the constraints tree
 // it generates a logicalConstraint which copies this tree
 // this tree includes andConstraints, OrConstraints and Constraints on device components, rule execution or timer status
-// if the config does not follow the manual, a non-empty list of mistakes is returned
+// if the config does not abide by the manual, a non-empty list of mistakes is returned
 func generateLogicalConstraint(constraints interface{}) (LogicalConstraint, []string) {
 	logic := constraints.(map[string]interface{})
 	if logic["operator"] != nil { // operator
@@ -382,7 +382,7 @@ func generateLogicalConstraint(constraints interface{}) (LogicalConstraint, []st
 }
 
 // generateLogicalConstraintOperator generates a logical operator (and / or) from logic where the operator field is present in the config
-// if the config does not follow the manual, a non-empty list of mistakes is returned
+// if the config does not abide by the manual, a non-empty list of mistakes is returned
 func generateLogicalConstraintOperator(logic map[string]interface{}) (LogicalConstraint, []string) {
 	errorList := make([]string, 0)
 	if logic["operator"] == "AND" {
@@ -408,7 +408,7 @@ func generateLogicalConstraintOperator(logic map[string]interface{}) (LogicalCon
 }
 
 // generateConstraint generates a constraint from logic where the comparator field is present in the config
-// if the config does not follow the manual, a non-empty list of mistakes is returned
+// if the config does not abide by the manual, a non-empty list of mistakes is returned
 func generateConstraint(logic map[string]interface{}) (LogicalConstraint, []string) {
 	var constraint Constraint
 	errorList := make([]string, 0)
