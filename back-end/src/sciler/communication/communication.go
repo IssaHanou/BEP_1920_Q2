@@ -15,10 +15,8 @@ type Communicator struct {
 }
 
 // NewCommunicator is a constructor that sets up a communicator
-// host string host address of the broker
-// port int mqtt port of the broker
-// topicsOfInterest []string all topic to which to subscribe to
-// handler function(Client, Message) function that handles all incoming messages
+// config WorkingConfig the configuration for an escape room
+// messageHandler function(Client, Message) function that handles all incoming messages
 // onStart function() function that will be performed on startup
 func NewCommunicator(config config.WorkingConfig, messageHandler mqtt.MessageHandler, onStart func()) *Communicator {
 	opts := mqtt.NewClientOptions()
@@ -49,7 +47,7 @@ func configureConnectionOptions(opts *mqtt.ClientOptions) {
 
 // setHandlers is a method that configures what will be done on connect, disconnect and reconnect
 func setHandlers(opts *mqtt.ClientOptions, messageHandler mqtt.MessageHandler, onStart func()) {
-	opts.SetOnConnectHandler(func(client mqtt.Client) { // on connect subscribe and execute onStart
+	opts.SetOnConnectHandler(func(client mqtt.Client) { // on connect only subscribe to topic `back-end` and execute onStart
 		action(func() mqtt.Token {
 			return client.Subscribe("back-end", 2, messageHandler)
 		}, "subscribing", -1)
@@ -69,7 +67,7 @@ func setHandlers(opts *mqtt.ClientOptions, messageHandler mqtt.MessageHandler, o
 }
 
 // configureLWT is a method that sets a Last Will and Testament such that when the back-end disconnects,
-// the front-end will receive a connection message
+// the front-end will receive a connection message telling that the back-end disconnected
 func configureLWT(opts *mqtt.ClientOptions) {
 	will, _ := json.Marshal(map[string]interface{}{
 		"device_id": "back-end",

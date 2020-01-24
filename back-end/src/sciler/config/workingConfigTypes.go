@@ -352,7 +352,7 @@ func (constraint Constraint) Resolve(condition Condition, config WorkingConfig) 
 // LogicalCondition is an interface for operators and conditions
 type LogicalCondition interface {
 	Resolve(config WorkingConfig) bool
-	checkConstraints(config WorkingConfig, ruleID string) []string
+	checkConditions(config WorkingConfig, ruleID string) []string
 	GetConditionIDs() []string
 }
 

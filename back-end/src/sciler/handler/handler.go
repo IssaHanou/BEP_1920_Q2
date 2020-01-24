@@ -272,7 +272,7 @@ func (handler *Handler) onHint(hint string, instructor string) {
 }
 
 // onCheckConfig is the function to process the instruction `check config`
-// check the config and sends a message containing all errors it could find
+// checks the config and sends a message containing all errors it could find
 func (handler *Handler) onCheckConfig(configToRead interface{}) {
 	message := Message{
 		DeviceID: "back-end",
@@ -284,8 +284,8 @@ func (handler *Handler) onCheckConfig(configToRead interface{}) {
 	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 }
 
-// processConfig reads the config in.
-// If action is "use" then the message must tell the config a new config is now used and put it to use
+// onUseConfig is the function to process the instruction `use config`
+// checks the config and if it found no errors, it saves and uses this config
 func (handler *Handler) onUseConfig(configToRead interface{}, fileName string) {
 	// check if the config can be used, if so use and send message
 	if len(handler.checkConfig(configToRead)) == 0 {
@@ -298,6 +298,7 @@ func (handler *Handler) onUseConfig(configToRead interface{}, fileName string) {
 		}
 		jsonMessage, _ := json.Marshal(&message)
 		handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+		handler.SendSetup()
 	}
 }
 
@@ -314,18 +315,6 @@ func (handler *Handler) useConfig(configToRead interface{}, fileName string) {
 	}
 	handler.Config = newConfig
 	handler.ConfigFile = fullFileName
-	handler.SendSetup()
-}
-
-// connected is a method that sets a device to connected
-func (handler *Handler) connected(deviceID string) {
-	device, ok := handler.Config.Devices[deviceID]
-	if !ok {
-		logger.Warnf("device %s was not found in config", deviceID)
-	} else {
-		device.Connection = true
-		handler.Config.Devices[deviceID] = device
-	}
 }
 
 // checkConfig checks the config, if it finds any errors in processing the config,

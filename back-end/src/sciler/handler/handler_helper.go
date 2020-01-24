@@ -407,3 +407,14 @@ func getMapSlice(input interface{}) ([]map[string]interface{}, error) {
 	}
 	return output, nil
 }
+
+// connected is a method that sets a device to connected
+func (handler *Handler) connected(deviceID string) {
+	device, ok := handler.Config.Devices[deviceID]
+	if !ok {
+		logger.Warnf("device %s was not found in config", deviceID)
+	} else {
+		device.Connection = true
+		handler.Config.Devices[deviceID] = device
+	}
+}
