@@ -25,7 +25,7 @@ are specific defined depending on the sender and receiver.
 ##### example
     { 
     "device_id": "back-end",
-    "time_sent": "17-1-2019 16:20",
+    "time_sent": "17-1-2019 16:20:21",
     "type": "instruction",
     "contents": [
             {
@@ -96,7 +96,7 @@ are specific defined depending on the sender and receiver.
             - `instruction`
             - `instructed_by`
     - If type is `instruction`, then the then the message contents have
-             - `instruction` with value `reset` or `status update` or `test`
+             - `instruction` with value `reset` or `status update` or `test` or `setState`
     - If type is `status`, then the message contents has
         - `id` of device
         - `status` has a map of `component_id` keys and `status` values
@@ -105,6 +105,9 @@ are specific defined depending on the sender and receiver.
         - `id` of rule
         - `description` of rule
         - `status` of rule describes whether rule is finished or not
+    - If type is `front-end status`, then the message contents has a list of objects with:
+        - `id` of button
+        - `disabled` status of button
     - If type is `time`, then the then the message contents have
         - `id` of timer
         - `duration` has a number of the duration left in milliseconds
@@ -113,7 +116,9 @@ are specific defined depending on the sender and receiver.
         - a `name` parameter carrying the name of the escape room 
         - a `hints` parameter carrying a map with the name of puzzle as key and list of hints as value
         - an `events` parameter carrying a map with the name of the rule as key and the description as value
-        - a `cameras` parameter carrying a a list with camera objects with a `name` and `link` tag
+        - a `cameras` parameter carrying a list with camera objects with a `name` and `link` tag
+        - a `buttons` parameter carrying a list of button names that should be added to the front-end 
+
 ##### example
     { 
     "device_id": "back-end",
@@ -144,6 +149,3 @@ are specific defined depending on the sender and receiver.
         {"id":"groen","status":false}
         ]
     }
-    
-      
-    

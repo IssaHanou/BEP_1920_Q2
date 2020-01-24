@@ -12,6 +12,8 @@ import { Camera } from "./camera/camera";
 import { Hint } from "./components/hint/hint";
 import { formatMS, formatTime } from "./components/timer/timer";
 import { FullScreen } from "./fullscreen";
+import { Buttons } from "./components/manage/buttons";
+import * as config from "../assets/config.json";
 
 /**
  * This is the main application, controlling all actions that can happen.
@@ -36,6 +38,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   // Keeping track of data
   deviceList: Devices;
   puzzleList: Puzzles;
+  manageButtons: Buttons;
   hintList: Hint[];
   configErrorList: string[];
   cameras: Camera[];
@@ -66,7 +69,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
     }
 
     this.mqttService.onConnect.subscribe(() => {
-      this.logger.log("info", "Connected to broker");
+      this.logger.log("info", "connected to broker on " + config.host);
       this.sendInstruction([{ instruction: "send setup" }]);
       this.sendConnection(true);
       this.initializeTimers();
@@ -97,6 +100,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   initializeVariables() {
     this.deviceList = new Devices();
     this.puzzleList = new Puzzles();
+    this.manageButtons = new Buttons();
     this.hintList = [];
     this.configErrorList = [];
     this.cameras = [];
@@ -159,14 +163,10 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
 
   /**
    * Send a status to the broker, over topic `back-end`.
-   * @param start start status to be sent.
-   * @param stop stop status to be sent.
+   * @param status json data with key is the component (button name) and value is the status (boolean).
    */
-  public sendStatus(start, stop) {
-    const msg = new Message("front-end", "status", new Date(), {
-      start,
-      stop
-    });
+  public sendStatus(status) {
+    const msg = new Message("front-end", "status", new Date(), status);
     const jsonMessage: string = this.jsonConvert.serialize(msg);
     this.mqttService.unsafePublish("back-end", JSON.stringify(jsonMessage));
     this.logger.log(
@@ -197,7 +197,6 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
    */
   private processMessage(jsonMessage: string) {
     const msg: Message = Message.deserialize(jsonMessage);
-
     switch (msg.type) {
       case "confirmation": {
         this.processConfirmation(msg);
@@ -208,16 +207,15 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
         break;
       }
       case "status": {
-        this.deviceList.setDevice(msg.contents);
-
-        // When the back-end/front-end disconnects, all devices are disconnected
-        if (msg.contents.id === "front-end" && !msg.contents.connection) {
-          this.setConnectionAllDevices(false);
-        }
+        this.processStatus(msg);
         break;
       }
       case "event status": {
         this.puzzleList.updatePuzzles(msg.contents);
+        break;
+      }
+      case "front-end status": {
+        this.manageButtons.setButtons(msg.contents);
         break;
       }
       case "time": {
@@ -225,7 +223,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
         break;
       }
       case "setup": {
-        this.processSetUp(msg.contents);
+        this.processSetup(msg.contents);
         break;
       }
       // when a config is checked by the back-end it returns a list of found errors, these should be displayed
@@ -264,22 +262,15 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
    * reset - reset the front-end's device status
    * status update - send front-end's connection status to back-end
    * test - perform a test on the front-end
+   * setState - update the gameState of the front-end and inform the back-end
    */
   private processInstruction(jsonData) {
     for (const action of jsonData) {
       switch (action.instruction) {
-        case "reset":
-          {
-            this.deviceList.setDevice({
-              id: "front-end",
-              connection: true,
-              status: {
-                start: 0,
-                stop: 0
-              }
-            });
-          }
+        case "reset": {
+          this.resetFrontEndStatus();
           break;
+        }
         case "status update": {
           this.sendConnection(true);
           break;
@@ -288,46 +279,139 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
           this.openSnackbar("performing instruction test", "");
           break;
         }
+        case "set state": {
+          this.deviceList.updateDevice(action.component_id, action.value);
+          this.sendStatusFrontEnd();
+          break;
+        }
+        default: {
+          this.logger.log(
+            "warning",
+            "received unknown instruction: " + action.instruction
+          );
+          break;
+        }
       }
     }
+  }
+
+  /**
+   * Process status messages.
+   * @param msg the status message
+   */
+  private processStatus(msg: Message) {
+    this.deviceList.setDevice(msg.contents);
+
+    // When the back-end/front-end disconnects, all devices are disconnected
+    if (msg.contents.id === "front-end" && !msg.contents.connection) {
+      this.setConnectionAllDevices(false);
+    }
+  }
+
+  /**
+   * Get all the front-end's components' status,
+   * which is the status of the buttons (pressed or not) and the game state
+   * and send message to back-end.
+   */
+  sendStatusFrontEnd() {
+    const device = this.deviceList.getDevice("front-end");
+    if (device != null) {
+      const status = device.status;
+      const statusMsg = {};
+      for (const key of status.keys()) {
+        statusMsg[key] = status.get(key);
+      }
+      this.sendStatus(statusMsg);
+    }
+  }
+
+  /**
+   * Update the device list with front-end start-up status: all buttons are not clicked.
+   */
+  private resetFrontEndStatus() {
+    const statusMsg = new Map<string, any>();
+    for (const key of this.manageButtons.all.keys()) {
+      statusMsg.set(key, false);
+    }
+    statusMsg.set("gameState", "gereed");
+    this.deviceList.setDevice({
+      id: "front-end",
+      connection: true,
+      status: statusMsg
+    });
   }
 
   /**
    * The setup contain:
    * the name of the room to display in app
    * the camera links to select in camera view
+   * the buttons that should be in the front-end
    * the rule descriptions for in the puzzle table
    * the map with hints per puzzle to display in hint selection box
    *
-   * @param jsonData with name, camera, events, hints
+   * @param jsonData with name, camera, buttons, events, hints
    */
-  private processSetUp(jsonData) {
+  private processSetup(jsonData) {
     this.nameOfRoom = jsonData.name;
 
-    const cameraData = jsonData.cameras;
+    this.setupCameras(jsonData.cameras);
+    this.setupButtons(jsonData.buttons);
+    this.setupPuzzles(jsonData.events);
+    this.setupHints(jsonData.hints);
+  }
+
+  /**
+   * Sets cameras up given new cameraData
+   * @param cameraData Camera array
+   */
+  private setupCameras(cameraData: Camera[]) {
     this.cameras = [];
     if (cameraData !== null) {
       for (const cam of cameraData) {
         this.cameras.push(new Camera(cam));
       }
     }
+  }
 
-    const rules = jsonData.events;
+  /**
+   * Sets buttons up given new buttonData
+   * @param buttonData json containing list with buttons
+   */
+  private setupButtons(buttonData) {
+    this.manageButtons = new Buttons();
+    if (buttonData !== null) {
+      for (const btn of buttonData) {
+        this.manageButtons.setButton(btn);
+      }
+    }
+    this.resetFrontEndStatus();
+  }
+
+  /**
+   * Sets puzzles up given new rules
+   * @param rules json containing list of events
+   */
+  private setupPuzzles(rules) {
     this.puzzleList = new Puzzles();
     for (const rule in rules) {
       if (rules.hasOwnProperty(rule)) {
         this.puzzleList.addPuzzle(rule, rules[rule]);
       }
     }
+  }
 
-    const allHints = jsonData.hints;
+  /**
+   * Sets hints up given all puzzles
+   * @param puzzles json containing list of puzzles
+   */
+  private setupHints(puzzles) {
     this.hintList = [];
-    for (const puzzle in allHints) {
-      if (allHints.hasOwnProperty(puzzle)) {
+    for (const puzzle in puzzles) {
+      if (puzzles.hasOwnProperty(puzzle)) {
         const hints = [];
-        for (const index in allHints[puzzle]) {
-          if (allHints[puzzle].hasOwnProperty(index)) {
-            hints.push(allHints[puzzle][index]);
+        for (const index in puzzles[puzzle]) {
+          if (puzzles[puzzle].hasOwnProperty(index)) {
+            hints.push(puzzles[puzzle][index]);
           }
         }
         this.hintList.push(new Hint(puzzle, hints));
@@ -368,10 +452,10 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
    * @param action: button to display - optional use
    */
   public openSnackbar(message: string, action: string) {
-    const config = new MatSnackBarConfig();
-    config.duration = 3000;
-    config.panelClass = ["custom-snack-bar"];
-    this.snackBar.open(message, action, config);
+    const snackbar = new MatSnackBarConfig();
+    snackbar.duration = 3000;
+    snackbar.panelClass = ["custom-snack-bar"];
+    this.snackBar.open(message, action, snackbar);
   }
 
   /**

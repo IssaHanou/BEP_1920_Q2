@@ -24,10 +24,9 @@ export class TimerComponent implements OnInit {
    * It shows when the game will finish, depending on the current time and the duration of the game.
    */
   getDoneTime() {
-    const device = this.app.deviceList.getDevice("front-end");
-    if (device !== null) {
-      const status = device.status;
-      if (status.get("start") > 0 && status.get("stop") === 0) {
+    const general = this.app.timerList.getTimer("general");
+    if (general !== null) {
+      if (general.getState() === "stateActive") {
         const date = new Date();
         const timeDiff =
           date.getTime() + this.app.timerList.getTimer("general").duration;
