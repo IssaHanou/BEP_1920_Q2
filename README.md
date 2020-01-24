@@ -1,7 +1,7 @@
 # BEP_1920_Q2
-[![BCH compliance](https://bettercodehub.com/edge/badge/IssaHanou/BEP_1920_Q2?branch=develop-sprint-7)](https://bettercodehub.com/)
-
 [![Build Status](https://travis-ci.com/IssaHanou/BEP_1920_Q2.svg?branch=master)](https://travis-ci.com/IssaHanou/BEP_1920_Q2)
+[![BCH compliance](https://bettercodehub.com/edge/badge/IssaHanou/BEP_1920_Q2?branch=develop-sprint-7)](https://bettercodehub.com/)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 The front-end will be developed in Angular with TypeScript, all source code can be found in `front-end/`.
 
