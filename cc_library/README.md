@@ -11,14 +11,14 @@
 
 ### Structure
 There are two versions of the S.C.I.L.E.R. Client Computer Library:
-   - js-scc: a JavaScript version installable by npm, [click here for the  `README.md`](js-scc/README.md)
+   - js-scc: a JavaScript version installable by npm, [click here for the  `README.md`](js_scc/README.md)
    - py-scc: a Python version (will be) installable by pip [click here for the  `README.md`](py_scc/README.md)
 
 ### Client devices without library
 
 To set up communication with the S.C.I.L.E.R. system without the use of a library, you need to consider the following points:
 
-- Connect with a mosquitto broker at the same IP adress as the rest of the system, use the ports defined in your mosquitto config file or add a port if the current ones are not compatible with your device
+- Connect with a mosquitto broker at the same IP address as the rest of the system, use the ports defined in your mosquitto config file or add a port if the current ones are not compatible with your device
 - The MQTT client should subscribe to the topic `<devicename>` and `"client-computers"` (and `hint` if it is a hint device), where <devicename> is the same name used in the configfile of the back-end
 - A MQTT message publisher should publish messages to topic `back-end`, defined in the message_manual.md under chapter __Client Computers to Back-end__
 - On start-up a connection message should be send, and set a will for the mqtt client with a disconnection message, here is a python example:

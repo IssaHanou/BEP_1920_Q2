@@ -1,10 +1,9 @@
-## js-scc [(see npm)](https://www.npmjs.com/package/js-scc)
+## sciler [(see npm)](https://www.npmjs.com/package/sciler)
 
 ### Installation
-- npm install with ```npm install js-scc```
+- npm install with ```npm install sciler```
 
 ### Using this library
-- import lib with ```const Device = require("js-scc");```
 - create a class that extends `Device`, in order to do this, implement the following methods:
 
     | method                       | parameters                       |                                                                                                                  | returns                                                                                                                              |
@@ -39,15 +38,16 @@
     |                       | message (custom string containing more information)                               |         |                                                                                  |
     | `statusChanged()`     | none                                                                              | void    | call this function to signal that you updated a status so sciler can be notified |
 
+- import lib with ```const Device = require("sciler");```
 - in case of:
-    - angular: add `js-scc` to dependencies in `package.json`
+    - angular: add `sciler` to dependencies in `package.json`
     - browser javascript: (example nodejs serving web page with javascript which includes this library), [Browserify](http://browserify.org/) your javascript which includes this library.
 
 ### Example
 Javascript file:
 ```javascript
 $(document).ready(function() {
-  const Device = require("js-scc");
+  const Device = require("sciler");
   let display;
 
   class Display extends Device {
