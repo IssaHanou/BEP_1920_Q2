@@ -101,21 +101,6 @@ func TestInstructionSetUp(t *testing.T) {
 				"gameState": "gereed"},
 		},
 	})
-	//frontEndStatusMessage, _ := json.Marshal(Message{
-	//	DeviceID: "back-end",
-	//	TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-	//	Type:     "front-end status",
-	//	Contents: []map[string]interface{}{
-	//		{
-	//			"id":       "start",
-	//			"disabled": false,
-	//		},
-	//		{
-	//			"id":       "stop",
-	//			"disabled": true,
-	//		},
-	//	},
-	//})
 	messageEventStatus, _ := json.Marshal(Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
