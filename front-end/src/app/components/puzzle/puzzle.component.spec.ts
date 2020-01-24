@@ -52,6 +52,6 @@ describe("PuzzleComponent", () => {
     expect(tableHeaders.item(0).textContent).toContain("Puzzel");
     expect(tableHeaders.item(1).textContent).toContain("Opgelost");
     expect(tableHeaders.item(2).textContent).toContain("Beschrijving");
-    expect(tableHeaders.item(3).textContent).toContain("Puzzel af");
+    expect(tableHeaders.item(3).textContent).toContain("Handmatig afmaken");
   });
 });
