@@ -101,21 +101,6 @@ func TestInstructionSetUp(t *testing.T) {
 				"gameState": "gereed"},
 		},
 	})
-	frontEndStatusMessage, _ := json.Marshal(Message{
-		DeviceID: "back-end",
-		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "front-end status",
-		Contents: []map[string]interface{}{
-			{
-				"id":       "start",
-				"disabled": false,
-			},
-			{
-				"id":       "stop",
-				"disabled": true,
-			},
-		},
-	})
 	messageEventStatus, _ := json.Marshal(Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
@@ -129,13 +114,12 @@ func TestInstructionSetUp(t *testing.T) {
 	})
 
 	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)
-	communicatorMock.On("Publish", "front-end", string(messageEventStatus), 3)
-	communicatorMock.On("Publish", "telephone", string(statusInstructionMsg), 3)
-	communicatorMock.On("Publish", "front-end", string(statusInstructionMsg), 3)
-	communicatorMock.On("Publish", "front-end", string(statusMessageFrontEnd), 3)
 	communicatorMock.On("Publish", "front-end", string(timerGeneralMessage), 3)
 	communicatorMock.On("Publish", "front-end", string(statusMessage), 3)
-	communicatorMock.On("Publish", "front-end", string(frontEndStatusMessage), 3)
+	communicatorMock.On("Publish", "telephone", string(statusInstructionMsg), 3)
+	communicatorMock.On("Publish", "front-end", string(statusMessageFrontEnd), 3)
+	communicatorMock.On("Publish", "front-end", string(statusInstructionMsg), 3)
+	communicatorMock.On("Publish", "front-end", string(messageEventStatus), 3)
 	handler.msgMapper(instructionMsg)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 7)
 }
@@ -613,4 +597,23 @@ func TestSendInstructionDelay(t *testing.T) {
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
 	time.Sleep(1 * time.Second)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
+}
+
+func TestOnInstructionMsgSendStatus(t *testing.T) {
+	msg := Message{
+		DeviceID: "front-end",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "instruction",
+		Contents: []map[string]interface{}{{
+			"instruction": "send status",
+		}},
+	}
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_instruction.json"),
+		Communicator: communicatorMock,
+	}
+	communicatorMock.On("Publish", "front-end", mock.AnythingOfType("string"), 3)
+	handler.onInstructionMsg(msg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 10)
 }
