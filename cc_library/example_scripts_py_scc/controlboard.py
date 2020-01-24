@@ -124,7 +124,7 @@ class ControlBoard(Device):
         else:
             return False
 
-        return True, None
+        return True
 
     def blink(self, component, args):
         led = getattr(self, component)
