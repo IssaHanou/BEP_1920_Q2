@@ -92,3 +92,18 @@ confirmation message:
     }
     }
 ```
+instruction message:
+```json
+{ 
+          "device_id": "back-end",
+          "time_sent": "17-1-2019 16:19:70",
+          "type": "instruction",
+           "contents": [
+              {
+              "instruction":"turnOnOFf",
+              "value" : true,
+              "component_id": "redled"
+              }
+           ]
+        }
+```
