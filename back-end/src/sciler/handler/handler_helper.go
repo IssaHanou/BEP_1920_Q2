@@ -4,9 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	logger "github.com/sirupsen/logrus"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 	"reflect"
 	"sciler/config"
 	"time"
@@ -353,47 +350,6 @@ func (handler *Handler) SetTimer(timerID string, instructions config.ComponentIn
 		logger.Error(err)
 	}
 	handler.sendStatus(timerID)
-}
-
-// processConfig reads the config in.
-// If action is "use" then the message must tell the config a new config is now used and put it to use
-func (handler *Handler) processConfig(configToRead interface{}, action string, fileName string) {
-	jsonBytes, err := json.Marshal(configToRead)
-	if err != nil {
-		logger.Error(err)
-	} else {
-		newConfig, errorList := config.ReadJSON(jsonBytes)
-		message := Message{
-			DeviceID: "back-end",
-			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-			Type:     "config",
-			Contents: map[string][]string{},
-		}
-		if action == "check" {
-			if newConfig.General.Host != handler.Config.General.Host {
-				errorList = append(errorList, "host: different from current host for front and back-end")
-			}
-			if newConfig.General.Port != handler.Config.General.Port {
-				errorList = append(errorList, "port: different from current port for front and back-end")
-			}
-			message.Contents = map[string][]string{"errors": errorList}
-		}
-		if action == "use" && len(errorList) == 0 {
-			dir, _ := os.Getwd()
-			fullFileName := filepath.Join(dir, "back-end", "resources", "production", fileName)
-			err = ioutil.WriteFile(fullFileName, jsonBytes, 0644)
-			if err != nil {
-				logger.Error(err)
-			}
-			handler.Config = newConfig
-			handler.ConfigFile = fullFileName
-			handler.SendSetup()
-			message.Type = "new config"
-			message.Contents = map[string]string{"name": fileName}
-		}
-		jsonMessage, _ := json.Marshal(&message)
-		handler.Communicator.Publish("front-end", string(jsonMessage), 3)
-	}
 }
 
 // compareType compares a reflect.Kind and a string type and returns an error if not the same

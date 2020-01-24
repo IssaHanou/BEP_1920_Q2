@@ -284,10 +284,7 @@ class SccLib:
             logging.info(("instruction performed", action.instruction))
         else:
             logging.warning(
-                (
-                    "instruction: " + failed_action + " could not be performed",
-                    action,
-                )
+                ("instruction: " + failed_action + " could not be performed", action,)
             )
             return False
 
