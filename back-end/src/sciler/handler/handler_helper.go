@@ -342,7 +342,7 @@ func (handler *Handler) SetTimer(timerID string, instructions config.ComponentIn
 	case "stop":
 		err = handler.Config.Timers[timerID].Stop()
 	case "done":
-		err = handler.Config.Timers[timerID].Done()
+		err = handler.Config.Timers[timerID].Done(handler)
 	default:
 		err = fmt.Errorf("error occurred while reading timer instruction message: %v", instructions.Instruction)
 	}
