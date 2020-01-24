@@ -57,11 +57,11 @@ export class DeviceComponent implements OnInit {
    * Returns string with each component on new line.
    * If components are collapsed, return default.
    */
-  getComponents(status: Map<string, any>, deviceId: string): string {
+  getComponents(status: Map<string, any>, deviceId: string): any {
     if (!this.collapsed.get(deviceId)) {
-      return "click to see components";
+      return "open onderdelen en status";
     } else if (status.size === 0) {
-      return "nothing to show";
+      return "geen status";
     } else {
       const keys = Array.from(status.keys());
 
