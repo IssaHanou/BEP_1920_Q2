@@ -6,6 +6,6 @@ languages:
   - javascript
   - script
 exclude:
-  - /cc_library/example-scripts-js-scc/.*
-  - /cc_library/example-scripts-py-scc/.*
+  - /cc_library/example_scripts_js_scc/.*
+  - /cc_library/example_scripts_py_scc/.*
   - /front-end/karma.conf.js
