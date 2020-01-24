@@ -101,21 +101,21 @@ func TestInstructionSetUp(t *testing.T) {
 				"gameState": "gereed"},
 		},
 	})
-	frontEndStatusMessage, _ := json.Marshal(Message{
-		DeviceID: "back-end",
-		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "front-end status",
-		Contents: []map[string]interface{}{
-			{
-				"id":       "start",
-				"disabled": false,
-			},
-			{
-				"id":       "stop",
-				"disabled": true,
-			},
-		},
-	})
+	//frontEndStatusMessage, _ := json.Marshal(Message{
+	//	DeviceID: "back-end",
+	//	TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+	//	Type:     "front-end status",
+	//	Contents: []map[string]interface{}{
+	//		{
+	//			"id":       "start",
+	//			"disabled": false,
+	//		},
+	//		{
+	//			"id":       "stop",
+	//			"disabled": true,
+	//		},
+	//	},
+	//})
 	messageEventStatus, _ := json.Marshal(Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
@@ -129,13 +129,12 @@ func TestInstructionSetUp(t *testing.T) {
 	})
 
 	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)
-	communicatorMock.On("Publish", "front-end", string(messageEventStatus), 3)
-	communicatorMock.On("Publish", "telephone", string(statusInstructionMsg), 3)
-	communicatorMock.On("Publish", "front-end", string(statusInstructionMsg), 3)
-	communicatorMock.On("Publish", "front-end", string(statusMessageFrontEnd), 3)
 	communicatorMock.On("Publish", "front-end", string(timerGeneralMessage), 3)
 	communicatorMock.On("Publish", "front-end", string(statusMessage), 3)
-	communicatorMock.On("Publish", "front-end", string(frontEndStatusMessage), 3)
+	communicatorMock.On("Publish", "telephone", string(statusInstructionMsg), 3)
+	communicatorMock.On("Publish", "front-end", string(statusMessageFrontEnd), 3)
+	communicatorMock.On("Publish", "front-end", string(statusInstructionMsg), 3)
+	communicatorMock.On("Publish", "front-end", string(messageEventStatus), 3)
 	handler.msgMapper(instructionMsg)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 7)
 }
