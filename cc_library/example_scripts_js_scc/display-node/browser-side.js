@@ -1,5 +1,5 @@
 $(document).ready(function() {
-  const Device = require("js-scc");
+  const Device = require("sciler");
   let display;
 
   class Display extends Device {
