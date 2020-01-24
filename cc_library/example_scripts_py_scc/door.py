@@ -1,7 +1,7 @@
 import os
 import time
 
-from cc_library.src.sciler.scclib.device import Device
+from sciler.device import Device
 
 try:
     import RPi.GPIO as GPIO
@@ -15,7 +15,7 @@ class Door(Device):
         Define pin numbers to which units are connected on Pi.
         """
         two_up = os.path.abspath(os.path.join(__file__, ".."))
-        rel_path = "./door_config.json"
+        rel_path = "door_config.json"
         abs_file_path = os.path.join(two_up, rel_path)
         abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
         config = open(file=abs_file_path)
@@ -47,8 +47,8 @@ class Door(Device):
             else:
                 self.turn_on()
         else:
-            return False, action
-        return True, None
+            return False
+        return True
 
     def test(self):
         for i in range(0, 2):

@@ -3,7 +3,7 @@ import os
 import time
 
 import requests
-from scclib.device import Device
+from sciler.device import Device
 
 """
 How to use Hue Lights with S.C.I.L.E.R.:
@@ -20,13 +20,13 @@ How to use Hue Lights with S.C.I.L.E.R.:
 class HueLights(Device):
     def __init__(self):
         two_up = os.path.abspath(os.path.join(__file__, ".."))
-        rel_path = "./hue_lights_config.json"
+        rel_path = "hue_lights_config.json"
         abs_file_path = os.path.join(two_up, rel_path)
         abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
         config = open(file=abs_file_path)
         super().__init__(config)
         self.scene = "none"
-        self.hue_bridge = "http://192.168.178.128/"
+        self.hue_bridge = "http://192.168.178.20/"
         self.hue_user = "JQrPwJNthHtfPEG9vhW3mqwIVuFo3ESLD3gvkZOB"
         self.group = "Spotlights"
         self.header = {"Content-type": "application/json"}
@@ -41,8 +41,8 @@ class HueLights(Device):
         if instruction == "manual":
             self.set_manual(action.get("component_id"), action.get("value"))
         else:
-            return False, action
-        return True, None
+            return False
+        return True
 
     def test(self):
         params = json.dumps({"on": True, "bri": 200, "xy": [0.3, 0.3]})
