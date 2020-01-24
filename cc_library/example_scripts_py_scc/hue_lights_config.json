@@ -1,6 +1,6 @@
 {
   "id": "hue_lights",
   "host": "localhost",
-  "port": 1883
-  "label":[]
+  "port": 1883,
+  "labels": []
 }

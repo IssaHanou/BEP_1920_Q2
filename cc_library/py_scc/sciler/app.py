@@ -56,7 +56,7 @@ class Sciler:
 
     def __on_log(self, level, buf):
         """
-         MQTT Client method.
+        MQTT Client method.
         Broker logger that logs everything happening with the mqtt client.
         :param level: level of message
         :param buf: message to be logged
@@ -233,7 +233,7 @@ class Sciler:
     def __handle(self, message):
         """
         Interpreter of incoming messages.
-        Correct  mapper is called with the content of the message.
+        Correct mapper is called with the content of the message.
         Send confirmation message
         :param message: message from the back-end
         """
