@@ -341,7 +341,8 @@ func generateLogicalCondition(conditions interface{}) (LogicalCondition, []strin
 	}
 }
 
-// generateLogicalConstraintOperator generates a logical condition (and / or) from logic where the operator field is present in the config
+// generateLogicalConditionOperator generates a logical condition
+// (and / or) from logic where the operator field is present in the config
 // if the config does not abide by the manual, a non-empty list of mistakes is returned
 func generateLogicalConditionOperator(logic map[string]interface{}) (LogicalCondition, []string) {
 	errorList := make([]string, 0)

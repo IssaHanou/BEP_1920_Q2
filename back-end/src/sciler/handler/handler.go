@@ -130,7 +130,9 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 	}
 	handler.forwardConfirmation(instructionContents, raw, value.(bool))
 
-	// If a message is received from a device, it can be concluded that the device has positive connection status, and thus it's connection status is set to true
+	// If a message is received from a device,
+	// it can be concluded that the device has positive connection status,
+	// and thus it's connection status is set to true
 	handler.connected(raw.DeviceID)
 }
 
