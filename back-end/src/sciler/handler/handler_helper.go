@@ -4,9 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	logger "github.com/sirupsen/logrus"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 	"reflect"
 	"sciler/config"
 	"time"
@@ -140,34 +137,46 @@ func (handler *Handler) updateStatus(raw Message) {
 // For devices the status of components and the connection status is send
 // For timers the duration left and the state are send
 // param deviceID can be the ID of a device or a timer
-func (handler *Handler) sendStatus(deviceID string) {
-	var message Message
-	if device, ok := handler.Config.Devices[deviceID]; ok {
-		message = Message{
-			DeviceID: "back-end",
-			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-			Type:     "status",
-			Contents: map[string]interface{}{
-				"id":         device.ID,
-				"status":     device.Status,
-				"connection": device.Connection,
-			},
-		}
-	} else if timer, ok2 := handler.Config.Timers[deviceID]; ok2 {
-		duration, _ := timer.GetTimeLeft()
-		message = Message{
-			DeviceID: "back-end",
-			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-			Type:     "time",
-			Contents: map[string]interface{}{
-				"id":       timer.ID,
-				"duration": duration.Milliseconds(),
-				"state":    timer.State,
-			},
-		}
+func (handler *Handler) sendStatus(ID string) {
+	if device, ok := handler.Config.Devices[ID]; ok {
+		handler.sendStatusDevice(device)
+	} else if timer, ok2 := handler.Config.Timers[ID]; ok2 {
+		handler.sendStatusTimer(timer)
 	} else {
-		logger.Errorf("error occurred while sending status of %s, since it is not recognised as a device or timer", deviceID)
+		logger.Errorf("error occurred while sending status of %s, since it is not recognised as a device or timer", ID)
 		return
+	}
+}
+
+// sendStatusDevice sends status of a device to the front-end
+func (handler *Handler) sendStatusDevice(device *config.Device) {
+	message := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "status",
+		Contents: map[string]interface{}{
+			"id":         device.ID,
+			"status":     device.Status,
+			"connection": device.Connection,
+		},
+	}
+	jsonMessage, _ := json.Marshal(&message)
+	logger.Infof("sending status data to front-end: %v", message.Contents)
+	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+}
+
+// sendStatusTimer sends status of a timer to the front-end
+func (handler *Handler) sendStatusTimer(timer *config.Timer) {
+	duration, _ := timer.GetTimeLeft()
+	message := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "time",
+		Contents: map[string]interface{}{
+			"id":       timer.ID,
+			"duration": duration.Milliseconds(),
+			"state":    timer.State,
+		},
 	}
 	jsonMessage, _ := json.Marshal(&message)
 	logger.Infof("sending status data to front-end: %v", message.Contents)
@@ -333,88 +342,36 @@ func (handler *Handler) SetTimer(timerID string, instructions config.ComponentIn
 	case "stop":
 		err = handler.Config.Timers[timerID].Stop()
 	case "done":
-		err = handler.Config.Timers[timerID].Done()
+		err = handler.Config.Timers[timerID].Done(handler)
 	default:
 		err = fmt.Errorf("error occurred while reading timer instruction message: %v", instructions.Instruction)
 	}
-
 	if err != nil {
 		logger.Error(err)
 	}
 	handler.sendStatus(timerID)
 }
 
-// processConfig reads the config in.
-// If action is "check" then the return message must contain the possible errors
-// If action is "use" then the message must tell the config a new config is now used and put it to use
-func (handler *Handler) processConfig(configToRead interface{}, action string, fileName string) {
-	jsonBytes, err := json.Marshal(configToRead)
-	if err != nil {
-		logger.Error(err)
-	} else {
-		newConfig, errorList := config.ReadJSON(jsonBytes)
-		message := Message{
-			DeviceID: "back-end",
-			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-			Type:     "config",
-			Contents: map[string][]string{},
-		}
-		if action == "check" {
-			if newConfig.General.Host != handler.Config.General.Host {
-				errorList = append(errorList, "host: different from current host for front and back-end")
-			}
-			if newConfig.General.Port != handler.Config.General.Port {
-				errorList = append(errorList, "port: different from current port for front and back-end")
-			}
-			message.Contents = map[string][]string{"errors": errorList}
-		}
-		if action == "use" && len(errorList) == 0 {
-			dir, _ := os.Getwd()
-			fullFileName := filepath.Join(dir, "back-end", "resources", "production", fileName)
-			err = ioutil.WriteFile(fullFileName, jsonBytes, 0644)
-			if err != nil {
-				logger.Error(err)
-			}
-			handler.Config = newConfig
-			handler.ConfigFile = fullFileName
-			handler.SendSetup()
-			message.Type = "new config"
-			message.Contents = map[string]string{"name": fileName}
-		}
-		jsonMessage, _ := json.Marshal(&message)
-		handler.Communicator.Publish("front-end", string(jsonMessage), 3)
-	}
-}
-
 // compareType compares a reflect.Kind and a string type and returns an error if not the same
 func compareType(valueType reflect.Kind, inputType string) error {
 	switch inputType {
 	case "string":
-		{
-			if valueType != reflect.String {
-				return fmt.Errorf("status type string expected but %s found as type", valueType.String())
-			}
+		if valueType != reflect.String {
+			return fmt.Errorf("status type string expected but %s found as type", valueType.String())
 		}
 	case "boolean":
-		{
-			if valueType != reflect.Bool {
-				return fmt.Errorf("status type boolean expected but %s found as type", valueType.String())
-			}
+		if valueType != reflect.Bool {
+			return fmt.Errorf("status type boolean expected but %s found as type", valueType.String())
 		}
 	case "numeric":
-		{
-			if valueType != reflect.Int && valueType != reflect.Float64 {
-				return fmt.Errorf("status type numeric expected but %s found as type", valueType.String())
-			}
+		if valueType != reflect.Int && valueType != reflect.Float64 {
+			return fmt.Errorf("status type numeric expected but %s found as type", valueType.String())
 		}
 	case "array":
-		{
-			if valueType != reflect.Slice {
-				return fmt.Errorf("status type array/slice expected but %s found as type", valueType.String())
-			}
+		if valueType != reflect.Slice {
+			return fmt.Errorf("status type array/slice expected but %s found as type", valueType.String())
 		}
 	default:
-		// todo custom types
 		return fmt.Errorf("custom types like: %s, are not yet implemented", inputType)
 	}
 	return nil
@@ -440,7 +397,7 @@ func (handler *Handler) checkStatusType(device config.Device, status interface{}
 	return nil
 }
 
-// dirty trick to go from interface{} to []map[string]interface{}
+// getMapSlice is a dirty trick to go from `interface{}` to `[]map[string]interface{}`
 func getMapSlice(input interface{}) ([]map[string]interface{}, error) {
 	bytes, _ := json.Marshal(input)
 	var output []map[string]interface{}
@@ -449,4 +406,15 @@ func getMapSlice(input interface{}) ([]map[string]interface{}, error) {
 		return nil, err
 	}
 	return output, nil
+}
+
+// connected is a method that sets a device to connected
+func (handler *Handler) connected(deviceID string) {
+	device, ok := handler.Config.Devices[deviceID]
+	if !ok {
+		logger.Warnf("device %s was not found in config", deviceID)
+	} else {
+		device.Connection = true
+		handler.Config.Devices[deviceID] = device
+	}
 }

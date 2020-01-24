@@ -5,8 +5,12 @@ import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	logger "github.com/sirupsen/logrus"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"reflect"
 	"sciler/config"
+	"time"
 )
 
 // Message is a type that follows the structure all messages have, described in resources/manuals/message_manual.md
@@ -52,11 +56,7 @@ func (handler *Handler) msgMapper(raw Message) {
 		}
 	case "status":
 		{
-			handler.updateStatus(raw)
-			handler.sendStatus(raw.DeviceID)
-			handler.sendFrontEndStatus(raw)
-			handler.HandleEvent(raw.DeviceID)
-			handler.sendEventStatus()
+			handler.onStatusMsg(raw)
 		}
 	case "confirmation":
 		{
@@ -71,6 +71,15 @@ func (handler *Handler) msgMapper(raw Message) {
 			logger.Errorf("message received from %s, but no message type could be found for: %v", raw.DeviceID, raw.Type)
 		}
 	}
+}
+
+// onStatusMsg is the function to process status messages.
+func (handler *Handler) onStatusMsg(raw Message) {
+	handler.updateStatus(raw)
+	handler.sendStatus(raw.DeviceID)
+	handler.sendFrontEndStatus(raw)
+	handler.HandleEvent(raw.DeviceID)
+	handler.sendEventStatus()
 }
 
 // onConnectionMsg is the function to process connection messages from devices
@@ -119,7 +128,16 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 		logger.Errorf(err.Error())
 		return
 	}
+	handler.forwardConfirmation(instructionContents, raw, value.(bool))
 
+	// If a message is received from a device,
+	// it can be concluded that the device has positive connection status,
+	// and thus it's connection status is set to true
+	handler.connected(raw.DeviceID)
+}
+
+// forwardConfirmation sends a received confirmation message on to the front-end
+func (handler *Handler) forwardConfirmation(instructionContents []map[string]interface{}, raw Message, value bool) {
 	var instructionString string
 	for _, instruction := range instructionContents {
 		// Each instruction is added to a string for proper logging
@@ -132,22 +150,12 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 			logger.Infof("sending confirmation to front-end for instruction %v", instruction["instruction"])
 		}
 	}
-
-	if !value.(bool) {
+	if !value {
 		logger.Warnf("device %s did not complete instructions: %v at %v", raw.DeviceID,
 			instructionString, raw.TimeSent)
 	} else {
 		logger.Infof("device %s completed instructions: %v at %v", raw.DeviceID,
 			instructionString, raw.TimeSent)
-	}
-
-	// If a message is received from a device, it can be concluded that the device has positive connection status, and thus it's connection status is set to true
-	con, ok := handler.Config.Devices[raw.DeviceID]
-	if !ok {
-		logger.Warnf("device %s was not found in config", raw.DeviceID)
-	} else {
-		con.Connection = true
-		handler.Config.Devices[raw.DeviceID] = con
 	}
 }
 
@@ -157,7 +165,6 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 // The actions to take are decided by Message.Contents.instruction
 func (handler *Handler) onInstructionMsg(raw Message) {
 	logger.Infof("instruction message received from: %s", raw.DeviceID)
-
 	instructions, err := getMapSlice(raw.Contents)
 	if err != nil {
 		logger.Error(err)
@@ -166,68 +173,170 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 
 	for _, instruction := range instructions {
 		if raw.DeviceID == "front-end" {
-			switch instruction["instruction"] {
-			case "send setup": // send setup is instructed at start-up of the front-end
-				{
-					handler.SendSetup()
-				}
-			case "reset all": // reset all is instructed when the reset button is clicked in the front-end
-				{
-					handler.sendInstruction("client-computers", []map[string]string{{
-						"instruction":   "reset",
-						"instructed_by": raw.DeviceID,
-					}})
-					handler.sendInstruction("front-end", []map[string]string{{
-						"instruction":   "reset",
-						"instructed_by": raw.DeviceID,
-					}})
-					handler.Config = config.ReadFile(handler.ConfigFile)
-					handler.SendSetup()
-				}
-			case "test all": // test all is instructed when the test button is clicked in the front-end
-				{
-					handler.sendInstruction("client-computers", []map[string]string{{
-						"instruction":   "test",
-						"instructed_by": raw.DeviceID,
-					}})
-				}
-			case "test device": // test device is instructed when the test button of a device is clicked in the front-end
-				{
-					handler.sendInstruction(instruction["device"].(string), []map[string]string{{
-						"instruction":   "test",
-						"instructed_by": raw.DeviceID,
-					}})
-				}
-			case "finish rule": // finish rule is instructed then the "voer uit" button of a rule is clicked in the front-end
-				{
-					ruleToFinish := instruction["rule"].(string)
-					rule, ok := handler.Config.RuleMap[ruleToFinish]
-					if !ok {
-						logger.Errorf("could not find rule with id %s in map", ruleToFinish)
-					} else {
-						rule.Execute(handler)
-					}
-					handler.sendEventStatus()
-				}
-			case "hint": // hint in instructed when the front-end submits a hint
-				{
-					handler.sendInstruction("hint", []map[string]string{{
-						"instruction":   "hint",
-						"value":         instruction["value"].(string),
-						"instructed_by": raw.DeviceID,
-					}})
-				}
-			case "check config": // check config is instructed when a config file gets uploaded in the front-end
-				{
-					handler.processConfig(instruction["config"], "check", "")
-				}
-			case "use config": // use config is instructed when a the use config button is clicked in the front-end
-				{
-					handler.processConfig(instruction["config"], "use", instruction["file"].(string))
-				}
-			}
+			handler.handleInstruction(instruction, "front-end")
 		} else {
 			logger.Warnf("%s, tried to instruct the back-end, only the front-end is allowed to instruct the back-end", raw.DeviceID)
 		}
 	}
+}
+
+// handleInstruction is the function to process an instruction given the ID of the instructor
+func (handler *Handler) handleInstruction(instruction map[string]interface{}, instructor string) {
+	switch instruction["instruction"] {
+	case "send setup":
+		handler.SendSetup()
+	case "send status":
+		handler.onSendStatus()
+	case "reset all":
+		handler.onResetAll(instructor)
+	case "test all":
+		handler.onTestAll(instructor)
+	case "test device":
+		handler.onTestDevice(instruction["device"].(string), instructor)
+	case "finish rule":
+		handler.onFinishRule(instruction["rule"].(string))
+	case "hint":
+		handler.onHint(instruction["value"].(string), instructor)
+	case "check config":
+		handler.onCheckConfig(instruction["config"])
+	case "use config":
+		handler.onUseConfig(instruction["config"], instruction["file"].(string))
+	default:
+		logger.Warnf("%s is an unknown instruction", instruction["instruction"])
+	}
+}
+
+// onSendStatus is the function to process the instruction `send status`
+// send status is instructed when the front-end starts
+func (handler *Handler) onSendStatus() {
+	for _, device := range handler.Config.Devices {
+		handler.sendStatus(device.ID)
+	}
+	for _, timer := range handler.Config.Timers {
+		handler.sendStatus(timer.ID)
+	}
+	handler.sendEventStatus()
+}
+
+// onResetAll is the function to process the instruction `reset all`
+// reset all is instructed when the reset button is clicked in the front-end
+func (handler *Handler) onResetAll(deviceID string) {
+	handler.sendInstruction("client-computers", []map[string]string{{
+		"instruction":   "reset",
+		"instructed_by": deviceID,
+	}})
+	handler.sendInstruction("front-end", []map[string]string{{
+		"instruction":   "reset",
+		"instructed_by": deviceID,
+	}})
+	handler.Config = config.ReadFile(handler.ConfigFile)
+	handler.SendSetup()
+}
+
+// onTestAll is the function to process the instruction `test all`
+// test all is instructed when the test button is clicked in the front-end
+func (handler *Handler) onTestAll(instructor string) {
+	handler.sendInstruction("client-computers", []map[string]string{{
+		"instruction":   "test",
+		"instructed_by": instructor,
+	}})
+}
+
+// onTestDevice is the function to process the instruction `test device`
+// test device is instructed when the test button of a device is clicked in the front-end
+func (handler *Handler) onTestDevice(deviceID string, instructor string) {
+	handler.sendInstruction(deviceID, []map[string]string{{
+		"instruction":   "test",
+		"instructed_by": instructor,
+	}})
+}
+
+// onResetAll is the function to process the instruction `finish rule`
+// finish rule is instructed then the "voer uit" button of a rule is clicked in the front-end
+func (handler *Handler) onFinishRule(ruleID string) {
+	rule, ok := handler.Config.RuleMap[ruleID]
+	if !ok {
+		logger.Errorf("could not find rule with id %s in map", ruleID)
+	} else {
+		rule.Execute(handler)
+	}
+	handler.sendEventStatus()
+}
+
+// onHint is the function to process the instruction `hint`
+// hint in instructed when the front-end submits a hint
+func (handler *Handler) onHint(hint string, instructor string) {
+	handler.sendInstruction("hint", []map[string]string{{
+		"instruction":   "hint",
+		"value":         hint,
+		"instructed_by": instructor,
+	}})
+}
+
+// onCheckConfig is the function to process the instruction `check config`
+// checks the config and sends a message containing all errors it could find
+func (handler *Handler) onCheckConfig(configToRead interface{}) {
+	message := Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "config",
+		Contents: map[string][]string{"errors": handler.checkConfig(configToRead)},
+	}
+	jsonMessage, _ := json.Marshal(&message)
+	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+}
+
+// onUseConfig is the function to process the instruction `use config`
+// checks the config and if it found no errors, it saves and uses this config
+func (handler *Handler) onUseConfig(configToRead interface{}, fileName string) {
+	// check if the config can be used, if so use and send message
+	if len(handler.checkConfig(configToRead)) == 0 {
+		handler.useConfig(configToRead, fileName)
+		message := Message{
+			DeviceID: "back-end",
+			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+			Type:     "new config",
+			Contents: map[string]string{"name": fileName},
+		}
+		jsonMessage, _ := json.Marshal(&message)
+		handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+		handler.SendSetup()
+	}
+}
+
+// useConfig uses new config and save this config to file
+// warning this config should be checked first before using the config
+func (handler *Handler) useConfig(configToRead interface{}, fileName string) {
+	jsonBytes, _ := json.Marshal(configToRead)
+	newConfig, _ := config.ReadJSON(jsonBytes)
+	dir, _ := os.Getwd()
+	fullFileName := filepath.Join(dir, "back-end", "resources", "production", fileName)
+	err := ioutil.WriteFile(fullFileName, jsonBytes, 0644)
+	if err != nil {
+		logger.Error(err)
+	}
+	handler.Config = newConfig
+	handler.ConfigFile = fullFileName
+}
+
+// checkConfig checks the config, if it finds any errors in processing the config,
+// it will return a list of all found errors, if this slice is empty,
+// the config contains no errors and can be used safely
+func (handler *Handler) checkConfig(configToRead interface{}) []string {
+	errors := make([]string, 0)
+	jsonBytes, err := json.Marshal(configToRead)
+	if err != nil {
+		errors = append(errors, fmt.Sprintf("could not unmarshal json, %v", err))
+	} else {
+		newConfig, errorList := config.ReadJSON(jsonBytes)
+
+		if newConfig.General.Host != handler.Config.General.Host {
+			errorList = append(errorList, "host: different from current host for front and back-end")
+		}
+		if newConfig.General.Port != handler.Config.General.Port {
+			errorList = append(errorList, "port: different from current port for front and back-end")
+		}
+		errors = append(errors, errorList...)
+	}
+	return errors
 }

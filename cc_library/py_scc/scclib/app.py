@@ -117,7 +117,7 @@ class SccLib:
         :param topic: topic to publish to
         :param json_message: message to publish in json formatting
         """
-        # TODO what to do when publish fails
+        #
         self.client.publish(topic, json_message, 1)
         message_type = topic + " message published"
         logging.info((message_type, json_message))
@@ -261,37 +261,62 @@ class SccLib:
         for action in contents:
             instruction = action.get("instruction")
             if instruction == "test":
-                self.device.test()
-                logging.info(("instruction performed", instruction))
+                self.__do_test()
             elif instruction == "status update":
-                msg_dict = {
-                    "device_id": self.name,
-                    "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
-                    "type": "connection",
-                    "contents": {"connection": True},
-                }
-                msg = json.dumps(msg_dict)
-                self.__send_message("back-end", msg)
-                self.status_changed()
-                logging.info(("instruction performed", instruction))
+                self.__do_status_update()
             elif instruction == "reset":
-                self.device.reset()
-                logging.info(("instruction performed", instruction))
+                self.__do_reset()
             else:
-                (success, failed_action) = self.device.perform_instruction(
-                    action
-                )  # TODO: remove failed_action as return argument
-                if success:
-                    logging.info(("instruction performed", instruction))
-                else:
-                    logging.warning(
-                        (
-                            "instruction: " + failed_action + " could not be performed",
-                            action,
-                        )
-                    )
+                success = self.__do_custom_instruction(action)
+                if not success:
                     return False
         return True
+
+    def __do_test(self):
+        """
+        Method that performs instruction `test`
+        """
+        self.device.test()
+        logging.info("instruction performed test")
+
+    def __do_status_update(self):
+        """
+        Method that performs instruction `status update`
+        """
+        msg_dict = {
+            "device_id": self.name,
+            "time_sent": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+            "type": "connection",
+            "contents": {"connection": True},
+        }
+        msg = json.dumps(msg_dict)
+        self.__send_message("back-end", msg)
+        self.status_changed()
+        logging.info("instruction performed status update")
+
+    def __do_reset(self):
+        """
+        Method that performs instruction `reset`
+        """
+        self.device.reset()
+        logging.info("instruction performed reset")
+
+    def __do_custom_instruction(self, action):
+        """
+        Methods that performs custom instruction
+        :param action: dictionary with action details such as instruction, component_id and value
+        :return: boolean whether the instruction was performed successfully
+        """
+        (success, failed_action) = self.device.perform_instruction(
+            action
+        )  # TODO: remove failed_action as return argument
+        if success:
+            logging.info(("instruction performed", action.instruction))
+        else:
+            logging.warning(
+                ("instruction: " + failed_action + " could not be performed", action,)
+            )
+            return False
 
     def __subscribe_topic(self, topic):
         """

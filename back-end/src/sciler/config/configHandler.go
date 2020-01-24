@@ -88,7 +88,13 @@ func generateDevices(devices []ReadDevice, config *WorkingConfig) map[string]*De
 			false,
 		})
 	}
+	// add front-end to the devices
+	newDevices["front-end"] = generateFrontendDevice(config)
+	return newDevices
+}
 
+// generateFrontendDevice setups up a device which represents the front-end
+func generateFrontendDevice(config *WorkingConfig) *Device {
 	input := make(map[string]string)
 	status := make(map[string]interface{})
 	for _, btn := range config.ButtonEvents {
@@ -96,7 +102,7 @@ func generateDevices(devices []ReadDevice, config *WorkingConfig) map[string]*De
 		status[btn.ID] = false
 	}
 	status["gameState"] = "gereed"
-	newDevices["front-end"] = &(Device{
+	return &(Device{
 		ID:          "front-end",
 		Description: "The operator webapp for managing a escape room",
 		Input:       input,
@@ -111,7 +117,6 @@ func generateDevices(devices []ReadDevice, config *WorkingConfig) map[string]*De
 		Status:     status,
 		Connection: false,
 	})
-	return newDevices
 }
 
 // generateTimers creates map with id pointing to timer object for all timer objects and general timer.
@@ -234,176 +239,9 @@ func appendWhenUniqueComp(comps []*Component, comp *Component) []*Component {
 	return append(comps, comp)
 }
 
-// checkConfig is a method that will return an error
-// if the constraints value type is not equal to the device input type specified,
-// the actions type is not equal to the device output type,
-// or some other not allowed json configuration
-func checkConfig(config WorkingConfig) []string {
-	errList := make([]string, 0)
-	for _, puzzle := range config.Puzzles {
-		for _, rule := range puzzle.Event.Rules {
-			if err := rule.Conditions.checkConstraints(config, rule.ID); err != nil {
-				errList = append(errList, err...)
-			}
-			errList = append(errList, checkActions(rule.Actions, config)...)
-		}
-	}
-
-	for _, generalEvent := range config.GeneralEvents {
-		for _, rule := range generalEvent.Rules {
-			if err := rule.Conditions.checkConstraints(config, rule.ID); err != nil {
-				errList = append(errList, err...)
-			}
-			errList = append(errList, checkActions(rule.Actions, config)...)
-		}
-	}
-
-	for _, rule := range config.ButtonEvents {
-		if err := rule.Conditions.checkConstraints(config, rule.ID); err != nil {
-			errList = append(errList, err...)
-		}
-		errList = append(errList, checkActions(rule.Actions, config)...)
-	}
-
-	// todo check uniqueness of all device_id, timer_id and rule_id
-	return errList
-}
-
-// checkAction is a method that will return an error
-// if the action's value types and instructions are not equal to the unit's output specifications
-func checkActions(actions []Action, config WorkingConfig) []string {
-	errorList := make([]string, 0)
-	for _, action := range actions {
-		switch action.Type {
-		case "device":
-			errorList = append(errorList, checkActionDevice(action, config)...)
-		case "timer":
-			errorList = append(errorList, checkActionTimer(action, config)...)
-		case "label":
-			errorList = append(errorList, checkActionLabel(action, config)...)
-		default:
-			errorList = append(errorList,
-				fmt.Sprintf("only device, timer and label are accepted as type for an action, however type was specified as: %s", action.Type))
-		}
-	}
-	return errorList
-}
-
-// checkActionTimer is a method that checks the config in use for mistakes in the action of a timer
-// if the config does not follow the manual, a non-empty list of mistakes is returned
-func checkActionTimer(action Action, config WorkingConfig) []string {
-	errorList := make([]string, 0)
-	if _, ok := config.Timers[action.TypeID]; ok { // checks if timer can be found in the map, if so, it is stored in variable device
-		for _, actionMessage := range action.Message {
-			switch actionMessage.Instruction {
-			case "add", "subtract":
-				{
-					valueType := reflect.TypeOf(actionMessage.Value).Kind()
-					if valueType != reflect.String {
-						errorList = append(errorList,
-							fmt.Sprintf("input type string expected but %s found as type of value %v",
-								valueType.String(), actionMessage.Value))
-					}
-					break
-				}
-			case "start", "pause", "stop", "done":
-				break
-			default:
-				errorList = append(errorList, fmt.Sprintf("instruction %s is not defined for a timer", actionMessage.Instruction))
-			}
-		}
-	} else {
-		errorList = append(errorList, fmt.Sprintf("timer with id %s not found in map", action.TypeID))
-	}
-	return errorList
-}
-
-// checkActionDevice is a method that checks the current config for mistakes in the action of a device
-// if the config does not follow the manual, a non-empty list of mistakes is returned
-func checkActionDevice(action Action, config WorkingConfig) []string {
-	errorList := make([]string, 0)
-	if device, ok := config.Devices[action.TypeID]; ok { // checks if device can be found in the map, if so, it is stored in variable device
-		for _, actionMessage := range action.Message {
-			if outputObject, ok := device.Output[actionMessage.ComponentID]; ok {
-				valueType := reflect.TypeOf(actionMessage.Value).Kind()
-				if instructionType, ok := outputObject.Instructions[actionMessage.Instruction]; ok {
-					switch instructionType {
-					case "string":
-						{
-							if valueType != reflect.String {
-								errorList = append(errorList,
-									fmt.Sprintf("instruction type string expected but %s found as type of value %v",
-										valueType.String(), actionMessage.Value))
-							}
-						}
-					case "boolean":
-						{
-							if valueType != reflect.Bool {
-								errorList = append(errorList,
-									fmt.Sprintf("instruction type boolean expected but %s found as type of value %v",
-										valueType.String(), actionMessage.Value))
-							}
-						}
-					case "numeric":
-						{
-							if valueType != reflect.Int && valueType != reflect.Float64 {
-								errorList = append(errorList,
-									fmt.Sprintf("instruction type numeric expected but %s found as type of value %v",
-										valueType.String(), actionMessage.Value))
-							}
-						}
-					case "array":
-						{
-							if valueType != reflect.Slice {
-								errorList = append(errorList,
-									fmt.Sprintf("instruction type array/slice expected but %s found as type of value %v",
-										valueType.String(), actionMessage.Value))
-							}
-						}
-					default:
-						// todo custom types
-						errorList = append(errorList,
-							fmt.Sprintf("custom types like: %s, are not yet implemented", instructionType))
-					}
-				} else {
-					errorList = append(errorList,
-						fmt.Sprintf("instruction %s not found in map", actionMessage.Instruction))
-				}
-			} else {
-				errorList = append(errorList,
-					fmt.Sprintf("component with id %s not found in map", actionMessage.ComponentID))
-			}
-		}
-	} else {
-		errorList = append(errorList,
-			fmt.Sprintf("device with id %s not found in map", action.TypeID))
-	}
-	return errorList
-}
-
-// checkActionLabel checks if there is a label with this ID,
-// and checks if all components under this label have the correct instructions with a call to checkActionDevice
-// if the config does not follow the manual, a non-empty list of mistakes is returned
-func checkActionLabel(action Action, config WorkingConfig) []string {
-	errorList := make([]string, 0)
-	if _, ok := config.LabelMap[action.TypeID]; ok { // checks if label can be found in the map, if so, it is stored in variable device
-		for _, instruction := range action.Message {
-			for _, comp := range config.LabelMap[action.TypeID] {
-				instruction.ComponentID = comp.ID
-				errorList = append(errorList,
-					checkActionDevice(Action{TypeID: comp.Device.ID, Message: []ComponentInstruction{instruction}}, config)...)
-			}
-		}
-	} else {
-		errorList = append(errorList,
-			fmt.Sprintf("label with id %s not found in map", action.TypeID))
-	}
-	return errorList
-}
-
 // generatePuzzles transforms readPuzzles to puzzles
 // it generates events and copies the rest
-// if the config does not follow the manual, a non-empty list of mistakes is returned
+// if the config does not abide by the manual, a non-empty list of mistakes is returned
 func generatePuzzles(readPuzzles []ReadPuzzle, config *WorkingConfig) ([]*Puzzle, []string) {
 	var result []*Puzzle
 	errorList := make([]string, 0)
@@ -421,7 +259,7 @@ func generatePuzzles(readPuzzles []ReadPuzzle, config *WorkingConfig) ([]*Puzzle
 
 // generateGeneralEvents transforms readGeneralEvents to generalEvents
 // it loops through all readGeneralEvents and generates generalEvents for them
-// if the config does not follow the manual, a non-empty list of mistakes is returned
+// if the config does not abide by the manual, a non-empty list of mistakes is returned
 func generateGeneralEvents(readGeneralEvents []ReadGeneralEvent, config *WorkingConfig) ([]*GeneralEvent, []string) {
 	var result []*GeneralEvent
 	errorList := make([]string, 0)
@@ -435,7 +273,7 @@ func generateGeneralEvents(readGeneralEvents []ReadGeneralEvent, config *Working
 
 // generateGeneralEvent transforms readGeneralEvent to generalEvent
 // it generates rules and copies the rest
-// if the config does not follow the manual, a non-empty list of mistakes is returned
+// if the config does not abide by the manual, a non-empty list of mistakes is returned
 func generateGeneralEvent(event ReadEvent, config *WorkingConfig) (*GeneralEvent, []string) {
 	rules, errorList := generateRules(event.GetRules(), config)
 	return &GeneralEvent{
@@ -456,7 +294,7 @@ func generateButtonEvents(buttonEvents []ReadRule, config *WorkingConfig) (map[s
 
 // generateRules transforms readRules to rules
 // it generates conditions and copies the rest
-// if the config does not follow the manual, a non-empty list of mistakes is returned
+// if the config does not abide by the manual, a non-empty list of mistakes is returned
 func generateRules(readRules []ReadRule, config *WorkingConfig) ([]*Rule, []string) {
 	var rules []*Rule
 	errorList := make([]string, 0)
@@ -480,32 +318,14 @@ func generateRules(readRules []ReadRule, config *WorkingConfig) ([]*Rule, []stri
 // generateLogicalCondition traverses the conditions tree
 // it generates a logicalCondition which copies this tree
 // this tree includes andConditions, OrConditions and Conditions which put Constraints on a device, rule or timer
-// if the config does not follow the manual, a non-empty list of mistakes is returned
+// if the config does not abide by the manual, a non-empty list of mistakes is returned
 func generateLogicalCondition(conditions interface{}) (LogicalCondition, []string) {
 	logic := conditions.(map[string]interface{})
 	errorList := make([]string, 0)
 	if logic["operator"] != nil { // operator
-		if logic["operator"] == "AND" {
-			and := AndCondition{}
-			for _, condition := range logic["list"].([]interface{}) {
-				newCondition, newErrors := generateLogicalCondition(condition)
-				and.logics = append(and.logics, newCondition)
-				errorList = append(errorList, newErrors...)
-			}
-			return and, errorList
-		} else if logic["operator"] == "OR" {
-			or := OrCondition{}
-			for _, condition := range logic["list"].([]interface{}) {
-				newCondition, newErrors := generateLogicalCondition(condition)
-				or.logics = append(or.logics, newCondition)
-				errorList = append(errorList, newErrors...)
-			}
-			return or, errorList
-		} else {
-			return nil, append(errorList,
-				fmt.Sprintf("JSON config in wrong format, operator: %v, could not be processed", logic["operator"]))
-		}
-	} else if logic["type"] != nil && reflect.TypeOf(logic["type"]).Kind() == reflect.String && logic["type_id"] != nil && reflect.TypeOf(logic["type_id"]).Kind() == reflect.String {
+		return generateLogicalConditionOperator(logic)
+	} else if logic["type"] != nil && reflect.TypeOf(logic["type"]).Kind() == reflect.String &&
+		logic["type_id"] != nil && reflect.TypeOf(logic["type_id"]).Kind() == reflect.String {
 		constraints, newErrors := generateLogicalConstraint(logic["constraints"])
 		condition := Condition{
 			Type:        logic["type"].(string),
@@ -521,56 +341,94 @@ func generateLogicalCondition(conditions interface{}) (LogicalCondition, []strin
 	}
 }
 
+// generateLogicalConditionOperator generates a logical condition
+// (and / or) from logic where the operator field is present in the config
+// if the config does not abide by the manual, a non-empty list of mistakes is returned
+func generateLogicalConditionOperator(logic map[string]interface{}) (LogicalCondition, []string) {
+	errorList := make([]string, 0)
+	if logic["operator"] == "AND" {
+		and := AndCondition{}
+		for _, condition := range logic["list"].([]interface{}) {
+			newCondition, newErrors := generateLogicalCondition(condition)
+			and.logics = append(and.logics, newCondition)
+			errorList = append(errorList, newErrors...)
+		}
+		return and, errorList
+	} else if logic["operator"] == "OR" {
+		or := OrCondition{}
+		for _, condition := range logic["list"].([]interface{}) {
+			newCondition, newErrors := generateLogicalCondition(condition)
+			or.logics = append(or.logics, newCondition)
+			errorList = append(errorList, newErrors...)
+		}
+		return or, errorList
+	} else {
+		return nil, append(errorList,
+			fmt.Sprintf("JSON config in wrong format, operator: %v, could not be processed", logic["operator"]))
+	}
+}
+
 // generateLogicalConstraint traverses the constraints tree
 // it generates a logicalConstraint which copies this tree
 // this tree includes andConstraints, OrConstraints and Constraints on device components, rule execution or timer status
-// if the config does not follow the manual, a non-empty list of mistakes is returned
+// if the config does not abide by the manual, a non-empty list of mistakes is returned
 func generateLogicalConstraint(constraints interface{}) (LogicalConstraint, []string) {
 	logic := constraints.(map[string]interface{})
-	errorList := make([]string, 0)
 	if logic["operator"] != nil { // operator
-		if logic["operator"] == "AND" {
-			and := AndConstraint{}
-			for _, constraint := range logic["list"].([]interface{}) {
-				newConstraint, newErrors := generateLogicalConstraint(constraint)
-				and.logics = append(and.logics, newConstraint)
-				errorList = append(errorList, newErrors...)
-			}
-			return and, errorList
-		} else if logic["operator"] == "OR" {
-			or := OrConstraint{}
-			for _, constraint := range logic["list"].([]interface{}) {
-				newConstraint, newErrors := generateLogicalConstraint(constraint)
-				or.logics = append(or.logics, newConstraint)
-				errorList = append(errorList, newErrors...)
-			}
-			return or, errorList
-		} else {
-			return nil, append(errorList,
-				fmt.Sprintf("JSON config in wrong format, operator: %v, could not be processed", logic["operator"]))
-		}
+		return generateLogicalConstraintOperator(logic)
 	} else if logic["comparison"] != nil && reflect.TypeOf(logic["comparison"]).Kind() == reflect.String {
-		var constraint Constraint
-		if logic["component_id"] != nil && reflect.TypeOf(logic["component_id"]).Kind() == reflect.String {
-			constraint = Constraint{
-				Comparison:  logic["comparison"].(string),
-				ComponentID: logic["component_id"].(string),
-				Value:       logic["value"],
-			}
-		} else if logic["component_id"] == nil {
-			constraint = Constraint{
-				Comparison:  logic["comparison"].(string),
-				ComponentID: "",
-				Value:       logic["value"],
-			}
-		} else {
-			errorList = append(errorList,
-				fmt.Sprintf("JSON config in wrong format, component_id should be of type string, %v is of type %s",
-					logic["component_id"], reflect.TypeOf(logic["component_id"]).Kind().String()))
-		}
-
-		return constraint, errorList
+		return generateConstraint(logic)
 	}
-	return nil, append(errorList,
-		fmt.Sprintf("JSON config in wrong constraint format, conditions: %v, could not be processed", constraints))
+	return nil, []string{fmt.Sprintf("JSON config in wrong constraint format, conditions: %v, could not be processed", constraints)}
+}
+
+// generateLogicalConstraintOperator generates a logical operator (and / or) from logic where the operator field is present in the config
+// if the config does not abide by the manual, a non-empty list of mistakes is returned
+func generateLogicalConstraintOperator(logic map[string]interface{}) (LogicalConstraint, []string) {
+	errorList := make([]string, 0)
+	if logic["operator"] == "AND" {
+		and := AndConstraint{}
+		for _, constraint := range logic["list"].([]interface{}) {
+			newConstraint, newErrors := generateLogicalConstraint(constraint)
+			and.logics = append(and.logics, newConstraint)
+			errorList = append(errorList, newErrors...)
+		}
+		return and, errorList
+	} else if logic["operator"] == "OR" {
+		or := OrConstraint{}
+		for _, constraint := range logic["list"].([]interface{}) {
+			newConstraint, newErrors := generateLogicalConstraint(constraint)
+			or.logics = append(or.logics, newConstraint)
+			errorList = append(errorList, newErrors...)
+		}
+		return or, errorList
+	} else {
+		return nil, append(errorList,
+			fmt.Sprintf("JSON config in wrong format, operator: %v, could not be processed", logic["operator"]))
+	}
+}
+
+// generateConstraint generates a constraint from logic where the comparator field is present in the config
+// if the config does not abide by the manual, a non-empty list of mistakes is returned
+func generateConstraint(logic map[string]interface{}) (LogicalConstraint, []string) {
+	var constraint Constraint
+	errorList := make([]string, 0)
+	if logic["component_id"] != nil && reflect.TypeOf(logic["component_id"]).Kind() == reflect.String {
+		constraint = Constraint{
+			Comparison:  logic["comparison"].(string),
+			ComponentID: logic["component_id"].(string),
+			Value:       logic["value"],
+		}
+	} else if logic["component_id"] == nil {
+		constraint = Constraint{
+			Comparison:  logic["comparison"].(string),
+			ComponentID: "",
+			Value:       logic["value"],
+		}
+	} else {
+		errorList = append(errorList,
+			fmt.Sprintf("JSON config in wrong format, component_id should be of type string, %v is of type %s",
+				logic["component_id"], reflect.TypeOf(logic["component_id"]).Kind().String()))
+	}
+	return constraint, errorList
 }

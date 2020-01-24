@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from scclib.app import SccLib
 
 
+
 class Device(ABC):
     """
     Abstract device class from which all custom devices should inherit.
