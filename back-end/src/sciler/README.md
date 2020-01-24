@@ -26,5 +26,6 @@ sciler
     │   readConfigTypes.go
     │   workingConfigTypes.go
     │   workingConfigTypes_test.go
+    │   checkConfig.go
 ```
 

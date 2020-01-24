@@ -29,7 +29,6 @@ SCILER
 │   └───src
 │       └───sciler
 │           │   README.md
-│           │   main.go    
 │           │
 │           └───communication
 │           │   
@@ -47,11 +46,10 @@ SCILER
 │   │
 │   └───py_scc
 │   │   │   README.md
-│   │   └───scclib
+│   │   └───sciler
 │   │   
 │   └───js_scc
 │   │   │   README.md
-│   │   │   index.js
 │   │   
 │   └───example_scripts_py_scc
 │   └───example_scripts_js_scc
