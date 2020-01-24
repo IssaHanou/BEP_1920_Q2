@@ -28,7 +28,7 @@
         <div class="left">
           <form (ngSubmit)="setSrc()" class="camera-title">
             <mat-form-field>
-              <mat-select [formControl]="selectedCameraControl" placeholder="Choose camera to see its feed"
+              <mat-select [formControl]="selectedCameraControl" placeholder="Kies camera"
                           (selectionChange)="setSrc()">
                 <mat-option *ngFor="let camera of allCameras()" [value]="camera.name">{{ camera.name }}</mat-option>
               </mat-select>
@@ -36,13 +36,13 @@
           </form>
         </div>
         <div class="center">
-          <mat-checkbox [(ngModel)]="openSecond">Open second camera</mat-checkbox>
+          <mat-checkbox [(ngModel)]="openSecond">Open tweede camera</mat-checkbox>
         </div>
         <div class="right">
           <ng-container *ngIf="openSecond">
             <form (ngSubmit)="setSrc()" class="camera-title">
               <mat-form-field>
-                <mat-select [formControl]="selectedCameraControl2" placeholder="Choose camera to see its feed"
+                <mat-select [formControl]="selectedCameraControl2" placeholder="Kies camera"
                             (selectionChange)="setSrc2()">
                   <mat-option *ngFor="let camera of allCameras()" [value]="camera.name">{{ camera.name }}</mat-option>
                 </mat-select>
