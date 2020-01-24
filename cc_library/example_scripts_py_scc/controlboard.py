@@ -1,7 +1,7 @@
 import os
 import time
 
-from cc_library.src.sciler.scclib.device import Device
+from sciler.device import Device
 from Adafruit_ADS1x15 import ADS1115 as ADC
 
 try:
@@ -14,7 +14,7 @@ class ControlBoard(Device):
     def __init__(self):
 
         two_up = os.path.abspath(os.path.join(__file__, ".."))
-        rel_path = "./controlboard_config.json"
+        rel_path = "controlboard_config.json"
         abs_file_path = os.path.join(two_up, rel_path)
         abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
         config = open(file=abs_file_path)
@@ -122,9 +122,9 @@ class ControlBoard(Device):
         elif instruction == "turnOnOff":
             self.turn_on_off(action.get("component_id"), action.get("value"))
         else:
-            return False, action
+            return False
 
-        return True, None
+        return True
 
     def blink(self, component, args):
         led = getattr(self, component)

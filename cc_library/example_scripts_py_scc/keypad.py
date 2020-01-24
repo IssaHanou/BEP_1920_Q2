@@ -1,5 +1,5 @@
 import os
-from cc_library.src.sciler.scclib.device import Device
+from sciler.device import Device
 
 
 try:
@@ -18,7 +18,7 @@ class Keypad(Device):
         Returns status of all custom components, in json format.
         """
         if self.currentValue == "":
-            return {}
+            return {"code": 0}
 
         return {"code": int(self.currentValue)}
 
@@ -43,11 +43,12 @@ class Keypad(Device):
         Defines a reset sequence for device.
         """
         self.currentValue = ""
+        self.status_changed()
         self.log("reset")
 
     def __init__(self):
         two_up = os.path.abspath(os.path.join(__file__, ".."))
-        rel_path = "./keypad.json"
+        rel_path = "keypad.json"
         abs_file_path = os.path.join(two_up, rel_path)
         abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
         config = open(file=abs_file_path)

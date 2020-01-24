@@ -1,12 +1,12 @@
 import os
 
-from cc_library.src.sciler.scclib.device import Device
+from sciler.device import Device
 
 
 class Display(Device):
     def __init__(self):
         two_up = os.path.abspath(os.path.join(__file__, ".."))
-        rel_path = "./display_config.json"
+        rel_path = "display_config.json"
         abs_file_path = os.path.join(two_up, rel_path)
         abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
         config = open(file=abs_file_path)
@@ -21,8 +21,8 @@ class Display(Device):
         if instruction == "hint":
             self.show_hint(action)
         else:
-            return False, action
-        return True, None
+            return False
+        return True
 
     def test(self):
         self.hint = "test"

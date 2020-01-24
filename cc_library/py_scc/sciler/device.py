@@ -1,8 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
-
-# from scclib.app import SccLib
-from cc_library.src.sciler.scclib.app import SccLib
+from sciler.app import Sciler
 
 
 class Device(ABC):
@@ -46,16 +44,30 @@ class Device(ABC):
     def __init__(self, config):
         """
         The init of the subclass should call this method and also initialize all class attributes.
+        :param config: the config directory
         """
-        self.scclib = SccLib(config, self)
+        self.scclib = Sciler(config, self)
 
     def status_changed(self):
+        """
+        Passes the request to send status too the back-end to the message sender
+        """
         self.scclib.status_changed()
 
     def start(self, loop=None, stop=None):
+        """
+        Passes the request to start the message sender
+        :param loop: possible event loop
+        :param stop: possible end function
+        """
         self.scclib.start(loop, stop)
 
     def log(self, msg, level=logging.INFO):
+        """
+        Use the logger to log messages
+        :param msg: massage to log
+        :param level: level of message
+        """
         self.scclib.log(level, msg)
 
     @abstractmethod
