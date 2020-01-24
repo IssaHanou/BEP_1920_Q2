@@ -59,7 +59,7 @@ export class DeviceComponent implements OnInit {
    */
   getComponents(status: Map<string, any>, deviceId: string): any {
     if (!this.collapsed.get(deviceId)) {
-      return "zie onderdelen en status";
+      return "open onderdelen en status";
     } else if (status.size === 0) {
       return "geen status";
     } else {
