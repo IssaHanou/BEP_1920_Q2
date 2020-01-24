@@ -1,20 +1,11 @@
-```
- ________  ________  ___  ___       _______   ________     
-|\   ____\|\   ____\|\  \|\  \     |\  ___ \ |\   __  \    
-\ \  \___|\ \  \___|\ \  \ \  \    \ \   __/|\ \  \|\  \   
- \ \_____  \ \  \    \ \  \ \  \    \ \  \_|/_\ \   _  _\  
-  \|____|\  \ \  \____\ \  \ \  \____\ \  \_|\ \ \  \\  \| 
-    ____\_\  \ \_______\ \__\ \_______\ \_______\ \__\\ _\ 
-   |\_________\|_______|\|__|\|_______|\|_______|\|__|\|__|
-   \|_________|                                            
-```                                                           
+# Client Computer libraries
 
-### Structure
-There are two versions of the S.C.I.L.E.R. Client Computer Library:
-   - js-scc: a JavaScript version installable by npm, [click here for the  `README.md`](js_scc/README.md)
-   - py-scc: a Python version (will be) installable by pip [click here for the  `README.md`](py_scc/README.md)
+## Deployment
+There are two versions of the sciler Client Computer Library:
+   - a JavaScript version installable by npm, [click here for the  `README.md`](js_scc/README.md)
+   - a Python version (will be) installable by pip [click here for the  `README.md`](py_scc/README.md)
 
-### Client devices without library
+## Development without library
 
 To set up communication with the S.C.I.L.E.R. system without the use of a library, you need to consider the following points:
 
@@ -106,4 +97,41 @@ instruction message:
               }
            ]
         }
+```
+
+## Development
+
+### sciler Javascript
+For checkstyle prettier is used.
+#### Installation prettier
+```
+    npm install --save-dev --save-exact prettier
+    npm install --save-dev tslint-config-prettier
+```
+#### Run prettier manually
+- navigate to `BEP_1920_Q2/front-end/`
+- run `prettier --write "**/*.ts"`
+
+#### uploading library to npm
+in `package.json` change version, then run:
+```
+npm login
+npm publish
+```
+
+### sciler Python
+For checkstyle flake8 and black are used.
+#### Installation black and flake8
+- run `pip install black flake8`
+#### Run black and flake8 manually
+- navigate to `cc_library\py_scc\`
+- run `black sciler`
+- run `flake8 sciler`
+
+#### uploading library to pip
+in setup.py change version, then run:
+```
+pip install twine wheel 
+python setup.py sdist bdist_wheel
+twine upload dist/*
 ```

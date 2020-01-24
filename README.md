@@ -1,4 +1,15 @@
 # BEP_1920_Q2
+```
+ ________  ________  ___  ___       _______   ________     
+|\   ____\|\   ____\|\  \|\  \     |\  ___ \ |\   __  \    
+\ \  \___|\ \  \___|\ \  \ \  \    \ \   __/|\ \  \|\  \   
+ \ \_____  \ \  \    \ \  \ \  \    \ \  \_|/_\ \   _  _\  
+  \|____|\  \ \  \____\ \  \ \  \____\ \  \_|\ \ \  \\  \| 
+    ____\_\  \ \_______\ \__\ \_______\ \_______\ \__\\ _\ 
+   |\_________\|_______|\|__|\|_______|\|_______|\|__|\|__|
+   \|_________|                                            
+```                                                           
+
 [![Build Status](https://travis-ci.com/IssaHanou/BEP_1920_Q2.svg?branch=master)](https://travis-ci.com/IssaHanou/BEP_1920_Q2)
 [![BCH compliance](https://bettercodehub.com/edge/badge/IssaHanou/BEP_1920_Q2?branch=develop-sprint-7)](https://bettercodehub.com/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
