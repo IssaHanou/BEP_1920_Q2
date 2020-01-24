@@ -1,4 +1,0 @@
-flake8
-black
-paho-mqtt
-Adafruit_ADS1x15

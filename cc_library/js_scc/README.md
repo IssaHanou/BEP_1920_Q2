@@ -16,14 +16,8 @@
     - create a constructor which calls the constructor of `Device` with `super(config, logger)` where:
         - config is a dictionary which has keys:
             - `id`: this is the id of a device. Write it in camelCase, e.g. "controlBoard".
-            - `description`: this is optional and can contain more information about the device. This can be displayed in the front-end, so should be readable and in Dutch. 
             - `host`: the IP address of the host for the broker, formatted as a string.
             - `port` the port of the host for the broker, formatted as a number.
-            - `input`: defines type of values to be expected as input as a map. There can be one key `value`, or the keys can be component ids. 
-                The value is a map with the `type` property. This is defined as a string and can "string", "boolean", "array", "integer" or a custom name. 
-            - `output`: defines type of values to be expected as output as a map. There can be one key `value`, or the keys can be component ids. 
-                The value is a map with the `type` property. This is defined as a string and can "string", "boolean", "array", "integer" or a custom name.
-                It can also carry the `instruction` property which defines a map with custom instruction for the device. 
             - `labels`: these are the labels to which this device should also subscribe, labels is an array of strings, 
         - logger is a function(date, level, message) in which an own logger is implemented where
              - `date` is an Date object
@@ -122,19 +116,9 @@ Where `display_config.json` is:
 ```json
 {
   "id": "display-node",
-  "description": "Display can print hints",
   "host": "192.168.178.49",
   "labels": ["hint"],
-  "port": 8083,
-  "input": {},
-  "output": {
-    "display": {
-      "type": "string",
-      "instructions": {
-        "hint": "string"
-      }
-    }
-  }
+  "port": 8083
 }
 ```
 And where `index.html` is:
