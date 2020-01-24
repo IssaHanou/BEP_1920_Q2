@@ -197,8 +197,8 @@ func (and AndCondition) checkConditions(config WorkingConfig, ruleID string) []s
 	return errorList
 }
 
-// checkConditions is a method that checks types and comparator operators by
-// checking the constraints of a condition
+// checkConditions is a method that checks the constraints in a condition
+// this is different from the checkConditions on an OrCondition or an AndCondition since those contain a list of conditions
 func (condition Condition) checkConditions(config WorkingConfig, ruleID string) []string {
 	return condition.Constraints.checkConstraints(condition, config, ruleID)
 }
