@@ -236,7 +236,7 @@
   ],
   "general": {
     "duration": "5m",
-    "host": "192.168.178.82",
+    "host": "localhost",
     "name": "Demo week 6",
     "port": 1883
   },

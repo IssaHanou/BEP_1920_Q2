@@ -1,6 +1,6 @@
 {
   "id": "door",
-  "host": "192.168.178.82",
+  "host": "localhost",
   "labels": [],
   "port": 1883
 }
