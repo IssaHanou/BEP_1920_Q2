@@ -1,4 +1,4 @@
-const Device = require("js-scc"); // production
+const Device = require("sciler"); // production
 
 export class Display extends Device {
   private hint: string;
