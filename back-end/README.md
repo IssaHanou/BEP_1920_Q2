@@ -1,5 +1,7 @@
+# Sciler back-end
+The back-end server contains and manages all logic in the escape room.
 
-## Back-end on Raspberry Pi
+## Deployment on Raspberry Pi
 #### Make config:
 - in directory `back-end` (copy and) rename [resources/`room_config.json.default`](resources/production/room_config.json.default) to `room_config.json`
 - (optional), change this file as desired following the [room_manual.md](resources/manuals/room_manual.md)
@@ -39,13 +41,3 @@ When using Goland uncheck `Use GOPATH that is defined in system environment` and
 
 run `go get ./...` in the `sciler` folder to go get all dependencies
 
-### Setup gofmt and golint to run automatically:
-- install golint: `go get -u golang.org/x/lint/golint`
-- natigate to Settings > Tools > File Watchers 
-- press `+` and select `go fmt`
-- enable auto saved files to trigger the watcher in advanced settings
-- press `ok`
-- select and copy & paste the go fmt watcher
-- edit name and program to `golint`
-- edit arguments to `-set_exit_status $FilePath$`
-- press `ok`
