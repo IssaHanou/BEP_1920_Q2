@@ -13,7 +13,7 @@ func checkConfig(config WorkingConfig) []string {
 	errList := make([]string, 0)
 	for _, puzzle := range config.Puzzles {
 		for _, rule := range puzzle.Event.Rules {
-			if err := rule.Conditions.checkConstraints(config, rule.ID); err != nil {
+			if err := rule.Conditions.checkConditions(config, rule.ID); err != nil {
 				errList = append(errList, err...)
 			}
 			errList = append(errList, checkActions(rule.Actions, config)...)
@@ -22,7 +22,7 @@ func checkConfig(config WorkingConfig) []string {
 
 	for _, generalEvent := range config.GeneralEvents {
 		for _, rule := range generalEvent.Rules {
-			if err := rule.Conditions.checkConstraints(config, rule.ID); err != nil {
+			if err := rule.Conditions.checkConditions(config, rule.ID); err != nil {
 				errList = append(errList, err...)
 			}
 			errList = append(errList, checkActions(rule.Actions, config)...)
@@ -30,7 +30,7 @@ func checkConfig(config WorkingConfig) []string {
 	}
 
 	for _, rule := range config.ButtonEvents {
-		if err := rule.Conditions.checkConstraints(config, rule.ID); err != nil {
+		if err := rule.Conditions.checkConditions(config, rule.ID); err != nil {
 			errList = append(errList, err...)
 		}
 		errList = append(errList, checkActions(rule.Actions, config)...)
@@ -160,7 +160,7 @@ func checkActionLabel(action Action, config WorkingConfig) []string {
 	return errorList
 }
 
-// checkValidComparison checks if the comparison is a valid one
+// checkValidComparison checks if the comparison is a valid one (one that can be used in a condition)
 func checkValidComparison(comparison string) bool {
 	comparisonTypesAllowed := []string{"eq", "lt", "gt", "lte", "gte", "contains", "not"}
 	for _, comp := range comparisonTypesAllowed {
@@ -171,11 +171,12 @@ func checkValidComparison(comparison string) bool {
 	return false
 }
 
-// checkConstraints is a method that checks types and comparator operators
-func (or OrCondition) checkConstraints(config WorkingConfig, ruleID string) []string {
+// checkConditions is a method that checks types and comparator operators by
+// running through all the conditions in de OrCondition and check all those conditions
+func (or OrCondition) checkConditions(config WorkingConfig, ruleID string) []string {
 	errorList := make([]string, 0)
 	for _, logic := range or.logics {
-		err := logic.checkConstraints(config, ruleID)
+		err := logic.checkConditions(config, ruleID)
 		if err != nil {
 			errorList = append(errorList, err...)
 		}
@@ -183,11 +184,12 @@ func (or OrCondition) checkConstraints(config WorkingConfig, ruleID string) []st
 	return errorList
 }
 
-// checkConstraints is a method that checks types and comparator operators
-func (and AndCondition) checkConstraints(config WorkingConfig, ruleID string) []string {
+// checkConditions is a method that checks types and comparator operators by
+// running through all the conditions in de AndCondition and check all those conditions
+func (and AndCondition) checkConditions(config WorkingConfig, ruleID string) []string {
 	errorList := make([]string, 0)
 	for _, logic := range and.logics {
-		err := logic.checkConstraints(config, ruleID)
+		err := logic.checkConditions(config, ruleID)
 		if err != nil {
 			errorList = append(errorList, err...)
 		}
@@ -195,12 +197,14 @@ func (and AndCondition) checkConstraints(config WorkingConfig, ruleID string) []
 	return errorList
 }
 
-// checkConstraints is a method that checks types and comparator operators
-func (condition Condition) checkConstraints(config WorkingConfig, ruleID string) []string {
+// checkConditions is a method that checks types and comparator operators by
+// checking the constraints of a condition
+func (condition Condition) checkConditions(config WorkingConfig, ruleID string) []string {
 	return condition.Constraints.checkConstraints(condition, config, ruleID)
 }
 
-// checkConstraints is a method that checks types and comparator operators
+// checkConstraints is a method that checks types and comparator operators by
+// running through all the conditions in de OrConstraint and check all those constraints
 func (or OrConstraint) checkConstraints(condition Condition, config WorkingConfig, ruleID string) []string {
 	errorList := make([]string, 0)
 	for _, logic := range or.logics {
@@ -212,7 +216,8 @@ func (or OrConstraint) checkConstraints(condition Condition, config WorkingConfi
 	return errorList
 }
 
-// checkConstraints is a method that checks types and comparator operators
+// checkConstraints is a method that checks types and comparator operators by
+// running through all the conditions in de AndConstraint and check all those constraints
 func (and AndConstraint) checkConstraints(condition Condition, config WorkingConfig, ruleID string) []string {
 	errorList := make([]string, 0)
 	for _, logic := range and.logics {
@@ -224,7 +229,8 @@ func (and AndConstraint) checkConstraints(condition Condition, config WorkingCon
 	return errorList
 }
 
-// checkConstraints is a method that checks types and comparator operators
+// checkConstraints is a method that checks types and comparator operators by
+// checking the conditionType and call the correct check for that type
 func (constraint Constraint) checkConstraints(condition Condition, config WorkingConfig, ruleID string) []string {
 	switch condition.Type {
 	case "device":

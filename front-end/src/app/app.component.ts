@@ -355,9 +355,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
     this.nameOfRoom = jsonData.name;
 
     this.setupCameras(jsonData.cameras);
-    console.log(jsonData);
     this.setupButtons(jsonData.buttons);
-    this.resetFrontEndStatus();
     this.setupPuzzles(jsonData.events);
     this.setupHints(jsonData.hints);
   }
@@ -380,14 +378,13 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
    * @param buttonData json containing list with buttons
    */
   private setupButtons(buttonData) {
-    console.log("buttons:");
-    console.log(buttonData);
     this.manageButtons = new Buttons();
     if (buttonData !== null) {
       for (const btn of buttonData) {
         this.manageButtons.setButton(btn);
       }
     }
+    this.resetFrontEndStatus();
   }
 
   /**
