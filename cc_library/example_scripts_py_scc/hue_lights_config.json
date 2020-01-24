@@ -1,6 +1,6 @@
 {
   "id": "hue_lights",
-  "description": "4 spotlights",
   "host": "localhost",
   "port": 1883
+  "label":[]
 }
