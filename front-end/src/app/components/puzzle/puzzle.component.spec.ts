@@ -50,7 +50,7 @@ describe("PuzzleComponent", () => {
     const compiled = fixture.debugElement.nativeElement;
     const tableHeaders = compiled.querySelectorAll("th");
     expect(tableHeaders.item(0).textContent).toContain("Puzzel");
-    expect(tableHeaders.item(1).textContent).toContain("Status");
+    expect(tableHeaders.item(1).textContent).toContain("Opgelost");
     expect(tableHeaders.item(2).textContent).toContain("Beschrijving");
     expect(tableHeaders.item(3).textContent).toContain("Puzzel af");
   });
