@@ -10,13 +10,13 @@ This is the library to create devices to work together with the SCILER system
 - import lib with `from scclib.device import Device`
 ##### create a class that extends `Device`
 - in order to do this:
-    - implement getStatus() which should return a dictionary of the current status
-    - implement performInstruction(action) which should return a boolean of whether the instruction can be performed, where action has:
+    - implement `getStatus()` which should return a dictionary of the current status
+    - implement `performInstruction(action)` which should return a boolean of whether the instruction can be performed, where action has:
         - `instruction`: string with the name of the instruction
         - `value`: any type with a value specific for this instruction
         - `component_id`: string with the name of the component for which the instruction is meant (can be undefined) 
-    - implement test() which returns nothing, this method should do something visible so the operator can test this device works correctly
-    - implement reset() which returns nothing, this method should make the device return to its starting state so that the escape room can be started again
+    - implement `test()` which returns nothing, this method should do something visible so the operator can test this device works correctly
+    - implement `reset()` which returns nothing, this method should make the device return to its starting state so that the escape room can be started again
     - create a constructor which calls the constructor of `Device` with `super(config, logger)` where:
         - config is a dictionary which has keys:
             - `id`: this is the id of a device. Write it in camelCase, e.g. "controlBoard".
@@ -28,13 +28,13 @@ This is the library to create devices to work together with the SCILER system
              - `level` is one of the following strings: 'debug', 'info', 'warn', 'error', 'fatal'
              - `message` is a custom string containing more information
         - it should also add event listeners to GPIO for all input components.
-    - implement main() which should call start(loop, stop) with an optional event loop and ending function.  
+    - implement `main()` which should call `start(loop, stop)` with an optional event loop and ending function.  
 ##### Now in your class which implements `Device` 
 - you can call:
-    - log(level, message) which logs using the logger provided in `Device` where level one of the following strings: 'debug', 'info', 'warn', 'error', 'fatal' and message custom string containing more information
-    - statusChanged() which can be called to signal to `Device` that the status is changed, this will send a new status to SCILER
+    - `log(level, message)` which logs using the logger provided in `Device` where level one of the following strings: 'debug', 'info', 'warn', 'error', 'fatal' and message custom string containing more information
+    -  `statusChanged()` which can be called to signal to `Device` that the status is changed, this will send a new status to SCILER
 ##### To now start the system
- - initialize the device in your main program and call device.main() 
+ - initialize the device in your main program and call `device.main() `
 
 ### Example
 ```python
@@ -96,7 +96,7 @@ where `display_config.json` is
   "port": 1883
 }
 ```
-example of main() with loop and stop:
+example of `main()` with loop and stop:
 ```python
     def loop(self):
         previous = self.get_sliders_analog_reading()
