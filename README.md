@@ -1,6 +1,8 @@
 # BEP_1920_Q2
 [![BCH compliance](https://bettercodehub.com/edge/badge/IssaHanou/BEP_1920_Q2?branch=develop-sprint-7)](https://bettercodehub.com/)
 
+[![Build Status](https://travis-ci.com/IssaHanou/BEP_1920_Q2.svg?branch=master)](https://travis-ci.com/IssaHanou/BEP_1920_Q2)
+
 The front-end will be developed in Angular with TypeScript, all source code can be found in `front-end/`.
 
 The back-end will be developed in Go, all source code can be found in `back-end/`.
