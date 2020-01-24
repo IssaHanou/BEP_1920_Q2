@@ -274,7 +274,7 @@ class SccLib:
     def __do_custom_instruction(self, action):
         """
         Methods that performs custom instruction
-        :param action: dictionary with the action details such as instruction, component_id and value
+        :param action: dictionary with action details such as instruction, component_id and value
         :return: boolean whether the instruction was performed successfully
         """
         (success, failed_action) = self.device.perform_instruction(
