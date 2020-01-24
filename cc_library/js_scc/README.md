@@ -1,10 +1,10 @@
-## js-scc [(see npm)](https://www.npmjs.com/package/js-scc)
+## sciler [(see npm)](https://www.npmjs.com/package/sciler)
 
 ### Installation
-- npm install with ```npm install js-scc```
+- npm install with ```npm install sciler```
 
 ### Using this library
-- import lib with ```const Device = require("js-scc");```
+- import lib with ```const Device = require("sciler");```
 - create a class that extends `Device`, in order to do this:
     - implement getStatus() which should return a dictionary of the current status
     - implement performInstruction(action) which should return a boolean of whether the instruction can be performed, where action has:
@@ -28,14 +28,14 @@
     - log(level, message) which logs using the logger provided in `Device` where level one of the following strings: 'debug', 'info', 'warn', 'error', 'fatal' and message custom string containing more information
     - statusChanged() which can be called to signal to `Device` that the status is changed, this will send a new status to SCILER
 - in case of:
-    - angular: add `js-scc` to dependencies in `package.json`
+    - angular: add `sciler` to dependencies in `package.json`
     - browser javascript: (example nodejs serving web page with javascript which includes this library), [Browserify](http://browserify.org/) your javascript which includes this library.
 
 ### Example
 Javascript file:
 ```javascript
 $(document).ready(function() {
-  const Device = require("js-scc");
+  const Device = require("sciler");
   let display;
 
   class Display extends Device {
