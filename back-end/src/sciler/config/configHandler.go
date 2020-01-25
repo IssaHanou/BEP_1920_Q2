@@ -320,6 +320,9 @@ func generateRules(readRules []ReadRule, config *WorkingConfig) ([]*Rule, []stri
 // this tree includes andConditions, OrConditions and Conditions which put Constraints on a device, rule or timer
 // if the config does not abide by the manual, a non-empty list of mistakes is returned
 func generateLogicalCondition(conditions interface{}) (LogicalCondition, []string) {
+	if conditions == nil {
+		return nil, make([]string, 0)
+	}
 	logic := conditions.(map[string]interface{})
 	errorList := make([]string, 0)
 	if logic["operator"] != nil { // operator

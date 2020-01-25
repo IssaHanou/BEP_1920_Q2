@@ -96,7 +96,7 @@ func checkActionDevice(action Action, config WorkingConfig) []string {
 			if outputObject, ok := device.Output[actionMessage.ComponentID]; ok {
 				if instructionType, ok := outputObject.Instructions[actionMessage.Instruction]; ok {
 					if err := checkActionInstructionType(reflect.TypeOf(actionMessage.Value).Kind(), instructionType, actionMessage.Value); err != nil {
-						errorList = append(errorList, "level III - implementation error: "+err.Error())
+						errorList = append(errorList, err.Error())
 					}
 				} else {
 					errorList = append(errorList, fmt.Sprintf("level III - implementation error: instruction %s not found in map", actionMessage.Instruction))

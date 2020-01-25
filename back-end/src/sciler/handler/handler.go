@@ -252,7 +252,7 @@ func (handler *Handler) onTestDevice(deviceID string, instructor string) {
 }
 
 // onResetAll is the function to process the instruction `finish rule`
-// finish rule is instructed then the "voer uit" button of a rule is clicked in the front-end
+// finish rule is instructed when the "puzzel eindigen" button of a rule is clicked in the front-end
 func (handler *Handler) onFinishRule(ruleID string) {
 	rule, ok := handler.Config.RuleMap[ruleID]
 	if !ok {
@@ -275,13 +275,13 @@ func (handler *Handler) onHint(hint string, instructor string) {
 
 // onCheckConfig is the function to process the instruction `check config`
 // checks the config and sends a message containing all errors it could find
-func (handler *Handler) onCheckConfig(configToRead interface{}, configName string) {
+func (handler *Handler) onCheckConfig(configToRead interface{}, fileName string) {
 	message := Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "config",
 		Contents: map[string]interface{}{
-			"name":   configName,
+			"name":   fileName,
 			"errors": handler.checkConfig(configToRead),
 		},
 	}
@@ -329,7 +329,7 @@ func (handler *Handler) checkConfig(configToRead interface{}) []string {
 	errors := make([]string, 0)
 	jsonBytes, err := json.Marshal(configToRead)
 	if err != nil {
-		errors = append(errors, fmt.Sprintf("could not unmarshal json, %v", err))
+		errors = append(errors, fmt.Sprintf("level I: JSON error - could not unmarshal json, %v", err))
 	} else {
 		newConfig, errorList := config.ReadJSON(jsonBytes)
 
