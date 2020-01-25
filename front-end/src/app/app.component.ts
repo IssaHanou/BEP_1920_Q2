@@ -155,7 +155,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
     this.mqttService.unsafePublish("back-end", jsonMessage);
     for (const inst of instructions) {
       if ("config" in inst) {
-        msg.contents = { config: "contents to long to print" };
+        msg.contents = { config: "contents to long to print", name: inst.name };
         jsonMessage = JSON.stringify(this.jsonConvert.serialize(msg));
       }
     }

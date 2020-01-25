@@ -321,7 +321,7 @@ func generateRules(readRules []ReadRule, config *WorkingConfig) ([]*Rule, []stri
 // if the config does not abide by the manual, a non-empty list of mistakes is returned
 func generateLogicalCondition(conditions interface{}) (LogicalCondition, []string) {
 	if conditions == nil {
-		return nil, make([]string, 0)
+		return AndCondition{}, make([]string, 0)
 	}
 	logic := conditions.(map[string]interface{})
 	errorList := make([]string, 0)
