@@ -41,6 +41,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   manageButtons: Buttons;
   hintList: Hint[];
   configErrorList: string[];
+  uploadedConfig = "";
   cameras: Camera[];
   selectedCamera: string;
   selectedCamera2: string;
@@ -228,6 +229,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
       }
       // when a config is checked by the back-end it returns a list of found errors, these should be displayed
       case "config": {
+        this.uploadedConfig = msg.contents.name;
         this.configErrorList = msg.contents.errors;
         break;
       }

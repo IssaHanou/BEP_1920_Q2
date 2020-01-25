@@ -11,7 +11,6 @@ import { AppComponent } from "../app.component";
 })
 export class ConfigComponent implements OnInit {
   reader: FileReader;
-  uploaded = "";
   data = "";
   errors: string[];
   currentFile: File;
@@ -29,18 +28,18 @@ export class ConfigComponent implements OnInit {
     this.reader.addEventListener("load", e => {
       this.data = e.target[res];
       this.errors = [];
-      this.app.configErrorList = [];
       this.app.sendInstruction([
         {
           instruction: "check config",
-          config: JSON.parse(this.data)
+          config: JSON.parse(this.data),
+          name: this.currentFile.name
         }
       ]);
     });
     this.reader.addEventListener("error", e => {
       this.errors.push(e.target[res]);
       this.app.logger.log("error", "error while reading file");
-      this.uploaded = "Error tijdens uploaden: " + e.target[res];
+      this.app.uploadedConfig = "Error tijdens uploaden: " + e.target[res];
     });
   }
 
@@ -52,7 +51,6 @@ export class ConfigComponent implements OnInit {
   checkFile(files: FileList) {
     this.currentFile = files.item(0);
     this.reader.readAsText(this.currentFile, "UTF-8");
-    this.uploaded = "Uploaden gelukt: " + this.currentFile.name + "!";
   }
 
   /**
@@ -88,5 +86,12 @@ export class ConfigComponent implements OnInit {
    */
   noErrors(): boolean {
     return this.errors.length === 0 && this.app.configErrorList.length === 0;
+  }
+
+  /**
+   * Return the name of the uploaded config file.
+   */
+  getUploaded(): string {
+    return this.app.uploadedConfig;
   }
 }

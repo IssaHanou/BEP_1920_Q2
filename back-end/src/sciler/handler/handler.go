@@ -198,7 +198,7 @@ func (handler *Handler) handleInstruction(instruction map[string]interface{}, in
 	case "hint":
 		handler.onHint(instruction["value"].(string), instructor)
 	case "check config":
-		handler.onCheckConfig(instruction["config"])
+		handler.onCheckConfig(instruction["config"], instruction["name"].(string))
 	case "use config":
 		handler.onUseConfig(instruction["config"], instruction["file"].(string))
 	default:
@@ -275,12 +275,15 @@ func (handler *Handler) onHint(hint string, instructor string) {
 
 // onCheckConfig is the function to process the instruction `check config`
 // checks the config and sends a message containing all errors it could find
-func (handler *Handler) onCheckConfig(configToRead interface{}) {
+func (handler *Handler) onCheckConfig(configToRead interface{}, configName string) {
 	message := Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "config",
-		Contents: map[string][]string{"errors": handler.checkConfig(configToRead)},
+		Contents: map[string]interface{}{
+			"name":   configName,
+			"errors": handler.checkConfig(configToRead),
+		},
 	}
 	jsonMessage, _ := json.Marshal(&message)
 	handler.Communicator.Publish("front-end", string(jsonMessage), 3)

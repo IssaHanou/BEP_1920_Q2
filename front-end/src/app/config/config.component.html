@@ -6,14 +6,14 @@
       <input id="inputFile" class="original-config-button" type="file" accept="application/json"
              (change)="checkFile($event.target.files)" >
     </div>
-    <p class="uploadString">{{ uploaded }}</p>
-    <div *ngIf="uploaded != '' && !noErrors()" class="file-output-errors">
+    <p class="uploadString">{{ getUploaded() }}</p>
+    <div *ngIf="getUploaded() != '' && !noErrors()" class="file-output-errors">
       <mat-list class="error-list">
         <mat-list-item class="error-list-title">Errors</mat-list-item>
         <mat-list-item *ngFor="let error of getErrors()">{{ error }}</mat-list-item>
       </mat-list>
     </div>
-    <div *ngIf="uploaded != '' && noErrors()" class="file-output-no-errors">
+    <div *ngIf="getUploaded() != '' && noErrors()" class="file-output-no-errors">
       <mat-list class="error-list">
         <mat-list-item class="error-list-title">Errors</mat-list-item>
         <mat-list-item>Geen errors gevonden!</mat-list-item>
