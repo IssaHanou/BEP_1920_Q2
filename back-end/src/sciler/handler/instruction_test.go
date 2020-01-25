@@ -11,7 +11,7 @@ import (
 )
 
 ////////////////////////////// Instruction tests //////////////////////////////
-func TestInstructionSetUp(t *testing.T) {
+func TestInstructionSetup(t *testing.T) {
 	communicatorMock := new(CommunicatorMock)
 	workingConfig := config.ReadFile("../../../resources/testing/test_setup.json")
 	handler := Handler{
@@ -59,7 +59,7 @@ func TestInstructionSetUp(t *testing.T) {
 			"status":     map[string]interface{}{},
 		},
 	})
-	returnMessage, _ := json.Marshal(Message{
+	returnMessage1, _ := json.Marshal(Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "setup",
@@ -88,6 +88,35 @@ func TestInstructionSetUp(t *testing.T) {
 			},
 		},
 	})
+	returnMessage2, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "setup",
+		Contents: map[string]interface{}{
+			"name": "Escape X",
+			"hints": map[string][]string{
+				"Telefoon puzzels": {"De knop verzend jouw volgorde", "Heb je al even gewacht?"},
+				"Control puzzel":   {"Zet de schuiven nauwkeurig"},
+			},
+			"events": map[string]string{
+				"correctSequence": "De juiste volgorde van cijfers moet gedraaid worden.",
+			},
+			"cameras": []map[string]string{
+				{"link": "https://raccoon.games", "name": "camera1"},
+				{"link": "https://debrouwerij.io", "name": "camera2"},
+			},
+			"buttons": []map[string]interface{}{
+				{
+					"id":       "stop",
+					"disabled": true,
+				},
+				{
+					"id":       "start",
+					"disabled": false,
+				},
+			},
+		},
+	})
 	statusMessageFrontEnd, _ := json.Marshal(Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
@@ -99,21 +128,6 @@ func TestInstructionSetUp(t *testing.T) {
 				"start":     false,
 				"stop":      false,
 				"gameState": "gereed"},
-		},
-	})
-	frontEndStatusMessage, _ := json.Marshal(Message{
-		DeviceID: "back-end",
-		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "front-end status",
-		Contents: []map[string]interface{}{
-			{
-				"id":       "start",
-				"disabled": false,
-			},
-			{
-				"id":       "stop",
-				"disabled": true,
-			},
 		},
 	})
 	messageEventStatus, _ := json.Marshal(Message{
@@ -128,14 +142,15 @@ func TestInstructionSetUp(t *testing.T) {
 		},
 	})
 
-	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)
-	communicatorMock.On("Publish", "front-end", string(messageEventStatus), 3)
-	communicatorMock.On("Publish", "telephone", string(statusInstructionMsg), 3)
-	communicatorMock.On("Publish", "front-end", string(statusInstructionMsg), 3)
-	communicatorMock.On("Publish", "front-end", string(statusMessageFrontEnd), 3)
-	communicatorMock.On("Publish", "front-end", string(timerGeneralMessage), 3)
-	communicatorMock.On("Publish", "front-end", string(statusMessage), 3)
-	communicatorMock.On("Publish", "front-end", string(frontEndStatusMessage), 3)
+	communicatorMock.On("Publish", "front-end", string(returnMessage1), 3) // only one of these should be called (button order is random)
+	communicatorMock.On("Publish", "front-end", string(returnMessage2), 3) // only one of these should be called (button order is random)
+	communicatorMock.On("Publish", "front-end", string(timerGeneralMessage), 3).Once()
+	communicatorMock.On("Publish", "front-end", string(statusMessage), 3).Once()
+	communicatorMock.On("Publish", "telephone", string(statusInstructionMsg), 3).Once()
+	communicatorMock.On("Publish", "front-end", string(statusMessageFrontEnd), 3).Once()
+	communicatorMock.On("Publish", "front-end", string(statusMessageFrontEnd), 3).Once()
+	communicatorMock.On("Publish", "front-end", string(statusInstructionMsg), 3).Once()
+	communicatorMock.On("Publish", "front-end", string(messageEventStatus), 3).Once()
 	handler.msgMapper(instructionMsg)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 7)
 }
@@ -613,4 +628,23 @@ func TestSendInstructionDelay(t *testing.T) {
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
 	time.Sleep(1 * time.Second)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
+}
+
+func TestOnInstructionMsgSendStatus(t *testing.T) {
+	msg := Message{
+		DeviceID: "front-end",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "instruction",
+		Contents: []map[string]interface{}{{
+			"instruction": "send status",
+		}},
+	}
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_instruction.json"),
+		Communicator: communicatorMock,
+	}
+	communicatorMock.On("Publish", "front-end", mock.AnythingOfType("string"), 3)
+	handler.onInstructionMsg(msg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 10)
 }

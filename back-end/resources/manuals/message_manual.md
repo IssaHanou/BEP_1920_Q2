@@ -25,7 +25,7 @@ are specific defined depending on the sender and receiver.
 ##### example
     { 
     "device_id": "back-end",
-    "time_sent": "17-1-2019 16:20",
+    "time_sent": "17-1-2019 16:20:21",
     "type": "instruction",
     "contents": [
             {
@@ -59,7 +59,7 @@ are specific defined depending on the sender and receiver.
 ##### Example   
     { 
     "device_id": "controlBoard",
-    "time_sent": "17-1-2019 16:20",
+    "time_sent": "17-1-2019 16:20:20",
     "type": "status",
     "contents": {
         "redSwitch": true 
@@ -76,7 +76,7 @@ are specific defined depending on the sender and receiver.
 ##### Example
     { 
     "device_id": "front-end",
-    "time_sent": "17-1-2019 16:20",
+    "time_sent": "17-1-2019 16:20:20",
     "type": "instruction",
     "contents": [{
             "instruction":"finish rule",
@@ -122,7 +122,7 @@ are specific defined depending on the sender and receiver.
 ##### example
     { 
     "device_id": "back-end",
-    "time_sent": "17-1-2019 16:20",
+    "time_sent": "17-1-2019 16:20:20",
     "type": "status",
     "contents": [
             { 

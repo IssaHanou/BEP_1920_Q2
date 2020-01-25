@@ -135,9 +135,12 @@ func (t *Timer) Stop() error {
 
 // Done finishes the timer as if it ran out of time
 // can not finish a timer that is already Expired
-func (t *Timer) Done() error {
+func (t *Timer) Done(handler InstructionSender) error {
 	if t.State == "stateExpired" {
 		return fmt.Errorf("timer %v is already Expired and can not be finished again", t.ID)
+	}
+	if t.State == "stateIdle" {
+		t.Start(handler)
 	}
 	t.Ending()
 	t.T.Stop()
@@ -308,12 +311,6 @@ func (condition Condition) GetConditionIDs() []string {
 	return []string{condition.TypeID}
 }
 
-// checkConstraints is a method that checks types and comparator operators
-func (condition Condition) checkConstraints(config WorkingConfig, ruleID string) []string {
-	// todo check if type id exists
-	return condition.Constraints.checkConstraints(condition, config, ruleID)
-}
-
 // Resolve is a method that checks if a condition is met
 func (condition Condition) Resolve(config WorkingConfig) bool {
 	return condition.Constraints.Resolve(condition, config)
@@ -324,135 +321,6 @@ type Constraint struct {
 	Comparison  string
 	ComponentID string
 	Value       interface{}
-}
-
-// checkConstraints is a method that checks types and comparator operators
-func (constraint Constraint) checkConstraints(condition Condition, config WorkingConfig, ruleID string) []string {
-	switch condition.Type {
-	case "device":
-		{
-			if device, ok := config.Devices[condition.TypeID]; ok { // checks if device can be found in the map, if so, it is stored in variable device
-				valueType := reflect.TypeOf(constraint.Value).Kind()
-				if inputType, ok := device.Input[constraint.ComponentID]; ok {
-					return checkDeviceConstraint(inputType, valueType, constraint, ruleID)
-				} else if output, ok := device.Output[constraint.ComponentID]; ok {
-					return checkDeviceConstraint(output.Type, valueType, constraint, ruleID)
-				} else {
-					return []string{fmt.Sprintf("on rule %s: component with id %s not found in input or output map", ruleID, constraint.ComponentID)}
-				}
-			} else {
-				return []string{fmt.Sprintf("on rule %s: device with id %s not found in device map", ruleID, condition.TypeID)}
-			}
-		}
-	case "timer":
-		if _, ok := config.Timers[condition.TypeID]; ok {
-			valueType := reflect.TypeOf(constraint.Value).Kind()
-			comparison := constraint.Comparison
-			if valueType != reflect.Bool {
-				return []string{fmt.Sprintf("on rule %s: timer input type boolean expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
-			}
-			if !CheckValidComparison(comparison) {
-				return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
-			}
-			if comparison != "eq" {
-				return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on a boolean", ruleID, comparison)}
-			}
-
-		} else {
-			return []string{fmt.Sprintf("on rule %s: timer with id %s not found in map", ruleID, condition.TypeID)}
-		}
-	case "rule":
-		if _, ok := config.RuleMap[condition.TypeID]; ok { // checks if rule can be found in the map, if so, it is stored in variable device
-			valueType := reflect.TypeOf(constraint.Value).Kind()
-			comparison := constraint.Comparison
-			if valueType != reflect.Int && valueType != reflect.Float64 {
-				return []string{fmt.Sprintf("on rule %s: rule value type numeric expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
-			}
-			if !CheckValidComparison(comparison) {
-				return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
-			}
-			if comparison == "contains" {
-				return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on rule", ruleID, comparison)}
-			}
-		} else {
-			return []string{fmt.Sprintf("on rule %s: rule with id %s not found in map", ruleID, condition.TypeID)}
-		}
-	default:
-		return []string{fmt.Sprintf("on rule %s: invalid type of condition: %v", ruleID, condition.Type)}
-	}
-	// all cases for errors are already handled
-	return make([]string, 0)
-}
-
-// checkDeviceConstraint checks that the typeToCheck (input or output type that is expected from config for certain component)
-// matches the valueType that was found in the constraint.
-// The constraint comparison is checked to be valid and of the proper type, depending on the typeToCheck
-func checkDeviceConstraint(typeToCheck string, valueType reflect.Kind, constraint Constraint, ruleID string) []string {
-	switch typeToCheck {
-	case "string":
-		{
-			if valueType != reflect.String {
-				return []string{fmt.Sprintf("on rule %s: device input/output type string expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
-			}
-			if !CheckValidComparison(constraint.Comparison) {
-				return []string{fmt.Sprintf("on rule %s: device comparison %s is not valid", ruleID, constraint.Comparison)}
-			}
-			if constraint.Comparison != "eq" && constraint.Comparison != "not" {
-				return []string{fmt.Sprintf("on rule %s: device comparison %s not allowed on a string", ruleID, constraint.Comparison)}
-			}
-		}
-	case "boolean":
-		{
-			if valueType != reflect.Bool {
-				return []string{fmt.Sprintf("on rule %s: device input/output type boolean expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
-			}
-			if !CheckValidComparison(constraint.Comparison) {
-				return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, constraint.Comparison)}
-			}
-			if constraint.Comparison != "eq" {
-				return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on a boolean", ruleID, constraint.Comparison)}
-			}
-		}
-	case "numeric":
-		{
-			if valueType != reflect.Int && valueType != reflect.Float64 {
-				return []string{fmt.Sprintf("on rule %s: device input/output numeric expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
-			}
-			if !CheckValidComparison(constraint.Comparison) {
-				return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, constraint.Comparison)}
-			}
-			if constraint.Comparison == "contains" {
-				return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on a numeric", ruleID, constraint.Comparison)}
-			}
-		}
-	case "array":
-		{
-			if valueType != reflect.Slice {
-				return []string{fmt.Sprintf("on rule %s: device input/output array/slice expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
-			}
-			if !CheckValidComparison(constraint.Comparison) {
-				return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, constraint.Comparison)}
-			}
-			if constraint.Comparison != "contains" && constraint.Comparison != "eq" && constraint.Comparison != "not" {
-				return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on an array", ruleID, constraint.Comparison)}
-			}
-		}
-	default:
-		// todo custom types
-		return []string{fmt.Sprintf("on rule %s: custom types like: %s, are not yet implemented", ruleID, typeToCheck)}
-	}
-	return make([]string, 0)
-}
-
-// CheckValidComparison checks if the comparison is a valid one
-func CheckValidComparison(comparison string) bool {
-	comparisonTypesAllowed := []string{"eq", "lt", "gt", "lte", "gte", "contains", "not"}
-	for _, comp := range comparisonTypesAllowed {
-		if comp == comparison {
-			return true
-		}
-	}
-	return false
 }
 
 // Resolve is a method that checks if a constraint is met
@@ -484,7 +352,7 @@ func (constraint Constraint) Resolve(condition Condition, config WorkingConfig) 
 // LogicalCondition is an interface for operators and conditions
 type LogicalCondition interface {
 	Resolve(config WorkingConfig) bool
-	checkConstraints(config WorkingConfig, ruleID string) []string
+	checkConditions(config WorkingConfig, ruleID string) []string
 	GetConditionIDs() []string
 }
 
@@ -500,18 +368,6 @@ func (and AndCondition) GetConditionIDs() []string {
 		IDs = append(IDs, logic.GetConditionIDs()...)
 	}
 	return IDs
-}
-
-// checkConstraints is a method that checks types and comparator operators
-func (and AndCondition) checkConstraints(config WorkingConfig, ruleID string) []string {
-	errorList := make([]string, 0)
-	for _, logic := range and.logics {
-		err := logic.checkConstraints(config, ruleID)
-		if err != nil {
-			errorList = append(errorList, err...)
-		}
-	}
-	return errorList
 }
 
 // Resolve is a method that checks if a condition is met
@@ -537,18 +393,6 @@ func (or OrCondition) GetConditionIDs() []string {
 	return IDs
 }
 
-// checkConstraints is a method that checks types and comparator operators
-func (or OrCondition) checkConstraints(config WorkingConfig, ruleID string) []string {
-	errorList := make([]string, 0)
-	for _, logic := range or.logics {
-		err := logic.checkConstraints(config, ruleID)
-		if err != nil {
-			errorList = append(errorList, err...)
-		}
-	}
-	return errorList
-}
-
 // Resolve is a method that checks if a condition is met
 func (or OrCondition) Resolve(config WorkingConfig) bool {
 	result := false
@@ -569,20 +413,8 @@ type AndConstraint struct {
 	logics []LogicalConstraint
 }
 
-// checkConstraints is a method that checks types and comparator operators
-func (and AndConstraint) checkConstraints(condition Condition, config WorkingConfig, ruleID string) []string {
-	errorList := make([]string, 0)
-	for _, logic := range and.logics {
-		err := logic.checkConstraints(condition, config, ruleID)
-		if err != nil {
-			errorList = append(errorList, err...)
-		}
-	}
-	return errorList
-}
-
 // Resolve is a method that checks if a constraint is met
-func (and AndConstraint) Resolve(condition Condition, config WorkingConfig) bool { // todo: make lazy
+func (and AndConstraint) Resolve(condition Condition, config WorkingConfig) bool {
 	result := true
 	for _, logic := range and.logics {
 		result = result && logic.Resolve(condition, config)
@@ -595,20 +427,8 @@ type OrConstraint struct {
 	logics []LogicalConstraint
 }
 
-// checkConstraints is a method that checks types and comparator operators
-func (or OrConstraint) checkConstraints(condition Condition, config WorkingConfig, ruleID string) []string {
-	errorList := make([]string, 0)
-	for _, logic := range or.logics {
-		err := logic.checkConstraints(condition, config, ruleID)
-		if err != nil {
-			errorList = append(errorList, err...)
-		}
-	}
-	return errorList
-}
-
 // Resolve is a method that checks if a constraint is met
-func (or OrConstraint) Resolve(condition Condition, config WorkingConfig) bool { // todo: make lazy
+func (or OrConstraint) Resolve(condition Condition, config WorkingConfig) bool {
 	result := false
 	for _, logic := range or.logics {
 		result = result || logic.Resolve(condition, config)

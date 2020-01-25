@@ -197,7 +197,6 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
    */
   private processMessage(jsonMessage: string) {
     const msg: Message = Message.deserialize(jsonMessage);
-
     switch (msg.type) {
       case "confirmation": {
         this.processConfirmation(msg);
@@ -208,12 +207,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
         break;
       }
       case "status": {
-        this.deviceList.setDevice(msg.contents);
-
-        // When the back-end/front-end disconnects, all devices are disconnected
-        if (msg.contents.id === "front-end" && !msg.contents.connection) {
-          this.setConnectionAllDevices(false);
-        }
+        this.processStatus(msg);
         break;
       }
       case "event status": {
@@ -229,7 +223,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
         break;
       }
       case "setup": {
-        this.processSetUp(msg.contents);
+        this.processSetup(msg.contents);
         break;
       }
       // when a config is checked by the back-end it returns a list of found errors, these should be displayed
@@ -302,6 +296,19 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
+   * Process status messages.
+   * @param msg the status message
+   */
+  private processStatus(msg: Message) {
+    this.deviceList.setDevice(msg.contents);
+
+    // When the back-end/front-end disconnects, all devices are disconnected
+    if (msg.contents.id === "front-end" && !msg.contents.connection) {
+      this.setConnectionAllDevices(false);
+    }
+  }
+
+  /**
    * Get all the front-end's components' status,
    * which is the status of the buttons (pressed or not) and the game state
    * and send message to back-end.
@@ -344,18 +351,33 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
    *
    * @param jsonData with name, camera, buttons, events, hints
    */
-  private processSetUp(jsonData) {
+  private processSetup(jsonData) {
     this.nameOfRoom = jsonData.name;
 
-    const cameraData = jsonData.cameras;
+    this.setupCameras(jsonData.cameras);
+    this.setupButtons(jsonData.buttons);
+    this.setupPuzzles(jsonData.events);
+    this.setupHints(jsonData.hints);
+  }
+
+  /**
+   * Sets cameras up given new cameraData
+   * @param cameraData Camera array
+   */
+  private setupCameras(cameraData: Camera[]) {
     this.cameras = [];
     if (cameraData !== null) {
       for (const cam of cameraData) {
         this.cameras.push(new Camera(cam));
       }
     }
+  }
 
-    const buttonData = jsonData.buttons;
+  /**
+   * Sets buttons up given new buttonData
+   * @param buttonData json containing list with buttons
+   */
+  private setupButtons(buttonData) {
     this.manageButtons = new Buttons();
     if (buttonData !== null) {
       for (const btn of buttonData) {
@@ -363,23 +385,33 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
       }
     }
     this.resetFrontEndStatus();
+  }
 
-    const rules = jsonData.events;
+  /**
+   * Sets puzzles up given new rules
+   * @param rules json containing list of events
+   */
+  private setupPuzzles(rules) {
     this.puzzleList = new Puzzles();
     for (const rule in rules) {
       if (rules.hasOwnProperty(rule)) {
         this.puzzleList.addPuzzle(rule, rules[rule]);
       }
     }
+  }
 
-    const allHints = jsonData.hints;
+  /**
+   * Sets hints up given all puzzles
+   * @param puzzles json containing list of puzzles
+   */
+  private setupHints(puzzles) {
     this.hintList = [];
-    for (const puzzle in allHints) {
-      if (allHints.hasOwnProperty(puzzle)) {
+    for (const puzzle in puzzles) {
+      if (puzzles.hasOwnProperty(puzzle)) {
         const hints = [];
-        for (const index in allHints[puzzle]) {
-          if (allHints[puzzle].hasOwnProperty(index)) {
-            hints.push(allHints[puzzle][index]);
+        for (const index in puzzles[puzzle]) {
+          if (puzzles[puzzle].hasOwnProperty(index)) {
+            hints.push(puzzles[puzzle][index]);
           }
         }
         this.hintList.push(new Hint(puzzle, hints));

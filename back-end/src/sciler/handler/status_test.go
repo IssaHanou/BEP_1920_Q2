@@ -75,7 +75,6 @@ func TestOnStatusMsg(t *testing.T) {
 			component: "testComponent7",
 			status:    []int{1, 2, 3},
 		},
-		// TODO implement custom
 		{
 			name:      "component8 test",
 			component: "testComponent8",

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"math"
@@ -68,8 +69,7 @@ func getTestHandler() *Handler {
 		},
 	}
 	messageHandler := Handler{Config: workingConfig, ConfigFile: "fake file name"}
-	communicator := communication.NewCommunicator(workingConfig.General.Host,
-		workingConfig.General.Port, []string{"back-end", "test"}, messageHandler.NewHandler, func() {})
+	communicator := communication.NewCommunicator(workingConfig, messageHandler.NewHandler, func() {})
 	messageHandler.Communicator = communicator
 	return &messageHandler
 }
@@ -448,10 +448,6 @@ func TestHandleDoubleEvent(t *testing.T) {
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 4)
 	// if this test becomes flaky (only when this test takes longer then 1 second),
 	// (message expected includes time...), replace the messages with 'mock.Anything'
-
-	// TODO: to restore test so that the message are checked again:
-	//  - duplicate the publish front-end line,
-	//  - replace 'mock.Anything' with the correct messages
 }
 
 ////////////////////////////// Error/irregular behavior tests //////////////////////////////
@@ -607,6 +603,31 @@ func TestInstructionFromWrongDevice(t *testing.T) {
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 0)
 }
 
+func TestInstructionUnknownInstruction(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	workingConfig := config.ReadFile("../../../resources/testing/test_config.json")
+	handler := Handler{
+		Config:       workingConfig,
+		ConfigFile:   "../../../resources/testing/test_config.json",
+		Communicator: communicatorMock,
+	}
+	instructionMsg := Message{
+		DeviceID: "front-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{
+				"instruction": "unknown instruction",
+				"value":       "some value",
+			},
+		},
+	}
+	jsonHintMessage, _ := json.Marshal(&instructionMsg)
+	communicatorMock.On("Publish", "hint", string(jsonHintMessage), 3)
+	handler.msgMapper(instructionMsg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 0)
+}
+
 func TestSendStatusUnknownDevice(t *testing.T) {
 	communicatorMock := new(CommunicatorMock)
 	workingConfig := config.ReadFile("../../../resources/testing/test_config.json")
@@ -670,6 +691,54 @@ func TestOnInstructionMsgInvalidConfig(t *testing.T) {
 	}
 	configToTest := math.Inf(1)
 	communicatorMock.On("Publish", "front-end", mock.Anything, 3)
-	handler.processConfig(configToTest, "check", fileName)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 0)
+	assert.False(t, len(handler.checkConfig(configToTest)) == 0)
+}
+
+type MqttMessageMock struct {
+	mock.Mock
+}
+
+func (m MqttMessageMock) Duplicate() bool {
+	panic("implement me")
+}
+
+func (m MqttMessageMock) Qos() byte {
+	panic("implement me")
+}
+
+func (m MqttMessageMock) Retained() bool {
+	panic("implement me")
+}
+
+func (m MqttMessageMock) Topic() string {
+	panic("implement me")
+}
+
+func (m MqttMessageMock) MessageID() uint16 {
+	panic("implement me")
+}
+
+func (m MqttMessageMock) Payload() []byte {
+	json, _ := json.Marshal(Message{
+		DeviceID: "front-end",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "instruction",
+		Contents: []map[string]interface{}{},
+	})
+	return json
+}
+
+func (m MqttMessageMock) Ack() {
+	panic("implement me")
+}
+
+func TestNewHandler(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_instruction.json"),
+		Communicator: communicatorMock,
+	}
+	communicatorMock.On("Publish", "front-end", mock.AnythingOfType("string"), 3)
+	handler.NewHandler(mqtt.NewClient(mqtt.NewClientOptions()), new(MqttMessageMock))
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 0) // MqttMessageMock has a instruction with an empty list of instructions so no response is expected
 }
