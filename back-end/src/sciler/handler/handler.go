@@ -334,10 +334,10 @@ func (handler *Handler) checkConfig(configToRead interface{}) []string {
 		newConfig, errorList := config.ReadJSON(jsonBytes)
 
 		if newConfig.General.Host != handler.Config.General.Host {
-			errorList = append(errorList, "host: different from current host for front and back-end")
+			errorList = append(errorList, "level IV: system error - host: different from current host for front and back-end")
 		}
 		if newConfig.General.Port != handler.Config.General.Port {
-			errorList = append(errorList, "port: different from current port for front and back-end")
+			errorList = append(errorList, "level IV: system error - port: different from current port for front and back-end")
 		}
 		errors = append(errors, errorList...)
 	}

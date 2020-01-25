@@ -54,7 +54,7 @@ func checkActions(actions []Action, config WorkingConfig) []string {
 			errorList = append(errorList, checkActionLabel(action, config)...)
 		default:
 			errorList = append(errorList,
-				fmt.Sprintf("only device, timer and label are accepted as type for an action, however type was specified as: %s", action.Type))
+				fmt.Sprintf("level III - implementation error: only device, timer and label are accepted as type for an action, however type was specified as: %s", action.Type))
 		}
 	}
 	return errorList
@@ -71,18 +71,18 @@ func checkActionTimer(action Action, config WorkingConfig) []string {
 				valueType := reflect.TypeOf(actionMessage.Value).Kind()
 				if valueType != reflect.String {
 					errorList = append(errorList,
-						fmt.Sprintf("input type string expected but %s found as type of value %v",
+						fmt.Sprintf("level III - implementation error: input type string expected but %s found as type of value %v",
 							valueType.String(), actionMessage.Value))
 				}
 				break
 			case "start", "pause", "stop", "done":
 				break
 			default:
-				errorList = append(errorList, fmt.Sprintf("instruction %s is not defined for a timer", actionMessage.Instruction))
+				errorList = append(errorList, fmt.Sprintf("level III - implementation error: instruction %s is not defined for a timer", actionMessage.Instruction))
 			}
 		}
 	} else {
-		errorList = append(errorList, fmt.Sprintf("timer with id %s not found in map", action.TypeID))
+		errorList = append(errorList, fmt.Sprintf("level III - implementation error: timer with id %s not found in map", action.TypeID))
 	}
 	return errorList
 }
@@ -96,17 +96,17 @@ func checkActionDevice(action Action, config WorkingConfig) []string {
 			if outputObject, ok := device.Output[actionMessage.ComponentID]; ok {
 				if instructionType, ok := outputObject.Instructions[actionMessage.Instruction]; ok {
 					if err := checkActionInstructionType(reflect.TypeOf(actionMessage.Value).Kind(), instructionType, actionMessage.Value); err != nil {
-						errorList = append(errorList, err.Error())
+						errorList = append(errorList, "level III - implementation error: "+err.Error())
 					}
 				} else {
-					errorList = append(errorList, fmt.Sprintf("instruction %s not found in map", actionMessage.Instruction))
+					errorList = append(errorList, fmt.Sprintf("level III - implementation error: instruction %s not found in map", actionMessage.Instruction))
 				}
 			} else {
-				errorList = append(errorList, fmt.Sprintf("component with id %s not found in map", actionMessage.ComponentID))
+				errorList = append(errorList, fmt.Sprintf("level III - implementation error: component with id %s not found in map", actionMessage.ComponentID))
 			}
 		}
 	} else {
-		errorList = append(errorList, fmt.Sprintf("device with id %s not found in map", action.TypeID))
+		errorList = append(errorList, fmt.Sprintf("level III - implementation error: device with id %s not found in map", action.TypeID))
 	}
 	return errorList
 }
@@ -116,26 +116,26 @@ func checkActionInstructionType(valueType reflect.Kind, instructionType string, 
 	switch instructionType {
 	case "string":
 		if valueType != reflect.String {
-			return fmt.Errorf("instruction type string expected but %s found as type of value %v",
+			return fmt.Errorf("level III - implementation error: instruction type string expected but %s found as type of value %v",
 				valueType.String(), value)
 		}
 	case "boolean":
 		if valueType != reflect.Bool {
-			return fmt.Errorf("instruction type boolean expected but %s found as type of value %v",
+			return fmt.Errorf("level III - implementation error: instruction type boolean expected but %s found as type of value %v",
 				valueType.String(), value)
 		}
 	case "numeric":
 		if valueType != reflect.Int && valueType != reflect.Float64 {
-			return fmt.Errorf("instruction type numeric expected but %s found as type of value %v",
+			return fmt.Errorf("level III - implementation error: instruction type numeric expected but %s found as type of value %v",
 				valueType.String(), value)
 		}
 	case "array":
 		if valueType != reflect.Slice {
-			return fmt.Errorf("instruction type array/slice expected but %s found as type of value %v",
+			return fmt.Errorf("level III - implementation error: instruction type array/slice expected but %s found as type of value %v",
 				valueType.String(), value)
 		}
 	default:
-		return fmt.Errorf("custom types like: %s, are not yet implemented", instructionType)
+		return fmt.Errorf("level III - implementation error: custom types like: %s, are not yet implemented", instructionType)
 	}
 	return nil
 }
@@ -155,7 +155,7 @@ func checkActionLabel(action Action, config WorkingConfig) []string {
 		}
 	} else {
 		errorList = append(errorList,
-			fmt.Sprintf("label with id %s not found in map", action.TypeID))
+			fmt.Sprintf("level III - implementation error: label with id %s not found in map", action.TypeID))
 	}
 	return errorList
 }
@@ -240,7 +240,7 @@ func (constraint Constraint) checkConstraints(condition Condition, config Workin
 	case "rule":
 		return checkConstraintsRule(condition, config, ruleID, constraint)
 	default:
-		return []string{fmt.Sprintf("on rule %s: invalid type of condition: %v", ruleID, condition.Type)}
+		return []string{fmt.Sprintf("level III - implementation error: on rule %s: invalid type of condition: %v", ruleID, condition.Type)}
 	}
 }
 
@@ -252,10 +252,10 @@ func checkConstraintsDevice(condition Condition, config WorkingConfig, ruleID st
 		} else if outputObject, ok := device.Output[constraint.ComponentID]; ok {
 			return constraint.checkConstraintsDeviceType(outputObject.Type, ruleID)
 		} else {
-			return []string{fmt.Sprintf("on rule %s: component with id %s not found in map", ruleID, constraint.ComponentID)}
+			return []string{fmt.Sprintf("level III - implementation error: on rule %s: component with id %s not found in map", ruleID, constraint.ComponentID)}
 		}
 	} else {
-		return []string{fmt.Sprintf("on rule %s: device with id %s not found in map", ruleID, condition.TypeID)}
+		return []string{fmt.Sprintf("level III - implementation error: on rule %s: device with id %s not found in map", ruleID, condition.TypeID)}
 	}
 }
 
@@ -264,7 +264,7 @@ func checkConstraintsTimer(condition Condition, config WorkingConfig, ruleID str
 	if _, ok := config.Timers[condition.TypeID]; ok {
 		return checkConstraintsBooleanType(ruleID, constraint)
 	}
-	return []string{fmt.Sprintf("on rule %s: timer with id %s not found in map", ruleID, condition.TypeID)}
+	return []string{fmt.Sprintf("level III - implementation error: on rule %s: timer with id %s not found in map", ruleID, condition.TypeID)}
 }
 
 // checkConstraintsRule is a method that check all types and comparators of a constraint on a rule
@@ -273,16 +273,16 @@ func checkConstraintsRule(condition Condition, config WorkingConfig, ruleID stri
 		valueType := reflect.TypeOf(constraint.Value).Kind()
 		comparison := constraint.Comparison
 		if valueType != reflect.Int && valueType != reflect.Float64 {
-			return []string{fmt.Sprintf("on rule %s: value type numeric expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
+			return []string{fmt.Sprintf("level III - implementation error: on rule %s: value type numeric expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
 		}
 		if !checkValidComparison(comparison) {
-			return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
+			return []string{fmt.Sprintf("level III - implementation error: on rule %s: comparison %s is not valid", ruleID, comparison)}
 		}
 		if comparison == "contains" {
-			return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on rule", ruleID, comparison)}
+			return []string{fmt.Sprintf("level III - implementation error: on rule %s: comparison %s not allowed on rule", ruleID, comparison)}
 		}
 	} else {
-		return []string{fmt.Sprintf("on rule %s: rule with id %s not found in map", ruleID, condition.TypeID)}
+		return []string{fmt.Sprintf("level III - implementation error: on rule %s: rule with id %s not found in map", ruleID, condition.TypeID)}
 	}
 	// all cases for errors are already handled
 	return make([]string, 0)
@@ -300,7 +300,7 @@ func (constraint Constraint) checkConstraintsDeviceType(typeToCheck string, rule
 	case "array":
 		return checkConstraintsDeviceArrayType(ruleID, constraint)
 	default:
-		return []string{fmt.Sprintf("on rule %s: custom types like: %s, are not yet implemented", ruleID, typeToCheck)}
+		return []string{fmt.Sprintf("level III - implementation error: on rule %s: custom types like: %s, are not yet implemented", ruleID, typeToCheck)}
 	}
 }
 
@@ -310,13 +310,13 @@ func checkConstraintsDeviceStringType(ruleID string, constraint Constraint) []st
 	valueType := reflect.TypeOf(constraint.Value).Kind()
 	comparison := constraint.Comparison
 	if valueType != reflect.String {
-		return []string{fmt.Sprintf("on rule %s: type string expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
+		return []string{fmt.Sprintf("level III - implementation error: on rule %s: type string expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
 	}
 	if !checkValidComparison(comparison) {
-		return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
+		return []string{fmt.Sprintf("level III - implementation error: on rule %s: comparison %s is not valid", ruleID, comparison)}
 	}
 	if comparison != "eq" && comparison != "not" {
-		return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on a string", ruleID, comparison)}
+		return []string{fmt.Sprintf("level III - implementation error: on rule %s: comparison %s not allowed on a string", ruleID, comparison)}
 	}
 	// all cases for errors are already handled
 	return make([]string, 0)
@@ -328,13 +328,13 @@ func checkConstraintsBooleanType(ruleID string, constraint Constraint) []string 
 	valueType := reflect.TypeOf(constraint.Value).Kind()
 	comparison := constraint.Comparison
 	if valueType != reflect.Bool {
-		return []string{fmt.Sprintf("on rule %s: type boolean expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
+		return []string{fmt.Sprintf("level III - implementation error: on rule %s: type boolean expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
 	}
 	if !checkValidComparison(comparison) {
-		return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
+		return []string{fmt.Sprintf("level III - implementation error: on rule %s: comparison %s is not valid", ruleID, comparison)}
 	}
 	if comparison != "eq" {
-		return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on a boolean", ruleID, comparison)}
+		return []string{fmt.Sprintf("level III - implementation error: on rule %s: comparison %s not allowed on a boolean", ruleID, comparison)}
 	}
 	// all cases for errors are already handled
 	return make([]string, 0)
@@ -346,13 +346,13 @@ func checkConstraintsDeviceNumericType(ruleID string, constraint Constraint) []s
 	valueType := reflect.TypeOf(constraint.Value).Kind()
 	comparison := constraint.Comparison
 	if valueType != reflect.Int && valueType != reflect.Float64 {
-		return []string{fmt.Sprintf("on rule %s: type numeric expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
+		return []string{fmt.Sprintf("level III - implementation error: on rule %s: type numeric expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
 	}
 	if !checkValidComparison(comparison) {
-		return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
+		return []string{fmt.Sprintf("level III - implementation error: on rule %s: comparison %s is not valid", ruleID, comparison)}
 	}
 	if comparison == "contains" {
-		return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on a numeric", ruleID, comparison)}
+		return []string{fmt.Sprintf("level III - implementation error: on rule %s: comparison %s not allowed on a numeric", ruleID, comparison)}
 	}
 	// all cases for errors are already handled
 	return make([]string, 0)
@@ -364,13 +364,13 @@ func checkConstraintsDeviceArrayType(ruleID string, constraint Constraint) []str
 	valueType := reflect.TypeOf(constraint.Value).Kind()
 	comparison := constraint.Comparison
 	if valueType != reflect.Slice {
-		return []string{fmt.Sprintf("on rule %s: type array/slice expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
+		return []string{fmt.Sprintf("level III - implementation error: on rule %s: type array/slice expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
 	}
 	if !checkValidComparison(comparison) {
-		return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
+		return []string{fmt.Sprintf("level III - implementation error: on rule %s: comparison %s is not valid", ruleID, comparison)}
 	}
 	if comparison != "contains" && comparison != "eq" && comparison != "not" {
-		return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on an array", ruleID, comparison)}
+		return []string{fmt.Sprintf("level III - implementation error: on rule %s: comparison %s not allowed on an array", ruleID, comparison)}
 	}
 	// all cases for errors are already handled
 	return make([]string, 0)

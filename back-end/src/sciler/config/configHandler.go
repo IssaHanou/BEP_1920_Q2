@@ -16,7 +16,7 @@ func ReadFile(filename string) WorkingConfig {
 	dat, err := ioutil.ReadFile(filename)
 	errorList := make([]string, 0)
 	if err != nil {
-		errorList = append(errorList, errors.New("Could not read file "+filename).Error())
+		errorList = append(errorList, errors.New("could not read file "+filename).Error())
 		panic(errorList[0])
 	}
 	config, jsonErrors := ReadJSON(dat)
@@ -36,7 +36,7 @@ func ReadJSON(input []byte) (WorkingConfig, []string) {
 	var config ReadConfig
 	jsonErr := json.Unmarshal(input, &config)
 	if jsonErr != nil {
-		return WorkingConfig{}, []string{jsonErr.Error()}
+		return WorkingConfig{}, []string{"level I - JSON error: " + jsonErr.Error()}
 	}
 	newConfig, configErr := generateDataStructures(config)
 	return newConfig, configErr
@@ -128,14 +128,14 @@ func generateTimers(timers []ReadTimer, config *WorkingConfig) (map[string]*Time
 	for _, readTimer := range timers {
 		duration, err := time.ParseDuration(readTimer.Duration)
 		if err != nil {
-			errorList = append(errorList, err.Error())
+			errorList = append(errorList, "level II - format error: "+err.Error())
 		} else {
 			newTimers[readTimer.ID] = newTimer(readTimer.ID, duration)
 		}
 	}
 	duration, err := time.ParseDuration(config.General.Duration)
 	if err != nil {
-		errorList = append(errorList, err.Error())
+		errorList = append(errorList, "level II - format error: "+err.Error())
 	} else {
 		newTimers["general"] = newTimer("general", duration)
 	}
@@ -337,7 +337,7 @@ func generateLogicalCondition(conditions interface{}) (LogicalCondition, []strin
 		return AndCondition{}, errorList
 	} else {
 		return nil, append(errorList,
-			fmt.Sprintf("JSON config in wrong condition format, conditions: %v, could not be processed", conditions))
+			fmt.Sprintf("level II - format error: JSON config in wrong condition format, conditions: %v, could not be processed", conditions))
 	}
 }
 
@@ -364,7 +364,7 @@ func generateLogicalConditionOperator(logic map[string]interface{}) (LogicalCond
 		return or, errorList
 	} else {
 		return nil, append(errorList,
-			fmt.Sprintf("JSON config in wrong format, operator: %v, could not be processed", logic["operator"]))
+			fmt.Sprintf("level II - format error: JSON config in wrong format, operator: %v, could not be processed", logic["operator"]))
 	}
 }
 
@@ -379,7 +379,7 @@ func generateLogicalConstraint(constraints interface{}) (LogicalConstraint, []st
 	} else if logic["comparison"] != nil && reflect.TypeOf(logic["comparison"]).Kind() == reflect.String {
 		return generateConstraint(logic)
 	}
-	return nil, []string{fmt.Sprintf("JSON config in wrong constraint format, conditions: %v, could not be processed", constraints)}
+	return nil, []string{fmt.Sprintf("level II - format error: JSON config in wrong constraint format, conditions: %v, could not be processed", constraints)}
 }
 
 // generateLogicalConstraintOperator generates a logical operator (and / or) from logic where the operator field is present in the config
@@ -404,7 +404,7 @@ func generateLogicalConstraintOperator(logic map[string]interface{}) (LogicalCon
 		return or, errorList
 	} else {
 		return nil, append(errorList,
-			fmt.Sprintf("JSON config in wrong format, operator: %v, could not be processed", logic["operator"]))
+			fmt.Sprintf("level II - format error: JSON config in wrong format, operator: %v, could not be processed", logic["operator"]))
 	}
 }
 
@@ -427,7 +427,7 @@ func generateConstraint(logic map[string]interface{}) (LogicalConstraint, []stri
 		}
 	} else {
 		errorList = append(errorList,
-			fmt.Sprintf("JSON config in wrong format, component_id should be of type string, %v is of type %s",
+			fmt.Sprintf("level II - format error: JSON config in wrong format, component_id should be of type string, %v is of type %s",
 				logic["component_id"], reflect.TypeOf(logic["component_id"]).Kind().String()))
 	}
 	return constraint, errorList

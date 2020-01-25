@@ -31,13 +31,13 @@ export class ConfigComponent implements OnInit {
       this.app.sendInstruction([
         {
           instruction: "check config",
-          config: JSON.parse(this.data),
+          config: this.getJSONConfig(),
           name: this.currentFile.name
         }
       ]);
     });
     this.reader.addEventListener("error", e => {
-      this.errors.push(e.target[res]);
+      this.errors.push("level I - file error: " + e.target[res]);
       this.app.logger.log("error", "error while reading file");
       this.app.uploadedConfig = "Error tijdens uploaden: " + e.target[res];
     });
@@ -61,10 +61,23 @@ export class ConfigComponent implements OnInit {
     this.app.sendInstruction([
       {
         instruction: "use config",
-        config: JSON.parse(this.data),
+        config: this.getJSONConfig(),
         file: this.currentFile.name
       }
     ]);
+  }
+
+  /**
+   * Parses JSON and catches error when JSON is invalid.
+   */
+  getJSONConfig() {
+    try{
+      return JSON.parse(this.data)
+    } catch (e) {
+      this.errors.push("level I - JSON error: "+ e);
+      this.app.logger.log("error", "error while reading file");
+      this.app.uploadedConfig = "Error tijdens uploaden: " + e;
+    }
   }
 
   /**
@@ -72,10 +85,10 @@ export class ConfigComponent implements OnInit {
    */
   getErrors(): string[] {
     const list = [];
-    for (const err of this.app.configErrorList) {
+    for (const err of this.errors) {
       list.push(err);
     }
-    for (const err of this.errors) {
+    for (const err of this.app.configErrorList) {
       list.push(err);
     }
     return list;
