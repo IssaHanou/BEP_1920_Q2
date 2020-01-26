@@ -331,10 +331,6 @@ func (constraint Constraint) checkConstraintsDeviceType(typeToCheck string, rule
 // checkConstraintsDeviceStringType is a method that returns all error (if any)
 // in a constraint of a device with string type constraint
 func checkConstraintsDeviceStringType(ruleID string, deviceID string, constraint Constraint) []string {
-	if constraint.Value == nil {
-		return []string{fmt.Sprintf("level III - implementation error: on rule %s, constraint on device with id %s: value was nil",
-			ruleID, deviceID)}
-	}
 	valueType := reflect.TypeOf(constraint.Value).Kind()
 	comparison := constraint.Comparison
 	if valueType != reflect.String {

@@ -414,6 +414,7 @@ func TestInstructionCheckConfigNoErrors(t *testing.T) {
 			{
 				"instruction": "check config",
 				"config":      configToTest,
+				"name":        "testFile",
 			},
 		},
 	}
@@ -421,8 +422,9 @@ func TestInstructionCheckConfigNoErrors(t *testing.T) {
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "config",
-		Contents: map[string][]string{
-			"errors": {},
+		Contents: map[string]interface{}{
+			"errors": []string{},
+			"name":   "testFile",
 		},
 	}
 	jsonMessage, _ := json.Marshal(&returnMsg)
@@ -448,22 +450,26 @@ func TestInstructionCheckConfigWithErrors(t *testing.T) {
 		DeviceID: "front-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "instruction",
-		Contents: []map[string]interface{}{{
-			"instruction": "check config",
-			"config":      configToTest},
+		Contents: []map[string]interface{}{
+			{
+				"instruction": "check config",
+				"config":      configToTest,
+				"name":        "testFile",
+			},
 		},
 	}
 	returnMsg := Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "config",
-		Contents: map[string][]string{
-			"errors": {
-				"time: unknown unit x in duration 10x",
-				"time: missing unit in duration 30",
-				"host: different from current host for front and back-end",
-				"port: different from current port for front and back-end",
+		Contents: map[string]interface{}{
+			"errors": []string{
+				"level II - format error: time: unknown unit x in duration 10x",
+				"level II - format error: time: missing unit in duration 30",
+				"level IV - system error: host: different from current host for front and back-end",
+				"level IV - system error: port: different from current port for front and back-end",
 			},
+			"name": "testFile",
 		},
 	}
 	jsonMessage, _ := json.Marshal(&returnMsg)

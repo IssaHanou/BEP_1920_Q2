@@ -49,7 +49,7 @@ export class ConfigComponent implements OnInit {
    * When clicking the upload button, first reset the file, so the same one can be entered again for re-checking.
    */
   resetCurrentFile(event) {
-    event.target.value=null
+    event.target.value = null;
   }
 
   /**
@@ -57,7 +57,6 @@ export class ConfigComponent implements OnInit {
    * Only one file can be submitted.
    */
   checkFile(files: FileList) {
-    console.log(this.currentFile);
     this.currentFile = files.item(0);
     this.reader.readAsText(this.currentFile, "UTF-8");
   }

@@ -329,15 +329,15 @@ func (handler *Handler) checkConfig(configToRead interface{}) []string {
 	errors := make([]string, 0)
 	jsonBytes, err := json.Marshal(configToRead)
 	if err != nil {
-		errors = append(errors, fmt.Sprintf("level I: JSON error - could not unmarshal json, %v", err))
+		errors = append(errors, fmt.Sprintf("level I - JSON error: could not unmarshal json, %v", err))
 	} else {
 		newConfig, errorList := config.ReadJSON(jsonBytes)
 
 		if newConfig.General.Host != handler.Config.General.Host {
-			errorList = append(errorList, "level IV: system error - host: different from current host for front and back-end")
+			errorList = append(errorList, "level IV - system error: host: different from current host for front and back-end")
 		}
 		if newConfig.General.Port != handler.Config.General.Port {
-			errorList = append(errorList, "level IV: system error - port: different from current port for front and back-end")
+			errorList = append(errorList, "level IV - system error: port: different from current port for front and back-end")
 		}
 		errors = append(errors, errorList...)
 	}
