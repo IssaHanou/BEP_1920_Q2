@@ -12,10 +12,10 @@
       "description": "client computer to test latency",
       "input": {},
       "output": {
-        "pinged": {
-          "type": "boolean",
+        "ping": {
+          "type": "numeric",
           "instructions": {
-            "ping": "boolean"
+            "ping": "numeric"
           }
         }
       }

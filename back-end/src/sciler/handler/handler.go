@@ -123,7 +123,7 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 		return
 	}
 	msg := original.(map[string]interface{})
-	instructionContents, err := GetMapSlice(msg["contents"])
+	instructionContents, err := getMapSlice(msg["contents"])
 	if err != nil {
 		logger.Errorf(err.Error())
 		return

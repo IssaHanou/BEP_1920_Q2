@@ -20,8 +20,12 @@ import (
 // Make sure when running windows, the setup in systemtesting/README.md is followed
 
 func TestLatency(t *testing.T) {
-	// start broker
-	// start latency client
+	// edit mosquitto.conf bind address to local ip of the Pi
+	// start broker with `mosquitto -c mosquitto.conf`
+	// edit latency_config.json host to local ip of the Pi
+	// start latency client with python3 latency.py
+
+	// run this test
 
 	receiveTimes := make(map[int]int64, 100)
 
@@ -35,6 +39,8 @@ func TestLatency(t *testing.T) {
 	configurations := config.ReadFile(filename)
 	logger.SetLevel(logger.ErrorLevel)
 
+	loop := true
+
 	messageHandler := handler.Handler{Config: configurations, ConfigFile: filename}
 	messageHandler.Communicator = communication.NewCommunicator(configurations, func(client mqtt.Client, message mqtt.Message) {
 		var msg handler.Message
@@ -44,7 +50,11 @@ func TestLatency(t *testing.T) {
 
 		if msg.Type == "status" {
 			contents := msg.Contents.(map[string]interface{})
-			receiveTimes[int(contents["ping"].(float64))] = makeTimestamp()
+			i := int(contents["ping"].(float64))
+			if receiveTimes[i] == 0 {
+				receiveTimes[i] = makeTimestamp()
+				loop = false
+			}
 		}
 
 	}, func() {
@@ -54,10 +64,12 @@ func TestLatency(t *testing.T) {
 	messageHandler.Communicator.Start()
 
 	const numberOfMessage = 100
+	var meanLatency float64
+	var minLatency int64
+	var maxLatency int64
 
 	requestTimes := make(map[int]int64, 100)
 	for i := 0; i < numberOfMessage; i++ {
-
 		// Send instruction to Client computer
 		requestTimes[i] = makeTimestamp()
 		messageHandler.SendComponentInstruction("latency", []config.ComponentInstruction{{
@@ -66,27 +78,36 @@ func TestLatency(t *testing.T) {
 			Value:       i,
 		}}, "")
 
-	}
+		// wait for status update
+		for loop {
+			time.Sleep(1 * time.Nanosecond)
+		}
 
-	time.Sleep(1 * time.Second)
-
-	var meanLatency float64
-
-	for i := 0; i < numberOfMessage; i++ {
 		assert.False(t, receiveTimes[i] == 0, "Did not receive an status message in time")
 		latency := receiveTimes[i] - requestTimes[i]
-		fmt.Println(receiveTimes[i])
-		fmt.Println(requestTimes[i])
-		fmt.Println(latency)
 		assert.Truef(t, latency <= 100, "the latency of all messages should be <= 100 ms but latency was %v ms", latency)
 		meanLatency += float64(latency) / numberOfMessage
+		if i == 0 {
+			minLatency = latency
+			maxLatency = latency
+		} else {
+			if minLatency > latency {
+				minLatency = latency
+			}
+			if maxLatency < latency {
+				maxLatency = latency
+			}
+		}
+		loop = true
 	}
 
 	fmt.Println(fmt.Sprintf("%d messages were sent with a mean latency of %v ms", numberOfMessage, meanLatency))
+	fmt.Println(fmt.Sprintf("with a minimal latency of %v ms", minLatency))
+	fmt.Println(fmt.Sprintf("with a maximal latency of %v ms", maxLatency))
 }
 
 func makeTimestamp() int64 {
-	return time.Now().UnixNano() / (int64(time.Millisecond)/int64(time.Nanosecond))
+	return time.Now().UnixNano() / (int64(time.Millisecond) / int64(time.Nanosecond))
 }
 
 func executeScript(script string) {

@@ -1,0 +1,6 @@
+{
+  "id": "latency",
+  "host": "localhost",
+  "labels": [],
+  "port": 1883
+}
