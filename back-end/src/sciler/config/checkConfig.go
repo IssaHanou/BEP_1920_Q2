@@ -54,8 +54,7 @@ func checkActions(actions []Action, config WorkingConfig, ruleID string) []strin
 			errorList = append(errorList, action.checkActionLabel(config, ruleID)...)
 		default:
 			errorList = append(errorList,
-				fmt.Sprintf("level III - implementation error: on rule %s: only device, timer and label are accepted as type for an action, however type was specified as: %s",
-					ruleID, action.Type))
+				fmt.Sprintf("level III - implementation error: on rule %s: only device, timer and label are accepted as type for an action, however type was specified as: %s", ruleID, action.Type))
 		}
 	}
 	return errorList
@@ -76,13 +75,11 @@ func (action Action) checkActionTimer(config WorkingConfig, ruleID string) []str
 			case "start", "pause", "stop", "done":
 				break
 			default:
-				errorList = append(errorList, fmt.Sprintf("level III - implementation error: on rule %s, actions for timer with id %s: instruction '%s' is not defined for a timer",
-					ruleID, action.TypeID, actionMessage.Instruction))
+				errorList = append(errorList, fmt.Sprintf("level III - implementation error: on rule %s, actions for timer with id %s: instruction '%s' is not defined for a timer", ruleID, action.TypeID, actionMessage.Instruction))
 			}
 		}
 	} else {
-		errorList = append(errorList, fmt.Sprintf("level III - implementation error: on rule %s's actions: timer with id %s not found in timer map",
-			ruleID, action.TypeID))
+		errorList = append(errorList, fmt.Sprintf("level III - implementation error: on rule %s's actions: timer with id %s not found in timer map", ruleID, action.TypeID))
 	}
 	return errorList
 }
@@ -111,13 +108,11 @@ func (action Action) checkActionDevice(config WorkingConfig, ruleID string) []st
 					errorList = append(errorList, err)
 				}
 			} else {
-				errorList = append(errorList, fmt.Sprintf("level III - implementation error: on rule %s, actions for device with id %s: component with id %s not found in map",
-					ruleID, action.TypeID, actionMessage.ComponentID))
+				errorList = append(errorList, fmt.Sprintf("level III - implementation error: on rule %s, actions for device with id %s: component with id %s not found in map", ruleID, action.TypeID, actionMessage.ComponentID))
 			}
 		}
 	} else {
-		errorList = append(errorList, fmt.Sprintf("level III - implementation error: on rule %s, actions for device with id %s: device with id %s not found in device map",
-			ruleID, action.TypeID, action.TypeID))
+		errorList = append(errorList, fmt.Sprintf("level III - implementation error: on rule %s, actions for device with id %s: device with id %s not found in device map", ruleID, action.TypeID, action.TypeID))
 	}
 	return errorList
 }
