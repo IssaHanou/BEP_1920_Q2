@@ -340,11 +340,8 @@ func generateLogicalCondition(conditions interface{}, ruleID string) (LogicalCon
 		return condition, append(errorList, newErrors...)
 	} else if len(logic) == 0 { // When `conditions` in config is empty, create empty condition
 		return AndCondition{}, errorList
-	} else {
-		return nil, append(errorList,
-			fmt.Sprintf("level II - format error: on rule with id %s: JSON config in wrong condition format, conditions: %v, could not be processed",
-				ruleID, conditions))
 	}
+	return nil, append(errorList, fmt.Sprintf("level II - format error: on rule with id %s: JSON config in wrong condition format, conditions: %v, could not be processed", ruleID, conditions))
 }
 
 // generateLogicalConditionOperator generates a logical condition
@@ -368,10 +365,8 @@ func generateLogicalConditionOperator(logic map[string]interface{}, ruleID strin
 			errorList = append(errorList, newErrors...)
 		}
 		return or, errorList
-	} else {
-		return nil, append(errorList,
-			fmt.Sprintf("level II - for mat error: on rule with id %s: JSON config in wrong format, operator: %v, could not be processed", ruleID, logic["operator"]))
 	}
+	return nil, append(errorList, fmt.Sprintf("level II - for mat error: on rule with id %s: JSON config in wrong format, operator: %v, could not be processed", ruleID, logic["operator"]))
 }
 
 // generateLogicalConstraint traverses the constraints tree
