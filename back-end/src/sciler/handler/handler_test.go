@@ -2,8 +2,10 @@ package handler
 
 import (
 	"encoding/json"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"math"
 	"sciler/communication"
 	"sciler/config"
 	"testing"
@@ -67,8 +69,7 @@ func getTestHandler() *Handler {
 		},
 	}
 	messageHandler := Handler{Config: workingConfig, ConfigFile: "fake file name"}
-	communicator := communication.NewCommunicator(workingConfig.General.Host,
-		workingConfig.General.Port, []string{"back-end", "test"}, messageHandler.NewHandler, func() {})
+	communicator := communication.NewCommunicator(workingConfig, messageHandler.NewHandler, func() {})
 	messageHandler.Communicator = communicator
 	return &messageHandler
 }
@@ -85,7 +86,8 @@ func TestHandler_SetTimer_Start(t *testing.T) {
 func TestHandler_SetTimer_Stop(t *testing.T) {
 	handler := getTestHandler()
 	content := config.ComponentInstruction{Instruction: "stop"}
-	handler.Config.Timers["TestTimer"].Start(handler)
+	err := handler.Config.Timers["TestTimer"].Start(handler)
+	assert.Nil(t, err)
 	assert.Equal(t, "stateActive", handler.Config.Timers["TestTimer"].State)
 	handler.SetTimer("TestTimer", content)
 	assert.Equal(t, "stateExpired", handler.Config.Timers["TestTimer"].State)
@@ -94,7 +96,8 @@ func TestHandler_SetTimer_Stop(t *testing.T) {
 func TestHandler_SetTimer_Pause(t *testing.T) {
 	handler := getTestHandler()
 	content := config.ComponentInstruction{Instruction: "pause"}
-	handler.Config.Timers["TestTimer"].Start(handler)
+	err := handler.Config.Timers["TestTimer"].Start(handler)
+	assert.Nil(t, err)
 	assert.Equal(t, "stateActive", handler.Config.Timers["TestTimer"].State)
 	handler.SetTimer("TestTimer", content)
 	assert.Equal(t, "stateIdle", handler.Config.Timers["TestTimer"].State)
@@ -139,10 +142,21 @@ func TestHandler_SetTimer_Subtract_Parse_Error(t *testing.T) {
 func TestHandler_SetTimer_Done(t *testing.T) {
 	handler := getTestHandler()
 	content := config.ComponentInstruction{Instruction: "done"}
-	handler.Config.Timers["TestTimer"].Start(handler)
+	err := handler.Config.Timers["TestTimer"].Start(handler)
+	assert.Nil(t, err)
 	assert.Equal(t, "stateActive", handler.Config.Timers["TestTimer"].State)
 	handler.SetTimer("TestTimer", content)
 	assert.Equal(t, "stateExpired", handler.Config.Timers["TestTimer"].State)
+}
+
+func TestHandler_SetTimer_Illegal(t *testing.T) {
+	handler := getTestHandler()
+	content := config.ComponentInstruction{Instruction: "illegal"}
+	err := handler.Config.Timers["TestTimer"].Start(handler)
+	assert.Nil(t, err)
+	assert.Equal(t, "stateActive", handler.Config.Timers["TestTimer"].State, "state shouldn't change")
+	handler.SetTimer("TestTimer", content)
+	assert.Equal(t, "stateActive", handler.Config.Timers["TestTimer"].State, "state shouldn't change")
 }
 
 func TestGetStatus(t *testing.T) {
@@ -162,59 +176,6 @@ func TestGetStatus(t *testing.T) {
 	communicatorMock.On("Publish", "display", string(msg), 3)
 	handler.GetStatus("display")
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
-}
-
-func TestSendInstruction(t *testing.T) {
-	communicatorMock := new(CommunicatorMock)
-	handler := Handler{
-		Config:       config.ReadFile("../../../resources/testing/test_instruction.json"),
-		Communicator: communicatorMock,
-	}
-	inst := []config.ComponentInstruction{
-		{"display", "hint", "my hint"},
-	}
-	msg, _ := json.Marshal(Message{
-		DeviceID: "back-end",
-		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "instruction",
-		Contents: inst,
-	})
-	communicatorMock.On("Publish", "display", string(msg), 3)
-	handler.SendComponentInstruction("display", inst, "")
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
-}
-
-func TestSendInstructionDelay(t *testing.T) {
-	communicatorMock := new(CommunicatorMock)
-	handler := Handler{
-		Config:       config.ReadFile("../../../resources/testing/test_instruction.json"),
-		Communicator: communicatorMock,
-	}
-	inst := []config.ComponentInstruction{
-		{"display", "hint", "my hint"},
-	}
-	inst2 := []config.ComponentInstruction{
-		{"display", "hint", "my hint 2"},
-	}
-	msg, _ := json.Marshal(Message{
-		DeviceID: "back-end",
-		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "instruction",
-		Contents: inst,
-	})
-	msg2, _ := json.Marshal(Message{
-		DeviceID: "back-end",
-		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "instruction",
-		Contents: inst2,
-	})
-	communicatorMock.On("Publish", "display", string(msg), 3)
-	communicatorMock.On("Publish", "display", string(msg2), 3)
-	handler.SendComponentInstruction("display", inst, "")
-	handler.SendComponentInstruction("display", inst2, "5s")
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
-	time.Sleep(6 * time.Second)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
 }
 
 ////////////////////////////// Connection tests //////////////////////////////
@@ -247,6 +208,25 @@ func TestOnConnectionMsgOtherDevice(t *testing.T) {
 	_, ok := handler.Config.Devices["WrongDevice"]
 	assert.Equal(t, false, ok,
 		"Device should not exist in devices because it was not in config")
+}
+
+func TestOnConnectionMsgFrontEnd(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_instruction.json"),
+		Communicator: communicatorMock,
+	}
+	msg := Message{
+		DeviceID: "front-end",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "connection",
+		Contents: map[string]interface{}{
+			"connection": false},
+	}
+
+	communicatorMock.On("Publish", mock.AnythingOfType("string"), mock.AnythingOfType("string"), 3)
+	handler.msgMapper(msg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 8)
 }
 
 func TestOnConnectionMsgInvalid(t *testing.T) {
@@ -403,11 +383,20 @@ func TestHandleSingleEvent(t *testing.T) {
 		},
 	})
 
+	messageFrontEndStatus, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "front-end status",
+		Contents: nil,
+	})
+
+	communicatorMock.On("Publish", "front-end", string(messageFrontEndStatus), 3)
 	communicatorMock.On("Publish", "front-end", string(messageEventStatus), 3)
 	communicatorMock.On("Publish", "front-end", string(messageStatus), 3)
 	communicatorMock.On("Publish", "controlBoard", string(messageInstruction), 3)
 	handler.msgMapper(msg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
+	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 4)
 	// if this test becomes flaky (only when this test takes longer then 1 second),
 	// (message expected includes time...), replace the messages with 'mock.Anything'
 }
@@ -455,13 +444,10 @@ func TestHandleDoubleEvent(t *testing.T) {
 	communicatorMock.On("Publish", "front-end", mock.Anything, 3)
 	communicatorMock.On("Publish", "controlBoard", string(messageInstruction), 3)
 	handler.msgMapper(msg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
+	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 4)
 	// if this test becomes flaky (only when this test takes longer then 1 second),
 	// (message expected includes time...), replace the messages with 'mock.Anything'
-
-	// TODO: to restore test so that the message are checked again:
-	//  - duplicate the publish front-end line,
-	//  - replace 'mock.Anything' with the correct messages
 }
 
 ////////////////////////////// Error/irregular behavior tests //////////////////////////////
@@ -545,11 +531,19 @@ func TestLimitRule(t *testing.T) {
 		},
 	})
 
+	messageFrontEndStatus, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "front-end status",
+		Contents: nil,
+	})
+
+	communicatorMock.On("Publish", "front-end", string(messageFrontEndStatus), 3)
 	communicatorMock.On("Publish", "front-end", string(messageStatus), 3)
 	communicatorMock.On("Publish", "front-end", string(messageEventStatus), 3)
 	communicatorMock.On("Publish", "controlBoard", mock.Anything, 3)
 	handler.msgMapper(msg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
 	// Only publish to front-end for status should be done, no action should be performed
 }
 
@@ -609,6 +603,31 @@ func TestInstructionFromWrongDevice(t *testing.T) {
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 0)
 }
 
+func TestInstructionUnknownInstruction(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	workingConfig := config.ReadFile("../../../resources/testing/test_config.json")
+	handler := Handler{
+		Config:       workingConfig,
+		ConfigFile:   "../../../resources/testing/test_config.json",
+		Communicator: communicatorMock,
+	}
+	instructionMsg := Message{
+		DeviceID: "front-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{
+				"instruction": "unknown instruction",
+				"value":       "some value",
+			},
+		},
+	}
+	jsonHintMessage, _ := json.Marshal(&instructionMsg)
+	communicatorMock.On("Publish", "hint", string(jsonHintMessage), 3)
+	handler.msgMapper(instructionMsg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 0)
+}
+
 func TestSendStatusUnknownDevice(t *testing.T) {
 	communicatorMock := new(CommunicatorMock)
 	workingConfig := config.ReadFile("../../../resources/testing/test_config.json")
@@ -630,4 +649,96 @@ func TestSendStatusUnknownDevice(t *testing.T) {
 	communicatorMock.On("Publish", "hint", string(msg), 3)
 	handler.sendStatus("Unknown device or timer")
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 0)
+}
+
+func TestOnInstructionMsgFinishUnkwownRule(t *testing.T) {
+	msg := Message{
+		DeviceID: "front-end",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "instruction",
+		Contents: []map[string]interface{}{{
+			"instruction": "finish rule",
+			"rule":        "this-does-not-exist"},
+		},
+	}
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_instruction.json"),
+		Communicator: communicatorMock,
+	}
+	returnMessage, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "event status",
+		Contents: []map[string]interface{}{{
+			"id":     "rule",
+			"status": false},
+		},
+	})
+	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)
+	handler.onInstructionMsg(msg)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+}
+
+func TestOnInstructionMsgInvalidConfig(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	fileName := "../../../resources/testing/test_config.json"
+	workingConfig := config.ReadFile(fileName)
+	handler := Handler{
+		Config:       workingConfig,
+		ConfigFile:   fileName,
+		Communicator: communicatorMock,
+	}
+	configToTest := math.Inf(1)
+	communicatorMock.On("Publish", "front-end", mock.Anything, 3)
+	assert.False(t, len(handler.checkConfig(configToTest)) == 0)
+}
+
+type MqttMessageMock struct {
+	mock.Mock
+}
+
+func (m MqttMessageMock) Duplicate() bool {
+	panic("implement me")
+}
+
+func (m MqttMessageMock) Qos() byte {
+	panic("implement me")
+}
+
+func (m MqttMessageMock) Retained() bool {
+	panic("implement me")
+}
+
+func (m MqttMessageMock) Topic() string {
+	panic("implement me")
+}
+
+func (m MqttMessageMock) MessageID() uint16 {
+	panic("implement me")
+}
+
+func (m MqttMessageMock) Payload() []byte {
+	json, _ := json.Marshal(Message{
+		DeviceID: "front-end",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "instruction",
+		Contents: []map[string]interface{}{},
+	})
+	return json
+}
+
+func (m MqttMessageMock) Ack() {
+	panic("implement me")
+}
+
+func TestNewHandler(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_instruction.json"),
+		Communicator: communicatorMock,
+	}
+	communicatorMock.On("Publish", "front-end", mock.AnythingOfType("string"), 3)
+	handler.NewHandler(mqtt.NewClient(mqtt.NewClientOptions()), new(MqttMessageMock))
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 0) // MqttMessageMock has a instruction with an empty list of instructions so no response is expected
 }

@@ -1,0 +1,15 @@
+{
+  "name": "display-node",
+  "version": "1.0.0",
+  "description": "an example site",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "browserify": "^16.5.0",
+    "sciler": "latest"
+  }
+}

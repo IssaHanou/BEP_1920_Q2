@@ -1,0 +1,6 @@
+{
+  "id": "display",
+  "host": "localhost",
+  "labels": ["hint"],
+  "port": 1883
+}

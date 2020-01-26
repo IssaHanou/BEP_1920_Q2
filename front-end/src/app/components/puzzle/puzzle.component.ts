@@ -3,14 +3,23 @@ import { MatSort, MatTableDataSource } from "@angular/material";
 import { AppComponent } from "../../app.component";
 import { Puzzle } from "./puzzle";
 
+/**
+ * The puzzle component controls the puzzles tables and is shown in the "Puzzels" box on the home page.
+ */
 @Component({
   selector: "app-puzzle",
   templateUrl: "./puzzle.component.html",
   styleUrls: ["./puzzle.component.css", "../../../assets/css/main.css"]
 })
 export class PuzzleComponent implements OnInit {
+  /**
+   * The keys used by the table to retrieve data from the DataSource
+   */
   puzzleColumns: string[] = ["id", "status", "description", "done"];
 
+  /**
+   * Control the sorting of the table.
+   */
   @ViewChild("PuzzleTableSort", { static: true }) sort: MatSort;
 
   constructor(private app: AppComponent) {}
@@ -34,9 +43,22 @@ export class PuzzleComponent implements OnInit {
   }
 
   /**
-   * When button is pressed, manually override the finished status of rule in back-end.
+   * When button in the table is pressed, manually override the finished status of rule in back-end.
    */
   finishRule(ruleId: string) {
     this.app.sendInstruction([{ instruction: "finish rule", rule: ruleId }]);
+  }
+
+  /**
+   * Only if the game is running can a rule be executed manually.
+   */
+  getGameStateInGame() {
+    const general = this.app.timerList.getTimer("general");
+    if (general !== null) {
+      if (general.getState() === "stateActive") {
+        return false;
+      }
+    }
+    return true;
   }
 }

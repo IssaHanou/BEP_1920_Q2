@@ -2,8 +2,8 @@
   "general": {
     "name": "Escape X",
     "duration": "30",
-    "host": "localhost",
-    "port": 1883
+    "host": "localhost2",
+    "port": 1884
   },
   "cameras": [
     {"name": "camera1", "link": "https://raccoon.games"},

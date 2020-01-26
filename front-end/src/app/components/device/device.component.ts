@@ -3,15 +3,28 @@ import { Device } from "./device";
 import { AppComponent } from "../../app.component";
 import { MatSort, MatTableDataSource } from "@angular/material";
 
+/**
+ * The device component controls the device table in the "Apparaten" box on the home page.
+ */
 @Component({
   selector: "app-device",
   templateUrl: "./device.component.html",
   styleUrls: ["./device.component.css", "../../../assets/css/main.css"]
 })
 export class DeviceComponent implements OnInit {
+  /**
+   * The keys used by the table to retrieve data from the DataSource
+   */
   deviceColumns: string[] = ["id", "connection", "component", "status", "test"];
+
+  /**
+   * Map keeping track of which rows are collapsed.
+   */
   collapsed: Map<string, boolean>;
 
+  /**
+   * Control the sorting of the table.
+   */
   @ViewChild("DeviceTableSort", { static: true }) sort: MatSort;
 
   constructor(private app: AppComponent) {
@@ -44,11 +57,11 @@ export class DeviceComponent implements OnInit {
    * Returns string with each component on new line.
    * If components are collapsed, return default.
    */
-  getComponents(status: Map<string, any>, deviceId: string): string {
+  getComponents(status: Map<string, any>, deviceId: string): any {
     if (!this.collapsed.get(deviceId)) {
-      return "click to see components";
+      return "open onderdelen en status";
     } else if (status.size === 0) {
-      return "nothing to show";
+      return "geen status";
     } else {
       const keys = Array.from(status.keys());
 
@@ -103,8 +116,8 @@ export class DeviceComponent implements OnInit {
   }
 
   /**
-   * Clicking a row should collapse the components and their statuses.
-   * Clicking again should unfold.
+   * Clicking a row should unfold the components and their statuses.
+   * Clicking again should collapse.
    * @param row the row to collapse with full device data
    */
   collapseComponents(row) {

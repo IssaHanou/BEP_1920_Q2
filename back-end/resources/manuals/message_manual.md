@@ -21,6 +21,26 @@ are specific defined depending on the sender and receiver.
         - `instructed_by`: this is the id of the device which originally send this instruction (usually front-end)
         - `component_id`: this will be the id of a component in a timer or device, 
                 (optional)
+                
+##### example
+    { 
+    "device_id": "back-end",
+    "time_sent": "17-1-2019 16:20:21",
+    "type": "instruction",
+    "contents": [
+            {
+            "instruction":"turnOnOff",
+            "value": true,
+            "component_id": "led1" 
+            },
+            {
+            "instruction":"turnOnOff",
+            "value": false,
+            "component_id": "led2"
+            }
+        ]
+    }
+    
    
 ### Client Computers to Back-end
 - `type`: the type of the message, this can be:
@@ -36,7 +56,16 @@ are specific defined depending on the sender and receiver.
         - `instructed` is the original instruction message for the device, including the `instructed_by` tag
     - If type is `connection`, then the message contents has te following:
         - `connection` is a boolean defining the connection status of the device.
-        
+##### Example   
+    { 
+    "device_id": "controlBoard",
+    "time_sent": "17-1-2019 16:20:20",
+    "type": "status",
+    "contents": {
+        "redSwitch": true 
+        "blueSwitch": false
+        }
+    }
 ### Front-end to Back-end
 - `type`: the type of the message, this can be:
     - `instruction`
@@ -44,7 +73,16 @@ are specific defined depending on the sender and receiver.
     - If type is `instruction`, then the then the message contents have
         - `instruction`: one of following instructions: 
         `send setup`, `send status`, `reset all`, `test all`, `test device`, `finish rule`, `hint`
-     
+##### Example
+    { 
+    "device_id": "front-end",
+    "time_sent": "17-1-2019 16:20:20",
+    "type": "instruction",
+    "contents": [{
+            "instruction":"finish rule",
+            "rule": "playlist puzzel 1",
+            }]
+    }     
 ### Back-end to Front-end
 - `type`: the type of the message, this can be:
     - `confirmation`
@@ -58,7 +96,7 @@ are specific defined depending on the sender and receiver.
             - `instruction`
             - `instructed_by`
     - If type is `instruction`, then the then the message contents have
-             - `instruction` with value `reset` or `status update` or `test`
+             - `instruction` with value `reset` or `status update` or `test` or `setState`
     - If type is `status`, then the message contents has
         - `id` of device
         - `status` has a map of `component_id` keys and `status` values
@@ -67,6 +105,9 @@ are specific defined depending on the sender and receiver.
         - `id` of rule
         - `description` of rule
         - `status` of rule describes whether rule is finished or not
+    - If type is `front-end status`, then the message contents has a list of objects with:
+        - `id` of button
+        - `disabled` status of button
     - If type is `time`, then the then the message contents have
         - `id` of timer
         - `duration` has a number of the duration left in milliseconds
@@ -75,4 +116,36 @@ are specific defined depending on the sender and receiver.
         - a `name` parameter carrying the name of the escape room 
         - a `hints` parameter carrying a map with the name of puzzle as key and list of hints as value
         - an `events` parameter carrying a map with the name of the rule as key and the description as value
-        - a `cameras` parameter carrying a a list with camera objects with a `name` and `link` tag
+        - a `cameras` parameter carrying a list with camera objects with a `name` and `link` tag
+        - a `buttons` parameter carrying a list of button names that should be added to the front-end 
+
+##### example
+    { 
+    "device_id": "back-end",
+    "time_sent": "17-1-2019 16:20:20",
+    "type": "status",
+    "contents": [
+            { 
+            "id": "controlBoard" 
+            "connection":true
+            "status": {
+                "redSwitch": true
+                "blueSwitch": false
+                }
+            }
+        ]
+    }
+    { 
+    "device_id":"back-end",
+    "time_sent":"17-01-2020 15:33:28",
+    "type":"event status",
+    "contents":[
+        {"id":"rood","status":false},
+        {"id":"oranje","status":false},
+        {"id":"add 5 min timer","status":false},
+        {"id":"time up","status":false},
+        {"id":"Puzzles done","status":false},
+        {"id":"stop timer","status":false},
+        {"id":"groen","status":false}
+        ]
+    }

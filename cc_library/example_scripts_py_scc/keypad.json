@@ -1,0 +1,6 @@
+{
+  "id": "keypad",
+  "host": "localhost",
+  "port": 1883,
+  "labels": []
+}
