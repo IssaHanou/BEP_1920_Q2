@@ -3,8 +3,8 @@
   <div class="contents">
     <div class="file-input">
       <label class="mat-raised-button mat-primary custom-md-button config-button" for="inputFile">Upload configuratie</label>
-      <input id="inputFile" class="original-config-button" type="file" accept="application/json"
-             (change)="checkFile($event.target.files)" >
+      <input type="file" accept="application/json" id="inputFile" ref="fileInput" class="original-config-button"
+             (click)="resetCurrentFile($event)" (change)="checkFile($event.target.files)">
     </div>
     <p class="uploadString">{{ getUploaded() }}</p>
     <div *ngIf="getUploaded() != '' && !noErrors()">

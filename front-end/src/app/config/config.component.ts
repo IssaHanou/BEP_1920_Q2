@@ -46,9 +46,18 @@ export class ConfigComponent implements OnInit {
   ngOnInit() {}
 
   /**
+   * When clicking the upload button, first reset the file, so the same one can be entered again for re-checking.
+   */
+  resetCurrentFile(event) {
+    event.target.value=null
+  }
+
+  /**
    * When file is submitted, call the file reader and tell the user the upload was successful.
+   * Only one file can be submitted.
    */
   checkFile(files: FileList) {
+    console.log(this.currentFile);
     this.currentFile = files.item(0);
     this.reader.readAsText(this.currentFile, "UTF-8");
   }
