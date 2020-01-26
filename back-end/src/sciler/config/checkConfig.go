@@ -279,9 +279,9 @@ func (constraint Constraint) checkConstraints(condition Condition, config Workin
 func checkConstraintsDevice(condition Condition, config WorkingConfig, ruleID string, constraint Constraint) []string {
 	if device, ok := config.Devices[condition.TypeID]; ok { // checks if device can be found in the map, if so, it is stored in variable device
 		if inputType, ok := device.Input[constraint.ComponentID]; ok {
-			return constraint.checkConstraintsDeviceType(inputType, ruleID, condition.TypeID)
+			return constraint.checkConstraintsDeviceType(inputType, []string{ruleID, condition.TypeID})
 		} else if outputObject, ok := device.Output[constraint.ComponentID]; ok {
-			return constraint.checkConstraintsDeviceType(outputObject.Type, ruleID, condition.TypeID)
+			return constraint.checkConstraintsDeviceType(outputObject.Type, []string{ruleID, condition.TypeID})
 		} else {
 			return []string{fmt.Sprintf("level III - implementation error: on rule %s, constraint on rule with id %s: component with id %s not found in device input or output map",
 				ruleID, condition.TypeID, constraint.ComponentID)}
@@ -307,39 +307,33 @@ func checkConstraintsRule(condition Condition, config WorkingConfig, ruleID stri
 		valueType := reflect.TypeOf(constraint.Value).Kind()
 		comparison := constraint.Comparison
 		if valueType != reflect.Int && valueType != reflect.Float64 {
-			return []string{fmt.Sprintf("level III - implementation error: on rule %s, constraint on rule with id %s: value type numeric expected but %s found as type of te value: %v",
-				ruleID, condition.TypeID, valueType.String(), constraint.Value)}
-		}
-		if !checkValidComparison(comparison) {
-			return []string{fmt.Sprintf("level III - implementation error: on rule %s, constraint on rule with id %s: comparison '%s' is not valid",
-				ruleID, condition.TypeID, comparison)}
-		}
-		if comparison == "contains" {
-			return []string{fmt.Sprintf("level III - implementation error: on rule %s, constraint on rule with id %s: comparison '%s' not allowed on a rule constraint",
-				ruleID, condition.TypeID, comparison)}
+			return []string{fmt.Sprintf("level III - implementation error: on rule %s, constraint on rule with id %s: value type numeric expected but %s found as type of te value: %v", ruleID, condition.TypeID, valueType.String(), constraint.Value)}
+		} else if !checkValidComparison(comparison) {
+			return []string{fmt.Sprintf("level III - implementation error: on rule %s, constraint on rule with id %s: comparison '%s' is not valid", ruleID, condition.TypeID, comparison)}
+		} else if comparison == "contains" {
+			return []string{fmt.Sprintf("level III - implementation error: on rule %s, constraint on rule with id %s: comparison '%s' not allowed on a rule constraint", ruleID, condition.TypeID, comparison)}
 		}
 	} else {
-		return []string{fmt.Sprintf("level III - implementation error: on rule %s, constraint on rule with id %s: rule with id %s not found in rule map",
-			ruleID, condition.TypeID, condition.TypeID)}
+		return []string{fmt.Sprintf("level III - implementation error: on rule %s, constraint on rule with id %s: rule with id %s not found in rule map", ruleID, condition.TypeID, condition.TypeID)}
 	}
-	// all cases for errors are already handled
-	return make([]string, 0)
+	return make([]string, 0) // all cases for errors are already handled
 }
 
 // checkConstraintsDeviceType is a method that checks type defined by the config and check if the constraint has that value type
-func (constraint Constraint) checkConstraintsDeviceType(typeToCheck string, ruleID string, deviceID string) []string {
+// errorParameters contains [ruleID, deviceID] to put in error message
+func (constraint Constraint) checkConstraintsDeviceType(typeToCheck string, errorParameters []string) []string {
 	switch typeToCheck {
 	case "string":
-		return checkConstraintsDeviceStringType([]string{ruleID, deviceID}, constraint)
+		return checkConstraintsDeviceStringType(errorParameters, constraint)
 	case "boolean":
-		return checkConstraintsBooleanType([]string{ruleID, deviceID, "device"}, constraint)
+		return checkConstraintsBooleanType(append(errorParameters, "device"), constraint)
 	case "numeric":
-		return checkConstraintsDeviceNumericType([]string{ruleID, deviceID}, constraint)
+		return checkConstraintsDeviceNumericType(errorParameters, constraint)
 	case "array":
-		return checkConstraintsDeviceArrayType([]string{ruleID, deviceID}, constraint)
+		return checkConstraintsDeviceArrayType(errorParameters, constraint)
 	default:
 		return []string{fmt.Sprintf("level III - implementation error: on rule %s, constraint on device with id %s: custom types of value like: %s, are not yet implemented",
-			ruleID, deviceID, typeToCheck)}
+			errorParameters[0], errorParameters[1], typeToCheck)}
 	}
 }
 
