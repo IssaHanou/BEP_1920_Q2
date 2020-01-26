@@ -134,7 +134,9 @@ func generateTimers(timers []ReadTimer, config *WorkingConfig) (map[string]*Time
 		}
 	}
 	duration, err := time.ParseDuration(config.General.Duration)
-	if err != nil {
+	if config.General.Duration == "" {
+		errorList = append(errorList, "level II - format error: no duration was given in 'general'")
+	} else if err != nil {
 		errorList = append(errorList, "level II - format error: "+err.Error())
 	} else {
 		newTimers["general"] = newTimer("general", duration)
