@@ -326,22 +326,26 @@ func generateLogicalCondition(conditions interface{}, ruleID string) (LogicalCon
 		return AndCondition{}, make([]string, 0)
 	}
 	logic := conditions.(map[string]interface{})
-	errorList := make([]string, 0)
 	if logic["operator"] != nil && logic["list"] != nil {
 		return generateLogicalConditionOperator(logic, ruleID)
 	} else if logic["type"] != nil && reflect.TypeOf(logic["type"]).Kind() == reflect.String &&
 		logic["type_id"] != nil && reflect.TypeOf(logic["type_id"]).Kind() == reflect.String {
-		constraints, newErrors := generateLogicalConstraint(logic["constraints"], ruleID)
-		condition := Condition{
-			Type:        logic["type"].(string),
-			TypeID:      logic["type_id"].(string),
-			Constraints: constraints,
-		}
-		return condition, append(errorList, newErrors...)
+		return generateCondition(logic, ruleID)
 	} else if len(logic) == 0 { // When `conditions` in config is empty, create empty condition
-		return AndCondition{}, errorList
+		return AndCondition{}, make([]string, 0)
 	}
-	return nil, append(errorList, fmt.Sprintf("level II - format error: on rule with id %s: JSON config in wrong condition format, conditions: %v, could not be processed", ruleID, conditions))
+	return nil, []string{fmt.Sprintf("level II - format error: on rule with id %s: JSON config in wrong condition format, conditions: %v, could not be processed", ruleID, conditions)}
+}
+
+// generateCondition generates a Condition object with set constraints.
+func generateCondition(logic map[string]interface{}, ruleID string) (LogicalCondition, []string) {
+	constraints, newErrors := generateLogicalConstraint(logic["constraints"], ruleID)
+	condition := Condition{
+		Type:        logic["type"].(string),
+		TypeID:      logic["type_id"].(string),
+		Constraints: constraints,
+	}
+	return condition, newErrors
 }
 
 // generateLogicalConditionOperator generates a logical condition
