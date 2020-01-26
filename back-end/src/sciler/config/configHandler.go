@@ -309,7 +309,7 @@ func generateRules(readRules []ReadRule, config *WorkingConfig) ([]*Rule, []stri
 			Conditions:  nil,
 			Actions:     readRule.Actions,
 		}
-		conditions, newErrors := generateLogicalCondition(readRule.Conditions)
+		conditions, newErrors := generateLogicalCondition(readRule.Conditions, rule.ID)
 		rule.Conditions = conditions
 		errorList = append(errorList, newErrors...)
 		rules = append(rules, &rule)
@@ -321,17 +321,17 @@ func generateRules(readRules []ReadRule, config *WorkingConfig) ([]*Rule, []stri
 // it generates a logicalCondition which copies this tree
 // this tree includes andConditions, OrConditions and Conditions which put Constraints on a device, rule or timer
 // if the config does not abide by the manual, a non-empty list of mistakes is returned
-func generateLogicalCondition(conditions interface{}) (LogicalCondition, []string) {
+func generateLogicalCondition(conditions interface{}, ruleID string) (LogicalCondition, []string) {
 	if conditions == nil {
 		return AndCondition{}, make([]string, 0)
 	}
 	logic := conditions.(map[string]interface{})
 	errorList := make([]string, 0)
-	if logic["operator"] != nil { // operator
-		return generateLogicalConditionOperator(logic)
+	if logic["operator"] != nil && logic["list"] != nil {
+		return generateLogicalConditionOperator(logic, ruleID)
 	} else if logic["type"] != nil && reflect.TypeOf(logic["type"]).Kind() == reflect.String &&
 		logic["type_id"] != nil && reflect.TypeOf(logic["type_id"]).Kind() == reflect.String {
-		constraints, newErrors := generateLogicalConstraint(logic["constraints"])
+		constraints, newErrors := generateLogicalConstraint(logic["constraints"], ruleID)
 		condition := Condition{
 			Type:        logic["type"].(string),
 			TypeID:      logic["type_id"].(string),
@@ -342,19 +342,20 @@ func generateLogicalCondition(conditions interface{}) (LogicalCondition, []strin
 		return AndCondition{}, errorList
 	} else {
 		return nil, append(errorList,
-			fmt.Sprintf("level II - format error: JSON config in wrong condition format, conditions: %v, could not be processed", conditions))
+			fmt.Sprintf("level II - format error: on rule with id %s: JSON config in wrong condition format, conditions: %v, could not be processed",
+				ruleID, conditions))
 	}
 }
 
 // generateLogicalConditionOperator generates a logical condition
 // (and / or) from logic where the operator field is present in the config
 // if the config does not abide by the manual, a non-empty list of mistakes is returned
-func generateLogicalConditionOperator(logic map[string]interface{}) (LogicalCondition, []string) {
+func generateLogicalConditionOperator(logic map[string]interface{}, ruleID string) (LogicalCondition, []string) {
 	errorList := make([]string, 0)
 	if logic["operator"] == "AND" {
 		and := AndCondition{}
 		for _, condition := range logic["list"].([]interface{}) {
-			newCondition, newErrors := generateLogicalCondition(condition)
+			newCondition, newErrors := generateLogicalCondition(condition, ruleID)
 			and.logics = append(and.logics, newCondition)
 			errorList = append(errorList, newErrors...)
 		}
@@ -362,14 +363,15 @@ func generateLogicalConditionOperator(logic map[string]interface{}) (LogicalCond
 	} else if logic["operator"] == "OR" {
 		or := OrCondition{}
 		for _, condition := range logic["list"].([]interface{}) {
-			newCondition, newErrors := generateLogicalCondition(condition)
+			newCondition, newErrors := generateLogicalCondition(condition, ruleID)
 			or.logics = append(or.logics, newCondition)
 			errorList = append(errorList, newErrors...)
 		}
 		return or, errorList
 	} else {
 		return nil, append(errorList,
-			fmt.Sprintf("level II - format error: JSON config in wrong format, operator: %v, could not be processed", logic["operator"]))
+			fmt.Sprintf("level II - format error: on rule with id %s: JSON config in wrong format, operator: %v, could not be processed",
+				ruleID, logic["operator"]))
 	}
 }
 
@@ -377,24 +379,31 @@ func generateLogicalConditionOperator(logic map[string]interface{}) (LogicalCond
 // it generates a logicalConstraint which copies this tree
 // this tree includes andConstraints, OrConstraints and Constraints on device components, rule execution or timer status
 // if the config does not abide by the manual, a non-empty list of mistakes is returned
-func generateLogicalConstraint(constraints interface{}) (LogicalConstraint, []string) {
-	logic := constraints.(map[string]interface{})
-	if logic["operator"] != nil { // operator
-		return generateLogicalConstraintOperator(logic)
-	} else if logic["comparison"] != nil && reflect.TypeOf(logic["comparison"]).Kind() == reflect.String {
-		return generateConstraint(logic)
+func generateLogicalConstraint(constraints interface{}, ruleID string) (LogicalConstraint, []string) {
+	if constraints == nil {
+		return AndConstraint{}, []string{fmt.Sprintf("level II - format error: on rule with id %s: condition contains no constraints", ruleID)}
 	}
-	return nil, []string{fmt.Sprintf("level II - format error: JSON config in wrong constraint format, conditions: %v, could not be processed", constraints)}
+	logic := constraints.(map[string]interface{})
+	if logic["operator"] != nil && logic["list"] != nil {
+		return generateLogicalConstraintOperator(logic, ruleID)
+	} else if logic["comparison"] != nil && reflect.TypeOf(logic["comparison"]).Kind() == reflect.String &&
+		logic["value"] != nil {
+		return generateConstraint(logic, ruleID)
+	} else if len(logic) == 0 { // When `constraints` in config is empty, create empty constraint
+		return AndConstraint{}, make([]string, 0)
+	}
+	return nil, []string{fmt.Sprintf("level II - format error: on rule with id %s: JSON config in wrong constraint format, constraints: %v, could not be processed",
+		ruleID, constraints)}
 }
 
 // generateLogicalConstraintOperator generates a logical operator (and / or) from logic where the operator field is present in the config
 // if the config does not abide by the manual, a non-empty list of mistakes is returned
-func generateLogicalConstraintOperator(logic map[string]interface{}) (LogicalConstraint, []string) {
+func generateLogicalConstraintOperator(logic map[string]interface{}, ruleID string) (LogicalConstraint, []string) {
 	errorList := make([]string, 0)
 	if logic["operator"] == "AND" {
 		and := AndConstraint{}
 		for _, constraint := range logic["list"].([]interface{}) {
-			newConstraint, newErrors := generateLogicalConstraint(constraint)
+			newConstraint, newErrors := generateLogicalConstraint(constraint, ruleID)
 			and.logics = append(and.logics, newConstraint)
 			errorList = append(errorList, newErrors...)
 		}
@@ -402,20 +411,21 @@ func generateLogicalConstraintOperator(logic map[string]interface{}) (LogicalCon
 	} else if logic["operator"] == "OR" {
 		or := OrConstraint{}
 		for _, constraint := range logic["list"].([]interface{}) {
-			newConstraint, newErrors := generateLogicalConstraint(constraint)
+			newConstraint, newErrors := generateLogicalConstraint(constraint, ruleID)
 			or.logics = append(or.logics, newConstraint)
 			errorList = append(errorList, newErrors...)
 		}
 		return or, errorList
 	} else {
 		return nil, append(errorList,
-			fmt.Sprintf("level II - format error: JSON config in wrong format, operator: %v, could not be processed", logic["operator"]))
+			fmt.Sprintf("level II - format error: on rule with id %s: JSON config in wrong format, operator: %v, could not be processed",
+				ruleID, logic["operator"]))
 	}
 }
 
 // generateConstraint generates a constraint from logic where the comparator field is present in the config
 // if the config does not abide by the manual, a non-empty list of mistakes is returned
-func generateConstraint(logic map[string]interface{}) (LogicalConstraint, []string) {
+func generateConstraint(logic map[string]interface{}, ruleID string) (LogicalConstraint, []string) {
 	var constraint Constraint
 	errorList := make([]string, 0)
 	if logic["component_id"] != nil && reflect.TypeOf(logic["component_id"]).Kind() == reflect.String {
@@ -432,8 +442,8 @@ func generateConstraint(logic map[string]interface{}) (LogicalConstraint, []stri
 		}
 	} else {
 		errorList = append(errorList,
-			fmt.Sprintf("level II - format error: JSON config in wrong format, component_id should be of type string, %v is of type %s",
-				logic["component_id"], reflect.TypeOf(logic["component_id"]).Kind().String()))
+			fmt.Sprintf("level II - format error: on rule with id %s: JSON config in wrong format, component_id should be of type string, %v is of type %s",
+				ruleID, logic["component_id"], reflect.TypeOf(logic["component_id"]).Kind().String()))
 	}
 	return constraint, errorList
 }

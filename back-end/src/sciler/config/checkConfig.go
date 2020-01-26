@@ -69,11 +69,15 @@ func checkActionTimer(action Action, config WorkingConfig, ruleID string) []stri
 		for _, actionMessage := range action.Message {
 			switch actionMessage.Instruction {
 			case "add", "subtract":
-				valueType := reflect.TypeOf(actionMessage.Value).Kind()
-				if valueType != reflect.String {
-					errorList = append(errorList,
-						fmt.Sprintf("level III - implementation error: on rule %s, actions for timer with id %s: input type string expected but %s found as type of value %v",
-							ruleID, action.TypeID, valueType.String(), actionMessage.Value))
+				if actionMessage.Value == nil {
+					errorList = append(errorList, fmt.Sprintf("level III - implementation error: on rule %s, action with id %s: value of action message is nil", ruleID, action.TypeID))
+				} else {
+					valueType := reflect.TypeOf(actionMessage.Value).Kind()
+					if valueType != reflect.String {
+						errorList = append(errorList,
+							fmt.Sprintf("level III - implementation error: on rule %s, actions for timer with id %s: input type string expected but %s found as type of value %v",
+								ruleID, action.TypeID, valueType.String(), actionMessage.Value))
+					}
 				}
 				break
 			case "start", "pause", "stop", "done":
@@ -98,8 +102,12 @@ func checkActionDevice(action Action, config WorkingConfig, ruleID string) []str
 		for _, actionMessage := range action.Message {
 			if outputObject, ok := device.Output[actionMessage.ComponentID]; ok {
 				if instructionType, ok := outputObject.Instructions[actionMessage.Instruction]; ok {
-					if err := checkActionInstructionType(reflect.TypeOf(actionMessage.Value).Kind(), instructionType, actionMessage.Value, ruleID); err != nil {
-						errorList = append(errorList, err.Error())
+					if actionMessage.Value == nil {
+						errorList = append(errorList, fmt.Sprintf("level III - implementation error: on rule %s, action with id %s: value of action message is nil", ruleID, action.TypeID))
+					} else {
+						if err := checkActionInstructionType(reflect.TypeOf(actionMessage.Value).Kind(), instructionType, actionMessage.Value, ruleID); err != nil {
+							errorList = append(errorList, err.Error())
+						}
 					}
 				} else {
 					errorList = append(errorList, fmt.Sprintf("level III - implementation error: on rule %s, actions for device with id %s: instruction '%s' not found in map",
@@ -323,6 +331,10 @@ func (constraint Constraint) checkConstraintsDeviceType(typeToCheck string, rule
 // checkConstraintsDeviceStringType is a method that returns all error (if any)
 // in a constraint of a device with string type constraint
 func checkConstraintsDeviceStringType(ruleID string, deviceID string, constraint Constraint) []string {
+	if constraint.Value == nil {
+		return []string{fmt.Sprintf("level III - implementation error: on rule %s, constraint on device with id %s: value was nil",
+			ruleID, deviceID)}
+	}
 	valueType := reflect.TypeOf(constraint.Value).Kind()
 	comparison := constraint.Comparison
 	if valueType != reflect.String {
