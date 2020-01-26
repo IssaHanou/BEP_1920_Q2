@@ -333,6 +333,16 @@
                   "value": "audio1"
                 }
               ]
+            },
+            {
+              "type": "timer",
+              "type_id": "timer2",
+              "message": [
+                {
+                  "instruction": "add",
+                  "value": "5m"
+                }
+              ]
             }
           ]
         }
