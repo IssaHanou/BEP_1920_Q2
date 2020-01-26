@@ -370,8 +370,7 @@ func generateLogicalConditionOperator(logic map[string]interface{}, ruleID strin
 		return or, errorList
 	} else {
 		return nil, append(errorList,
-			fmt.Sprintf("level II - format error: on rule with id %s: JSON config in wrong format, operator: %v, could not be processed",
-				ruleID, logic["operator"]))
+			fmt.Sprintf("level II - for mat error: on rule with id %s: JSON config in wrong format, operator: %v, could not be processed", ruleID, logic["operator"]))
 	}
 }
 
