@@ -392,8 +392,7 @@ func generateLogicalConstraint(constraints interface{}, ruleID string) (LogicalC
 	} else if len(logic) == 0 { // When `constraints` in config is empty, create empty constraint
 		return AndConstraint{}, make([]string, 0)
 	}
-	return nil, []string{fmt.Sprintf("level II - format error: on rule with id %s: JSON config in wrong constraint format, constraints: %v, could not be processed",
-		ruleID, constraints)}
+	return nil, []string{fmt.Sprintf("level II - format error: on rule with id %s: JSON config in wrong constraint format, constraints: %v, could not be processed", ruleID, constraints)}
 }
 
 // generateLogicalConstraintOperator generates a logical operator (and / or) from logic where the operator field is present in the config
@@ -418,8 +417,7 @@ func generateLogicalConstraintOperator(logic map[string]interface{}, ruleID stri
 		return or, errorList
 	} else {
 		return nil, append(errorList,
-			fmt.Sprintf("level II - format error: on rule with id %s: JSON config in wrong format, operator: %v, could not be processed",
-				ruleID, logic["operator"]))
+			fmt.Sprintf("level II - format error: on rule with id %s: JSON config in wrong format, operator: %v, could not be processed", ruleID, logic["operator"]))
 	}
 }
 
@@ -442,8 +440,7 @@ func generateConstraint(logic map[string]interface{}, ruleID string) (LogicalCon
 		}
 	} else {
 		errorList = append(errorList,
-			fmt.Sprintf("level II - format error: on rule with id %s: JSON config in wrong format, component_id should be of type string, %v is of type %s",
-				ruleID, logic["component_id"], reflect.TypeOf(logic["component_id"]).Kind().String()))
+			fmt.Sprintf("level II - format error: on rule with id %s: JSON config in wrong format, component_id should be of type string, %v is of type %s", ruleID, logic["component_id"], reflect.TypeOf(logic["component_id"]).Kind().String()))
 	}
 	return constraint, errorList
 }

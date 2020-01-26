@@ -47,11 +47,11 @@ func checkActions(actions []Action, config WorkingConfig, ruleID string) []strin
 	for _, action := range actions {
 		switch action.Type {
 		case "device":
-			errorList = append(errorList, checkActionDevice(action, config, ruleID)...)
+			errorList = append(errorList, action.checkActionDevice(config, ruleID)...)
 		case "timer":
-			errorList = append(errorList, checkActionTimer(action, config, ruleID)...)
+			errorList = append(errorList, action.checkActionTimer(config, ruleID)...)
 		case "label":
-			errorList = append(errorList, checkActionLabel(action, config, ruleID)...)
+			errorList = append(errorList, action.checkActionLabel(config, ruleID)...)
 		default:
 			errorList = append(errorList,
 				fmt.Sprintf("level III - implementation error: on rule %s: only device, timer and label are accepted as type for an action, however type was specified as: %s",
@@ -63,7 +63,7 @@ func checkActions(actions []Action, config WorkingConfig, ruleID string) []strin
 
 // checkActionTimer is a method that checks the config in use for mistakes in the actions of a timer
 // if the config does not abide by the manual, a non-empty list of mistakes is returned
-func checkActionTimer(action Action, config WorkingConfig, ruleID string) []string {
+func (action Action) checkActionTimer(config WorkingConfig, ruleID string) []string {
 	errorList := make([]string, 0)
 	if _, ok := config.Timers[action.TypeID]; ok { // checks if timer can be found in the map, if so, it is stored in variable device
 		for _, actionMessage := range action.Message {
@@ -91,20 +91,18 @@ func checkActionTimer(action Action, config WorkingConfig, ruleID string) []stri
 // errorParameters contains [ruleID, action.TypeID] to put in the error messages
 func checkTimeAlterInstruction(actionMessage ComponentInstruction, errorParameters []string) string {
 	if actionMessage.Value == nil {
-		return fmt.Sprintf("level III - implementation error: on rule %s, action for timer with id %s: value of action message is nil",
-			errorParameters[0], errorParameters[1])
+		return fmt.Sprintf("level III - implementation error: on rule %s, action for timer with id %s: value of action message is nil", errorParameters[0], errorParameters[1])
 	}
 	valueType := reflect.TypeOf(actionMessage.Value).Kind()
 	if valueType != reflect.String {
-		return fmt.Sprintf("level III - implementation error: on rule %s, actions for timer with id %s: input type string expected but %s found as type of value %v",
-			errorParameters[0], errorParameters[1], valueType.String(), actionMessage.Value)
+		return fmt.Sprintf("level III - implementation error: on rule %s, actions for timer with id %s: input type string expected but %s found as type of value %v", errorParameters[0], errorParameters[1], valueType.String(), actionMessage.Value)
 	}
 	return ""
 }
 
 // checkActionDevice is a method that checks the current config for mistakes in the actions of a device
 // if the config does not abide by the manual, a non-empty list of mistakes is returned
-func checkActionDevice(action Action, config WorkingConfig, ruleID string) []string {
+func (action Action) checkActionDevice(config WorkingConfig, ruleID string) []string {
 	errorList := make([]string, 0)
 	if device, ok := config.Devices[action.TypeID]; ok { // checks if device can be found in the map, if so, it is stored in variable device
 		for _, actionMessage := range action.Message {
@@ -145,27 +143,22 @@ func checkActionInstructionType(valueType reflect.Kind, instructionType string, 
 	switch instructionType {
 	case "string":
 		if valueType != reflect.String {
-			return fmt.Errorf("level III - implementation error: on rule %s's actions: instruction type string expected but %s found as type of the value: %v",
-				ruleID, valueType.String(), value)
+			return fmt.Errorf("level III - implementation error: on rule %s's actions: instruction type string expected but %s found as type of the value: %v", ruleID, valueType.String(), value)
 		}
 	case "boolean":
 		if valueType != reflect.Bool {
-			return fmt.Errorf("level III - implementation error: on rule %s's actions: instruction type boolean expected but %s found as type of the value: %v",
-				ruleID, valueType.String(), value)
+			return fmt.Errorf("level III - implementation error: on rule %s's actions: instruction type boolean expected but %s found as type of the value: %v", ruleID, valueType.String(), value)
 		}
 	case "numeric":
 		if valueType != reflect.Int && valueType != reflect.Float64 {
-			return fmt.Errorf("level III - implementation error: on rule %s's actions: instruction type numeric expected but %s found as type of the value: %v",
-				ruleID, valueType.String(), value)
+			return fmt.Errorf("level III - implementation error: on rule %s's actions: instruction type numeric expected but %s found as type of the value: %v", ruleID, valueType.String(), value)
 		}
 	case "array":
 		if valueType != reflect.Slice {
-			return fmt.Errorf("level III - implementation error: on rule %s's actions: instruction type array/slice expected but %s found as type of the value: %v",
-				ruleID, valueType.String(), value)
+			return fmt.Errorf("level III - implementation error: on rule %s's actions: instruction type array/slice expected but %s found as type of the value: %v", ruleID, valueType.String(), value)
 		}
 	default:
-		return fmt.Errorf("level III - implementation error: on rule %s's actions: custom types of value like: %s, are not yet implemented",
-			ruleID, instructionType)
+		return fmt.Errorf("level III - implementation error: on rule %s's actions: custom types of value like: %s, are not yet implemented", ruleID, instructionType)
 	}
 	return nil
 }
@@ -173,14 +166,14 @@ func checkActionInstructionType(valueType reflect.Kind, instructionType string, 
 // checkActionLabel checks if there is a label with this ID,
 // and checks if all components under this label have the correct instructions with a call to checkActionDevice
 // if the config does not abide by the manual, a non-empty list of mistakes is returned
-func checkActionLabel(action Action, config WorkingConfig, ruleID string) []string {
+func (action Action) checkActionLabel(config WorkingConfig, ruleID string) []string {
 	errorList := make([]string, 0)
 	if _, ok := config.LabelMap[action.TypeID]; ok { // checks if label can be found in the map, if so, it is stored in variable device
 		for _, instruction := range action.Message {
 			for _, comp := range config.LabelMap[action.TypeID] {
 				instruction.ComponentID = comp.ID
 				errorList = append(errorList,
-					checkActionDevice(Action{TypeID: comp.Device.ID, Message: []ComponentInstruction{instruction}}, config, ruleID)...)
+					Action{TypeID: comp.Device.ID, Message: []ComponentInstruction{instruction}}.checkActionDevice(config, ruleID)...)
 			}
 		}
 	} else {
