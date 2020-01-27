@@ -1,0 +1,39 @@
+{
+  "general": {
+    "name": "Escape X",
+    "duration": "30m",
+    "host": "localhost",
+    "port": 1883
+  },
+  "devices": [
+    {
+      "description": "displays hints",
+      "id": "display-angular",
+      "input": {},
+      "output": {
+        "hint": {
+          "instructions": {
+            "hint": "string"
+          },
+          "label": [
+            "hint"
+          ],
+          "type": "string"
+        }
+      }
+    },
+    {
+      "description": "displays messages",
+      "id": "display-angular",
+      "input": {},
+      "output": {
+        "display": {
+          "instructions": {
+            "show": "string"
+          },
+          "type": "string"
+        }
+      }
+    }
+  ]
+}

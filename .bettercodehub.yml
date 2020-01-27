@@ -1,0 +1,11 @@
+component_depth: 1
+languages:
+  - python
+  - go
+  - typescript
+  - javascript
+  - script
+exclude:
+  - /cc_library/example_scripts_js_scc/.*
+  - /cc_library/example_scripts_py_scc/.*
+  - /front-end/karma.conf.js

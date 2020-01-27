@@ -30,7 +30,6 @@ describe("Puzzles", () => {
     const newMap = new Map<string, string>();
     expect(puzzles.all.size).toBe(0);
     puzzles.addPuzzle("my rule", "this my rule");
-    // puzzles.all.set("my rule", new Puzzle("my rule", "y"));
     expect(puzzles.all.size).toBe(1);
     expect(puzzles.all.get("my rule").status).toBe(false);
   });

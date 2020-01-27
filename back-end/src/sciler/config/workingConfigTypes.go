@@ -7,16 +7,19 @@ import (
 	"time"
 )
 
-// WorkingConfig has additional fields to ReadConfig, with lists of conditions, constraints and actions.
+// WorkingConfig has additional includes all information necessary in an escape room
+// some maps are also cached in order to assure faster message handling
 type WorkingConfig struct {
 	General       General
 	Cameras       []Camera
 	Puzzles       []*Puzzle
 	GeneralEvents []*GeneralEvent
+	ButtonEvents  map[string]*Rule
 	Devices       map[string]*Device
 	Timers        map[string]*Timer
 	StatusMap     map[string][]*Rule
 	RuleMap       map[string]*Rule
+	EventRuleMap  map[string]*Rule
 	LabelMap      map[string][]*Component
 }
 
@@ -132,9 +135,12 @@ func (t *Timer) Stop() error {
 
 // Done finishes the timer as if it ran out of time
 // can not finish a timer that is already Expired
-func (t *Timer) Done() error {
+func (t *Timer) Done(handler InstructionSender) error {
 	if t.State == "stateExpired" {
 		return fmt.Errorf("timer %v is already Expired and can not be finished again", t.ID)
+	}
+	if t.State == "stateIdle" {
+		t.Start(handler)
 	}
 	t.Ending()
 	t.T.Stop()
@@ -162,7 +168,7 @@ type InstructionSender interface {
 
 // Finished is a method that checks is the a rule have been finished, meaning if it reached its maximum number of executions
 func (r *Rule) Finished() bool {
-	return r.Executed == r.Limit
+	return r.Executed == r.Limit && r.Limit != 0
 }
 
 // Execute performs all actions of a rule
@@ -171,7 +177,7 @@ func (r *Rule) Execute(handler InstructionSender) {
 		go action.Execute(handler)
 	}
 	r.Executed++
-	logger.Infof("Executed rule %s", r.ID)
+	logger.Infof("executed actions of rule with id %s", r.ID)
 	handler.HandleEvent(r.ID)
 }
 
@@ -221,6 +227,7 @@ type Event interface {
 	GetRules() []*Rule
 }
 
+// compare is a method used to perform a comparison between to variables and a comparator string
 func compare(param1 interface{}, param2 interface{}, comparision string) bool {
 	if param1 == nil {
 		return false
@@ -252,7 +259,7 @@ func compare(param1 interface{}, param2 interface{}, comparision string) bool {
 	}
 }
 
-// numericToFloat64 checks if numeric value is in or float64 and returns float64
+// numericToFloat64 checks if numeric value is int or float64 and converts it to a float64 (if it wasn't already)
 func numericToFloat64(input interface{}) float64 {
 	switch input.(type) {
 	case float64:
@@ -265,6 +272,7 @@ func numericToFloat64(input interface{}) float64 {
 	}
 }
 
+// contains is a function that checks if a slice contains an element
 func contains(list interface{}, element interface{}) bool {
 	slice := reflect.ValueOf(list)
 	for i := 0; i < slice.Len(); i++ {
@@ -303,12 +311,6 @@ func (condition Condition) GetConditionIDs() []string {
 	return []string{condition.TypeID}
 }
 
-// checkConstraints is a method that checks types and comparator operators
-func (condition Condition) checkConstraints(config WorkingConfig, ruleID string) []string {
-	// todo check if type id exists
-	return condition.Constraints.checkConstraints(condition, config, ruleID)
-}
-
 // Resolve is a method that checks if a condition is met
 func (condition Condition) Resolve(config WorkingConfig) bool {
 	return condition.Constraints.Resolve(condition, config)
@@ -319,127 +321,6 @@ type Constraint struct {
 	Comparison  string
 	ComponentID string
 	Value       interface{}
-}
-
-// checkConstraints is a method that checks types and comparator operators
-func (constraint Constraint) checkConstraints(condition Condition, config WorkingConfig, ruleID string) []string {
-	switch condition.Type {
-	case "device":
-		{
-			if device, ok := config.Devices[condition.TypeID]; ok { // checks if device can be found in the map, if so, it is stored in variable device
-
-				valueType := reflect.TypeOf(constraint.Value).Kind()
-				comparison := constraint.Comparison
-				if inputType, ok := device.Input[constraint.ComponentID]; ok {
-					switch inputType {
-					case "string":
-						{
-							if valueType != reflect.String {
-								return []string{fmt.Sprintf("on rule %s: input type string expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
-							}
-							if !CheckValidComparison(comparison) {
-								return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
-							}
-							if comparison != "eq" && comparison != "not" {
-								return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on a string", ruleID, comparison)}
-							}
-						}
-					case "boolean":
-						{
-							if valueType != reflect.Bool {
-								return []string{fmt.Sprintf("on rule %s: input type boolean expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
-							}
-							if !CheckValidComparison(comparison) {
-								return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
-							}
-							if comparison != "eq" {
-								return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on a boolean", ruleID, comparison)}
-							}
-						}
-					case "numeric":
-						{
-							if valueType != reflect.Int && valueType != reflect.Float64 {
-								return []string{fmt.Sprintf("on rule %s: input type numeric expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
-							}
-							if !CheckValidComparison(comparison) {
-								return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
-							}
-							if comparison == "contains" {
-								return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on a numeric", ruleID, comparison)}
-							}
-						}
-					case "array":
-						{
-							if valueType != reflect.Slice {
-								return []string{fmt.Sprintf("on rule %s: input type array/slice expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
-							}
-							if !CheckValidComparison(comparison) {
-								return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
-							}
-							if comparison != "contains" && comparison != "eq" && comparison != "not" {
-								return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on an array", ruleID, comparison)}
-							}
-						}
-					default:
-						// todo custom types
-						return []string{fmt.Sprintf("on rule %s: custom types like: %s, are not yet implemented", ruleID, inputType)}
-					}
-				} else {
-					return []string{fmt.Sprintf("on rule %s: component with id %s not found in map", ruleID, constraint.ComponentID)}
-				}
-			} else {
-				return []string{fmt.Sprintf("on rule %s: device with id %s not found in map", ruleID, condition.TypeID)}
-			}
-		}
-	case "timer":
-		if _, ok := config.Timers[condition.TypeID]; ok {
-			valueType := reflect.TypeOf(constraint.Value).Kind()
-			comparison := constraint.Comparison
-			if valueType != reflect.Bool {
-				return []string{fmt.Sprintf("on rule %s: input type boolean expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
-			}
-			if !CheckValidComparison(comparison) {
-				return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
-			}
-			if comparison != "eq" {
-				return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on a boolean", ruleID, comparison)}
-			}
-
-		} else {
-			return []string{fmt.Sprintf("on rule %s: timer with id %s not found in map", ruleID, condition.TypeID)}
-		}
-	case "rule":
-		if _, ok := config.RuleMap[condition.TypeID]; ok { // checks if rule can be found in the map, if so, it is stored in variable device
-			valueType := reflect.TypeOf(constraint.Value).Kind()
-			comparison := constraint.Comparison
-			if valueType != reflect.Int && valueType != reflect.Float64 {
-				return []string{fmt.Sprintf("on rule %s: value type numeric expected but %s found as type of value %v", ruleID, valueType.String(), constraint.Value)}
-			}
-			if !CheckValidComparison(comparison) {
-				return []string{fmt.Sprintf("on rule %s: comparison %s is not valid", ruleID, comparison)}
-			}
-			if comparison == "contains" {
-				return []string{fmt.Sprintf("on rule %s: comparison %s not allowed on rule", ruleID, comparison)}
-			}
-		} else {
-			return []string{fmt.Sprintf("on rule %s: rule with id %s not found in map", ruleID, condition.TypeID)}
-		}
-	default:
-		return []string{fmt.Sprintf("on rule %s: invalid type of condition: %v", ruleID, condition.Type)}
-	}
-	// all cases for errors are already handled
-	return make([]string, 0)
-}
-
-// CheckValidComparison checks if the comparison is a valid one
-func CheckValidComparison(comparison string) bool {
-	comparisonTypesAllowed := []string{"eq", "lt", "gt", "lte", "gte", "contains", "not"}
-	for _, comp := range comparisonTypesAllowed {
-		if comp == comparison {
-			return true
-		}
-	}
-	return false
 }
 
 // Resolve is a method that checks if a constraint is met
@@ -471,7 +352,7 @@ func (constraint Constraint) Resolve(condition Condition, config WorkingConfig) 
 // LogicalCondition is an interface for operators and conditions
 type LogicalCondition interface {
 	Resolve(config WorkingConfig) bool
-	checkConstraints(config WorkingConfig, ruleID string) []string
+	checkConditions(config WorkingConfig, ruleID string) []string
 	GetConditionIDs() []string
 }
 
@@ -487,18 +368,6 @@ func (and AndCondition) GetConditionIDs() []string {
 		IDs = append(IDs, logic.GetConditionIDs()...)
 	}
 	return IDs
-}
-
-// checkConstraints is a method that checks types and comparator operators
-func (and AndCondition) checkConstraints(config WorkingConfig, ruleID string) []string {
-	errorList := make([]string, 0)
-	for _, logic := range and.logics {
-		err := logic.checkConstraints(config, ruleID)
-		if err != nil {
-			errorList = append(errorList, err...)
-		}
-	}
-	return errorList
 }
 
 // Resolve is a method that checks if a condition is met
@@ -524,18 +393,6 @@ func (or OrCondition) GetConditionIDs() []string {
 	return IDs
 }
 
-// checkConstraints is a method that checks types and comparator operators
-func (or OrCondition) checkConstraints(config WorkingConfig, ruleID string) []string {
-	errorList := make([]string, 0)
-	for _, logic := range or.logics {
-		err := logic.checkConstraints(config, ruleID)
-		if err != nil {
-			errorList = append(errorList, err...)
-		}
-	}
-	return errorList
-}
-
 // Resolve is a method that checks if a condition is met
 func (or OrCondition) Resolve(config WorkingConfig) bool {
 	result := false
@@ -556,20 +413,8 @@ type AndConstraint struct {
 	logics []LogicalConstraint
 }
 
-// checkConstraints is a method that checks types and comparator operators
-func (and AndConstraint) checkConstraints(condition Condition, config WorkingConfig, ruleID string) []string {
-	errorList := make([]string, 0)
-	for _, logic := range and.logics {
-		err := logic.checkConstraints(condition, config, ruleID)
-		if err != nil {
-			errorList = append(errorList, err...)
-		}
-	}
-	return errorList
-}
-
 // Resolve is a method that checks if a constraint is met
-func (and AndConstraint) Resolve(condition Condition, config WorkingConfig) bool { // todo: make lazy
+func (and AndConstraint) Resolve(condition Condition, config WorkingConfig) bool {
 	result := true
 	for _, logic := range and.logics {
 		result = result && logic.Resolve(condition, config)
@@ -582,20 +427,8 @@ type OrConstraint struct {
 	logics []LogicalConstraint
 }
 
-// checkConstraints is a method that checks types and comparator operators
-func (or OrConstraint) checkConstraints(condition Condition, config WorkingConfig, ruleID string) []string {
-	errorList := make([]string, 0)
-	for _, logic := range or.logics {
-		err := logic.checkConstraints(condition, config, ruleID)
-		if err != nil {
-			errorList = append(errorList, err...)
-		}
-	}
-	return errorList
-}
-
 // Resolve is a method that checks if a constraint is met
-func (or OrConstraint) Resolve(condition Condition, config WorkingConfig) bool { // todo: make lazy
+func (or OrConstraint) Resolve(condition Condition, config WorkingConfig) bool {
 	result := false
 	for _, logic := range or.logics {
 		result = result || logic.Resolve(condition, config)

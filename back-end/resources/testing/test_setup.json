@@ -74,5 +74,76 @@
     }
   ],
   "general_events": [
+  ],
+  "button_events": [
+    {
+      "id": "start",
+      "description": "Als het spel start, moeten alle rode leds aan gaan en de groene uit",
+      "limit": 2,
+      "conditions": {},
+      "actions": [
+        {
+          "type": "timer",
+          "type_id": "general",
+          "message": [
+            {
+              "instruction": "start"
+            }
+          ]
+        },
+        {
+          "type": "device",
+          "type_id": "front-end",
+          "message": [
+            {
+              "instruction": "set state",
+              "component_id": "gameState",
+              "value": "in spel"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stop",
+      "description": "Als het spel stopt, moeten alle lichten uitgaan",
+      "limit": 1,
+      "conditions": {
+        "operator": "AND",
+        "list": [
+          {
+            "type": "device",
+            "type_id": "front-end",
+            "constraints": {
+              "component_id": "gameState",
+              "comparison": "eq",
+              "value": "in spel"
+            }
+          }
+        ]
+      },
+      "actions": [
+        {
+          "type": "timer",
+          "type_id": "general",
+          "message": [
+            {
+              "instruction": "pause"
+            }
+          ]
+        },
+        {
+          "type": "device",
+          "type_id": "front-end",
+          "message": [
+            {
+              "instruction": "set state",
+              "component_id": "gameState",
+              "value": "in spel"
+            }
+          ]
+        }
+      ]
+    }
   ]
 }

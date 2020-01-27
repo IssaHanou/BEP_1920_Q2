@@ -1,0 +1,6 @@
+{
+  "id": "controlBoard",
+  "host": "localhost",
+  "port": 1883,
+  "labels": []
+}
