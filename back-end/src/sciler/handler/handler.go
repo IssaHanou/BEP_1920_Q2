@@ -185,8 +185,6 @@ func (handler *Handler) handleInstruction(instruction map[string]interface{}, in
 	switch instruction["instruction"] {
 	case "send setup":
 		handler.SendSetup()
-	case "send status":
-		handler.onSendStatus()
 	case "reset all":
 		handler.onResetAll(instructor)
 	case "test all":
