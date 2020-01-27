@@ -81,23 +81,32 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 func generateDevices(devices []ReadDevice, config *WorkingConfig) (map[string]*Device, []string) {
 	newDevices := make(map[string]*Device)
 	errorList := make([]string, 0)
-	for _, readDevice := range devices {
-		if _, ok := newDevices[readDevice.ID]; ok {
-			errorList = append(errorList, fmt.Sprintf("level II - format error: device with id %s already exists in device map", readDevice.ID))
-		} else {
-			newDevices[readDevice.ID] = &(Device{
-				readDevice.ID,
-				readDevice.Description,
-				readDevice.Input,
-				readDevice.Output,
-				make(map[string]interface{}),
-				false,
-			})
-		}
-	}
 	// add front-end to the devices
 	newDevices["front-end"] = generateFrontendDevice(config)
+	for _, readDevice := range devices {
+		if device, err := generateDevice(newDevices, readDevice); err != "" {
+			errorList = append(errorList, err)
+		} else {
+			newDevices[readDevice.ID] = device
+		}
+	}
 	return newDevices, errorList
+}
+
+// generateDevice checks whether the read device's id already exist in the device map,
+// if so it returns error, otherwise it returns the pointer to the created Device.
+func generateDevice(newDevices map[string]*Device, readDevice ReadDevice) (*Device, string) {
+	if _, ok := newDevices[readDevice.ID]; ok {
+		return nil, fmt.Sprintf("level II - format error: device with id %s already exists in device map", readDevice.ID)
+	}
+	return &(Device{
+		readDevice.ID,
+		readDevice.Description,
+		readDevice.Input,
+		readDevice.Output,
+		make(map[string]interface{}),
+		false,
+	}), ""
 }
 
 // generateFrontendDevice setups up a device which represents the front-end
@@ -132,25 +141,36 @@ func generateFrontendDevice(config *WorkingConfig) *Device {
 func generateTimers(timers []ReadTimer, config *WorkingConfig) (map[string]*Timer, []string) {
 	errorList := make([]string, 0)
 	newTimers := make(map[string]*Timer)
+	if generalTimer, err := generateGeneralTimer(ReadTimer{"general", config.General.Duration}, newTimers); err != "" {
+		errorList = append(errorList, err)
+	} else {
+		newTimers["general"] = generalTimer
+	}
 	for _, readTimer := range timers {
-		duration, err := time.ParseDuration(readTimer.Duration)
-		if err != nil {
-			errorList = append(errorList, "level II - format error: "+err.Error())
-		} else if _, ok := newTimers[readTimer.ID]; ok {
-			errorList = append(errorList, fmt.Sprintf("level II - format error: timer with id %s already exists in timer map", readTimer.ID))
+		if newTimer, err := generateGeneralTimer(readTimer, newTimers); err != "" {
+			errorList = append(errorList, err)
 		} else {
-			newTimers[readTimer.ID] = newTimer(readTimer.ID, duration)
+			newTimers[readTimer.ID] = newTimer
 		}
 	}
-	duration, err := time.ParseDuration(config.General.Duration)
-	if config.General.Duration == "" {
-		errorList = append(errorList, "level II - format error: no duration was given in 'general'")
-	} else if err != nil {
-		errorList = append(errorList, "level II - format error: "+err.Error())
-	} else {
-		newTimers["general"] = newTimer("general", duration)
-	}
 	return newTimers, errorList
+}
+
+// generateGeneralTimer checks if the timer's duration is present and in the correct format
+// and if the timer's id does not already exist in the map
+// if so it return the new timer
+// for the room's general timer, the id is 'general', and its duration is found in 'general' info in the config
+func generateGeneralTimer(timer ReadTimer, timerMap map[string]*Timer) (*Timer, string) {
+	duration, err := time.ParseDuration(timer.Duration)
+	if timer.Duration == "" {
+		return nil, fmt.Sprintf("level II - format error: no duration was given for timer with id %s", timer.ID)
+	} else if err != nil {
+		return nil, "level II - format error: " + err.Error()
+	} else if _, ok := timerMap[timer.ID]; ok {
+		return nil, fmt.Sprintf("level II - format error: timer with id %s already exists in timer map", timer.ID)
+	} else {
+		return newTimer(timer.ID, duration), ""
+	}
 }
 
 // getAllRules creates rule list of the rule pointers belonging to all events,
