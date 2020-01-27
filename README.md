@@ -11,7 +11,7 @@
 ```                                                           
 
 [![Build Status](https://travis-ci.com/IssaHanou/BEP_1920_Q2.svg?branch=master)](https://travis-ci.com/IssaHanou/BEP_1920_Q2)
-[![BCH compliance](https://bettercodehub.com/edge/badge/IssaHanou/BEP_1920_Q2?branch=develop-sprint-7)](https://bettercodehub.com/)
+[![BCH compliance](https://bettercodehub.com/edge/badge/IssaHanou/BEP_1920_Q2?branch=master)](https://bettercodehub.com/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 
