@@ -10,8 +10,8 @@ This is the library to create devices to work together with the SCILER system
 - import lib with `from sciler.device import Device`
 ##### create a class that extends `Device`
 - in order to do this:
-    - implement `getStatus()` which should return a dictionary of the current status
-    - implement `performInstruction(action)` which should return a boolean of whether the instruction can be performed, where action has:
+    - implement `get_status()` which should return a dictionary of the current status
+    - implement `perform_instruction(action)` which should return a boolean of whether the instruction can be performed, where action has:
         - `instruction`: string with the name of the instruction
         - `value`: any type with a value specific for this instruction
         - `component_id`: string with the name of the component for which the instruction is meant (can be undefined) 
@@ -32,7 +32,7 @@ This is the library to create devices to work together with the SCILER system
 ##### Now in your class which implements `Device` 
 - you can call:
     - `log(level, message)` which logs using the logger provided in `Device` where level one of the following strings: 'debug', 'info', 'warn', 'error', 'fatal' and message custom string containing more information
-    -  `statusChanged()` which can be called to signal to `Device` that the status is changed, this will send a new status to SCILER
+    -  `status_changed()` which can be called to signal to `Device` that the status is changed, this will send a new status to SCILER
 ##### To now start the system
  - initialize the device in your main program and call `device.main() `
 

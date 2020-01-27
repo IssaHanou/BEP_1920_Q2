@@ -185,8 +185,6 @@ func (handler *Handler) handleInstruction(instruction map[string]interface{}, in
 	switch instruction["instruction"] {
 	case "send setup":
 		handler.SendSetup()
-	case "send status":
-		handler.onSendStatus()
 	case "reset all":
 		handler.onResetAll(instructor)
 	case "test all":
@@ -198,24 +196,12 @@ func (handler *Handler) handleInstruction(instruction map[string]interface{}, in
 	case "hint":
 		handler.onHint(instruction["value"].(string), instructor)
 	case "check config":
-		handler.onCheckConfig(instruction["config"])
+		handler.onCheckConfig(instruction["config"], instruction["name"].(string))
 	case "use config":
 		handler.onUseConfig(instruction["config"], instruction["file"].(string))
 	default:
 		logger.Warnf("%s is an unknown instruction", instruction["instruction"])
 	}
-}
-
-// onSendStatus is the function to process the instruction `send status`
-// send status is instructed when the front-end starts
-func (handler *Handler) onSendStatus() {
-	for _, device := range handler.Config.Devices {
-		handler.sendStatus(device.ID)
-	}
-	for _, timer := range handler.Config.Timers {
-		handler.sendStatus(timer.ID)
-	}
-	handler.sendEventStatus()
 }
 
 // onResetAll is the function to process the instruction `reset all`
@@ -252,7 +238,7 @@ func (handler *Handler) onTestDevice(deviceID string, instructor string) {
 }
 
 // onResetAll is the function to process the instruction `finish rule`
-// finish rule is instructed then the "voer uit" button of a rule is clicked in the front-end
+// finish rule is instructed when the "puzzel eindigen" button of a rule is clicked in the front-end
 func (handler *Handler) onFinishRule(ruleID string) {
 	rule, ok := handler.Config.RuleMap[ruleID]
 	if !ok {
@@ -275,12 +261,15 @@ func (handler *Handler) onHint(hint string, instructor string) {
 
 // onCheckConfig is the function to process the instruction `check config`
 // checks the config and sends a message containing all errors it could find
-func (handler *Handler) onCheckConfig(configToRead interface{}) {
+func (handler *Handler) onCheckConfig(configToRead interface{}, fileName string) {
 	message := Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
 		Type:     "config",
-		Contents: map[string][]string{"errors": handler.checkConfig(configToRead)},
+		Contents: map[string]interface{}{
+			"name":   fileName,
+			"errors": handler.checkConfig(configToRead),
+		},
 	}
 	jsonMessage, _ := json.Marshal(&message)
 	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
@@ -326,15 +315,15 @@ func (handler *Handler) checkConfig(configToRead interface{}) []string {
 	errors := make([]string, 0)
 	jsonBytes, err := json.Marshal(configToRead)
 	if err != nil {
-		errors = append(errors, fmt.Sprintf("could not unmarshal json, %v", err))
+		errors = append(errors, fmt.Sprintf("level I - JSON error: could not unmarshal json, %v", err))
 	} else {
 		newConfig, errorList := config.ReadJSON(jsonBytes)
 
 		if newConfig.General.Host != handler.Config.General.Host {
-			errorList = append(errorList, "host: different from current host for front and back-end")
+			errorList = append(errorList, "level IV - system error: host: different from current host for front and back-end")
 		}
 		if newConfig.General.Port != handler.Config.General.Port {
-			errorList = append(errorList, "port: different from current port for front and back-end")
+			errorList = append(errorList, "level IV - system error: port: different from current port for front and back-end")
 		}
 		errors = append(errors, errorList...)
 	}

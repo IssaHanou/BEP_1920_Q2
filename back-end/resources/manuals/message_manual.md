@@ -1,13 +1,13 @@
 `message`: this is the format of messages sent between all system components.
 ### Base of message
-- `device_id`: the id of the device of which de message is send. 
+- `device_id`: the id of the device of which de message is sent. 
 - `time_sent`: the time at which the message is sent in the format 
 "dd-mm-yyyy hh:mm:ss".
 - `type`: the type of the message
 - `contents`: the actual contents the message want to pass on
 
 `device_id` and `time_sent` is defined the same for each message, `type` and `contents`
-are specific defined depending on the sender and receiver.
+are specifically defined depending on the sender and receiver.
 
 ### Back-end to Client Computers
 - `type`: the type of the message, this can be:
@@ -16,12 +16,12 @@ are specific defined depending on the sender and receiver.
     - If type is `instruction`, then the message contents is __list__ of instructions 
     that have:
         - `instruction`: one of the instructions specified for this device or 
-        component or one of following instructions: `test`, `status update`, `reset`
+        component or one of the following instructions: `test`, `status update`, `reset`
         - `value`: this is the value (argument) for the instruction (optional)
         - `instructed_by`: this is the id of the device which originally send this instruction (usually front-end)
         - `component_id`: this will be the id of a component in a timer or device, 
                 (optional)
-                
+     
 ##### example
     { 
     "device_id": "back-end",
@@ -40,7 +40,6 @@ are specific defined depending on the sender and receiver.
             }
         ]
     }
-    
    
 ### Client Computers to Back-end
 - `type`: the type of the message, this can be:
@@ -56,6 +55,7 @@ are specific defined depending on the sender and receiver.
         - `instructed` is the original instruction message for the device, including the `instructed_by` tag
     - If type is `connection`, then the message contents has te following:
         - `connection` is a boolean defining the connection status of the device.
+
 ##### Example   
     { 
     "device_id": "controlBoard",
@@ -66,13 +66,15 @@ are specific defined depending on the sender and receiver.
         "blueSwitch": false
         }
     }
+
 ### Front-end to Back-end
 - `type`: the type of the message, this can be:
     - `instruction`
 - `contents`:
-    - If type is `instruction`, then the then the message contents have
+    - If type is `instruction`, then the message contents have
         - `instruction`: one of following instructions: 
         `send setup`, `send status`, `reset all`, `test all`, `test device`, `finish rule`, `hint`
+
 ##### Example
     { 
     "device_id": "front-end",
@@ -104,17 +106,17 @@ are specific defined depending on the sender and receiver.
     - If type is `event status`, then the message contents has objects with
         - `id` of rule
         - `description` of rule
-        - `status` of rule describes whether rule is finished or not
+        - `status` of rule describes whether the rule is finished or not
     - If type is `front-end status`, then the message contents has a list of objects with:
         - `id` of button
         - `disabled` status of button
-    - If type is `time`, then the then the message contents have
+    - If type is `time`, then the message contents have
         - `id` of timer
         - `duration` has a number of the duration left in milliseconds
         - `state` sting of the timer state
     - If type is `setup`, the contents:
         - a `name` parameter carrying the name of the escape room 
-        - a `hints` parameter carrying a map with the name of puzzle as key and list of hints as value
+        - a `hints` parameter carrying a map with the name of the puzzle as key and a list of hints as value
         - an `events` parameter carrying a map with the name of the rule as key and the description as value
         - a `cameras` parameter carrying a list with camera objects with a `name` and `link` tag
         - a `buttons` parameter carrying a list of button names that should be added to the front-end 

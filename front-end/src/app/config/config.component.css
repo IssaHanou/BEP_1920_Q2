@@ -14,6 +14,9 @@
 }
 
 /*Styling the output box*/
+.information-box {
+  margin: 5px;
+}
 .file-output-errors {
   background-color: #E68364;
   padding: 5px;

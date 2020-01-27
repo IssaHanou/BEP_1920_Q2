@@ -30,7 +30,7 @@ The back-end server contains and manages all logic in the escape room.
 
 ##### To run on boot
 - use tool like supervisord
-- command `....... sciler` from  directory ~/go/src/BEP_1920_Q2 with $GOPATH=...
+- command `$GOPATH/bin/sciler` from  directory ~/go/src/BEP_1920_Q2 with $GOPATH=/home/pi/go/src/BEP_1920_Q2/back-end
 
 ## Development
 The back-end is written in Go. Tools used are go fmt, golint and Testify. 

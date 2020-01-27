@@ -19,6 +19,13 @@ func TestDurationError(t *testing.T) {
 		"Incorrect json (duration in int) should panic")
 }
 
+func TestDurationNil(t *testing.T) {
+	filename := "../../../resources/testing/testDurationMissing.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"Incorrect json (duration in int) should panic")
+}
+
 func TestDurationErrorWrongFormat(t *testing.T) {
 	filename := "../../../resources/testing/testDurationErrorWrongFormat.json"
 	assert.Panics(t,
@@ -200,9 +207,100 @@ func Test_CheckActionArray(t *testing.T) {
 		"instruction type does not match given value in an action")
 }
 
+func Test_CheckActionNoValueDevice(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckActionNoValueDevice.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"action does not have a value for front-end set state instruction")
+}
+
+func Test_CheckActionNoValueTimer(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckActionNoValueTimer.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"action does not have a value for timer add instruction")
+}
+
+func Test_CheckConstraintNoValueDevice(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckConstraintNoValueDevice.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"constraint does not have a value for front-end condition")
+}
+
+func Test_CheckConstraintNoValueRule(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckConstraintNoValueRule.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"constraint does not have a value for rule condition")
+}
+
+func Test_CheckConstraintNoValueTimer(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckConstraintNoValueTimer.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"constraint does not have a value for timer condition")
+}
+
 func Test_GenerateEmptyConditions(t *testing.T) {
-	filename := "../../../resources/testing/testEmptyConditions.json"
+	filename := "../../../resources/testing/wrong-types/test_emptyConditions.json"
 	assert.NotPanics(t,
 		func() { ReadFile(filename) },
 		"empty conditions should not panic")
+}
+
+func Test_GenerateEmptyConstraints(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/test_emptyConstraints.json"
+	assert.NotPanics(t,
+		func() { ReadFile(filename) },
+		"empty constraints should not panic")
+}
+
+func Test_GenerateEmptyConstraintList(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/test_emptyConstraintList.json"
+	assert.NotPanics(t,
+		func() { ReadFile(filename) },
+		"empty constraint list should not panic")
+}
+
+func Test_GenerateConditionList(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/test_emptyConditionList.json"
+	assert.NotPanics(t,
+		func() { ReadFile(filename) },
+		"empty condition list should not panic")
+}
+
+func Test_GenerateNoConditions(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/test_noConditions.json"
+	assert.NotPanics(t,
+		func() { ReadFile(filename) },
+		"no conditions key in config should not panic")
+}
+
+func Test_GenerateNoConstraints(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/test_noConstraints.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"no constraints key in config should panic, because it is an invalid condition")
+}
+
+func Test_DoubleRuleId(t *testing.T) {
+	filename := "../../../resources/testing/test_doubleRuleId.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"two rules with the same id is not allowed")
+}
+
+func Test_DoubleDeviceId(t *testing.T) {
+	filename := "../../../resources/testing/test_doubleDeviceId.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"two devices with the same id is not allowed")
+}
+
+func Test_DoubleTimerId(t *testing.T) {
+	filename := "../../../resources/testing/test_doubleTimerId.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"two timers with the same id is not allowed")
 }

@@ -1,0 +1,97 @@
+{
+  "general": {
+    "name": "Escape X",
+    "duration": "30m",
+    "host": "localhost",
+    "port": 1883
+  },
+  "puzzles": [
+    {
+      "name": "event",
+      "hints": [],
+      "rules": [
+        {
+          "id": "mainSwitch flipped",
+          "description": "Als de mainSwitch true is, moet greenLight1 aangaan",
+          "limit": 1,
+          "conditions": {
+            "operator": "OR",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "controlBoard",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "component_id": "mainSwitch",
+                      "comparison": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "controlBoard",
+              "message": [
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "turnOnOff",
+                  "value": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "general_events": [
+    {
+      "name": "event",
+      "rules": [
+        {
+          "id": "mainSwitch flipped",
+          "description": "Als de mainSwitch true is, moet greenLight1 aangaan",
+          "limit": 1,
+          "conditions": {
+            "operator": "OR",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "controlBoard",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "component_id": "mainSwitch",
+                      "comparison": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "controlBoard",
+              "message": [
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "turnOnOff",
+                  "value": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
