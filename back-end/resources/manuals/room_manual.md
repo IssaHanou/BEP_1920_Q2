@@ -152,3 +152,5 @@ This can be displayed in the front-end, so should be readable and in Dutch.
            - `instruction`: one of the instructions specified for the components with this label
            - `value`: this is the value for the instruction of the type specified for this device and component 
     - `delay` in case of type `device` or `label`: This is optional, this is a duration in format XhXmXs, if an action has a delay, the message will publish after this delay.
+
+![visualisation of the configuration file](../../../images/UML-final-config.png)
