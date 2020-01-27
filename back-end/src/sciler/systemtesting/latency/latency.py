@@ -1,5 +1,5 @@
 import json
-from scclib.device import Device
+from sciler.device import Device
 
 
 class Latency(Device):
