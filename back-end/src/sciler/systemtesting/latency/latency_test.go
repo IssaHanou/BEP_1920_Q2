@@ -20,13 +20,6 @@ import (
 // Make sure when running windows, the setup in systemtesting/README.md is followed
 
 func TestLatency(t *testing.T) {
-	// edit mosquitto.conf bind address to local ip of the Pi
-	// start broker with `mosquitto -c mosquitto.conf`
-	// edit latency_config.json host to local ip of the Pi
-	// start latency client with python3 latency.py
-
-	// run this test
-
 	logger.Info("starting latency test")
 	receiveTimes := make(map[int]int64, 100)
 
