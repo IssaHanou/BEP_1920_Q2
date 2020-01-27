@@ -283,3 +283,24 @@ func Test_GenerateNoConstraints(t *testing.T) {
 		func() { ReadFile(filename) },
 		"no constraints key in config should panic, because it is an invalid condition")
 }
+
+func Test_DoubleRuleId(t *testing.T) {
+	filename := "../../../resources/testing/test_doubleRuleId.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"two rules with the same id is not allowed")
+}
+
+func Test_DoubleDeviceId(t *testing.T) {
+	filename := "../../../resources/testing/test_doubleDeviceId.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"two devices with the same id is not allowed")
+}
+
+func Test_DoubleTimerId(t *testing.T) {
+	filename := "../../../resources/testing/test_doubleTimerId.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"two timers with the same id is not allowed")
+}

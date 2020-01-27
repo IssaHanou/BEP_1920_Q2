@@ -55,10 +55,11 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 	config.GeneralEvents = newEvents
 	newButtonEvents, buttonEventErrors := generateButtonEvents(readConfig.ButtonEvents, &config)
 	config.ButtonEvents = newButtonEvents
-	config.Devices = generateDevices(readConfig.Devices, &config) // this needs to happen after generateButtonEvents for status map
+	newDevices, deviceErrors := generateDevices(readConfig.Devices, &config) // this needs to happen after generateButtonEvents for status map
+	config.Devices = newDevices
 	newTimers, timerErrors := generateTimers(readConfig.Timers, &config)
 	config.Timers = newTimers
-	errorList = append(errorList, append(buttonEventErrors, append(puzzleErrors, append(eventErrors, timerErrors...)...)...)...)
+	errorList = append(errorList, append(buttonEventErrors, append(puzzleErrors, append(eventErrors, append(deviceErrors, timerErrors...)...)...)...)...)
 
 	if len(errorList) == 0 {
 		// if there are errors in config format,
@@ -66,9 +67,10 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 		// and with checking constraint
 		config.StatusMap = generateStatusMap(&config)
 		config.EventRuleMap = generateEventRuleMap(&config)
-		config.RuleMap = generateRuleMap(&config)
+		ruleMap, ruleErrors := generateRuleMap(&config)
+		config.RuleMap = ruleMap
 		config.LabelMap = generateLabelMap(&config)
-		errorList = append(errorList, checkConfig(config)...)
+		errorList = append(errorList, append(ruleErrors, checkConfig(config)...)...)
 	}
 	return config, errorList
 }
@@ -76,21 +78,26 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 // generateDevices creates the config devices map which points device id to a device in the WorkingConfig.
 // Creates front-end device manually as its information is not in `devices` in the configuration file.
 // The components are defined as the custom buttons, with boolean status of clicked or not.
-func generateDevices(devices []ReadDevice, config *WorkingConfig) map[string]*Device {
+func generateDevices(devices []ReadDevice, config *WorkingConfig) (map[string]*Device, []string) {
 	newDevices := make(map[string]*Device)
+	errorList := make([]string, 0)
 	for _, readDevice := range devices {
-		newDevices[readDevice.ID] = &(Device{
-			readDevice.ID,
-			readDevice.Description,
-			readDevice.Input,
-			readDevice.Output,
-			make(map[string]interface{}),
-			false,
-		})
+		if _, ok := newDevices[readDevice.ID]; ok {
+			errorList = append(errorList, fmt.Sprintf("level II - format error: device with id %s already exists in device map", readDevice.ID))
+		} else {
+			newDevices[readDevice.ID] = &(Device{
+				readDevice.ID,
+				readDevice.Description,
+				readDevice.Input,
+				readDevice.Output,
+				make(map[string]interface{}),
+				false,
+			})
+		}
 	}
 	// add front-end to the devices
 	newDevices["front-end"] = generateFrontendDevice(config)
-	return newDevices
+	return newDevices, errorList
 }
 
 // generateFrontendDevice setups up a device which represents the front-end
@@ -129,6 +136,8 @@ func generateTimers(timers []ReadTimer, config *WorkingConfig) (map[string]*Time
 		duration, err := time.ParseDuration(readTimer.Duration)
 		if err != nil {
 			errorList = append(errorList, "level II - format error: "+err.Error())
+		} else if _, ok := newTimers[readTimer.ID]; ok {
+			errorList = append(errorList, fmt.Sprintf("level II - format error: timer with id %s already exists in timer map", readTimer.ID))
 		} else {
 			newTimers[readTimer.ID] = newTimer(readTimer.ID, duration)
 		}
@@ -163,18 +172,22 @@ func getAllRules(config *WorkingConfig) []*Rule {
 // generateRuleMap creates rule map with rule id
 // pointing to rule object pointers for all rules of all events
 // this map can be used to easily find (and edit) a rule by its id
-func generateRuleMap(config *WorkingConfig) map[string]*Rule {
+// if a double rule id is found, an error is logged
+func generateRuleMap(config *WorkingConfig) (map[string]*Rule, []string) {
 	ruleMap := make(map[string]*Rule)
+	errorList := make([]string, 0)
 	rules := getAllRules(config)
-
 	for _, event := range config.ButtonEvents {
 		rules = append(rules, event)
 	}
-
 	for _, rule := range rules {
-		ruleMap[rule.ID] = rule
+		if _, ok := ruleMap[rule.ID]; ok {
+			errorList = append(errorList, fmt.Sprintf("level III - implementation errorList: rule with id %s already exists in ruleMap", rule.ID))
+		} else {
+			ruleMap[rule.ID] = rule
+		}
 	}
-	return ruleMap
+	return ruleMap, errorList
 }
 
 // generatePuzzle RuleMap creates rule map with rule id
