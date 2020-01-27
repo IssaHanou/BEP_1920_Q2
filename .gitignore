@@ -11,6 +11,7 @@ back-end/resources/production/*.json
 */debug.log
 /cc_library/example_scripts_py_scc/logs/
 /cc_library/example_scripts_js_scc/logs/
+/cc_library/logs/
 /cc_library/venv
 /cc_library/src
 front-end/src/app/assets/config.json
