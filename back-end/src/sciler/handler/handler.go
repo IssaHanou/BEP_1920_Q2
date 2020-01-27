@@ -204,18 +204,6 @@ func (handler *Handler) handleInstruction(instruction map[string]interface{}, in
 	}
 }
 
-// onSendStatus is the function to process the instruction `send status`
-// send status is instructed when the front-end starts
-func (handler *Handler) onSendStatus() {
-	for _, device := range handler.Config.Devices {
-		handler.sendStatus(device.ID)
-	}
-	for _, timer := range handler.Config.Timers {
-		handler.sendStatus(timer.ID)
-	}
-	handler.sendEventStatus()
-}
-
 // onResetAll is the function to process the instruction `reset all`
 // reset all is instructed when the reset button is clicked in the front-end
 func (handler *Handler) onResetAll(deviceID string) {
