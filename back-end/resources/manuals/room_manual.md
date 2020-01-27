@@ -131,7 +131,7 @@ This can be displayed in the front-end, so should be readable and in Dutch.
             1. Logical operator
                 - `operator`: this can `AND` or `OR`
                 - `list`: this is an array of constraints / logical operators
-            2.
+            2. Constraint
                 - `comparison`: this is the type of comparison and can be `eq`, `lt`, `gt`, `contains` , `lte`, `gte`, `not`. However, only `eq` will work on all types, `lt`, `gt`, `lte`, `gte` only on numeric, and `contains` only on arrays, `not` does not work on booleans.
                 - `value`: this is the value on which the comparison is made. In case of `device` type, it should be in the same type as specified in the input of the device. 
                 If it has custom input, then enter value in preferred type and deal with it on the client.
