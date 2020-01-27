@@ -21,7 +21,7 @@ are specifically defined depending on the sender and receiver.
         - `instructed_by`: this is the id of the device which originally send this instruction (usually front-end)
         - `component_id`: this will be the id of a component in a timer or device, 
                 (optional)
-                
+     
 ##### example
     { 
     "device_id": "back-end",
@@ -40,7 +40,6 @@ are specifically defined depending on the sender and receiver.
             }
         ]
     }
-    
    
 ### Client Computers to Back-end
 - `type`: the type of the message, this can be:
@@ -56,6 +55,7 @@ are specifically defined depending on the sender and receiver.
         - `instructed` is the original instruction message for the device, including the `instructed_by` tag
     - If type is `connection`, then the message contents has te following:
         - `connection` is a boolean defining the connection status of the device.
+
 ##### Example   
     { 
     "device_id": "controlBoard",
@@ -66,6 +66,7 @@ are specifically defined depending on the sender and receiver.
         "blueSwitch": false
         }
     }
+
 ### Front-end to Back-end
 - `type`: the type of the message, this can be:
     - `instruction`
@@ -73,6 +74,7 @@ are specifically defined depending on the sender and receiver.
     - If type is `instruction`, then the message contents have
         - `instruction`: one of following instructions: 
         `send setup`, `send status`, `reset all`, `test all`, `test device`, `finish rule`, `hint`
+
 ##### Example
     { 
     "device_id": "front-end",

@@ -43,6 +43,7 @@ This will be a list of all devices in the room. Each device is defined as a JSON
     
 ### Timers
 This will be a list of all the time-related actions/conditions. all timers have to be started in an action and be checked in a condition to be used.
+
 - `id`: this will be the id of the timer. Write in camelCase and numbers are fine, e.g. "timerHint1". This id should be unique compared to other timers ids and also the rule ids as well as the device ids.
 - `duration`: This will be the duration after which the timer will trigger to true and the conditions containing the timer will be checked to execute actions. The format is XhXmXs, each size optional, e.g. 1h30m30s, 40m30s, 1m30s
 
@@ -126,7 +127,6 @@ This can be displayed in the front-end, so should be readable and in Dutch.
         - `type`: this can be `rule`, `timer` or `device`.
         - `type_id`: this will be the id of a timer, rule or device, depending on the type.
         - `constraints`: this is either a logical operator (i) defined by `operator` (either `AND` or `OR`) and `list` which is a list of conditions or other logical operators **or** this is a constraint (ii) defined by `comp`, `value` and `component_id`      
-        
             1. Logical operator
                 - `operator`: this can `AND` or `OR`
                 - `list`: this is an array of constraints / logical operators
@@ -136,7 +136,8 @@ This can be displayed in the front-end, so should be readable and in Dutch.
                 In the case of `timer` type, it should be boolean
                 In the case of `rule` type, it should be numeric since the comparison will be done against the times the rule is executed
                 - `component_id`: in the case of "device" type, this is the id of the component it triggers.
-                In the case of "timer" type, this is non-existent. 
+                In the case of "timer" type, this is non-existent.
+                 
 - `actions`: this is an array of actions:
         
     - `type`: this can be `device`, `timer` or `label`
