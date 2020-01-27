@@ -464,8 +464,8 @@ func TestInstructionCheckConfigWithErrors(t *testing.T) {
 		Type:     "config",
 		Contents: map[string]interface{}{
 			"errors": []string{
-				"level II - format error: time: unknown unit x in duration 10x",
 				"level II - format error: time: missing unit in duration 30",
+				"level II - format error: time: unknown unit x in duration 10x",
 				"level IV - system error: host: different from current host for front and back-end",
 				"level IV - system error: port: different from current port for front and back-end",
 			},
