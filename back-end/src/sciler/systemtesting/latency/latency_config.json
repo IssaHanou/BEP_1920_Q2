@@ -1,6 +1,6 @@
 {
   "id": "latency",
-  "host": "localhost",
+  "host": "192.168.178.82",
   "labels": [],
   "port": 1883
 }

@@ -27,6 +27,7 @@ func TestLatency(t *testing.T) {
 
 	// run this test
 
+	logger.Info("starting latency test")
 	receiveTimes := make(map[int]int64, 100)
 
 	dir, dirErr := os.Getwd()
