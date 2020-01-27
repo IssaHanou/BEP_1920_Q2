@@ -1,4 +1,4 @@
-package systemtesting
+package latency
 
 import (
 	"encoding/json"

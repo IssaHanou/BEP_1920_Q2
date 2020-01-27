@@ -19,6 +19,8 @@ The back-end server contains and manages all logic in the escape room.
 `export GOPATH=~/go/src/BEP_1920_Q2/back-end`\
 `export PATH=$PATH:$GOPATH/bin`
 - reboot
+- run `mkdir go`
+- run `mkdir go/src`
 - run `pi@raspberrypi:~/go/src $ git clone https://github.com/IssaHanou/BEP_1920_Q2.git`
 - run `pi@raspberrypi:~/go/src/BEP_1920_Q2/back-end/src/sciler $ go get ./...`
 - run `pi@raspberrypi:~/go/src/BEP_1920_Q2 $ go install sciler`
