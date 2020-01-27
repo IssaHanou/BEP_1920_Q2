@@ -21,7 +21,7 @@ type Communicator struct {
 func NewCommunicator(config config.WorkingConfig, messageHandler mqtt.MessageHandler, onStart func()) *Communicator {
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("%s://%s:%d", "tcp", config.General.Host, config.General.Port))
-	opts.SetClientID("back-end-gwennan")
+	opts.SetClientID("back-end")
 
 	configureConnectionOptions(opts)
 	setHandlers(opts, messageHandler, onStart)
