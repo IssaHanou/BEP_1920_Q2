@@ -20,7 +20,7 @@ The [Front-end](front-end/README.md) is developed in Angular with TypeScript, al
 
 The [Back-end](back-end/README.md) is developed in Go, all source code can be found in `back-end/`.
 
-The [Client Computer Library](cc_library/README.md) is developed in Python, all source code can be found in `cc-library/`.
+The [Client Computer Library](cc_library/README.md) is initially developed in Python and later a JavaScript version was added, all source code can be found in `cc-library/`.
 
 All of these parts of SCILER communicate via a [MQTT Broker](broker/README.md), for which a [Mosquitto](https://mosquitto.org/) broker was used.
 
