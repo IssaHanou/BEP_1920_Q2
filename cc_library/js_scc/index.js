@@ -253,7 +253,7 @@ class SccLib {
         }
         default: {
           let success = this._doCustomInstruction(action);
-          if (!success) return false
+          if (!success) return false;
           break;
         }
       }
@@ -302,8 +302,8 @@ class SccLib {
     if (!this.device.performInstruction(action)) {
       // action NOT successful
       this.log(
-          "warn",
-          "instruction " +
+        "warn",
+        "instruction " +
           action.instruction +
           " could not be performed, " +
           action
@@ -311,7 +311,7 @@ class SccLib {
       return false;
     } else {
       this.log("info", "instruction performed " + instruction);
-      return true
+      return true;
     }
   }
 
@@ -379,8 +379,8 @@ class SccLib {
    */
   statusChanged() {
     this._sendMessage(
-        "back-end",
-        new Message(this.name, "status", this.device.getStatus())
+      "back-end",
+      new Message(this.name, "status", this.device.getStatus())
     );
   }
 }
