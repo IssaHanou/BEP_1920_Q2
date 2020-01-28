@@ -239,11 +239,7 @@ class Sciler:
         """
         message = message.payload.decode("utf-8")
         message = json.loads(message)
-        if message.get("type") != "instruction":
-            logging.warning(
-                ("received non-instruction message of type: ", message.get("type"))
-            )
-        else:
+        if message.get("type") == "instruction":
             success = self.__check_message(message.get("contents"))
             conf_msg_dict = {
                 "device_id": self.name,
@@ -253,6 +249,20 @@ class Sciler:
             }
             msg = json.dumps(conf_msg_dict)
             self.__send_message("back-end", msg)
+        elif message.get("type") == "time":
+            self.__check_time(message.get("contents"))
+        else:
+            logging.warning(
+                ("received non-instruction message of type: ", message.get("type"))
+            )
+
+    def __check_time(self, contents):
+        """
+        check_time gets the time status of all timers
+        :param contents: contents is the time status from the original status message
+        """
+        contents["instruction"] = "time"
+        self.__do_custom_instruction(contents)
 
     def __check_message(self, contents):
         """
