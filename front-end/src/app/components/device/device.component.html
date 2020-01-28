@@ -14,10 +14,25 @@
           <ng-container *ngIf="!element.connection"><span class="cross">&#10006;</span></ng-container>
         </td>
       </ng-container>
+      <ng-container matColumnDef="unfold">
+        <th mat-header-cell *matHeaderCellDef class="custom-md-table-header onderdeel-header">Laat status zien</th>
+        <td mat-cell *matCellDef="let element" class="unfold-cell comp-pad-right">
+          <ng-container *ngIf="collapsed.get(element.id)">
+            <button mat-button class="mat-raised-button unfold-button" color=primary (click)="collapseComponents(element.id)">
+              status
+            </button>
+          </ng-container>
+          <ng-container *ngIf="!collapsed.get(element.id)">
+            <button mat-button class="mat-raised-button collapse-button" color=primary (click)="collapseComponents(element.id)">
+              sluit
+            </button>
+          </ng-container>
+        </td>
+      </ng-container>
       <ng-container matColumnDef="component">
         <th mat-header-cell *matHeaderCellDef class="custom-md-table-header onderdeel-header">Onderdeel</th>
         <td mat-cell id="{{ element.id }}-component" *matCellDef="let element" class="component-cell comp-pad-right">
-          {{ getComponents(element.status, element.id) }}
+            {{ getComponents(element.status, element.id) }}
         </td>
       </ng-container>
       <ng-container matColumnDef="status">
@@ -30,7 +45,7 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header class="test-column custom-md-table-header">Test</th>
         <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
           <button mat-button class="mat-raised-button test-column" color=primary
-                  disabled="{{ !app.getGameStateInGame() }}" (click)="testDevice(element.id)">Test</button>
+                  disabled="{{ !app.getGameStateInGame() }}" (click)="testDevice(element.id)">test</button>
         </td>
       </ng-container>
 

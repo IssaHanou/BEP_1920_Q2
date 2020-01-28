@@ -15,7 +15,7 @@ export class DeviceComponent implements OnInit {
   /**
    * The keys used by the table to retrieve data from the DataSource
    */
-  deviceColumns: string[] = ["id", "connection", "component", "status", "test"];
+  deviceColumns: string[] = ["id", "connection", "unfold", "component", "status", "test"];
 
   /**
    * Map keeping track of which rows are collapsed.
@@ -42,7 +42,7 @@ export class DeviceComponent implements OnInit {
     for (const device of this.app.deviceList.all.values()) {
       devices.push(device);
       if (!this.collapsed.has(device.id)) {
-        this.collapsed.set(device.id, false);
+        this.collapsed.set(device.id, true);
       }
     }
     devices.sort((a: Device, b: Device) => a.id.localeCompare(b.id));
@@ -53,7 +53,7 @@ export class DeviceComponent implements OnInit {
   }
 
   /**
-   * In the table, show the front-end as device with name "operator scherm.
+   * In the table, show the front-end as device with name "operator scherm".
    */
   getName(deviceId: string): string {
     if (deviceId === "front-end") {
@@ -70,10 +70,8 @@ export class DeviceComponent implements OnInit {
    * For the front-end, only show gameState.
    */
   getComponents(status: Map<string, any>, deviceId: string): any {
-    if (!this.collapsed.get(deviceId)) {
-      return "open onderdelen en status";
-    } else if (status.size === 0) {
-      return "geen status";
+    if (this.collapsed.get(deviceId)) {
+      return "";
     } else if (deviceId === "front-end") {
       return "gameState";
     } else {
@@ -95,7 +93,7 @@ export class DeviceComponent implements OnInit {
    * For the front-end only show gameState status.
    */
   formatStatus(status: Map<string, any>, deviceId: string): string {
-    if (!this.collapsed.get(deviceId)) {
+    if (this.collapsed.get(deviceId)) {
       return "";
     } else if (deviceId === "front-end") {
       return status.get("gameState");
@@ -134,12 +132,12 @@ export class DeviceComponent implements OnInit {
   }
 
   /**
-   * Clicking a row should unfold the components and their statuses.
-   * Clicking again should collapse.
-   * @param row the row to collapse with full device data
+   * Clicking the 'status' button should show the components and their statuses.
+   * Clicking the 'sluit' button should hide the components and their statuses.
+   * @param deviceID the status of this device should be shown/hidden
    */
-  collapseComponents(row) {
-    const oldValue = this.collapsed.get(row.id);
-    this.collapsed.set(row.id, !oldValue);
+  collapseComponents(deviceID: string) {
+    const oldValue = this.collapsed.get(deviceID);
+    this.collapsed.set(deviceID, !oldValue);
   }
 }
