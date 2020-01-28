@@ -69,8 +69,13 @@ func TestInstructionSetup(t *testing.T) {
 				"Telefoon puzzels": {"De knop verzend jouw volgorde", "Heb je al even gewacht?"},
 				"Control puzzel":   {"Zet de schuiven nauwkeurig"},
 			},
-			"events": map[string]string{
-				"correctSequence": "De juiste volgorde van cijfers moet gedraaid worden.",
+			"events": []map[string]interface{}{
+				{
+					"id":          "correctSequence",
+					"status":      false,
+					"description": "De juiste volgorde van cijfers moet gedraaid worden.",
+					"puzzle":      true,
+				},
 			},
 			"cameras": []map[string]string{
 				{"link": "https://raccoon.games", "name": "camera1"},
@@ -98,8 +103,13 @@ func TestInstructionSetup(t *testing.T) {
 				"Telefoon puzzels": {"De knop verzend jouw volgorde", "Heb je al even gewacht?"},
 				"Control puzzel":   {"Zet de schuiven nauwkeurig"},
 			},
-			"events": map[string]string{
-				"correctSequence": "De juiste volgorde van cijfers moet gedraaid worden.",
+			"events": []map[string]interface{}{
+				{
+					"id":          "correctSequence",
+					"status":      false,
+					"description": "De juiste volgorde van cijfers moet gedraaid worden.",
+					"puzzle":      true,
+				},
 			},
 			"cameras": []map[string]string{
 				{"link": "https://raccoon.games", "name": "camera1"},

@@ -253,6 +253,12 @@ func (handler *Handler) getEventStatus() []map[string]interface{} {
 		status["status"] = rule.Finished()
 		list = append(list, status)
 	}
+	for _, rule := range handler.Config.PuzzleRuleMap {
+		var status = make(map[string]interface{})
+		status["id"] = rule.ID
+		status["status"] = rule.Finished()
+		list = append(list, status)
+	}
 	return list
 }
 
@@ -265,13 +271,30 @@ func (handler *Handler) getHints() map[string][]string {
 	return hints
 }
 
-// getEventDescriptions returns a map of hints with puzzle name as key and list of hints for that puzzle as value
-func (handler *Handler) getEventDescriptions() map[string]string {
-	events := make(map[string]string)
+// getEventDescriptions returns a map of rules with the rule id, description and status,
+// and an additional parameter whether or not the rule belongs to a puzzle
+func (handler *Handler) getEventDescriptions() []map[string]interface{} {
+	events := make([]map[string]interface{}, 0)
 	for _, rule := range handler.Config.EventRuleMap {
-		events[rule.ID] = rule.Description
+		status := getMapWithStatusInfo(rule)
+		status["puzzle"] = false
+		events = append(events, status)
+	}
+	for _, rule := range handler.Config.PuzzleRuleMap {
+		status := getMapWithStatusInfo(rule)
+		status["puzzle"] = true
+		events = append(events, status)
 	}
 	return events
+}
+
+// Create a map and set the rule's id, description and status properties.
+func getMapWithStatusInfo(rule *config.Rule) map[string]interface{} {
+	var status = make(map[string]interface{})
+	status["id"] = rule.ID
+	status["description"] = rule.Description
+	status["status"] = rule.Finished()
+	return status
 }
 
 // getCameras returns a map with camera name and camera link

@@ -70,6 +70,7 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 		uniqueErrors := checkUniqueIDs(&config)
 		config.StatusMap = generateStatusMap(&config)
 		config.EventRuleMap = generateEventRuleMap(&config)
+		config.PuzzleRuleMap = generatePuzzleRuleMap(&config)
 		config.LabelMap = generateLabelMap(&config)
 		errorList = append(errorList, append(ruleErrors, append(uniqueErrors, checkConfig(config)...)...)...)
 	}
@@ -211,15 +212,31 @@ func generateRuleMap(config *WorkingConfig) (map[string]*Rule, []string) {
 	return ruleMap, errorList
 }
 
-// generatePuzzle RuleMap creates rule map with rule id
-// pointing to rule object pointers for rules of all puzzles and general events
+// generateEventRuleMap creates rule map with rule id
+// pointing to rule object pointers for rules of all general events
 func generateEventRuleMap(config *WorkingConfig) map[string]*Rule {
 	ruleMap := make(map[string]*Rule)
-	rules := getAllRules(config)
 
-	for _, rule := range rules {
-		ruleMap[rule.ID] = rule
+	for _, event := range config.GeneralEvents {
+		for _, rule := range event.GetRules() {
+			ruleMap[rule.ID] = rule
+		}
 	}
+
+	return ruleMap
+}
+
+// generatePuzzleRuleMap creates rule map with rule id
+// pointing to rule object pointers for rules of all puzzles
+func generatePuzzleRuleMap(config *WorkingConfig) map[string]*Rule {
+	ruleMap := make(map[string]*Rule)
+
+	for _, event := range config.Puzzles {
+		for _, rule := range event.GetRules() {
+			ruleMap[rule.ID] = rule
+		}
+	}
+
 	return ruleMap
 }
 

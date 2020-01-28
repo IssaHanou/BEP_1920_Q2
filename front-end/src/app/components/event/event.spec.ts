@@ -1,10 +1,10 @@
-import { Puzzle } from "./puzzle";
+import { Event } from "./event";
 
 describe("Puzzle", () => {
-  let puzzle: Puzzle;
+  let puzzle: Event;
 
   beforeEach(() => {
-    puzzle = new Puzzle("Door open", "this is my rule");
+    puzzle = new Event("Door open", "this is my rule");
   });
 
   it("should create", () => {

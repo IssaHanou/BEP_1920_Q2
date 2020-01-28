@@ -5,7 +5,7 @@ import { JsonConvert } from "json2typescript";
 import { MatSnackBar, MatSnackBarConfig } from "@angular/material";
 import { Observable, Subscription, timer } from "rxjs";
 import { Devices } from "./components/device/devices";
-import { Puzzles } from "./components/puzzle/puzzles";
+import { Events } from "./components/event/events";
 import { Timers } from "./components/timer/timers";
 import { Logger } from "./logger";
 import { Camera } from "./camera/camera";
@@ -37,7 +37,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
 
   // Keeping track of data
   deviceList: Devices;
-  puzzleList: Puzzles;
+  puzzleList: Events;
   manageButtons: Buttons;
   hintList: Hint[];
   configErrorList: string[];
@@ -100,7 +100,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
    */
   initializeVariables() {
     this.deviceList = new Devices();
-    this.puzzleList = new Puzzles();
+    this.puzzleList = new Events();
     this.manageButtons = new Buttons();
     this.hintList = [];
     this.configErrorList = [];
@@ -391,20 +391,16 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
 
   /**
    * Sets puzzles up given new rules
-   * @param rules json containing list of events
+   * @param rules json containing list of event object maps
    */
   private setupPuzzles(rules) {
-    this.puzzleList = new Puzzles();
-    for (const rule in rules) {
-      if (rules.hasOwnProperty(rule)) {
-        this.puzzleList.addPuzzle(rule, rules[rule]);
-      }
-    }
+    this.puzzleList = new Events();
+    this.puzzleList.updatePuzzles(rules);
   }
 
   /**
    * Sets hints up given all puzzles
-   * @param puzzles json containing list of puzzles
+   * @param puzzles json containing list of hints
    */
   private setupHints(puzzles) {
     this.hintList = [];
@@ -466,6 +462,26 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   getCurrentTime() {
     const date = new Date();
     return formatTime(date.getTime(), date.getTimezoneOffset());
+  }
+
+  /**
+   * When button in the events or puzzles table is pressed, manually override the finished status of rule in back-end.
+   */
+  finishRule(ruleId: string) {
+    this.sendInstruction([{ instruction: "finish rule", rule: ruleId }]);
+  }
+
+  /**
+   * Only if the game is running can a rule be executed manually.
+   */
+  getGameStateInGame() {
+    const general = this.timerList.getTimer("general");
+    if (general !== null) {
+      if (general.getState() === "stateActive") {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**

@@ -1,5 +1,5 @@
 /**
- * Puzzle object, which has an id, status (can be anything, depending on device implementation) and connection status (boolean).
+ * Event object, which has an id, status (can be anything, depending on device implementation) and connection status (boolean).
  */
 export class Device {
   id: string;

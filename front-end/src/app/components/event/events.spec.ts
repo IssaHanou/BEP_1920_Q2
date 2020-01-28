@@ -1,7 +1,7 @@
-import { Puzzles } from "./puzzles";
+import { Events } from "./events";
 
 describe("Puzzles", () => {
-  let puzzles: Puzzles;
+  let puzzles: Events;
   let jsonData: JSON;
 
   beforeEach(() => {
@@ -11,7 +11,7 @@ describe("Puzzles", () => {
            "description": "The door opens"
         }]
     `);
-    puzzles = new Puzzles();
+    puzzles = new Events();
   });
 
   it("should create", () => {
@@ -29,7 +29,12 @@ describe("Puzzles", () => {
   it("should add puzzle", () => {
     const newMap = new Map<string, string>();
     expect(puzzles.all.size).toBe(0);
-    puzzles.addPuzzle("my rule", "this my rule");
+    puzzles.updatePuzzles({
+      "id": "my rule",
+      "description": "this my rule",
+      "status": "true",
+      "puzzle": false
+    });
     expect(puzzles.all.size).toBe(1);
     expect(puzzles.all.get("my rule").status).toBe(false);
   });

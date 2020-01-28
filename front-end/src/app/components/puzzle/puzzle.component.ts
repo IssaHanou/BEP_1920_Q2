@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { MatSort, MatTableDataSource } from "@angular/material";
 import { AppComponent } from "../../app.component";
-import { Puzzle } from "./puzzle";
+import { Event } from "../event/event";
 
 /**
  * The puzzle component controls the puzzles tables and is shown in the "Puzzels" box on the home page.
@@ -27,38 +27,20 @@ export class PuzzleComponent implements OnInit {
   ngOnInit() {}
 
   /**
-   * Returns list of Puzzle objects with their current status.
+   * Returns list of Event objects with their current status.
    * Return in the form of map table data source, with sorting enabled.
    */
-  public getPuzzleStatus(): MatTableDataSource<Puzzle> {
-    const puzzles: Puzzle[] = [];
+  public getPuzzleStatus(): MatTableDataSource<Event> {
+    const puzzles: Event[] = [];
     for (const puzzle of this.app.puzzleList.all.values()) {
-      puzzles.push(puzzle);
-    }
-    puzzles.sort((a: Puzzle, b: Puzzle) => a.id.localeCompare(b.id));
-
-    const dataSource = new MatTableDataSource<Puzzle>(puzzles);
-    dataSource.sort = this.sort;
-    return dataSource;
-  }
-
-  /**
-   * When button in the table is pressed, manually override the finished status of rule in back-end.
-   */
-  finishRule(ruleId: string) {
-    this.app.sendInstruction([{ instruction: "finish rule", rule: ruleId }]);
-  }
-
-  /**
-   * Only if the game is running can a rule be executed manually.
-   */
-  getGameStateInGame() {
-    const general = this.app.timerList.getTimer("general");
-    if (general !== null) {
-      if (general.getState() === "stateActive") {
-        return false;
+      if (puzzle.isPuzzle) {
+        puzzles.push(puzzle);
       }
     }
-    return true;
+    puzzles.sort((a: Event, b: Event) => a.id.localeCompare(b.id));
+
+    const dataSource = new MatTableDataSource<Event>(puzzles);
+    dataSource.sort = this.sort;
+    return dataSource;
   }
 }

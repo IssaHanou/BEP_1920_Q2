@@ -46,6 +46,20 @@ body { /*body of the index.html*/
 .boolean-column {
   text-align: center;
 }
+/*Special for puzzle/events tables*/
+.rule-id {
+  white-space: nowrap;
+  min-width: 20%;
+}
+.rule-status {
+  width: 70px;
+}
+@media only screen and (max-width: 470px) {
+  .rule-description {
+    display: none;
+  }
+}
+
 
 
 /*Other components throughout the application*/
