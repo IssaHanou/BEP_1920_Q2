@@ -54,6 +54,12 @@ body { /*body of the index.html*/
   font-size: 16px;
   border-radius: 4px;
 }
+.check-mark {
+  color: green !important;
+}
+.cross {
+  color: red !important;
+}
 
 
 

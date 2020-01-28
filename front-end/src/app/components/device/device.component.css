@@ -9,7 +9,7 @@
   padding-right: 5px;
 }
 .test-column {
-
+  width: 64px;
 }
 
 @media only screen and (max-width: 470px) {
