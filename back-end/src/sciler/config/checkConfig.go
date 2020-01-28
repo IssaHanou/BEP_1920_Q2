@@ -5,6 +5,48 @@ import (
 	"reflect"
 )
 
+// checkUniqueIDs checks whether all timers, devices and rules have unique ids compared to each other.
+func checkUniqueIDs(config *WorkingConfig) []string {
+	idList := make(map[string]string, 0) // the value keeps track of type (rule/timer/device) to put in error message
+	errorList := make([]string, 0)
+	for timerID := range config.Timers { // these timer id's are already checked for uniqueness
+		idList[timerID] = "timer"
+	}
+	idList, deviceErrors := checkDeviceUniqueIDs(idList, config)
+	_, ruleErrors := checkRuleUniqueIDs(idList, config)
+	return append(errorList, append(deviceErrors, ruleErrors...)...)
+}
+
+// checkDeviceUniqueIDs checks whether the devices do not have any ids in common with the timers in the config
+func checkDeviceUniqueIDs(idList map[string]string, config *WorkingConfig) (map[string]string, []string) {
+	errorList := make([]string, 0)
+	for deviceID := range config.Devices {
+		if value, ok := idList[deviceID]; ok {
+			errorList = append(errorList,
+				fmt.Sprintf("level III - implementation error: checking device with id %s, but a %s with id %s already exists",
+					deviceID, value, deviceID))
+		} else {
+			idList[deviceID] = "device"
+		}
+	}
+	return idList, errorList
+}
+
+// checkRuleUniqueIDs checks whether the rules do not have any ids in common with the timers or devices in the config
+func checkRuleUniqueIDs(idList map[string]string, config *WorkingConfig) (map[string]string, []string) {
+	errorList := make([]string, 0)
+	for ruleID := range config.RuleMap {
+		if value, ok := idList[ruleID]; ok {
+			errorList = append(errorList,
+				fmt.Sprintf("level III - implementation error: checking rule with id %s, but a %s with id %s already exists",
+					ruleID, value, ruleID))
+		} else {
+			idList[ruleID] = "rule"
+		}
+	}
+	return idList, errorList
+}
+
 // checkConfig is a method that will return an error
 // if the constraints value type is not equal to the device input type specified,
 // the actions type is not equal to the device output type,
@@ -35,8 +77,6 @@ func checkConfig(config WorkingConfig) []string {
 		}
 		errList = append(errList, checkActions(rule.Actions, config, rule.ID)...)
 	}
-
-	// TODO check uniqueness of all device_id, timer_id and rule_id
 	return errList
 }
 
