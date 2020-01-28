@@ -18,6 +18,7 @@ The back-end server contains and manages all logic in the escape room.
 `export PATH=$PATH:$GOROOT/bin`\
 `export GOPATH=~/go/src/BEP_1920_Q2/back-end`\
 `export PATH=$PATH:$GOPATH/bin`
+- reboot pi
 - run `pi@raspberrypi:~/go/src $ git clone https://github.com/IssaHanou/BEP_1920_Q2.git`
 - run `pi@raspberrypi:~/go/src/BEP_1920_Q2/back-end/src/sciler $ go get ./...`
 - run `pi@raspberrypi:~/go/src/BEP_1920_Q2 $ go install sciler`
@@ -29,9 +30,22 @@ The back-end server contains and manages all logic in the escape room.
 - run `pi@raspberrypi:~/go/src/BEP_1920_Q2 $ sciler`
 
 ##### To run on boot
-- use tool like supervisord
-- command `$GOPATH/bin/sciler` from  directory ~/go/src/BEP_1920_Q2 with $GOPATH=/home/pi/go/src/BEP_1920_Q2/back-end
-
+- use tool like supervisord:
+- run sudo apt-get install supervisor
+- run sudo nano /etc/supervisor/conf.d/back-end.conf and save:
+```
+[program:back-end]
+directory=/home/pi/go/src/BEP_1920_Q2/
+command=/bin/sh -c "$GOPATH/bin/sciler"
+user=pi
+group_name=pi
+stdout_logfile=/home/pi/sciler_logs/logs_back-end.txt
+redirect_stderr=true
+autostart=true
+autorestart=true
+environment=CODENATION_ENV=prod
+environment=GOPATH="/home/pi/go/src/BEP_1920_Q2/back-end"
+```
 ## Development
 The back-end is written in Go. Tools used are go fmt, golint and Testify. 
 
