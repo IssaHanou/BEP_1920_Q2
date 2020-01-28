@@ -70,7 +70,6 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 		uniqueErrors := checkUniqueIDs(&config)
 		config.StatusMap = generateStatusMap(&config)
 		config.EventRuleMap = generateEventRuleMap(&config)
-
 		config.LabelMap = generateLabelMap(&config)
 		errorList = append(errorList, append(ruleErrors, append(uniqueErrors, checkConfig(config)...)...)...)
 	}
@@ -173,48 +172,6 @@ func generateGeneralTimer(timer ReadTimer, timerMap map[string]*Timer) (*Timer, 
 	} else {
 		return newTimer(timer.ID, duration), ""
 	}
-}
-
-// checkUniqueIDs checks whether all timers, devices and rules have unique ids compared to each other.
-func checkUniqueIDs(config *WorkingConfig) []string {
-	idList := make(map[string]string, 0) // the value keeps track of type (rule/timer/device) to put in error message
-	errorList := make([]string, 0)
-	for timerID := range config.Timers {
-		idList[timerID] = "timer"
-	}
-	idList, deviceErrors := checkDeviceUniqueIDs(idList, config)
-	_, ruleErrors := checkRuleUniqueIDs(idList, config)
-	return append(errorList, append(deviceErrors, ruleErrors...)...)
-}
-
-// checkDeviceUniqueIDs checks whether the devices do not have any ids in common with the timers in the config
-func checkDeviceUniqueIDs(idList map[string]string, config *WorkingConfig) (map[string]string, []string) {
-	errorList := make([]string, 0)
-	for deviceID := range config.Devices {
-		if value, ok := idList[deviceID]; ok {
-			errorList = append(errorList,
-				fmt.Sprintf("level III - implementation error: checking devive with id %s, but a %s with id %s already exists",
-					deviceID, value, deviceID))
-		} else {
-			idList[deviceID] = "device"
-		}
-	}
-	return idList, errorList
-}
-
-// checkRuleUniqueIDs checks whether the rules do not have any ids in common with the timers or devices in the config
-func checkRuleUniqueIDs(idList map[string]string, config *WorkingConfig) (map[string]string, []string) {
-	errorList := make([]string, 0)
-	for ruleID := range config.RuleMap {
-		if value, ok := idList[ruleID]; ok {
-			errorList = append(errorList,
-				fmt.Sprintf("level III - implementation error: checking rule with id %s, but a %s with id %s already exists",
-					ruleID, value, ruleID))
-		} else {
-			idList[ruleID] = "rule"
-		}
-	}
-	return idList, errorList
 }
 
 // getAllRules creates rule list of the rule pointers belonging to all events,
