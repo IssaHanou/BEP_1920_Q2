@@ -3,23 +3,18 @@
   padding-right: 5px;
 }
 
-.component-cell {
-  white-space: pre-wrap;
+/*Styling the status expansion panels.*/
+::ng-deep .status-expansion .mat-expansion-panel-body {
+  padding: 0;
 }
+.mat-expansion-panel-header, .mat-expansion-panel {
+  background-color: #EEEEEE;
+}
+
 
 /*Button columns should be button width.*/
 .test-column {
   width: 64px;
-}
-.unfold-cell {
-  width: 75px;
-}
-.collapse-button {
-  background-color: #7280ce;
-  width: 75px;
-}
-.unfold-button {
-  width: 75px;
 }
 
 /*With small screens, do not show test button*/
