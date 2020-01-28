@@ -1,6 +1,6 @@
 {
   "id": "display-node",
   "host": "localhost",
-  "labels": ["hint"],
+  "labels": ["hint", "time"],
   "port": 8083
 }

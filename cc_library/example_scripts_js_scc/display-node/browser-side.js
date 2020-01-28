@@ -26,6 +26,9 @@ $(document).ready(function() {
           this.statusChanged();
           break;
         }
+        case "time": {
+          displayText(action.duration)
+        }
         default: {
           return false;
         }

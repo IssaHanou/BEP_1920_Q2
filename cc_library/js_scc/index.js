@@ -201,19 +201,31 @@ class SccLib {
    */
   _handle(payloadString) {
     const message = JSON.parse(payloadString);
-    if (message.type !== "instruction") {
-      this.log(
-        "warn",
-        "received non-instruction message of type: " + message.type
-      );
-    } else {
+    if (message.type == "instruction") {
       const success = this._checkMessage(message.contents);
       const confirmation = new Message(this.name, "confirmation", {
         completed: success,
         instructed: message
       });
       this._sendMessage("back-end", confirmation);
+    } else if (message.type == "time") {
+      this._checkTime(message.contents);
+    } else {
+      this.log(
+        "warn",
+        "received non-instruction message of type: " + message.type
+      );
     }
+  }
+
+  /**
+   * _checkTime executes the time status of a message
+   * @param contents is the time status from the original status message
+   * @private
+   */
+  _checkTime(contents) {
+    contents.instruction = "time";
+    this._doCustomInstruction(contents);
   }
 
   /**
@@ -240,7 +252,7 @@ class SccLib {
           break;
         }
         default: {
-          let success = this._doCustomInstruction();
+          let success = this._doCustomInstruction(action);
           if (!success) return false
           break;
         }
