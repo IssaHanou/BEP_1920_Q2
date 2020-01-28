@@ -53,15 +53,29 @@ export class DeviceComponent implements OnInit {
   }
 
   /**
+   * In the table, show the front-end as device with name "operator scherm.
+   */
+  getName(deviceId: string): string {
+    if (deviceId === "front-end") {
+      return "operator scherm";
+    } else {
+      return deviceId;
+    }
+  }
+
+  /**
    * Creates list of components (keys of status maps), in alphabetical order.
    * Returns string with each component on new line.
    * If components are collapsed, return default.
+   * For the front-end, only show gameState.
    */
   getComponents(status: Map<string, any>, deviceId: string): any {
     if (!this.collapsed.get(deviceId)) {
       return "open onderdelen en status";
     } else if (status.size === 0) {
       return "geen status";
+    } else if (deviceId === "front-end") {
+      return "gameState";
     } else {
       const keys = Array.from(status.keys());
 
@@ -78,10 +92,13 @@ export class DeviceComponent implements OnInit {
    * Creates list of components (keys of status maps), in alphabetical order.
    * Returns string with each component's value on new line.
    * If components are collapse, return nothing.
+   * For the front-end only show gameState status.
    */
   formatStatus(status: Map<string, any>, deviceId: string): string {
     if (!this.collapsed.get(deviceId)) {
       return "";
+    } else if (deviceId === "front-end") {
+      return status.get("gameState");
     } else {
       const keys = Array.from(status.keys());
       keys.sort();
@@ -108,6 +125,7 @@ export class DeviceComponent implements OnInit {
 
   /**
    * When button is pressed, test a single device.
+   * The test button can not be clicked when game is in play (timer is running).
    */
   testDevice(deviceId: string) {
     this.app.sendInstruction([

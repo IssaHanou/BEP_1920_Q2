@@ -469,6 +469,19 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
+   * Only if the game is running can a rule be executed manually.
+   */
+  getGameStateInGame() {
+    const general = this.timerList.getTimer("general");
+    if (general !== null) {
+      if (general.getState() === "stateActive") {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * Stops timers, then create new variables and timers
    */
   public resetConfig() {

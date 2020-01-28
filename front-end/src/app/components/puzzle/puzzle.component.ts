@@ -44,21 +44,9 @@ export class PuzzleComponent implements OnInit {
 
   /**
    * When button in the table is pressed, manually override the finished status of rule in back-end.
+   * The finish rule button can only be clicked when game is in play (timer is running).
    */
   finishRule(ruleId: string) {
     this.app.sendInstruction([{ instruction: "finish rule", rule: ruleId }]);
-  }
-
-  /**
-   * Only if the game is running can a rule be executed manually.
-   */
-  getGameStateInGame() {
-    const general = this.app.timerList.getTimer("general");
-    if (general !== null) {
-      if (general.getState() === "stateActive") {
-        return false;
-      }
-    }
-    return true;
   }
 }

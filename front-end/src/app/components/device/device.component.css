@@ -8,6 +8,9 @@
 .comp-pad-right {
   padding-right: 5px;
 }
+.test-column {
+
+}
 
 @media only screen and (max-width: 470px) {
   .test-column {
