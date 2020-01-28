@@ -44,6 +44,8 @@
     - browser javascript: (example nodejs serving web page with javascript which includes this library), [Browserify](http://browserify.org/) your javascript which includes this library.
 
 ### Example
+See this [github repo](https://github.com/IssaHanou/BEP_1920_Q2/tree/develop-sprint-8/cc_library/example_scripts_js_scc) or the example below
+
 Javascript file:
 ```javascript
 $(document).ready(function() {
