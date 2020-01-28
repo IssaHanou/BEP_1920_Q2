@@ -11,11 +11,10 @@ import {
   MatInputModule,
   MatPaginatorModule,
   MatSortModule,
-  MatTableDataSource,
+  MatExpansionModule,
   MatTableModule
 } from "@angular/material";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { Device } from "./device";
 
 describe("DeviceComponent", () => {
   let component: DeviceComponent;
@@ -31,6 +30,7 @@ describe("DeviceComponent", () => {
         MatPaginatorModule,
         MatFormFieldModule,
         MatInputModule,
+        MatExpansionModule,
         MatSnackBarModule,
         BrowserAnimationsModule
       ],
@@ -59,8 +59,7 @@ describe("DeviceComponent", () => {
     const tableHeaders = compiled.querySelectorAll("th");
     expect(tableHeaders.item(0).textContent).toContain("Apparaat");
     expect(tableHeaders.item(1).textContent).toContain("Connectie");
-    expect(tableHeaders.item(2).textContent).toContain("Onderdeel");
-    expect(tableHeaders.item(3).textContent).toContain("Status");
-    expect(tableHeaders.item(4).textContent).toContain("Test");
+    expect(tableHeaders.item(2).textContent).toContain("Laat status zien");
+    expect(tableHeaders.item(3).textContent).toContain("Test");
   });
 });
