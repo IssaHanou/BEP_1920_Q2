@@ -179,7 +179,7 @@ func generateGeneralTimer(timer ReadTimer, timerMap map[string]*Timer) (*Timer, 
 func checkUniqueIDs(config *WorkingConfig) []string {
 	idList := make(map[string]string, 0) // the value keeps track of type (rule/timer/device) to put in error message
 	errorList := make([]string, 0)
-	for timerID, _ := range config.Timers {
+	for timerID := range config.Timers {
 		idList[timerID] = "timer"
 	}
 	idList, deviceErrors := checkDeviceUniqueIDs(idList, config)
@@ -190,9 +190,11 @@ func checkUniqueIDs(config *WorkingConfig) []string {
 // checkDeviceUniqueIDs checks whether the devices do not have any ids in common with the timers in the config
 func checkDeviceUniqueIDs(idList map[string]string, config *WorkingConfig) (map[string]string, []string) {
 	errorList := make([]string, 0)
-	for deviceID, _ := range config.Devices {
+	for deviceID := range config.Devices {
 		if value, ok := idList[deviceID]; ok {
-			errorList = append(errorList, fmt.Sprintf("level III - implementation error: a %s with id %s already exists", value, deviceID))
+			errorList = append(errorList,
+				fmt.Sprintf("level III - implementation error: checking devive with id %s, but a %s with id %s already exists",
+					deviceID, value, deviceID))
 		} else {
 			idList[deviceID] = "device"
 		}
@@ -203,9 +205,11 @@ func checkDeviceUniqueIDs(idList map[string]string, config *WorkingConfig) (map[
 // checkRuleUniqueIDs checks whether the rules do not have any ids in common with the timers or devices in the config
 func checkRuleUniqueIDs(idList map[string]string, config *WorkingConfig) (map[string]string, []string) {
 	errorList := make([]string, 0)
-	for ruleID, _ := range config.RuleMap {
+	for ruleID := range config.RuleMap {
 		if value, ok := idList[ruleID]; ok {
-			errorList = append(errorList, fmt.Sprintf("level III - implementation error: a %s with id %s already exists", value, ruleID))
+			errorList = append(errorList,
+				fmt.Sprintf("level III - implementation error: checking rule with id %s, but a %s with id %s already exists",
+					ruleID, value, ruleID))
 		} else {
 			idList[ruleID] = "rule"
 		}
