@@ -65,12 +65,14 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 		// if there are errors in config format,
 		// wait with creating maps (which use condition type ids)
 		// and with checking constraint
-		config.StatusMap = generateStatusMap(&config)
-		config.EventRuleMap = generateEventRuleMap(&config)
 		ruleMap, ruleErrors := generateRuleMap(&config)
 		config.RuleMap = ruleMap
+		uniqueErrors := checkUniqueIDs(&config)
+		config.StatusMap = generateStatusMap(&config)
+		config.EventRuleMap = generateEventRuleMap(&config)
+
 		config.LabelMap = generateLabelMap(&config)
-		errorList = append(errorList, append(ruleErrors, checkConfig(config)...)...)
+		errorList = append(errorList, append(ruleErrors, append(uniqueErrors, checkConfig(config)...)...)...)
 	}
 	return config, errorList
 }
@@ -173,6 +175,44 @@ func generateGeneralTimer(timer ReadTimer, timerMap map[string]*Timer) (*Timer, 
 	}
 }
 
+// checkUniqueIDs checks whether all timers, devices and rules have unique ids compared to each other.
+func checkUniqueIDs(config *WorkingConfig) []string {
+	idList := make(map[string]string, 0) // the value keeps track of type (rule/timer/device) to put in error message
+	errorList := make([]string, 0)
+	for timerID, _ := range config.Timers {
+		idList[timerID] = "timer"
+	}
+	idList, deviceErrors := checkDeviceUniqueIDs(idList, config)
+	_, ruleErrors := checkRuleUniqueIDs(idList, config)
+	return append(errorList, append(deviceErrors, ruleErrors...)...)
+}
+
+// checkDeviceUniqueIDs checks whether the devices do not have any ids in common with the timers in the config
+func checkDeviceUniqueIDs(idList map[string]string, config *WorkingConfig) (map[string]string, []string) {
+	errorList := make([]string, 0)
+	for deviceID, _ := range config.Devices {
+		if value, ok := idList[deviceID]; ok {
+			errorList = append(errorList, fmt.Sprintf("level III - implementation error: a %s with id %s already exists", value, deviceID))
+		} else {
+			idList[deviceID] = "device"
+		}
+	}
+	return idList, errorList
+}
+
+// checkRuleUniqueIDs checks whether the rules do not have any ids in common with the timers or devices in the config
+func checkRuleUniqueIDs(idList map[string]string, config *WorkingConfig) (map[string]string, []string) {
+	errorList := make([]string, 0)
+	for ruleID, _ := range config.RuleMap {
+		if value, ok := idList[ruleID]; ok {
+			errorList = append(errorList, fmt.Sprintf("level III - implementation error: a %s with id %s already exists", value, ruleID))
+		} else {
+			idList[ruleID] = "rule"
+		}
+	}
+	return idList, errorList
+}
+
 // getAllRules creates rule list of the rule pointers belonging to all events,
 // except button events,
 // because those should not be added to status map, only to rule map
@@ -247,6 +287,7 @@ func generateStatusMap(config *WorkingConfig) map[string][]*Rule {
 
 	for _, rule := range rules {
 		for _, id := range rule.Conditions.GetConditionIDs() {
+
 			statusMap[id] = appendWhenUniqueRule(statusMap[id], rule)
 		}
 	}

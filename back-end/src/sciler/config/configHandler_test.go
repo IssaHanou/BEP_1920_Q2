@@ -304,3 +304,10 @@ func Test_DoubleTimerId(t *testing.T) {
 		func() { ReadFile(filename) },
 		"two timers with the same id is not allowed")
 }
+
+func Test_DoubleIDs(t *testing.T) {
+	filename := "../../../resources/testing/test_doubleIDs.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"two timers with the same id is not allowed")
+}
