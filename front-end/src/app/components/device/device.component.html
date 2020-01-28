@@ -16,17 +16,17 @@
       </ng-container>
       <ng-container matColumnDef="unfold">
         <th mat-header-cell *matHeaderCellDef class="custom-md-table-header">Laat status zien</th>
-        <td mat-cell *matCellDef="let element">
-          <mat-expansion-panel class="status-expansion" [expanded]="false">
-            <mat-expansion-panel-header>
+        <td mat-cell *matCellDef="let element" class="panel-cell">
+          <mat-expansion-panel class="status-panel" [expanded]="false">
+            <mat-expansion-panel-header collapsedHeight="*" expandedHeight="*">
             </mat-expansion-panel-header>
             <table mat-table [dataSource]="getComponentList(element.id)"
-                   class="mat-elevation-z8 custom-md-table">
+                   class="mat-elevation-z8 custom-md-table component-table">
                 <ng-container matColumnDef="component">
-                  <td mat-cell *matCellDef="let comp" class="comp-pad-right">{{ comp.id }}</td>
+                  <td mat-cell *matCellDef="let comp" class="component-cell">{{ comp.id }}</td>
                 </ng-container>
                 <ng-container matColumnDef="status">
-                  <td mat-cell *matCellDef="let comp">{{ comp.status }}</td>
+                  <td mat-cell *matCellDef="let comp" class="status-cell">{{ comp.status }}</td>
                 </ng-container>
               <tr mat-row *matRowDef="let compRow; columns: componentColumns;"></tr>
             </table>

@@ -4,13 +4,31 @@
 }
 
 /*Styling the status expansion panels.*/
-::ng-deep .status-expansion .mat-expansion-panel-body {
+::ng-deep .status-panel .mat-expansion-panel-body {
   padding: 0;
 }
-.mat-expansion-panel-header, .mat-expansion-panel {
+.mat-expansion-panel {
   background-color: #EEEEEE;
 }
-
+.mat-expansion-panel-header {
+  background-color: #EEEEEE;
+  height: 24px !important;
+}
+.panel-cell {
+  vertical-align: top;
+}
+.component-table .mat-row {
+  height: auto;
+}
+.component-table .mat-cell {
+  padding: 2px 2px 2px 2px;
+}
+.component-cell {
+  text-align: left;
+}
+.status-cell {
+  text-align: right;
+}
 
 /*Button columns should be button width.*/
 .test-column {
