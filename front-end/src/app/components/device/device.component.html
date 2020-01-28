@@ -15,7 +15,7 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="unfold">
-        <th mat-header-cell *matHeaderCellDef class="custom-md-table-header onderdeel-header">Laat status zien</th>
+        <th mat-header-cell *matHeaderCellDef class="custom-md-table-header">Laat status zien</th>
         <td mat-cell *matCellDef="let element" class="unfold-cell comp-pad-right">
           <ng-container *ngIf="collapsed.get(element.id)">
             <button mat-button class="mat-raised-button unfold-button" color=primary (click)="collapseComponents(element.id)">
@@ -30,16 +30,14 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="component">
-        <th mat-header-cell *matHeaderCellDef class="custom-md-table-header onderdeel-header">Onderdeel</th>
-        <td mat-cell id="{{ element.id }}-component" *matCellDef="let element" class="component-cell comp-pad-right">
-            {{ getComponents(element.status, element.id) }}
-        </td>
+        <th mat-header-cell *matHeaderCellDef class="custom-md-table-header comp-pad-right">Onderdeel</th>
+        <!--Needs to be one line, otherwise spaces are added to text (due to wrap)-->
+        <td mat-cell id="{{ element.id }}-component" *matCellDef="let element" class="component-cell comp-pad-right">{{getComponents(element.status, element.id)}}</td>
       </ng-container>
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef class="custom-md-table-header">Status</th>
-        <td mat-cell id="{{element.id}}-status" *matCellDef="let element" class="component-cell">
-          {{ formatStatus(element.status, element.id) }}
-        </td>
+        <!--Needs to be one line, otherwise spaces are added to text (due to wrap)-->
+        <td mat-cell id="{{element.id}}-status" *matCellDef="let element" class="component-cell status-cell">{{formatStatus(element.status, element.id)}}</td>
       </ng-container>
       <ng-container matColumnDef="test">
         <th mat-header-cell *matHeaderCellDef mat-sort-header class="test-column custom-md-table-header">Test</th>
