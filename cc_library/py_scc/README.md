@@ -12,9 +12,12 @@ This is the library to create devices to work together with the SCILER system
 - in order to do this:
     - implement `get_status()` which should return a dictionary of the current status
     - implement `perform_instruction(action)` which should return a boolean of whether the instruction can be performed, where action has:
-        - `instruction`: string with the name of the instruction
+        - `instruction`: string with the name of the instruction (special case `time`)
         - `value`: any type with a value specific for this instruction
         - `component_id`: string with the name of the component for which the instruction is meant (can be undefined) 
+        - `id` in case of `time` instruction: string id of timer (`general` is the main duration of the escape room)
+        - `duration` in case of `time` instruction: integer in milliseconds
+        - `state` in case of `time` instruction: string of state of timer (`stateActive`, `stateIdle`, or `stateExpired`)    
     - implement `test()` which returns nothing, this method should do something visible so the operator can test this device works correctly
     - implement `reset()` which returns nothing, this method should make the device return to its starting state so that the escape room can be started again
     - create a constructor which calls the constructor of `Device` with `super(config, logger)` where:

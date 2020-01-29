@@ -141,7 +141,7 @@ class SccLib {
      * @private
      */
     this._onConnect = function() {
-      // subscripe to all labels and standard topics
+      // subscribe to all labels and standard topics
       for (let i = 0; i < this.labels.length; i++) {
         this.client.subscribe(this.labels[i]);
       }
@@ -219,7 +219,7 @@ class SccLib {
   }
 
   /**
-   * _checkTime executes the time status of a message
+   * _checkTime executes instruction for a time status of a message
    * @param contents is the time status from the original status message
    * @private
    */

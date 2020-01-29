@@ -83,7 +83,6 @@ func TestHandler_SetTimer_Start(t *testing.T) {
 	assert.Equal(t, "stateIdle", handler.Config.Timers["TestTimer"].State)
 	handler.SetTimer("TestTimer", content)
 	assert.Equal(t, "stateActive", handler.Config.Timers["TestTimer"].State)
-
 }
 
 func TestHandler_SetTimer_Stop(t *testing.T) {
