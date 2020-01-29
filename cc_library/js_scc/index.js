@@ -213,7 +213,7 @@ class SccLib {
     } else {
       this.log(
         "warn",
-        "received non-instruction message of type: " + message.type
+        "received not-recognized message of type: " + message.type
       );
     }
   }

@@ -253,12 +253,12 @@ class Sciler:
             self.__check_time(message.get("contents"))
         else:
             logging.warning(
-                ("received non-instruction message of type: ", message.get("type"))
+                ("received non-recognized message of type: ", message.get("type"))
             )
 
     def __check_time(self, contents):
         """
-        check_time gets the time status of all timers
+        check_time executes instruction for a time status of a message
         :param contents: contents is the time status from the original status message
         """
         contents["instruction"] = "time"
