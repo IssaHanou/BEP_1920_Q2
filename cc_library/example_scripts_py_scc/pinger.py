@@ -62,7 +62,7 @@ class Pinger(Device):
             self.avg = int(round(self.accumulativeLatency / self.pong))
 
     def test(self):
-        print("test")
+        print(self.latencies)
 
     def reset(self):
         self.pinging = False
