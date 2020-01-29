@@ -1,0 +1,20 @@
+/*Styling inner tables*/
+::ng-deep .puzzle-panel .mat-expansion-panel-body {
+  padding: 5px;
+}
+.mat-expansion-panel {
+  background-color: #EEEEEE;
+}
+.mat-expansion-panel-header {
+  background-color: #EEEEEE;
+  font-weight: bold;
+}
+
+/*Styling spacing within outer table*/
+.puzzle-table .mat-row {
+  height: auto;
+}
+.puzzle-table .mat-cell {
+  padding: 2px 2px 2px 2px;
+}
+

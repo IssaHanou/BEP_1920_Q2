@@ -21,8 +21,8 @@ describe("Puzzles", () => {
 
   it("should add puzzle and set status", () => {
     puzzles.updatePuzzles(jsonData);
-    expect(puzzles.all.size).toBe(1);
+    expect(puzzles.rules.size).toBe(1);
     puzzles.updatePuzzles(jsonData);
-    expect(puzzles.all.get("Door open").status).toBe(true);
+    expect(puzzles.rules.get("Door open").status).toBe(true);
   });
 });

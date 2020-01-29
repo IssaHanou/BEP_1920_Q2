@@ -1,45 +1,17 @@
-import {Component, OnInit, ViewChild} from "@angular/core";
-import {MatSort, MatTableDataSource} from "@angular/material";
-import {Event} from "./event";
-import {AppComponent} from "../../app.component";
+import { Component, OnInit } from "@angular/core";
+import { AppComponent } from "../../app.component";
+import { EventsMethods } from "../EventsMethods";
 
 @Component({
   selector: "app-event",
   templateUrl: "./event.component.html",
-  styleUrls: ["./event.component.css"]
+  styleUrls: ["./event.component.css", "../../../assets/css/main.css", "./../events.css"],
+  providers: [EventsMethods]
 })
 export class EventComponent implements OnInit {
 
-  /**
-   * The keys used by the table to retrieve data from the DataSource
-   */
-  eventColumns: string[] = ["id", "status", "description", "done"];
-
-  /**
-   * Control the sorting of the table.
-   */
-  @ViewChild("EventTableSort", { static: true }) sort: MatSort;
-
-  constructor(private app: AppComponent) { }
+  constructor(private app: AppComponent, private methods: EventsMethods) {}
 
   ngOnInit() {
-  }
-
-  /**
-   * Returns list of Event objects with their current status.
-   * Return in the form of map table data source, with sorting enabled.
-   */
-  public getEventStatus(): MatTableDataSource<Event> {
-    const puzzles: Event[] = [];
-    for (const puzzle of this.app.puzzleList.all.values()) {
-      if (!puzzle.isPuzzle) {
-        puzzles.push(puzzle);
-      }
-    }
-    puzzles.sort((a: Event, b: Event) => a.id.localeCompare(b.id));
-
-    const dataSource = new MatTableDataSource<Event>(puzzles);
-    dataSource.sort = this.sort;
-    return dataSource;
   }
 }

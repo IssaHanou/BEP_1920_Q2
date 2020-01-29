@@ -1,7 +1,6 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
-import { MatSort, MatTableDataSource } from "@angular/material";
+import { Component, OnInit } from "@angular/core";
 import { AppComponent } from "../../app.component";
-import { Event } from "../event/event";
+import { EventsMethods } from "../EventsMethods";
 
 /**
  * The puzzle component controls the puzzles tables and is shown in the "Puzzels" box on the home page.
@@ -9,13 +8,10 @@ import { Event } from "../event/event";
 @Component({
   selector: "app-puzzle",
   templateUrl: "./puzzle.component.html",
-  styleUrls: ["./puzzle.component.css", "../../../assets/css/main.css"]
+  styleUrls: ["./puzzle.component.css", "../../../assets/css/main.css", "./../events.css"],
+  providers: [EventsMethods]
 })
 export class PuzzleComponent implements OnInit {
-  /**
-   * The keys used by the table to retrieve data from the DataSource
-   */
-  puzzleColumns: string[] = ["id", "status", "description", "done"];
 
   /**
    * Hint to send for a certain puzzle.
@@ -28,32 +24,15 @@ export class PuzzleComponent implements OnInit {
   device: string;
 
   /**
-   * Control the sorting of the table.
+   * Events methods to access methods for events and puzzles.
    */
-  @ViewChild("PuzzleTableSort", {static: true}) sort: MatSort;
+  methods;
 
   constructor(private app: AppComponent) {
+    this.methods = new EventsMethods(app);
   }
 
   ngOnInit() {
-  }
-
-  /**
-   * Returns list of Event objects with their current status.
-   * Return in the form of map table data source, with sorting enabled.
-   */
-  public getPuzzleStatus(): MatTableDataSource<Event> {
-    const puzzles: Event[] = [];
-    for (const puzzle of this.app.puzzleList.all.values()) {
-      if (puzzle.isPuzzle) {
-        puzzles.push(puzzle);
-      }
-    }
-    puzzles.sort((a: Event, b: Event) => a.id.localeCompare(b.id));
-
-    const dataSource = new MatTableDataSource<Event>(puzzles);
-    dataSource.sort = this.sort;
-    return dataSource;
   }
 
 
@@ -72,7 +51,6 @@ export class PuzzleComponent implements OnInit {
       }
     }
   }
-
 
   /**
    * When a hint has been chosen for a puzzle and the accompanying "Stuur" button is clicked,

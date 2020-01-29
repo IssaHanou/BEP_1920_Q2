@@ -1,22 +1,27 @@
+/*Styling hint sections*/
+.hint-selection {
+  text-align: center;
+}
+.hint-header {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 24px;
+  color: rgba(0, 0, 0, 0.54);
+  margin: 0;
+}
 ::ng-deep .mat-form-field .mat-form-field-infix {
   width: auto !important;
-}
-.send-hint {
-  width: 50%;
 }
 .mat-form-field {
   padding: 5px;
   width: 35%;
 }
 .hint-button {
-  width: 8%;
+  width: 10%;
 }
 
 @media only screen and (max-width: 950px) {
-  .send-hint {
-    width: 35%;
-  }
   .mat-form-field {
-    width: 80%;
+    width: 90%;
   }
 }

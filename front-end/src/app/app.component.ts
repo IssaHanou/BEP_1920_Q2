@@ -363,7 +363,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * Sets cameras up given new cameraData
+   * Creates cameras array given new cameraData
    * @param cameraData Camera array
    */
   private setupCameras(cameraData: Camera[]) {
@@ -376,7 +376,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * Sets buttons up given new buttonData
+   * Creates buttons map given new buttonData
    * @param buttonData json containing list with buttons
    */
   private setupButtons(buttonData) {
@@ -390,16 +390,17 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * Sets puzzles up given new rules
+   * Creates rules map with the given new rules, and creates the puzzle-name-to-rule-map.
    * @param rules json containing list of event object maps
    */
   private setupPuzzles(rules) {
     this.puzzleList = new Events();
     this.puzzleList.updatePuzzles(rules);
+    this.puzzleList.createRulesPerEvent();
   }
 
   /**
-   * Sets hints up given all puzzles
+   * Create hints array with the hints per puzzle
    * @param puzzles json containing list of hints
    */
   private setupHints(puzzles) {
@@ -465,13 +466,6 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * When button in the events or puzzles table is pressed, manually override the finished status of rule in back-end.
-   */
-  finishRule(ruleId: string) {
-    this.sendInstruction([{ instruction: "finish rule", rule: ruleId }]);
-  }
-
-  /**
    * Only if the game is running can a rule be executed manually.
    */
   getGameStateInGame() {
@@ -482,10 +476,6 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
       }
     }
     return true;
-  }
-
-  getEventDescription(eventID: string) {
-    return this.puzzleList.all.get(eventID).description;
   }
 
   /**
