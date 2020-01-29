@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 // checkUniqueIDs checks whether all timers, devices and rules have unique ids compared to each other.
@@ -144,7 +145,7 @@ func (action Action) checkActionDevice(config WorkingConfig, ruleID string) []st
 	if device, ok := config.Devices[action.TypeID]; ok { // checks if device can be found in the map, if so, it is stored in variable device
 		for _, actionMessage := range action.Message {
 			if outputObject, ok := device.Output[actionMessage.ComponentID]; ok {
-				if err := checkOutputObject(outputObject, actionMessage, []string{ruleID, action.TypeID}); err != "" {
+				if err := config.checkOutputObject(outputObject, actionMessage, []string{ruleID, action.TypeID}); err != "" {
 					errorList = append(errorList, err)
 				}
 			} else {
@@ -159,12 +160,12 @@ func (action Action) checkActionDevice(config WorkingConfig, ruleID string) []st
 
 // checkOutputObject checks if the value of action message is not nil and if the instruction type is correct.
 // errorParameters contains [ruleID, action.TypeID] to put in the error message
-func checkOutputObject(outputObject OutputObject, actionMessage ComponentInstruction, errorParameters []string) string {
+func (config *WorkingConfig) checkOutputObject(outputObject OutputObject, actionMessage ComponentInstruction, errorParameters []string) string {
 	if instructionType, ok := outputObject.Instructions[actionMessage.Instruction]; ok {
 		if actionMessage.Value == nil {
 			return fmt.Sprintf("level III - implementation error: on rule %s, action for device with id %s: value of action message is nil",
 				errorParameters[0], errorParameters[1])
-		} else if err := checkActionInstructionType(reflect.TypeOf(actionMessage.Value).Kind(), instructionType, actionMessage.Value, errorParameters[0]); err != nil {
+		} else if err := config.checkActionInstructionType(reflect.TypeOf(actionMessage.Value).Kind(), instructionType, actionMessage.Value, errorParameters[0]); err != nil {
 			return err.Error()
 		}
 		return ""
@@ -174,7 +175,7 @@ func checkOutputObject(outputObject OutputObject, actionMessage ComponentInstruc
 }
 
 // checkActionInstructionType checks if the type op the value of an instruction is the same as the type the instruction requires according to the config
-func checkActionInstructionType(valueType reflect.Kind, instructionType string, value interface{}, ruleID string) error {
+func (config *WorkingConfig) checkActionInstructionType(valueType reflect.Kind, instructionType string, value interface{}, ruleID string) error {
 	switch instructionType {
 	case "string":
 		if valueType != reflect.String {
@@ -191,6 +192,21 @@ func checkActionInstructionType(valueType reflect.Kind, instructionType string, 
 	case "array":
 		if valueType != reflect.Slice {
 			return fmt.Errorf("level III - implementation error: on rule %s's actions: instruction type array/slice expected but %s found as type of the value: %v", ruleID, valueType.String(), value)
+		}
+	case "status":
+		if valueType != reflect.String {
+			return fmt.Errorf("level III - implementation error: on rule %s's actions: instruction type status expected but %s found as type of the value: %v", ruleID, valueType.String(), value)
+		} else {
+			split := strings.Split(value.(string), ".")
+			if len(split) == 2 {
+				deviceID := split[0]
+				componentID := split[1]
+				device := config.Devices[deviceID]
+				if device != nil && (device.Input[componentID] != "" || device.Output[componentID].Type != "") {
+					break
+				}
+			}
+			return fmt.Errorf("level III - implementation error: on rule %s's actions: instruction type status expected but %v which is not in the form of `deviceID.component`", ruleID, value)
 		}
 	default:
 		return fmt.Errorf("level III - implementation error: on rule %s's actions: custom types of value like: %s, are not yet implemented", ruleID, instructionType)

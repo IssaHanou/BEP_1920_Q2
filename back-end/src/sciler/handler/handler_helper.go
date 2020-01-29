@@ -76,6 +76,13 @@ func (handler *Handler) SendComponentInstruction(clientID string, instructions [
 	}
 }
 
+func (handler *Handler) prepareMessage(typeID string, messages []config.ComponentInstruction) []config.ComponentInstruction {
+	//for _, message := range messages {
+	//	message.
+	//}
+	return messages
+}
+
 // SendLabelInstruction provides the action with a componentID from de LabelMap and a device to send it to
 // This function is called in response to the execution of a rule
 // SendComponentInstruction is called for each component in the LabelMap under labelID
