@@ -1,6 +1,5 @@
 import { Component, OnInit } from "@angular/core";
 import { AppComponent } from "../../app.component";
-import { Device } from "../device/device";
 import { Button } from "./button";
 
 /**

@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
-import {Comp, Device} from "./device";
+import { Comp, Device } from "./device";
 import { AppComponent } from "../../app.component";
 import { MatSort, MatTableDataSource } from "@angular/material";
 
