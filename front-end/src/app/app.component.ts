@@ -318,10 +318,10 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   sendStatusFrontEnd() {
     const device = this.deviceList.getDevice("front-end");
     if (device != null) {
-      const status = device.status;
+      const statusMap = device.status;
       const statusMsg = {};
-      for (const key of status.keys()) {
-        statusMsg[key] = status.get(key);
+      for (const key of statusMap.keys()) {
+        statusMsg[key] = statusMap.get(key).status; // get the status from Comp
       }
       this.sendStatus(statusMsg);
     }
@@ -466,6 +466,19 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   getCurrentTime() {
     const date = new Date();
     return formatTime(date.getTime(), date.getTimezoneOffset());
+  }
+
+  /**
+   * Only if the game is running can a rule be executed manually.
+   */
+  getGameStateInGame() {
+    const general = this.timerList.getTimer("general");
+    if (general !== null) {
+      if (general.getState() === "stateActive") {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**

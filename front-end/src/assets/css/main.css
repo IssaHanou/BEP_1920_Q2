@@ -54,6 +54,12 @@ body { /*body of the index.html*/
   font-size: 16px;
   border-radius: 4px;
 }
+.check-mark {
+  color: green !important;
+}
+.cross {
+  color: red !important;
+}
 
 
 
@@ -82,7 +88,7 @@ body { /*body of the index.html*/
 
 
 /*Small screens should have little 'white space'*/
-@media only screen and (max-width: 800px) {
+@media only screen and (max-width: 1100px) {
   @media only screen and (min-width: 650px) {
     .left {
       margin: 0 5px 0 0;
@@ -109,6 +115,6 @@ body { /*body of the index.html*/
 
   .home-content {
     display: grid;
-    grid-template-columns: 40% 60%;
+    grid-template-columns: 50% 50%;
   }
 }
