@@ -74,9 +74,14 @@ func (handler *Handler) msgMapper(raw Message) {
 }
 
 // onStatusMsg is the function to process status messages.
+// front-end sends status message with button = true, then immediately button = false,
+// and already updates its own state, faster than the back-end messages are received again,
+// so we don't send again, as otherwise it has already reset to false, then receives messages for true false again.
 func (handler *Handler) onStatusMsg(raw Message) {
 	handler.updateStatus(raw)
-	handler.sendStatus(raw.DeviceID)
+	if raw.DeviceID != "front-end" {
+		handler.sendStatus(raw.DeviceID)
+	}
 	handler.sendFrontEndStatus(raw)
 	handler.HandleEvent(raw.DeviceID)
 	handler.sendEventStatus()

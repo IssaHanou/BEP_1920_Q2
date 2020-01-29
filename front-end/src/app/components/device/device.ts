@@ -3,13 +3,13 @@
  */
 export class Device {
   id: string;
-  status: Map<string, any>;
+  status: Map<string, Comp>;
   connection: boolean;
 
   constructor(jsonData) {
     this.id = jsonData.id;
     this.updateConnection(jsonData.connection);
-    this.status = new Map<string, any>();
+    this.status = new Map<string, Comp>();
     this.updateStatus(jsonData.status);
   }
 
@@ -29,10 +29,9 @@ export class Device {
     const keys = Object.keys(jsonStatus);
     for (const key of keys) {
       if (this.status.has(key)) {
-        this.status.delete(key);
-        this.status.set(key, jsonStatus[key]);
+        this.status.get(key).status = jsonStatus[key];
       } else {
-        this.status.set(key, jsonStatus[key]);
+        this.status.set(key, new Comp(key, jsonStatus[key]));
       }
     }
   }
@@ -43,5 +42,18 @@ export class Device {
    */
   getValue(comp) {
     return this.status.get(comp);
+  }
+}
+
+/**
+ * Comp class contains information about a component: its id and status.
+ */
+export class Comp {
+  id: string;
+  status: any;
+
+  constructor(id, status) {
+    this.id = id;
+    this.status = status;
   }
 }

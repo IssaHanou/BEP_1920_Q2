@@ -43,7 +43,9 @@ export class ConfigComponent implements OnInit {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.app.uploadedConfig = "";
+  }
 
   /**
    * When clicking the upload button, first reset the file, so the same one can be entered again for re-checking.
@@ -79,10 +81,10 @@ export class ConfigComponent implements OnInit {
    * Parses JSON and catches error when JSON is invalid.
    */
   getJSONConfig() {
-    try{
-      return JSON.parse(this.data)
+    try {
+      return JSON.parse(this.data);
     } catch (e) {
-      this.errors.push("level I - JSON error: "+ e);
+      this.errors.push("level I - JSON error: " + e);
       this.app.logger.log("error", "error while reading file");
       this.app.uploadedConfig = "Error tijdens uploaden: " + e;
     }
