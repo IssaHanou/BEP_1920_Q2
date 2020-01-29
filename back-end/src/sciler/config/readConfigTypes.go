@@ -127,7 +127,7 @@ func (action Action) Execute(handler InstructionSender) {
 	switch action.Type { // this cannot be any other Type than device, timer or label, (checked in checkActions function)
 	case "device":
 		{
-			handler.SendComponentInstruction(action.TypeID, handler.prepareMessage(action.TypeID, action.Message), action.Delay)
+			handler.SendComponentInstruction(action.TypeID, handler.PrepareMessage(action.TypeID, action.Message), action.Delay)
 		}
 	case "timer":
 		{

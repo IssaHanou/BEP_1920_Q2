@@ -20,6 +20,8 @@ class Display(Device):
         instruction = action.get("instruction")
         if instruction == "hint":
             self.show_hint(action)
+        if instruction == "status instruction":
+            print(action.get("value"))
         else:
             return False
         return True

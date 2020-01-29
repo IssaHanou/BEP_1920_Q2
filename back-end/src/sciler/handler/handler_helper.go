@@ -6,6 +6,7 @@ import (
 	logger "github.com/sirupsen/logrus"
 	"reflect"
 	"sciler/config"
+	"strings"
 	"time"
 )
 
@@ -76,10 +77,19 @@ func (handler *Handler) SendComponentInstruction(clientID string, instructions [
 	}
 }
 
-func (handler *Handler) prepareMessage(typeID string, messages []config.ComponentInstruction) []config.ComponentInstruction {
-	//for _, message := range messages {
-	//	message.
-	//}
+// PrepareMessage scans a message and if the instruction is of type status, the value of is replaced by the status of a device
+func (handler *Handler) PrepareMessage(typeID string, messages []config.ComponentInstruction) []config.ComponentInstruction {
+	device := handler.Config.Devices[typeID]
+	for i, message := range messages {
+		instructionType := device.Output[message.ComponentID].Instructions[message.Instruction]
+		if instructionType == "status" { // when the instruction type is status
+			split := strings.Split(message.Value.(string), ".")
+			deviceID := split[0]
+			componentID := split[1]
+			status := handler.Config.Devices[deviceID].Status[componentID]
+			messages[i].Value = status // set status of message to retrieved status
+		}
+	}
 	return messages
 }
 
