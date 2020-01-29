@@ -33,6 +33,7 @@ import { ManageComponent } from "../components/manage/manage.component";
 import { PuzzleComponent } from "../components/puzzle/puzzle.component";
 import { TimerComponent } from "../components/timer/timer.component";
 import { Overlay } from "@angular/cdk/overlay";
+import { EventComponent } from "../components/event/event.component";
 
 describe("HomeComponent", () => {
   let component: HomeComponent;
@@ -70,6 +71,7 @@ describe("HomeComponent", () => {
         HintComponent,
         DeviceComponent,
         ManageComponent,
+        EventComponent,
         PuzzleComponent,
         TimerComponent
       ],

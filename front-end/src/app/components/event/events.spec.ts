@@ -8,7 +8,8 @@ describe("Puzzles", () => {
     jsonData = JSON.parse(`[{
           "id": "Door open",
           "status": true,
-           "description": "The door opens"
+           "description": "The door opens",
+           "puzzle": false
         }]
     `);
     puzzles = new Events();
@@ -18,24 +19,10 @@ describe("Puzzles", () => {
     expect(puzzles).toBeTruthy();
   });
 
-  it("should set status", () => {
-    expect(puzzles.all.size).toBe(0);
+  it("should add puzzle and set status", () => {
     puzzles.updatePuzzles(jsonData);
     expect(puzzles.all.size).toBe(1);
     puzzles.updatePuzzles(jsonData);
     expect(puzzles.all.get("Door open").status).toBe(true);
-  });
-
-  it("should add puzzle", () => {
-    const newMap = new Map<string, string>();
-    expect(puzzles.all.size).toBe(0);
-    puzzles.updatePuzzles({
-      "id": "my rule",
-      "description": "this my rule",
-      "status": "true",
-      "puzzle": false
-    });
-    expect(puzzles.all.size).toBe(1);
-    expect(puzzles.all.get("my rule").status).toBe(false);
   });
 });

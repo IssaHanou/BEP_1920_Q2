@@ -1,6 +1,13 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { EventComponent } from './event.component';
+import {MqttModule, MqttService} from "ngx-mqtt";
+import {MQTT_SERVICE_OPTIONS} from "../../app.module";
+import {MatPaginatorModule, MatSnackBar, MatSortModule, MatTableModule} from "@angular/material";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {PuzzleComponent} from "../puzzle/puzzle.component";
+import {AppComponent} from "../../app.component";
+import {Overlay} from "@angular/cdk/overlay";
 
 describe('EventComponent', () => {
   let component: EventComponent;
@@ -8,7 +15,14 @@ describe('EventComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ EventComponent ]
+      declarations: [ EventComponent ],
+      imports: [
+        MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
+        MatTableModule,
+        MatSortModule,
+        MatPaginatorModule,
+        BrowserAnimationsModule],
+      providers: [MqttService, AppComponent, MatSnackBar, Overlay]
     })
     .compileComponents();
   }));

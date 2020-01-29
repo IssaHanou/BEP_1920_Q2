@@ -31,6 +31,7 @@ import { RouterModule } from "@angular/router";
 import { CameraComponent } from "./camera/camera.component";
 import { HomeComponent } from "./home/home.component";
 import { ConfigComponent } from "./config/config.component";
+import { EventComponent } from "./components/event/event.component";
 
 describe("AppComponent", () => {
   let component: AppComponent;
@@ -66,6 +67,7 @@ describe("AppComponent", () => {
         CameraComponent,
         HomeComponent,
         ConfigComponent,
+        EventComponent,
         HintComponent,
         DeviceComponent,
         ManageComponent,
