@@ -19,6 +19,7 @@
         <td mat-cell *matCellDef="let element" class="panel-cell">
           <mat-expansion-panel class="status-panel" [expanded]="false">
             <mat-expansion-panel-header collapsedHeight="*" expandedHeight="*">
+              status van onderdelen
             </mat-expansion-panel-header>
             <table mat-table [dataSource]="getComponentList(element.id)"
                    class="mat-elevation-z8 custom-md-table component-table">
