@@ -63,12 +63,23 @@ body { /*body of the index.html*/
 
 
 /*Other components throughout the application*/
-.custom-md-button, button {
+.custom-md-button {
   margin: 5px;
   font-size: 16px;
   border-radius: 4px;
 }
-
+.custom-icon-button {
+  margin: 0;
+  padding: 0;
+  border-width: 0;
+}
+.custom-icon {
+  font-size: 16px;
+  vertical-align: top;
+}
+.custom-tool-tip {
+  font-size: 14px;
+}
 
 
 /*Boxes on home page, which contain a header and contents box,

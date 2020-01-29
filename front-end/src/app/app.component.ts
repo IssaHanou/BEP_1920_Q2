@@ -484,6 +484,10 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
     return true;
   }
 
+  getEventDescription(eventID: string) {
+    return this.puzzleList.all.get(eventID).description;
+  }
+
   /**
    * Stops timers, then create new variables and timers
    */

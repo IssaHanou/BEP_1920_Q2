@@ -1,13 +1,19 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { EventComponent } from './event.component';
-import {MqttModule, MqttService} from "ngx-mqtt";
-import {MQTT_SERVICE_OPTIONS} from "../../app.module";
-import {MatPaginatorModule, MatSnackBar, MatSortModule, MatTableModule} from "@angular/material";
-import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
-import {PuzzleComponent} from "../puzzle/puzzle.component";
-import {AppComponent} from "../../app.component";
-import {Overlay} from "@angular/cdk/overlay";
+import {
+  MatPaginatorModule,
+  MatTooltipModule,
+  MatSnackBar,
+  MatIconModule,
+  MatSortModule,
+  MatTableModule
+} from "@angular/material";
+import { MqttModule, MqttService } from "ngx-mqtt";
+import { AppComponent } from "../../app.component";
+import { Overlay } from "@angular/cdk/overlay";
+import { MQTT_SERVICE_OPTIONS } from "../../app.module";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
 describe('EventComponent', () => {
   let component: EventComponent;
@@ -19,6 +25,8 @@ describe('EventComponent', () => {
       imports: [
         MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
         MatTableModule,
+        MatTooltipModule,
+        MatIconModule,
         MatSortModule,
         MatPaginatorModule,
         BrowserAnimationsModule],
@@ -48,6 +56,6 @@ describe('EventComponent', () => {
     expect(tableHeaders.item(0).textContent).toContain("Gebeurtenis");
     expect(tableHeaders.item(1).textContent).toContain("Uitgevoerd");
     expect(tableHeaders.item(2).textContent).toContain("Beschrijving");
-    expect(tableHeaders.item(3).textContent).toContain("Handmatig afmaken");
+    expect(tableHeaders.item(3).textContent).toContain("Handmatig uitvoeren");
   });
 });

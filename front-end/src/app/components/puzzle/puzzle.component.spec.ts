@@ -3,8 +3,10 @@ import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { PuzzleComponent } from "./puzzle.component";
 import {
   MatPaginatorModule,
+  MatTooltipModule,
   MatSnackBar,
   MatSortModule,
+  MatIconModule,
   MatTableModule
 } from "@angular/material";
 import { MqttModule, MqttService } from "ngx-mqtt";
@@ -22,7 +24,9 @@ describe("PuzzleComponent", () => {
       imports: [
         MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
         MatTableModule,
+        MatTooltipModule,
         MatSortModule,
+        MatIconModule,
         MatPaginatorModule,
         BrowserAnimationsModule
       ],

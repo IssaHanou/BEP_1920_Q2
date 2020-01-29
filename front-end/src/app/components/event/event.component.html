@@ -4,7 +4,13 @@
     <table mat-table matSort #EventTableSort="matSort" [dataSource]="getEventStatus()" class="mat-elevation-z8 custom-md-table">
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header">Gebeurtenis</th>
-        <td mat-cell *matCellDef="let element" class="rule-id"> {{ element.id }} </td>
+        <td mat-cell *matCellDef="let element" class="rule-id">
+          {{ element.id }}
+          <button class="custom-icon-button" matTooltip="{{ app.getEventDescription(element.id) }}"
+                  matTooltipPosition="right" matTooltipClass="custom-tool-tip">
+            <mat-icon class="custom-icon">info_outline</mat-icon>
+          </button>
+        </td>
       </ng-container>
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header">Uitgevoerd</th>
@@ -18,9 +24,9 @@
         <td mat-cell *matCellDef="let element" class="rule-description"> {{ element.description }} </td>
       </ng-container>
       <ng-container matColumnDef="done">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header">Handmatig afmaken</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header">Handmatig uitvoeren</th>
         <td mat-cell *matCellDef="let element">
-          <button mat-button class="mat-raised-button mat-primary" (click)="app.finishRule(element.id)"
+          <button mat-button class="mat-raised-button mat-primary custom-md-button" (click)="app.finishRule(element.id)"
                   disabled="{{ app.getGameStateInGame() }}">Uitvoeren</button>
         </td>
       </ng-container>
