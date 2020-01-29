@@ -318,10 +318,10 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   sendStatusFrontEnd() {
     const device = this.deviceList.getDevice("front-end");
     if (device != null) {
-      const status = device.status;
+      const statusMap = device.status;
       const statusMsg = {};
-      for (const key of status.keys()) {
-        statusMsg[key] = status.get(key);
+      for (const key of statusMap.keys()) {
+        statusMsg[key] = statusMap.get(key).status; // get the status from Comp
       }
       this.sendStatus(statusMsg);
     }
