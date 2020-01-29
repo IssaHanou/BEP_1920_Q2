@@ -12,6 +12,7 @@ import { MatSort, MatTableDataSource } from "@angular/material";
   styleUrls: ["./device.component.css", "../../../assets/css/main.css"]
 })
 export class DeviceComponent implements OnInit {
+  
   /**
    * The keys used by the table to retrieve data from the DataSource
    */
@@ -123,5 +124,12 @@ export class DeviceComponent implements OnInit {
   collapseComponents(row) {
     const oldValue = this.collapsed.get(row.id);
     this.collapsed.set(row.id, !oldValue);
+  }
+
+  /**
+   * Returns the description of a device with id.
+   */
+  public getDeviceDescription(id: string) {
+    return this.app.deviceList.all.get(id).description;
   }
 }
