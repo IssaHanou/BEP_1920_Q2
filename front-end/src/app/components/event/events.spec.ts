@@ -9,6 +9,7 @@ describe("Puzzles", () => {
           "id": "Door open",
           "status": true,
            "description": "The door opens",
+           "eventName": "name",
            "puzzle": false
         }]
     `);

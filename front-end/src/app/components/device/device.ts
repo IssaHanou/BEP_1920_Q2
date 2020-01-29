@@ -5,12 +5,20 @@ export class Device {
   id: string;
   status: Map<string, any>;
   connection: boolean;
+  description: string;
+  labels: string[];
 
   constructor(jsonData) {
     this.id = jsonData.id;
-    this.updateConnection(jsonData.connection);
+    this.labels = jsonData.labels;
+    this.description = jsonData.description;
     this.status = new Map<string, any>();
-    this.updateStatus(jsonData.status);
+    if (jsonData.hasOwnProperty("status")) {
+      this.updateStatus(jsonData.status);
+    }
+    if (jsonData.hasOwnProperty("connection")) {
+      this.updateConnection(jsonData.connection);
+    }
   }
 
   /**

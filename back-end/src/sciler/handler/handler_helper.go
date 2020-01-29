@@ -25,6 +25,7 @@ func (handler *Handler) SendSetup() {
 			"events":  handler.getSetUpEvents(),
 			"cameras": handler.getCameras(),
 			"buttons": handler.getButtons(),
+			"devices": handler.getDeviceInformation(),
 		},
 	}
 	jsonMessage, _ := json.Marshal(&message)
@@ -347,6 +348,24 @@ func (handler *Handler) getButtons() []map[string]interface{} {
 		buttons = append(buttons, button)
 	}
 	return buttons
+}
+
+// getDeviceLabels return a list of maps
+// Each map has the id, description and a list of labels it from that device
+func (handler *Handler) getDeviceInformation() []map[string]interface{} {
+	var list []map[string]interface{}
+	for _, device := range handler.Config.Devices {
+		deviceMap := make(map[string]interface{})
+		labels := make([]string, 0)
+		for _, output := range device.Output {
+			labels = append(labels, output.Label...)
+		}
+		deviceMap["id"] = device.ID
+		deviceMap["description"] = device.Description
+		deviceMap["labels"] = labels
+		list = append(list, deviceMap)
+	}
+	return list
 }
 
 // GetStatus asks devices to send status

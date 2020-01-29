@@ -4,7 +4,7 @@ describe("Event", () => {
   let puzzle: Event;
 
   beforeEach(() => {
-    puzzle = new Event("Door open", "this is my rule", false, true);
+    puzzle = new Event("Door open", "this is my rule", false, "name", true);
   });
 
   it("should create", () => {

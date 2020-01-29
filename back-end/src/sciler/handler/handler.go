@@ -194,7 +194,7 @@ func (handler *Handler) handleInstruction(instruction map[string]interface{}, in
 	case "finish rule":
 		handler.onFinishRule(instruction["rule"].(string))
 	case "hint":
-		handler.onHint(instruction["value"].(string), instructor)
+		handler.onHint(instruction, instructor)
 	case "check config":
 		handler.onCheckConfig(instruction["config"], instruction["name"].(string))
 	case "use config":
@@ -251,10 +251,10 @@ func (handler *Handler) onFinishRule(ruleID string) {
 
 // onHint is the function to process the instruction `hint`
 // hint in instructed when the front-end submits a hint
-func (handler *Handler) onHint(hint string, instructor string) {
-	handler.sendInstruction("hint", []map[string]string{{
+func (handler *Handler) onHint(jsonData map[string]interface{}, instructor string) {
+	handler.sendInstruction(jsonData["topic"].(string), []map[string]string{{
 		"instruction":   "hint",
-		"value":         hint,
+		"value":         jsonData["value"].(string),
 		"instructed_by": instructor,
 	}})
 }

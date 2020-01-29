@@ -75,6 +75,7 @@ func TestInstructionSetup(t *testing.T) {
 					"status":      false,
 					"description": "De juiste volgorde van cijfers moet gedraaid worden.",
 					"puzzle":      true,
+					"eventName":   "Telefoon puzzels",
 				},
 			},
 			"cameras": []map[string]string{
@@ -89,6 +90,18 @@ func TestInstructionSetup(t *testing.T) {
 				{
 					"id":       "stop",
 					"disabled": true,
+				},
+			},
+			"devices": []map[string]interface{}{
+				{
+					"id":          "front-end",
+					"description": "The operator webapp for managing a escape room",
+					"labels":      []string{},
+				},
+				{
+					"id":          "telephone",
+					"description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
+					"labels":      []string{"sound"},
 				},
 			},
 		},
@@ -109,6 +122,7 @@ func TestInstructionSetup(t *testing.T) {
 					"status":      false,
 					"description": "De juiste volgorde van cijfers moet gedraaid worden.",
 					"puzzle":      true,
+					"eventName":   "Telefoon puzzels",
 				},
 			},
 			"cameras": []map[string]string{
@@ -123,6 +137,18 @@ func TestInstructionSetup(t *testing.T) {
 				{
 					"id":       "start",
 					"disabled": false,
+				},
+			},
+			"devices": []map[string]interface{}{
+				{
+					"id":          "front-end",
+					"description": "The operator webapp for managing a escape room",
+					"labels":      []string{},
+				},
+				{
+					"id":          "telephone",
+					"description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
+					"labels":      []string{"sound"},
 				},
 			},
 		},

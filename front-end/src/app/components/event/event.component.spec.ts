@@ -7,6 +7,7 @@ import {
   MatSnackBar,
   MatIconModule,
   MatSortModule,
+  MatExpansionModule,
   MatTableModule
 } from "@angular/material";
 import { MqttModule, MqttService } from "ngx-mqtt";
@@ -21,18 +22,19 @@ describe("EventComponent", () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ EventComponent ],
+      declarations: [EventComponent],
       imports: [
         MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
         MatTableModule,
         MatTooltipModule,
         MatIconModule,
+        MatExpansionModule,
         MatSortModule,
         MatPaginatorModule,
-        BrowserAnimationsModule],
+        BrowserAnimationsModule
+      ],
       providers: [MqttService, AppComponent, MatSnackBar, Overlay]
-    })
-    .compileComponents();
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -47,15 +49,8 @@ describe("EventComponent", () => {
 
   it("should render header", () => {
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector("h3").textContent).toContain("Gebeurtenissen");
-  });
-
-  it("table should have correct headers", () => {
-    const compiled = fixture.debugElement.nativeElement;
-    const tableHeaders = compiled.querySelectorAll("th");
-    expect(tableHeaders.item(0).textContent).toContain("Gebeurtenis");
-    expect(tableHeaders.item(1).textContent).toContain("Uitgevoerd");
-    expect(tableHeaders.item(2).textContent).toContain("Beschrijving");
-    expect(tableHeaders.item(3).textContent).toContain("Handmatig uitvoeren");
+    expect(compiled.querySelector("h3").textContent).toContain(
+      "Gebeurtenissen"
+    );
   });
 });

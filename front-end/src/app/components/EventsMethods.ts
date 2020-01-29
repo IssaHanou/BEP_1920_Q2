@@ -1,10 +1,9 @@
 import { MatTableDataSource } from "@angular/material";
-import {Event} from "./event/event";
-import {AppComponent} from "../app.component";
-import {Inject} from "@angular/core";
+import { Event } from "./event/event";
+import { AppComponent } from "../app.component";
+import { Inject } from "@angular/core";
 
 export class EventsMethods {
-
   /**
    * The keys used by the table to retrieve data from the DataSource
    */
@@ -24,8 +23,11 @@ export class EventsMethods {
   public getEvents(shouldBePuzzle: boolean): MatTableDataSource<string> {
     const events: string[] = [];
     for (const eventName of this.app.puzzleList.rulesPerEvent.keys()) {
-      if (this.app.puzzleList.rulesPerEvent.get(eventName).length > 0 &&
-        this.app.puzzleList.rulesPerEvent.get(eventName)[0].isPuzzle == shouldBePuzzle) {
+      if (
+        this.app.puzzleList.rulesPerEvent.get(eventName).length > 0 &&
+        this.app.puzzleList.rulesPerEvent.get(eventName)[0].isPuzzle ==
+          shouldBePuzzle
+      ) {
         events.push(eventName);
       }
     }
@@ -43,9 +45,8 @@ export class EventsMethods {
       puzzles.push(rule);
     }
     puzzles.sort((a: Event, b: Event) => a.id.localeCompare(b.id));
-    return  new MatTableDataSource<Event>(puzzles);
+    return new MatTableDataSource<Event>(puzzles);
   }
-
 
   /**
    * When button in the events or puzzles table is pressed, manually override the finished status of rule in back-end.

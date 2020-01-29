@@ -359,12 +359,13 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
     this.setupCameras(jsonData.cameras);
     this.setupButtons(jsonData.buttons);
     this.setupPuzzles(jsonData.events);
+    this.setupDevices(jsonData.devices);
     this.setupHints(jsonData.hints);
   }
 
   /**
-   * Creates cameras array given new cameraData
-   * @param cameraData Camera array
+   * Creates cameras array given new cameraData.
+   * @param cameraData Camera object array.
    */
   private setupCameras(cameraData: Camera[]) {
     this.cameras = [];
@@ -376,8 +377,8 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * Creates buttons map given new buttonData
-   * @param buttonData json containing list with buttons
+   * Creates buttons map given new buttonData.
+   * @param buttonData json containing list with button object maps with id and disabled parameters.
    */
   private setupButtons(buttonData) {
     this.manageButtons = new Buttons();
@@ -391,7 +392,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
 
   /**
    * Creates rules map with the given new rules, and creates the puzzle-name-to-rule-map.
-   * @param rules json containing list of event object maps
+   * @param rules json containing list of event object maps with id, status, description, puzzle (bool), puzzleName.
    */
   private setupPuzzles(rules) {
     this.puzzleList = new Events();
@@ -400,8 +401,18 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * Create hints array with the hints per puzzle
-   * @param puzzles json containing list of hints
+   * Creates devices map with the given new devices.
+   * @param devices json containing list of device object maps with id, description and labels.
+   */
+  private setupDevices(devices) {
+    this.deviceList = new Devices();
+    this.deviceList.createDevices(devices);
+    this.deviceList.createLabelMap();
+  }
+
+  /**
+   * Create hints array with the hints per puzzle.
+   * @param puzzles json containing list of hint object maps with name of puzzle as key and hints list as value.
    */
   private setupHints(puzzles) {
     this.hintList = [];

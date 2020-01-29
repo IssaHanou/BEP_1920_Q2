@@ -61,7 +61,11 @@ export class HintComponent {
       this.predefinedHint !== "---"
     ) {
       this.app.sendInstruction([
-        { instruction: "hint", value: this.predefinedHint }
+        {
+          instruction: "hint",
+          value: this.predefinedHint,
+          topic: "hint"
+        }
       ]);
       this.predefinedHint = "---";
     }
@@ -76,7 +80,8 @@ export class HintComponent {
       this.app.sendInstruction([
         {
           instruction: "hint",
-          value: this.customHint
+          value: this.customHint,
+          topic: "hint"
         }
       ]);
       this.customHint = "";

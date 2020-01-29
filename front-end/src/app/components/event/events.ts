@@ -25,7 +25,16 @@ export class Events {
   updatePuzzles(jsonData) {
     for (const object of jsonData) {
       if (!this.rules.has(object.id)) {
-        this.rules.set(object.id, new Event(object.id, object.description, object.status, object.eventName, object.puzzle));
+        this.rules.set(
+          object.id,
+          new Event(
+            object.id,
+            object.description,
+            object.status,
+            object.eventName,
+            object.puzzle
+          )
+        );
       }
       this.rules.get(object.id).updateStatus(object.status);
     }

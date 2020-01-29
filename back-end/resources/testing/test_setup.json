@@ -21,7 +21,8 @@
           "type": "string",
           "instructions": {
             "play": "string"
-          }
+          },
+          "label": ["sound"]
         },
         "ringTone": {
           "type": "string",
