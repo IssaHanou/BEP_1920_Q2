@@ -46,6 +46,9 @@ autorestart=true
 environment=CODENATION_ENV=prod
 environment=GOPATH="/home/pi/go/src/BEP_1920_Q2/back-end"
 ```
+- run `sudo supervisorctl reread` and `sudo supervisorctl update`
+- run `sudo supervisorctl` to check status
+
 ## Development
 The back-end is written in Go. Tools used are go fmt, golint and Testify. 
 
