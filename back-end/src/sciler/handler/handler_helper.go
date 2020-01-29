@@ -79,18 +79,21 @@ func (handler *Handler) SendComponentInstruction(clientID string, instructions [
 
 // PrepareMessage scans a message and if the instruction is of type status, the value of is replaced by the status of a device
 func (handler *Handler) PrepareMessage(typeID string, messages []config.ComponentInstruction) []config.ComponentInstruction {
+	res := make([]config.ComponentInstruction, len(messages))
 	device := handler.Config.Devices[typeID]
 	for i, message := range messages {
+		msg := message
 		instructionType := device.Output[message.ComponentID].Instructions[message.Instruction]
 		if instructionType == "status" { // when the instruction type is status
 			split := strings.Split(message.Value.(string), ".")
 			deviceID := split[0]
 			componentID := split[1]
 			status := handler.Config.Devices[deviceID].Status[componentID]
-			messages[i].Value = status // set status of message to retrieved status
+			msg.Value = status // set status of message to retrieved status
 		}
+		res[i] = msg
 	}
-	return messages
+	return res
 }
 
 // SendLabelInstruction provides the action with a componentID from de LabelMap and a device to send it to
