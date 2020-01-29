@@ -201,14 +201,14 @@ class SccLib {
    */
   _handle(payloadString) {
     const message = JSON.parse(payloadString);
-    if (message.type == "instruction") {
+    if (message.type === "instruction") {
       const success = this._checkMessage(message.contents);
       const confirmation = new Message(this.name, "confirmation", {
         completed: success,
         instructed: message
       });
       this._sendMessage("back-end", confirmation);
-    } else if (message.type == "time") {
+    } else if (message.type === "time") {
       this._checkTime(message.contents);
     } else {
       this.log(
@@ -226,7 +226,7 @@ class SccLib {
   _checkTime(contents) {
     contents.instruction = "time";
     this._doCustomInstruction(contents);
-  }
+
 
   /**
    * _checkMessage executes all instructions in a message
