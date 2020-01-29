@@ -2,6 +2,9 @@
 
 
 ### Set-up
+- run sudo apt-get install mosquitto -y
+- run sudo apt-get install mosquitto-client
+
 When using Mosquitto as a broker, mosquitto.conf should be used to setup a broker with an extra listener for websockets.
  
 The bind-address should be changed to local-ip when communication outside a one machine development setup is required. 
@@ -9,6 +12,7 @@ The bind-address should be changed to local-ip when communication outside a one 
 > This command can only be used in the installation folder of Mosquitto. 
 
 The mosquitto.conf part of the command should be replaced by a path to this file.
+
 
 
 ```
@@ -41,6 +45,21 @@ listener 8083
 # This can be either mqtt or websockets.
 protocol websockets
 
+```
+### To run on boot
+- move mosquitto.conf file to etc/mosquitto/conf.d/
+- use tool like supervisord:
+- run sudo apt-get install supervisor
+- run sudo nano /etc/supervisor/conf.d/broker.conf and save:
+```
+[program:broker]
+command=/bin/sh -c "sudo service mosquitto stop && -c etc/mosquitto/conf.d/mosquitto.conf"
+user=pi
+group_name=pi
+stdout_logfile=/home/pi/sciler_logs/logs_broker.txt
+redirect_stderr=true
+autostart=true
+autorestart=true
 ```
 
 ### Topics

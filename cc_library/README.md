@@ -10,7 +10,7 @@ There are two versions of the sciler Client Computer Library:
 To set up communication with the S.C.I.L.E.R. system without the use of a library, you need to consider the following points:
 
 - Connect with a mosquitto broker at the same IP address as the rest of the system, use the ports defined in your mosquitto config file or add a port if the current ones are not compatible with your device
-- The MQTT client should subscribe to the topic `<devicename>` and `"client-computers"` (and `hint` if it is a hint device), where <devicename> is the same name used in the configfile of the back-end
+- The MQTT client should subscribe to the topic `<devicename>` and `"client-computers"` (and `hint`/`time` if it is a hint/time device), where <devicename> is the same name used in the configfile of the back-end
 - A MQTT message publisher should publish messages to topic `back-end`, defined in the message_manual.md under chapter __Client Computers to Back-end__
 - On start-up a connection message should be send, and set a will for the mqtt client with a disconnection message, here is a python example:
 ```python
@@ -98,7 +98,21 @@ instruction message:
            ]
         }
 ```
-
+time message:
+```json
+{ 
+          "device_id": "back-end",
+          "time_sent": "17-1-2019 16:19:70",
+          "type": "time",
+           "contents": [
+              {
+              "id":"general",
+              "duration" : 500000,
+              "state": "stateActive"
+              }
+           ]
+        }
+```
 ## Development
 
 ### sciler Javascript

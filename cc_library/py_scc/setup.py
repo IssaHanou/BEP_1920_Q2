@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="sciler",
-    version="0.2.0",
+    version="0.2.1",
     author="Raccoon Serious Games",
     author_email="BEP@raccoon.games",
     description="Client library for S.C.I.L.E.R.",
@@ -19,4 +19,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.5",
+    install_requires=[
+        "paho-mqtt",
+    ]
 )

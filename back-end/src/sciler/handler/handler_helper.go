@@ -181,6 +181,7 @@ func (handler *Handler) sendStatusTimer(timer *config.Timer) {
 	jsonMessage, _ := json.Marshal(&message)
 	logger.Infof("sending status data to front-end: %v", message.Contents)
 	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+	handler.Communicator.Publish("time", string(jsonMessage), 3)
 }
 
 // HandleEvent is a function that checks and possible executes all rules according to the given device/rule/timer
