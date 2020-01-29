@@ -65,12 +65,13 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 		// if there are errors in config format,
 		// wait with creating maps (which use condition type ids)
 		// and with checking constraint
-		config.StatusMap = generateStatusMap(&config)
-		config.EventRuleMap = generateEventRuleMap(&config)
 		ruleMap, ruleErrors := generateRuleMap(&config)
 		config.RuleMap = ruleMap
+		uniqueErrors := checkUniqueIDs(&config)
+		config.StatusMap = generateStatusMap(&config)
+		config.EventRuleMap = generateEventRuleMap(&config)
 		config.LabelMap = generateLabelMap(&config)
-		errorList = append(errorList, append(ruleErrors, checkConfig(config)...)...)
+		errorList = append(errorList, append(ruleErrors, append(uniqueErrors, checkConfig(config)...)...)...)
 	}
 	return config, errorList
 }
@@ -247,6 +248,7 @@ func generateStatusMap(config *WorkingConfig) map[string][]*Rule {
 
 	for _, rule := range rules {
 		for _, id := range rule.Conditions.GetConditionIDs() {
+
 			statusMap[id] = appendWhenUniqueRule(statusMap[id], rule)
 		}
 	}
