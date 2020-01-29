@@ -6,6 +6,10 @@ import {
   MatTooltipModule,
   MatSnackBar,
   MatSortModule,
+  MatFormFieldModule,
+  MatInputModule,
+  MatOptionModule,
+  MatSelectModule,
   MatIconModule,
   MatTableModule
 } from "@angular/material";
@@ -26,6 +30,10 @@ describe("PuzzleComponent", () => {
         MatTableModule,
         MatTooltipModule,
         MatSortModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatOptionModule,
+        MatSelectModule,
         MatIconModule,
         MatPaginatorModule,
         BrowserAnimationsModule

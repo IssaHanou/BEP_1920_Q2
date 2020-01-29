@@ -4,9 +4,9 @@ import {Event} from "./event";
 import {AppComponent} from "../../app.component";
 
 @Component({
-  selector: 'app-event',
-  templateUrl: './event.component.html',
-  styleUrls: ['./event.component.css']
+  selector: "app-event",
+  templateUrl: "./event.component.html",
+  styleUrls: ["./event.component.css"]
 })
 export class EventComponent implements OnInit {
 

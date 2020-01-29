@@ -22,7 +22,7 @@ func (handler *Handler) SendSetup() {
 		Contents: map[string]interface{}{
 			"name":    handler.Config.General.Name,
 			"hints":   handler.getHints(),
-			"events":  handler.getEventDescriptions(),
+			"events":  handler.getSetUpEvents(),
 			"cameras": handler.getCameras(),
 			"buttons": handler.getButtons(),
 		},
@@ -271,21 +271,48 @@ func (handler *Handler) getHints() map[string][]string {
 	return hints
 }
 
-// getEventDescriptions returns a map of rules with the rule id, description and status,
-// and an additional parameter whether or not the rule belongs to a puzzle
-func (handler *Handler) getEventDescriptions() []map[string]interface{} {
+// getSetUpEvents returns a map of rules with the rule id, description and status,
+// an additional parameter whether or not the rule belongs to a puzzle,
+// and the name of the puzzle/general event that the rule belongs to
+func (handler *Handler) getSetUpEvents() []map[string]interface{} {
 	events := make([]map[string]interface{}, 0)
 	for _, rule := range handler.Config.EventRuleMap {
 		status := getMapWithStatusInfo(rule)
 		status["puzzle"] = false
+		status["eventName"] = findEventName(rule.ID, handler.Config.GeneralEvents)
 		events = append(events, status)
 	}
 	for _, rule := range handler.Config.PuzzleRuleMap {
 		status := getMapWithStatusInfo(rule)
 		status["puzzle"] = true
+		status["eventName"] = findPuzzleName(rule.ID, handler.Config.Puzzles)
 		events = append(events, status)
 	}
 	return events
+}
+
+// findEventName finds the name of the general event that idToFind belongs to
+func findEventName(idToFind string, eventsToSearch []*config.GeneralEvent) string {
+	for _, event := range eventsToSearch {
+		for _, rule := range event.GetRules() {
+			if rule.ID == idToFind {
+				return event.GetName()
+			}
+		}
+	}
+	return ""
+}
+
+// findPuzzleName finds the name of the puzzle that idToFind belongs to
+func findPuzzleName(idToFind string, eventsToSearch []*config.Puzzle) string {
+	for _, event := range eventsToSearch {
+		for _, rule := range event.GetRules() {
+			if rule.ID == idToFind {
+				return event.GetName()
+			}
+		}
+	}
+	return ""
 }
 
 // Create a map and set the rule's id, description and status properties.

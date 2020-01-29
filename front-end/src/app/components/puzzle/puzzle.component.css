@@ -1,0 +1,22 @@
+::ng-deep .mat-form-field .mat-form-field-infix {
+  width: auto !important;
+}
+.send-hint {
+  width: 50%;
+}
+.mat-form-field {
+  padding: 5px;
+  width: 35%;
+}
+.hint-button {
+  width: 8%;
+}
+
+@media only screen and (max-width: 950px) {
+  .send-hint {
+    width: 35%;
+  }
+  .mat-form-field {
+    width: 80%;
+  }
+}

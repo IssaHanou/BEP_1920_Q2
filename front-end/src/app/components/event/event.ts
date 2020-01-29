@@ -5,12 +5,14 @@ export class Event {
   id: string;
   status: boolean;
   description: string;
+  puzzleName: string;
   isPuzzle: boolean;
 
-  constructor(id, description, status, isPuzzle) {
+  constructor(id, description, status, puzzleName, isPuzzle) {
     this.id = id;
     this.status = status;
     this.description = description;
+    this.puzzleName = puzzleName;
     this.isPuzzle = isPuzzle;
   }
 

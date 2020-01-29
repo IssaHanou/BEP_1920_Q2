@@ -15,10 +15,9 @@ export class Events {
    * If the event did not yet exist, create a new one with its description.
    */
   updatePuzzles(jsonData) {
-    for (let i = 0; i < jsonData.length; i++) {
-      const object = jsonData[i];
+    for (const object of jsonData) {
       if (!this.all.has(object.id)) {
-        this.all.set(object.id, new Event(object.id, object.description, object.status, object.puzzle));
+        this.all.set(object.id, new Event(object.id, object.description, object.status, object.eventName, object.puzzle));
       }
       this.all.get(object.id).updateStatus(object.status);
     }

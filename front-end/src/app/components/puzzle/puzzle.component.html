@@ -20,8 +20,24 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="description">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header rule-description">Beschrijving</th>
-        <td mat-cell *matCellDef="let element" class="rule-description"> {{ element.description }} </td>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header">Hints</th>
+        <td mat-cell *matCellDef="let element" class="send-hint">
+          <form (ngSubmit)="onSelectedHint()" class="hint-form">
+            <mat-form-field>
+              <mat-select [(ngModel)]="hint" name="hint" placeholder="Hint">
+                  <mat-option *ngFor="let hint of getHintList(element.puzzleName)" [value]="hint"> -{{ hint }} </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-select [(ngModel)]="device" name="device" placeholder="Waar">
+                <mat-option *ngFor="let device of getHintDevices()" [value]="device"> {{ device }} </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <button mat-button type="submit" class="mat-raised-button mat-primary custom-md-button hint-button">
+              <mat-icon>send</mat-icon>
+            </button>
+          </form>
+        </td>
       </ng-container>
       <ng-container matColumnDef="done">
         <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header">Handmatig afmaken</th>

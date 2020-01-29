@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { EventComponent } from './event.component';
+import { EventComponent } from "./event.component";
 import {
   MatPaginatorModule,
   MatTooltipModule,
@@ -15,7 +15,7 @@ import { Overlay } from "@angular/cdk/overlay";
 import { MQTT_SERVICE_OPTIONS } from "../../app.module";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
-describe('EventComponent', () => {
+describe("EventComponent", () => {
   let component: EventComponent;
   let fixture: ComponentFixture<EventComponent>;
 
@@ -41,7 +41,7 @@ describe('EventComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 
