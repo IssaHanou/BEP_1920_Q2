@@ -6,7 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"math"
-	"sciler/communication"
 	"sciler/config"
 	"testing"
 	"time"
@@ -69,7 +68,9 @@ func getTestHandler() *Handler {
 		},
 	}
 	messageHandler := Handler{Config: workingConfig, ConfigFile: "fake file name"}
-	communicator := communication.NewCommunicator(workingConfig, messageHandler.NewHandler, func() {})
+	communicator := new(CommunicatorMock)
+	communicator.On("Publish", "front-end", mock.Anything, 3)
+	communicator.On("Publish", "time", mock.Anything, 3)
 	messageHandler.Communicator = communicator
 	return &messageHandler
 }
@@ -78,6 +79,7 @@ func getTestHandler() *Handler {
 func TestHandler_SetTimer_Start(t *testing.T) {
 	handler := getTestHandler()
 	content := config.ComponentInstruction{Instruction: "start"}
+
 	assert.Equal(t, "stateIdle", handler.Config.Timers["TestTimer"].State)
 	handler.SetTimer("TestTimer", content)
 	assert.Equal(t, "stateActive", handler.Config.Timers["TestTimer"].State)
@@ -226,7 +228,7 @@ func TestOnConnectionMsgFrontEnd(t *testing.T) {
 
 	communicatorMock.On("Publish", mock.AnythingOfType("string"), mock.AnythingOfType("string"), 3)
 	handler.msgMapper(msg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 8)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 9)
 }
 
 func TestOnConnectionMsgInvalid(t *testing.T) {

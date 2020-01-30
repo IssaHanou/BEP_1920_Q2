@@ -21,7 +21,7 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header">Handmatig afmaken</th>
         <td mat-cell *matCellDef="let element">
           <button mat-button class="mat-raised-button mat-primary" (click)="finishRule(element.id)"
-                  disabled="{{ getGameStateInGame() }}">Puzzel eindigen</button>
+                  disabled="{{ app.getGameStateInGame() }}">wel gedaan</button>
         </td>
       </ng-container>
 

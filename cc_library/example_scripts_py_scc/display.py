@@ -20,8 +20,8 @@ class Display(Device):
         instruction = action.get("instruction")
         if instruction == "hint":
             self.show_hint(action)
-        if instruction == "status instruction":
-            print(action.get("value"))
+        elif instruction == "time":
+            self.show_time(action)
         else:
             return False
         return True
@@ -34,6 +34,10 @@ class Display(Device):
     def show_hint(self, data):
         self.hint = data.get("value")
         print(self.hint)
+        self.status_changed()
+
+    def show_time(self, data):
+        print(data.get("id"), "lasts", data.get("duration"),  "and is currently", data.get("state"))
         self.status_changed()
 
     def reset(self):

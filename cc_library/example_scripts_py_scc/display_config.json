@@ -1,6 +1,6 @@
 {
   "id": "display",
-  "host": "192.168.178.82",
-  "labels": ["hint"],
+  "host": "localhost",
+  "labels": ["hint", "time"],
   "port": 1883
 }
