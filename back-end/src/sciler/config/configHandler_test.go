@@ -227,9 +227,15 @@ func Test_CheckActionStatus3(t *testing.T) {
 		func() { ReadFile(filename) },
 		"instruction type is a string but not in the correct form")
 }
-
 func Test_CheckActionStatus4(t *testing.T) {
 	filename := "../../../resources/testing/wrong-types/testCheckActionStatus4.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"instruction type is a string but not in the correct form")
+}
+
+func Test_CheckActionStatus5(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckActionStatus5.json"
 	assert.NotPanics(t,
 		func() { ReadFile(filename) })
 }

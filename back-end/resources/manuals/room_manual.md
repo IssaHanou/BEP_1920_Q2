@@ -38,7 +38,7 @@ This will be a list of all devices in the room. Each device is defined as a JSON
     Possible types are: "string", "boolean", "numeric", "array", or a custom name. 
 - `output`: defines the outputs that can be expected, with their status and what instructions can be performed on these components
     - `type`: defines the type of values to be expected as output. Possible types are: "string", "boolean", "numeric", "array", or a custom name. 
-    - `instructions`: this is a map of the name of an instruction to the type of argument the instruction takes
+    - `instructions`: this is a map of the name of an instruction to the type of argument the instruction takes. Possible types are: "string", "boolean", "numeric", "array" and "status". Status will be the status of a device's component specified in the action.
     - `label`: this is a list of possible labels this component listens to when an action gets called on a label.
     
 ### Timers
@@ -145,7 +145,7 @@ This can be displayed in the front-end, so should be readable and in Dutch.
     - `message` in case of type `device`: this defines a list of componentInstructions which have a:
         - `component_id`: this will be the id of a component in a timer or device
         - `instruction`: one of the instructions specified for this device and component
-        - `value`: this is the value for the instruction of the type specified for this device and component
+        - `value`: this is the value for the instruction of the type specified for this device and component, in case this type is "status", a string in the form "`device_id`.`component_id`" should be specified. 
     - `message` in case of type `timer`:   
            - `instruction`: one of the instructions for timer, e.g. `start`, `stop`, `pause`, `done`, `add`, `subtract`
            - `value`: optional, in case of `add` and `subtract` a time should be given in format XhXmXs 

@@ -56,7 +56,7 @@
                 {
                   "component_id": "light",
                   "instruction": "set color",
-                  "value": "non existing device.light"
+                  "value": "tester.light"
                 }
               ]
             }

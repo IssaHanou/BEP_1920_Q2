@@ -56,7 +56,7 @@
                 {
                   "component_id": "light",
                   "instruction": "set color",
-                  "value": "tester.light"
+                  "value": "tester.non existing component"
                 }
               ]
             }
