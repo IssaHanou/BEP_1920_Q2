@@ -1,6 +1,6 @@
 import { Events } from "./events";
 
-describe("Puzzles", () => {
+describe("Events", () => {
   let puzzles: Events;
   let jsonData: JSON;
 

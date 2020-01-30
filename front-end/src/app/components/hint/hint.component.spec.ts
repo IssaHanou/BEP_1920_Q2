@@ -10,7 +10,8 @@ import {
   MatFormFieldModule,
   MatInputModule,
   MatOptionModule,
-  MatSelectModule
+  MatSelectModule,
+  MatExpansionModule
 } from "@angular/material";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
@@ -27,6 +28,7 @@ describe("HintComponent", () => {
         MatInputModule,
         MatSelectModule,
         MatOptionModule,
+        MatExpansionModule,
         BrowserAnimationsModule
       ],
       declarations: [HintComponent],

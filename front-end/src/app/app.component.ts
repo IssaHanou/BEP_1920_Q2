@@ -39,6 +39,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   deviceList: Devices;
   puzzleList: Events;
   manageButtons: Buttons;
+  sentHints: string[];
   hintList: Hint[];
   configErrorList: string[];
   uploadedConfig = "";
@@ -105,6 +106,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
     this.hintList = [];
     this.configErrorList = [];
     this.cameras = [];
+    this.sentHints = [];
     this.timerList = new Timers();
     const generalTimer = { id: "general", duration: 0, state: "stateIdle" };
     this.timerList.setTimer(generalTimer);
@@ -487,6 +489,38 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
       }
     }
     return true;
+  }
+
+  /**
+   * Log the hint to be send to the sentHints array. Then, send the hint instruction to the back-end.
+   * @param hint - the hint to send
+   * @param topicToSend - the topic to send the hint to
+   * @param puzzleName - the puzzleName to which a hint might belong (if selected), if it was a custom hint, this is "".
+   */
+  sendHint(hint: string, topicToSend: string, puzzleName: string) {
+    if (puzzleName !== "") {
+      puzzleName = ", over puzzel: " + puzzleName;
+    }
+    this.sentHints.push(
+      "Hint: " +
+        hint +
+        puzzleName +
+        ", verzonden naar: " +
+        topicToSend +
+        ", om: " +
+        this.getCurrentTime() +
+        "\n"
+    );
+    if (topicToSend === "alle hint apparaten" || topicToSend === "") {
+      topicToSend = "hint"; // hints to all devices should be published to topic hint
+    }
+    this.sendInstruction([
+      {
+        instruction: "hint",
+        value: hint,
+        topic: topicToSend
+      }
+    ]);
   }
 
   /**

@@ -33,8 +33,7 @@ export class Devices {
   createLabelMap() {
     for (const deviceId of this.all.keys()) {
       const device = this.all.get(deviceId);
-      for (const index in device.labels) {
-        const label = device.labels[0];
+      for (const label of Object.keys(device.labels)) {
         if (this.labels.has(label)) {
           this.labels.get(label).push(deviceId);
         } else {

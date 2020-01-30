@@ -12,7 +12,6 @@ import { MatSort, MatTableDataSource } from "@angular/material";
   styleUrls: ["./device.component.css", "../../../assets/css/main.css"]
 })
 export class DeviceComponent implements OnInit {
-
   /**
    * The keys used by the device table to retrieve data from the DataSource.
    */

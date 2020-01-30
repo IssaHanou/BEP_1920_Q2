@@ -1,25 +1,20 @@
-/**Have both buttons of same width**/
-.hint-button {
-  width: 80px;
-}
 /**Distance between hint box and button**/
 .mat-form-field {
   margin: 10px;
-  /*width: calc(90% - 90px);*/
   width: 90%;
 }
-/**For narrow hint boxes, the buttons should be below the fields**/
-@media only screen and (min-width: 700px) and (max-width: 1000px) {
-  .mat-form-field {
-    width: 90%;
-  }
+
+/*Style the hint log*/
+::ng-deep .puzzle-panel .mat-expansion-panel-body {
+  padding: 5px;
 }
-/*Long predefined hints should be multiple lines with some white space between hints*/
-::ng-deep .mat-select-panel mat-option.mat-option {
-  height: unset;
-  line-height: normal;
-  margin-block: 10px;
+.mat-expansion-panel {
+  background-color: #EEEEEE;
 }
-::ng-deep .mat-option-text.mat-option-text {
-  white-space: normal;
+.mat-expansion-panel-header {
+  background-color: #EEEEEE;
+  font-weight: bold;
+}
+.hint-log {
+  white-space: pre-wrap;
 }

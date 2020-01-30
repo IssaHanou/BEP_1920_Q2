@@ -25,7 +25,7 @@ export class EventsMethods {
     for (const eventName of this.app.puzzleList.rulesPerEvent.keys()) {
       if (
         this.app.puzzleList.rulesPerEvent.get(eventName).length > 0 &&
-        this.app.puzzleList.rulesPerEvent.get(eventName)[0].isPuzzle ==
+        this.app.puzzleList.rulesPerEvent.get(eventName)[0].isPuzzle ===
           shouldBePuzzle
       ) {
         events.push(eventName);

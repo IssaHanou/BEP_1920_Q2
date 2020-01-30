@@ -19,14 +19,17 @@ export class PuzzleComponent implements OnInit {
   /**
    * Hint to send for a certain puzzle.
    */
-  hint: string = "";
+  hint: string;
 
   /**
    * Topic to which a hint must be sent.
    */
-  topic: string = "";
+  topic: string;
 
-  constructor(private app: AppComponent, private methods: EventsMethods) {}
+  constructor(private app: AppComponent, private methods: EventsMethods) {
+    this.hint = "";
+    this.topic = "";
+  }
 
   ngOnInit() {}
 
@@ -51,20 +54,11 @@ export class PuzzleComponent implements OnInit {
    * and the accompanying send button is clicked,
    * the selected hint is sent as instruction to hint devices.
    */
-  onSelectedHint() {
+  onSelectedHint(puzzleName: string) {
     if (this.hint !== undefined && this.hint !== "") {
-      if (this.topic === "alle hint apparaten" || this.topic === "") {
-        this.topic = "hint"; // hints to all devices should be published to topic hint
-      }
-      this.app.sendInstruction([
-        {
-          instruction: "hint",
-          value: this.hint,
-          topic: this.topic
-        }
-      ]);
-      this.hint = "";
-      this.topic = "";
+      this.app.sendHint(this.hint, this.topic, puzzleName);
     }
+    this.hint = "";
+    this.topic = "";
   }
 }

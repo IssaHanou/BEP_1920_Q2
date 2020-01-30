@@ -15,5 +15,15 @@
       </mat-form-field>
       <input type="submit" value="Stuur" class="mat-raised-button mat-primary hint-button custom-md-button">
     </form>
+    <div class="hint-log">
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          log van verzonden hints
+        </mat-expansion-panel-header>
+        <ng-container *ngFor="let hint of getHintLog()">
+          {{ hint }}<br>
+        </ng-container>
+      </mat-expansion-panel>
+    </div>
   </div>
 </div>
