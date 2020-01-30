@@ -79,7 +79,10 @@ func TestInstructionSetup(t *testing.T) {
 				},
 			},
 			"cameras": []map[string]string{
-				{"link": "https://raccoon.games", "name": "camera1"},
+				{
+					"link": "https://raccoon.games",
+					"name": "camera1",
+				},
 			},
 			"buttons": []map[string]interface{}{
 				{
@@ -121,7 +124,10 @@ func TestInstructionSetup(t *testing.T) {
 				},
 			},
 			"cameras": []map[string]string{
-				{"link": "https://raccoon.games", "name": "camera1"},
+				{
+					"link": "https://raccoon.games",
+					"name": "camera1",
+				},
 			},
 			"buttons": []map[string]interface{}{
 				{
@@ -152,7 +158,6 @@ func TestInstructionSetup(t *testing.T) {
 			"connection": false,
 			"status": map[string]interface{}{
 				"start":     false,
-				"stop":      false,
 				"gameState": "gereed"},
 		},
 	})

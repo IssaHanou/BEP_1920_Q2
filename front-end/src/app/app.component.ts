@@ -37,7 +37,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
 
   // Keeping track of data
   deviceList: Devices;
-  puzzleList: Events;
+  allEventsList: Events;
   manageButtons: Buttons;
   sentHints: string[];
   hintList: Hint[];
@@ -101,7 +101,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
    */
   initializeVariables() {
     this.deviceList = new Devices();
-    this.puzzleList = new Events();
+    this.allEventsList = new Events();
     this.manageButtons = new Buttons();
     this.hintList = [];
     this.configErrorList = [];
@@ -214,7 +214,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
         break;
       }
       case "event status": {
-        this.puzzleList.updatePuzzles(msg.contents);
+        this.allEventsList.updatePuzzles(msg.contents);
         break;
       }
       case "front-end status": {
@@ -397,9 +397,9 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
    * @param rules json containing list of event object maps with id, status, description, puzzle (bool), puzzleName.
    */
   private setupPuzzles(rules) {
-    this.puzzleList = new Events();
-    this.puzzleList.updatePuzzles(rules);
-    this.puzzleList.createRulesPerEvent();
+    this.allEventsList = new Events();
+    this.allEventsList.updatePuzzles(rules);
+    this.allEventsList.createRulesPerEvent();
   }
 
   /**

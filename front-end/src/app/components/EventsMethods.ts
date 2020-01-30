@@ -22,10 +22,10 @@ export class EventsMethods {
    */
   public getEvents(shouldBePuzzle: boolean): MatTableDataSource<string> {
     const events: string[] = [];
-    for (const eventName of this.app.puzzleList.rulesPerEvent.keys()) {
+    for (const eventName of this.app.allEventsList.rulesPerEvent.keys()) {
       if (
-        this.app.puzzleList.rulesPerEvent.get(eventName).length > 0 &&
-        this.app.puzzleList.rulesPerEvent.get(eventName)[0].isPuzzle ===
+        this.app.allEventsList.rulesPerEvent.get(eventName).length > 0 &&
+        this.app.allEventsList.rulesPerEvent.get(eventName)[0].isPuzzle ===
           shouldBePuzzle
       ) {
         events.push(eventName);
@@ -41,7 +41,7 @@ export class EventsMethods {
    */
   public getRulesPerEvent(puzzleName: string): MatTableDataSource<Event> {
     const puzzles: Event[] = [];
-    for (const rule of this.app.puzzleList.rulesPerEvent.get(puzzleName)) {
+    for (const rule of this.app.allEventsList.rulesPerEvent.get(puzzleName)) {
       puzzles.push(rule);
     }
     puzzles.sort((a: Event, b: Event) => a.id.localeCompare(b.id));
@@ -60,6 +60,6 @@ export class EventsMethods {
    * Returns the description of an event with id eventID.
    */
   public getEventDescription(eventID: string) {
-    return this.app.puzzleList.rules.get(eventID).description;
+    return this.app.allEventsList.rules.get(eventID).description;
   }
 }

@@ -231,8 +231,8 @@ func generateEventRuleMap(config *WorkingConfig) map[string]*Rule {
 func generatePuzzleRuleMap(config *WorkingConfig) map[string]*Rule {
 	ruleMap := make(map[string]*Rule)
 
-	for _, event := range config.Puzzles {
-		for _, rule := range event.GetRules() {
+	for _, puzzle := range config.Puzzles {
+		for _, rule := range puzzle.GetRules() {
 			ruleMap[rule.ID] = rule
 		}
 	}

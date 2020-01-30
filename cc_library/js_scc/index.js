@@ -341,7 +341,6 @@ class SccLib {
     }
     const msg = new Paho.Message(JSON.stringify(message));
     msg.destinationName = topic;
-    this.log("info", "sent " + msg);
     this.client.send(msg);
   }
 
