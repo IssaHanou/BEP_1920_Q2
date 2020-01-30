@@ -80,16 +80,11 @@ func TestInstructionSetup(t *testing.T) {
 			},
 			"cameras": []map[string]string{
 				{"link": "https://raccoon.games", "name": "camera1"},
-				{"link": "https://debrouwerij.io", "name": "camera2"},
 			},
 			"buttons": []map[string]interface{}{
 				{
 					"id":       "start",
 					"disabled": false,
-				},
-				{
-					"id":       "stop",
-					"disabled": true,
 				},
 			},
 			"devices": []map[string]interface{}{
@@ -127,28 +122,23 @@ func TestInstructionSetup(t *testing.T) {
 			},
 			"cameras": []map[string]string{
 				{"link": "https://raccoon.games", "name": "camera1"},
-				{"link": "https://debrouwerij.io", "name": "camera2"},
 			},
 			"buttons": []map[string]interface{}{
 				{
 					"id":       "stop",
 					"disabled": true,
 				},
-				{
-					"id":       "start",
-					"disabled": false,
-				},
 			},
 			"devices": []map[string]interface{}{
-				{
-					"id":          "front-end",
-					"description": "The operator webapp for managing a escape room",
-					"labels":      []string{},
-				},
 				{
 					"id":          "telephone",
 					"description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
 					"labels":      []string{"sound"},
+				},
+				{
+					"id":          "front-end",
+					"description": "The operator webapp for managing a escape room",
+					"labels":      []string{},
 				},
 			},
 		},
