@@ -49,7 +49,8 @@ export class EventsMethods {
   }
 
   /**
-   * When button in the events or puzzles table is pressed, manually override the finished status of rule in back-end.
+   * When button in the table is pressed, manually override the finished status of rule in back-end.
+   * The finish rule button can only be clicked when game is in play (timer is running).
    */
   public finishRule(ruleId: string) {
     this.app.sendInstruction([{ instruction: "finish rule", rule: ruleId }]);

@@ -187,8 +187,9 @@ func TestInstructionSetup(t *testing.T) {
 	communicatorMock.On("Publish", "front-end", string(statusMessageFrontEnd), 3).Once()
 	communicatorMock.On("Publish", "front-end", string(statusInstructionMsg), 3).Once()
 	communicatorMock.On("Publish", "front-end", string(messageEventStatus), 3).Once()
+	communicatorMock.On("Publish", "time", string(timerGeneralMessage), 3).Once()
 	handler.msgMapper(instructionMsg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 7)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 8)
 }
 
 func TestOnInstructionMsgResetAll(t *testing.T) {
@@ -235,7 +236,7 @@ func TestOnInstructionMsgResetAll(t *testing.T) {
 	communicatorMock.On("Publish", "front-end", string(jsonStatusMsg), 3).Once()
 	communicatorMock.On("Publish", mock.AnythingOfType("string"), mock.AnythingOfType("string"), 3) // all calls from sendStatus update (tested in another test)
 	handler.msgMapper(instructionMsg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 13)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 14)
 }
 
 func TestOnInstructionMsgTestAll(t *testing.T) {
@@ -341,11 +342,12 @@ func TestOnInstructionMsgFinishRule(t *testing.T) {
 		},
 	})
 	communicatorMock.On("Publish", "front-end", string(instTimerMessage), 3)
+	communicatorMock.On("Publish", "time", string(instTimerMessage), 3)
 	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)
 	communicatorMock.On("Publish", "display", string(instHintMessage), 3)
 	handler.onInstructionMsg(msg)
 	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 4)
 }
 
 func TestOnInstructionMsgFinishRuleLabel(t *testing.T) {
@@ -548,7 +550,7 @@ func TestInstructionUseConfig(t *testing.T) {
 	communicatorMock.On("Publish", "front-end", string(jsonMessage), 3).Once()
 	communicatorMock.On("Publish", mock.AnythingOfType("string"), mock.AnythingOfType("string"), 3) // sendSetup tested in another test
 	handler.msgMapper(instructionMsg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 12)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 13)
 }
 
 func TestSendInstruction(t *testing.T) {

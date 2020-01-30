@@ -47,7 +47,8 @@ export class PuzzleComponent implements OnInit {
   }
 
   /**
-   * When a hint has been chosen for a puzzle and the accompanying "Stuur" button is clicked,
+   * When a hint has been chosen for a puzzle, a device (topic) has been chosen to send to
+   * and the accompanying send button is clicked,
    * the selected hint is sent as instruction to hint devices.
    */
   onSelectedHint() {

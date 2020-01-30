@@ -135,7 +135,7 @@ func (t *Timer) Stop() error {
 }
 
 // Done finishes the timer as if it ran out of time
-// can not finish a timer that is already Expired
+// cannot finish a timer that is already Expired
 func (t *Timer) Done(handler InstructionSender) error {
 	if t.State == "stateExpired" {
 		return fmt.Errorf("timer %v is already Expired and can not be finished again", t.ID)

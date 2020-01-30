@@ -152,9 +152,10 @@ func TestOnStatusMsgFrontEnd(t *testing.T) {
 		},
 	})
 	communicatorMock.On("Publish", "front-end", string(timerGeneralMessage), 3)
+	communicatorMock.On("Publish", "time", string(timerGeneralMessage), 3)
 	go handler.updateStatus(msg)
 	time.Sleep(100 * time.Millisecond)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
 }
 
 func TestOnStatusMsgWrongType(t *testing.T) {

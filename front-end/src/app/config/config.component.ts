@@ -43,7 +43,9 @@ export class ConfigComponent implements OnInit {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.app.uploadedConfig = "";
+  }
 
   /**
    * When clicking the upload button, first reset the file, so the same one can be entered again for re-checking.
