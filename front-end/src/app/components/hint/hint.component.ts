@@ -14,12 +14,12 @@ export class HintComponent {
   /**
    * The contents of the hint text field.
    */
-  customHint: string;
+  hint: string;
 
   /**
-   * The contents of the hint selection box.
+   * Topic to send hint to.
    */
-  predefinedHint: string;
+  topic: string;
 
   constructor(private app: AppComponent) {}
 
@@ -51,40 +51,19 @@ export class HintComponent {
   }
 
   /**
-   * When predefined hint has been chosen and the accompanying "Stuur" button is clicked,
-   * the selected hint is sent as instruction to hint devices.
-   */
-  onPredefinedHint() {
-    if (
-      this.predefinedHint !== undefined &&
-      this.predefinedHint !== "" &&
-      this.predefinedHint !== "---"
-    ) {
-      this.app.sendInstruction([
-        {
-          instruction: "hint",
-          value: this.predefinedHint,
-          topic: "hint"
-        }
-      ]);
-      this.predefinedHint = "---";
-    }
-  }
-
-  /**
    * When custom hint has been typed and the accompanying "Stuur" button is clicked,
    * the typed hint is sent as instruction to hint devices.
    */
   onCustomHint() {
-    if (this.customHint !== undefined && this.customHint !== "") {
+    if (this.hint !== undefined && this.hint !== "") {
       this.app.sendInstruction([
         {
           instruction: "hint",
-          value: this.customHint,
+          value: this.hint,
           topic: "hint"
         }
       ]);
-      this.customHint = "";
+      this.hint = "";
     }
   }
 }

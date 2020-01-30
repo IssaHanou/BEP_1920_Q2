@@ -79,4 +79,15 @@ export class Devices {
       return null;
     }
   }
+
+  /**
+   * Get list of devices which belong to label, and add the option to send the hint to `all devices`.
+   */
+  getDevicesWithLabel(label: string): string[] {
+    let hintDevices: string[] = ["alle hint apparaten"];
+    if (this.labels.has(label)) {
+      hintDevices = hintDevices.concat(this.labels.get(label));
+    }
+    return hintDevices;
+  }
 }

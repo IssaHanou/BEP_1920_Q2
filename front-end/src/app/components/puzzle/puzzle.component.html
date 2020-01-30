@@ -50,8 +50,10 @@
                     </mat-select>
                   </mat-form-field>
                   <mat-form-field>
-                    <mat-select [(ngModel)]="device" name="device" placeholder="Waar">
-                      <mat-option *ngFor="let device of getHintDevices()" [value]="device"> -{{ device }} </mat-option>
+                    <mat-select [(ngModel)]="topic" name="device" placeholder="Waar">
+                      <mat-option *ngFor="let device of app.deviceList.getDevicesWithLabel('hint')" [value]="device">
+                        -{{ device }}
+                      </mat-option>
                     </mat-select>
                   </mat-form-field>
                   <button mat-button type="submit" class="mat-raised-button mat-primary custom-md-button hint-button">

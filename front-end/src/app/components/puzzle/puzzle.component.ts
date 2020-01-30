@@ -22,9 +22,9 @@ export class PuzzleComponent implements OnInit {
   hint: string = "";
 
   /**
-   * Id of device to which a hint must be sent.
+   * Topic to which a hint must be sent.
    */
-  device: string = "";
+  topic: string = "";
 
   constructor(private app: AppComponent, private methods: EventsMethods) {}
 
@@ -53,29 +53,18 @@ export class PuzzleComponent implements OnInit {
    */
   onSelectedHint() {
     if (this.hint !== undefined && this.hint !== "") {
-      if (this.device === "all devices" || this.device === "") {
-        this.device = "hint"; // hints to all devices should be published to topic hint
+      if (this.topic === "alle hint apparaten" || this.topic === "") {
+        this.topic = "hint"; // hints to all devices should be published to topic hint
       }
       this.app.sendInstruction([
         {
           instruction: "hint",
           value: this.hint,
-          topic: this.device
+          topic: this.topic
         }
       ]);
       this.hint = "";
-      this.device = "";
+      this.topic = "";
     }
-  }
-
-  /**
-   * Get list of devices which can show hints, and add the option to send the hint to `all devices`.
-   */
-  getHintDevices(): string[] {
-    let hintDevices: string[] = ["all devices"];
-    if (this.app.deviceList.labels.has("hint")) {
-      hintDevices = hintDevices.concat(this.app.deviceList.labels.get("hint"));
-    }
-    return hintDevices;
   }
 }

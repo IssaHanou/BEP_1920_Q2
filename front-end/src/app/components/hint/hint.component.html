@@ -1,20 +1,17 @@
 <div class="home-box hint-box">
   <h3 class="header">Hints</h3>
   <div class="contents">
-    <form (ngSubmit)="onPredefinedHint()">
-      <mat-form-field>
-        <mat-select [(ngModel)]="predefinedHint" name="predefinedHint" placeholder="Kies bestaande hint">
-          <mat-optgroup *ngFor="let obj of getPuzzleList()" [label]="obj.puzzle">
-            <mat-option *ngFor="let hint of getHintList(obj.puzzle)" [value]="hint"> {{ hint }} </mat-option>
-          </mat-optgroup>
-        </mat-select>
-      </mat-form-field>
-      <input type="submit" value="Stuur" class="mat-raised-button mat-primary hint-button custom-md-button">
-    </form>
     <form (ngSubmit)="onCustomHint()">
       <mat-form-field>
-        <input matInput #input type="text" name="customHint" [(ngModel)]="customHint" placeholder="Type een eigen hint">
+        <input matInput #input type="text" name="customHint" [(ngModel)]="hint" placeholder="Type een eigen hint">
         <mat-hint>{{input.value?.length || 0}} karakters</mat-hint>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-select [(ngModel)]="topic" name="device" placeholder="Selecteer waar hint wordt laten zien">
+          <mat-option *ngFor="let device of app.deviceList.getDevicesWithLabel('hint')" [value]="device">
+            -{{ device }}
+          </mat-option>
+        </mat-select>
       </mat-form-field>
       <input type="submit" value="Stuur" class="mat-raised-button mat-primary hint-button custom-md-button">
     </form>
