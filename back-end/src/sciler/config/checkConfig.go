@@ -196,22 +196,27 @@ func (config *WorkingConfig) checkActionInstructionType(valueType reflect.Kind, 
 	case "status":
 		if valueType != reflect.String {
 			return fmt.Errorf("level III - implementation error: on rule %s's actions: instruction type status expected but %s found as type of the value: %v", ruleID, valueType.String(), value)
-		} else {
-			split := strings.Split(value.(string), ".")
-			if len(split) == 2 {
-				deviceID := split[0]
-				componentID := split[1]
-				device := config.Devices[deviceID]
-				if device != nil && (device.Input[componentID] != "" || device.Output[componentID].Type != "") {
-					break
-				}
-			}
-			return fmt.Errorf("level III - implementation error: on rule %s's actions: instruction type status expected but %v which is not in the form of `deviceID.component`", ruleID, value)
 		}
+		return config.checkStatusInstructionType(value.(string), ruleID)
 	default:
 		return fmt.Errorf("level III - implementation error: on rule %s's actions: custom types of value like: %s, are not yet implemented", ruleID, instructionType)
 	}
 	return nil
+}
+
+// checkStatusInstructionType checks if a status is in the form: `deviceID.component`
+// and if the device and component exists
+func (config *WorkingConfig) checkStatusInstructionType(status string, ruleID string) error {
+	split := strings.Split(status, ".")
+	if len(split) == 2 {
+		deviceID := split[0]
+		componentID := split[1]
+		device := config.Devices[deviceID]
+		if device != nil && (device.Input[componentID] != "" || device.Output[componentID].Type != "") {
+			return nil
+		}
+	}
+	return fmt.Errorf("level III - implementation error: on rule %s's actions: instruction type status expected but %v which is not in the form of `deviceID.component`", ruleID, status)
 }
 
 // checkActionLabel checks if there is a label with this ID,
