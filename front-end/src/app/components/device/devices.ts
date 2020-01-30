@@ -33,7 +33,8 @@ export class Devices {
   createLabelMap() {
     for (const deviceId of this.all.keys()) {
       const device = this.all.get(deviceId);
-      for (const label of Object.keys(device.labels)) {
+      for (const index of Object.keys(device.labels)) {
+        const label = device.labels[index];
         if (this.labels.has(label)) {
           this.labels.get(label).push(deviceId);
         } else {
@@ -87,6 +88,7 @@ export class Devices {
     if (this.labels.has(label)) {
       hintDevices = hintDevices.concat(this.labels.get(label));
     }
+    hintDevices.sort();
     return hintDevices;
   }
 }
