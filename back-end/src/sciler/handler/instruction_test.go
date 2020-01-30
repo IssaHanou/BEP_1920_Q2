@@ -388,9 +388,12 @@ func TestOnInstructionMsgHint(t *testing.T) {
 		DeviceID: "front-end",
 		TimeSent: "05-12-2019 09:42:10",
 		Type:     "instruction",
-		Contents: []map[string]interface{}{{
-			"instruction": "hint",
-			"value":       "This is my hint"},
+		Contents: []map[string]interface{}{
+			{
+				"instruction": "hint",
+				"value":       "This is my hint",
+				"topic":       "hint",
+			},
 		},
 	}
 	communicatorMock := new(CommunicatorMock)

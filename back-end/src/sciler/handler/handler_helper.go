@@ -295,26 +295,30 @@ func (handler *Handler) getSetUpEvents() []map[string]interface{} {
 
 // findEventName finds the name of the general event that idToFind belongs to
 func findEventName(idToFind string, eventsToSearch []*config.GeneralEvent) string {
+	nameFound := ""
 	for _, event := range eventsToSearch {
 		for _, rule := range event.GetRules() {
 			if rule.ID == idToFind {
-				return event.GetName()
+				nameFound = event.GetName()
+				break
 			}
 		}
 	}
-	return ""
+	return nameFound
 }
 
 // findPuzzleName finds the name of the puzzle that idToFind belongs to
 func findPuzzleName(idToFind string, eventsToSearch []*config.Puzzle) string {
+	nameFound := ""
 	for _, event := range eventsToSearch {
 		for _, rule := range event.GetRules() {
 			if rule.ID == idToFind {
-				return event.GetName()
+				nameFound = event.GetName()
+				break
 			}
 		}
 	}
-	return ""
+	return nameFound
 }
 
 // Create a map and set the rule's id, description and status properties.
