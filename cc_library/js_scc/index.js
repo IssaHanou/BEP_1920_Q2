@@ -226,7 +226,7 @@ class SccLib {
   _checkTime(contents) {
     contents.instruction = "time";
     this._doCustomInstruction(contents);
-
+  }
 
   /**
    * _checkMessage executes all instructions in a message
@@ -257,6 +257,7 @@ class SccLib {
           break;
         }
       }
+      this.log("info", "instruction performed " + instruction);
     }
     return true;
   }
@@ -267,7 +268,6 @@ class SccLib {
    */
   _doTest() {
     this.device.test();
-    this.log("info", "instruction performed " + instruction);
   }
 
   /**
@@ -280,7 +280,6 @@ class SccLib {
     });
     this._sendMessage("back-end", message);
     this.statusChanged();
-    this.log("info", "instruction performed " + instruction);
   }
 
   /**
@@ -289,7 +288,6 @@ class SccLib {
    */
   _doReset() {
     this.device.reset();
-    this.log("info", "instruction performed " + instruction);
   }
 
   /**
@@ -310,7 +308,6 @@ class SccLib {
       );
       return false;
     } else {
-      this.log("info", "instruction performed " + instruction);
       return true;
     }
   }
