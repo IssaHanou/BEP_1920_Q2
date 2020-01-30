@@ -77,7 +77,7 @@ func (handler *Handler) SendComponentInstruction(clientID string, instructions [
 	}
 }
 
-// PrepareMessage scans a message and if the instruction is of type status, the value of is replaced by the status of a device
+// PrepareMessage scans a message and if the instruction is of type status, if so the value of the message is replaced by the status of a device
 func (handler *Handler) PrepareMessage(typeID string, messages []config.ComponentInstruction) []config.ComponentInstruction {
 	res := make([]config.ComponentInstruction, len(messages))
 	device := handler.Config.Devices[typeID]

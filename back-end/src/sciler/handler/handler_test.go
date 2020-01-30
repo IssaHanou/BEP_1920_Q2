@@ -450,6 +450,43 @@ func TestHandleDoubleEvent(t *testing.T) {
 	// (message expected includes time...), replace the messages with 'mock.Anything'
 }
 
+func TestHandleActionWithStatus(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_sendStatusDeviceOnAction.json"),
+		Communicator: communicatorMock,
+	}
+	statusMsg := Message{
+		DeviceID: "colorMixer",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "status",
+		Contents: map[string]interface{}{
+			"color": "blue",
+		},
+	}
+
+	instructionMsg, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{
+				"component_id": "light",
+				"instruction":  "set color",
+				"value":        "blue",
+			},
+		},
+	})
+
+	communicatorMock.On("Publish", "front-end", mock.AnythingOfType("string"), 3).Times(3)
+	communicatorMock.On("Publish", "tester", string(instructionMsg), 3).Once()
+	handler.msgMapper(statusMsg)
+	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 4)
+	// if this test becomes flaky (only when this test takes longer then 1 second),
+	// (message expected includes time...), replace the messages with 'mock.Anything'
+}
+
 ////////////////////////////// Error/irregular behavior tests //////////////////////////////
 func TestMsgMapperIllegalType(t *testing.T) {
 	handler := getTestHandler()

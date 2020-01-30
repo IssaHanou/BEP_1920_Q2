@@ -1,6 +1,6 @@
 {
-  "id": "hue_lights1",
-  "host": "192.168.178.82",
+  "id": "hue_lights",
+  "host": "192.168.0.103",
   "port": 1883,
   "labels": []
 }

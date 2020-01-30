@@ -29,8 +29,8 @@ class HueLights(Device):
         self.bri = 0
         self.x = 0
         self.y = 0
-        self.hue_bridge = "http://192.168.178.20/"
-        self.hue_user = "JQrPwJNthHtfPEG9vhW3mqwIVuFo3ESLD3gvkZOB"
+        self.hue_bridge = "http://192.168.0.106/"
+        self.hue_user = "d3Vji9wgd150ttFBQM3wHl-DyXVBYWnZdO6ALHci"
         self.group = "Spotlights"
         self.header = {"Content-type": "application/json"}
 
@@ -110,11 +110,12 @@ class HueLights(Device):
 
     def set_single(self, action):
         if action.get("instruction") == "bri":
-            self.bri = action.get("value") * 2.5
+            # self.bri = action.get("value") * 2.5
+            self.bri = 100
         elif action.get("instruction") == "x":
-            self.x = 1 / 100 * action.get("value")
+            self.x = float(1 / 100 * action.get("value"))
         elif action.get("instruction") == "y":
-            self.y = 1 / 100 * action.get("value")
+            self.y = float(1 / 100 * action.get("value"))
         if action.get("component_id") == "all":
             url = (
                     self.hue_bridge
@@ -137,7 +138,7 @@ class HueLights(Device):
 
     def pub_to_hue(self, url):
         params = json.dumps({"on": True, "bri": self.bri, "xy": [self.x, self.y]})
-        print(params)
+        print(url, params, self.header)
         resp = requests.put(url, data=params, headers=self.header)
         if resp.status_code == 200:
             self.log("Template has been published.")
@@ -159,6 +160,19 @@ class HueLights(Device):
                 + "/action"
         )
         self.pub_to_hue(url)
+
+    def __loop(self):
+        url = (
+                self.hue_bridge
+                + "api/"
+                + self.hue_user
+                + "/groups/"
+                + self.group
+                + "/action"
+        )
+        while True:
+            time.sleep(1)
+            self.pub_to_hue(url)
 
     def main(self):
         self.start()
