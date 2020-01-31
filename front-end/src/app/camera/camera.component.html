@@ -11,9 +11,9 @@
     </h3>
   </div>
   <div class="header" *ngIf="!fullScreen">
-    <!--If not in full screen, the header is the full dropdown expansion panel-->
-    <mat-expansion-panel #expansionPanel [expanded]="true">
-      <mat-expansion-panel-header (click)="expandPanel(expansionPanel, $event)">
+    <!--If in full screen, the dropdown expansion panel cannot be expanded-->
+    <mat-expansion-panel #expansionPanel [expanded]="false">
+      <mat-expansion-panel-header (click)="expandPanel(expansionPanel, $event)" class="camera-header mat-elevation-z0">
         <h3 class="camera-title">
           Camera
           <span (click)="$event.stopPropagation()">

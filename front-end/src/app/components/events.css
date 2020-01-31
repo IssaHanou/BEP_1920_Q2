@@ -1,10 +1,4 @@
-/**Distance between hint box and button**/
-.mat-form-field {
-  margin: 10px;
-  width: 90%;
-}
-
-/*Style the hint log*/
+/*Styling inner tables*/
 ::ng-deep .puzzle-panel .mat-expansion-panel-body {
   padding: 5px;
 }
@@ -15,6 +9,12 @@
   background-color: #EEEEEE;
   font-weight: bold;
 }
-.hint-log {
-  white-space: pre-wrap;
+
+/*Styling spacing within outer table*/
+.puzzle-table .mat-row {
+  height: auto;
 }
+.puzzle-table .mat-cell {
+  padding: 2px 2px 2px 2px;
+}
+

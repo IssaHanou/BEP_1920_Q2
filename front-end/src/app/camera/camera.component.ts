@@ -52,14 +52,14 @@ export class CameraComponent extends FullScreen
   /**
    * Upon initializing, make sure to set the feeds of the iframe's to either:
    * 1. previously selected value
-   * 2. the first value in the list
+   * 2. the first value in the list (second for the second frame)
    * 3. a blank status to prevent crashes
    */
   ngOnInit() {
     if (this.app.selectedCamera !== undefined) {
       this.selectedCameraControl.setValue(this.app.selectedCamera);
       this.setSrc();
-    } else if (this.allCameras().length > 1) {
+    } else if (this.allCameras().length >= 1) {
       this.selectedCameraControl.setValue(this.allCameras()[0].name);
       this.setSrc();
     } else {
@@ -71,7 +71,7 @@ export class CameraComponent extends FullScreen
       this.selectedCameraControl2.setValue(this.app.selectedCamera2);
       this.setSrc2();
     } else if (this.allCameras().length > 1) {
-      this.selectedCameraControl2.setValue(this.allCameras()[0].name);
+      this.selectedCameraControl2.setValue(this.allCameras()[1].name);
       this.setSrc2();
     } else {
       this.cameraFeedSrc2 = this.sanitizer.bypassSecurityTrustResourceUrl(

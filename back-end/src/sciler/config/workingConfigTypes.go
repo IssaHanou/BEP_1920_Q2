@@ -20,6 +20,7 @@ type WorkingConfig struct {
 	StatusMap     map[string][]*Rule
 	RuleMap       map[string]*Rule
 	EventRuleMap  map[string]*Rule
+	PuzzleRuleMap map[string]*Rule
 	LabelMap      map[string][]*Component
 }
 

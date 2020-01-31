@@ -1,16 +1,24 @@
 /**
- * Puzzle object, which has an id, status (can be anything, depending on device implementation) and connection status (boolean).
+ * Event object, which has an id, status (can be anything, depending on device implementation) and connection status (boolean).
  */
 export class Device {
   id: string;
   status: Map<string, Comp>;
   connection: boolean;
+  description: string;
+  labels: string[];
 
   constructor(jsonData) {
     this.id = jsonData.id;
-    this.updateConnection(jsonData.connection);
+    this.labels = jsonData.labels;
+    this.description = jsonData.description;
     this.status = new Map<string, Comp>();
-    this.updateStatus(jsonData.status);
+    if (jsonData.hasOwnProperty("status")) {
+      this.updateStatus(jsonData.status);
+    }
+    if (jsonData.hasOwnProperty("connection")) {
+      this.updateConnection(jsonData.connection);
+    }
   }
 
   /**

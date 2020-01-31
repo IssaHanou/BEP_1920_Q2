@@ -5,7 +5,7 @@ import { JsonConvert } from "json2typescript";
 import { MatSnackBar, MatSnackBarConfig } from "@angular/material";
 import { Observable, Subscription, timer } from "rxjs";
 import { Devices } from "./components/device/devices";
-import { Puzzles } from "./components/puzzle/puzzles";
+import { Events } from "./components/event/events";
 import { Timers } from "./components/timer/timers";
 import { Logger } from "./logger";
 import { Camera } from "./camera/camera";
@@ -37,8 +37,9 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
 
   // Keeping track of data
   deviceList: Devices;
-  puzzleList: Puzzles;
+  allEventsList: Events;
   manageButtons: Buttons;
+  sentHints: string[];
   hintList: Hint[];
   configErrorList: string[];
   uploadedConfig = "";
@@ -100,11 +101,12 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
    */
   initializeVariables() {
     this.deviceList = new Devices();
-    this.puzzleList = new Puzzles();
+    this.allEventsList = new Events();
     this.manageButtons = new Buttons();
     this.hintList = [];
     this.configErrorList = [];
     this.cameras = [];
+    this.sentHints = [];
     this.timerList = new Timers();
     const generalTimer = { id: "general", duration: 0, state: "stateIdle" };
     this.timerList.setTimer(generalTimer);
@@ -212,7 +214,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
         break;
       }
       case "event status": {
-        this.puzzleList.updatePuzzles(msg.contents);
+        this.allEventsList.updatePuzzles(msg.contents);
         break;
       }
       case "front-end status": {
@@ -359,12 +361,13 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
     this.setupCameras(jsonData.cameras);
     this.setupButtons(jsonData.buttons);
     this.setupPuzzles(jsonData.events);
+    this.setupDevices(jsonData.devices);
     this.setupHints(jsonData.hints);
   }
 
   /**
-   * Sets cameras up given new cameraData
-   * @param cameraData Camera array
+   * Creates cameras array given new cameraData.
+   * @param cameraData Camera object array.
    */
   private setupCameras(cameraData: Camera[]) {
     this.cameras = [];
@@ -376,8 +379,8 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * Sets buttons up given new buttonData
-   * @param buttonData json containing list with buttons
+   * Creates buttons map given new buttonData.
+   * @param buttonData json containing list with button object maps with id and disabled parameters.
    */
   private setupButtons(buttonData) {
     this.manageButtons = new Buttons();
@@ -390,21 +393,28 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   }
 
   /**
-   * Sets puzzles up given new rules
-   * @param rules json containing list of events
+   * Creates rules map with the given new rules, and creates the puzzle-name-to-rule-map.
+   * @param rules json containing list of event object maps with id, status, description, puzzle (bool), puzzleName.
    */
   private setupPuzzles(rules) {
-    this.puzzleList = new Puzzles();
-    for (const rule in rules) {
-      if (rules.hasOwnProperty(rule)) {
-        this.puzzleList.addPuzzle(rule, rules[rule]);
-      }
-    }
+    this.allEventsList = new Events();
+    this.allEventsList.updatePuzzles(rules);
+    this.allEventsList.createRulesPerEvent();
   }
 
   /**
-   * Sets hints up given all puzzles
-   * @param puzzles json containing list of puzzles
+   * Creates devices map with the given new devices.
+   * @param devices json containing list of device object maps with id, description and labels.
+   */
+  private setupDevices(devices) {
+    this.deviceList = new Devices();
+    this.deviceList.createDevices(devices);
+    this.deviceList.createLabelMap();
+  }
+
+  /**
+   * Create hints array with the hints per puzzle.
+   * @param puzzles json containing list of hint object maps with name of puzzle as key and hints list as value.
    */
   private setupHints(puzzles) {
     this.hintList = [];
@@ -479,6 +489,38 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
       }
     }
     return true;
+  }
+
+  /**
+   * Log the hint to be send to the sentHints array. Then, send the hint instruction to the back-end.
+   * @param hint - the hint to send
+   * @param topicToSend - the topic to send the hint to
+   * @param puzzleName - the puzzleName to which a hint might belong (if selected), if it was a custom hint, this is "".
+   */
+  sendHint(hint: string, topicToSend: string, puzzleName: string) {
+    if (puzzleName !== "") {
+      puzzleName = ", over puzzel: " + puzzleName;
+    }
+    this.sentHints.push(
+      "Hint: " +
+        hint +
+        puzzleName +
+        ", verzonden naar: " +
+        topicToSend +
+        ", om: " +
+        this.getCurrentTime() +
+        "\n"
+    );
+    if (topicToSend === "alle hint apparaten" || topicToSend === "") {
+      topicToSend = "hint"; // hints to all devices should be published to topic hint
+    }
+    this.sendInstruction([
+      {
+        instruction: "hint",
+        value: hint,
+        topic: topicToSend
+      }
+    ]);
   }
 
   /**

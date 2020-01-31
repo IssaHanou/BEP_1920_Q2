@@ -344,3 +344,17 @@ func Test_DoubleIDs(t *testing.T) {
 		func() { ReadFile(filename) },
 		"two timers with the same id is not allowed")
 }
+
+func Test_DoublePuzzleNames(t *testing.T) {
+	filename := "../../../resources/testing/test_doublePuzzleNames.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"two puzzles with the same name is not allowed")
+}
+
+func Test_DoubleGeneralEventNames(t *testing.T) {
+	filename := "../../../resources/testing/test_doubleGeneralEventNames.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"two general events with the same name is not allowed")
+}

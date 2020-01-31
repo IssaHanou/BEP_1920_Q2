@@ -73,7 +73,10 @@ are specifically defined depending on the sender and receiver.
 - `contents`:
     - If type is `instruction`, then the message contents have
         - `instruction`: one of following instructions: 
-        `send setup`, `send status`, `reset all`, `test all`, `test device`, `finish rule`, `hint`
+            - `send setup`, `reset all`, `test all`: no additional parameters
+            - `test device`, has additional parameter `device` to specify which device to test
+            - `finish rule`, has additional parameter `rule` to specify which rule to finish
+            - `hint`: has extra parameters `value` and `topic` to specify the hint to send and on which topic
 
 ##### Example
     { 
@@ -85,6 +88,7 @@ are specifically defined depending on the sender and receiver.
             "rule": "playlist puzzel 1",
             }]
     }     
+
 ### Back-end to Front-end
 - `type`: the type of the message, this can be:
     - `confirmation`
@@ -105,7 +109,6 @@ are specifically defined depending on the sender and receiver.
         - `connection` boolean
     - If type is `event status`, then the message contents has objects with
         - `id` of rule
-        - `description` of rule
         - `status` of rule describes whether the rule is finished or not
     - If type is `front-end status`, then the message contents has a list of objects with:
         - `id` of button
@@ -117,9 +120,12 @@ are specifically defined depending on the sender and receiver.
     - If type is `setup`, the contents:
         - a `name` parameter carrying the name of the escape room 
         - a `hints` parameter carrying a map with the name of the puzzle as key and a list of hints as value
-        - an `events` parameter carrying a map with the name of the rule as key and the description as value
-        - a `cameras` parameter carrying a list with camera objects with a `name` and `link` tag
-        - a `buttons` parameter carrying a list of button names that should be added to the front-end 
+        - an `events` parameter carrying a list of maps with the parameters `id`, `description`, `status`,
+         `puzzle` (whether it belongs to puzzle or not), and `eventName` (name of general event or puzzle it belongs to) 
+        - a `cameras` parameter carrying a list of camera objects with a `name` and `link` tag
+        - a `buttons` parameter carrying a list of button maps with `id` and `disabled` parameters 
+        for buttons that should be added to the front-end
+        - a `devices` parameter carrying a list of device maps with `id`, `description` and `labels`
 
 ##### example
     { 

@@ -4,12 +4,14 @@ import { MqttModule, MqttService } from "ngx-mqtt";
 import { MQTT_SERVICE_OPTIONS } from "../../app.module";
 import { FormsModule } from "@angular/forms";
 import { AppComponent } from "../../app.component";
-import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { Overlay } from "@angular/cdk/overlay";
 import {
   MatFormFieldModule,
   MatInputModule,
   MatPaginatorModule,
+  MatTooltipModule,
+  MatIconModule,
   MatSortModule,
   MatExpansionModule,
   MatTableModule
@@ -30,8 +32,9 @@ describe("DeviceComponent", () => {
         MatPaginatorModule,
         MatFormFieldModule,
         MatInputModule,
+        MatTooltipModule,
+        MatIconModule,
         MatExpansionModule,
-        MatSnackBarModule,
         BrowserAnimationsModule
       ],
       declarations: [DeviceComponent],
