@@ -18,7 +18,7 @@ How to use Hue Lights with S.C.I.L.E.R.:
 """
 
 
-class Spot():
+class Spot:
 
     def __init__(self, x=0.3, y=0.3, bri=100):
         self.x = x
@@ -103,7 +103,7 @@ class HueLights(Device):
             for i in range(len(self.spots)):
                 self.set_spot(i, x, y, bri)
         else:
-            self.set_spot(comp[-1:], x, y, bri)
+            self.set_spot(int(comp[-1:]) - 1, x, y, bri)
 
     def set_spot(self, spot, x=None, y=None, bri=None):
         if x:
@@ -119,7 +119,7 @@ class HueLights(Device):
             for i in range(len(self.spots)):
                 self.set_single_spot(i, action)
         else:
-            self.set_spot(component[-1:], action)
+            self.set_spot(int(component[-1:]) - 1, action)
 
     def set_single_spot(self, spot, action):
         if action.get("instruction") == "bri":
