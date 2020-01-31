@@ -84,4 +84,11 @@ export class DeviceComponent implements OnInit {
       { instruction: "test device", device: deviceId }
     ]);
   }
+
+  /**
+   * Returns the description of a device with id.
+   */
+  public getDeviceDescription(id: string) {
+    return this.app.deviceList.all.get(id).description;
+  }
 }

@@ -14,21 +14,21 @@ export class HintComponent {
   /**
    * The contents of the hint text field.
    */
-  customHint: string;
+  hint: string;
 
   /**
-   * The contents of the hint selection box.
+   * Topic to send hint to.
    */
-  predefinedHint: string;
+  topic: string;
 
   constructor(private app: AppComponent) {}
 
   /**
-   * List of puzzle names to use as dividers in the selection box for predefined hints.
+   * List of hints that have been sent.
    */
-  getPuzzleList(): Hint[] {
+  getHintLog(): string[] {
     const list = [];
-    for (const hint of this.app.hintList) {
+    for (const hint of this.app.sentHints) {
       list.push(hint);
     }
     return list;
@@ -51,35 +51,15 @@ export class HintComponent {
   }
 
   /**
-   * When predefined hint has been chosen and the accompanying "Stuur" button is clicked,
+   * When a hint has been entered, a device (topic) has been chosen to send to
+   * and the accompanying send button is clicked,
    * the selected hint is sent as instruction to hint devices.
    */
-  onPredefinedHint() {
-    if (
-      this.predefinedHint !== undefined &&
-      this.predefinedHint !== "" &&
-      this.predefinedHint !== "---"
-    ) {
-      this.app.sendInstruction([
-        { instruction: "hint", value: this.predefinedHint }
-      ]);
-      this.predefinedHint = "---";
-    }
-  }
-
-  /**
-   * When custom hint has been typed and the accompanying "Stuur" button is clicked,
-   * the typed hint is sent as instruction to hint devices.
-   */
   onCustomHint() {
-    if (this.customHint !== undefined && this.customHint !== "") {
-      this.app.sendInstruction([
-        {
-          instruction: "hint",
-          value: this.customHint
-        }
-      ]);
-      this.customHint = "";
+    if (this.hint !== undefined && this.hint !== "") {
+      this.app.sendHint(this.hint, this.topic, "");
     }
+    this.hint = "";
+    this.topic = "";
   }
 }

@@ -1,32 +1,71 @@
 <div class="home-box puzzle-box">
   <h3 class="header">Puzzels</h3>
   <div class="contents">
-    <table mat-table matSort #PuzzleTableSort="matSort" [dataSource]="getPuzzleStatus()" class="mat-elevation-z8 custom-md-table">
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header">Puzzel</th>
-        <td mat-cell *matCellDef="let element" class="rule-id"> {{ element.id }} </td>
-      </ng-container>
-      <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header">Opgelost</th>
-        <td mat-cell *matCellDef="let element" class="boolean-column">
-          <ng-container *ngIf="element.status"><span class="check-mark">&#10004;</span></ng-container>
-          <ng-container *ngIf="!element.status"><span class="cross">&#10006;</span></ng-container>
-        </td>
-      </ng-container>
-      <ng-container matColumnDef="description">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header rule-description">Beschrijving</th>
-        <td mat-cell *matCellDef="let element" class="rule-description"> {{ element.description }} </td>
-      </ng-container>
-      <ng-container matColumnDef="done">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header">Handmatig afmaken</th>
-        <td mat-cell *matCellDef="let element">
-          <button mat-button class="mat-raised-button mat-primary" (click)="finishRule(element.id)"
-                  disabled="{{ app.getGameStateInGame() }}">wel gedaan</button>
+    <table mat-table [dataSource]="methods.getEvents(true)" class="puzzle-table mat-elevation-z8 custom-md-table">
+      <ng-container matColumnDef="puzzle">
+        <td mat-cell *matCellDef="let puzzle">
+          <mat-expansion-panel class="puzzle-panel">
+            <mat-expansion-panel-header>
+              {{ puzzle }}
+            </mat-expansion-panel-header>
+            <table mat-table [dataSource]="methods.getRulesPerEvent(puzzle)" class="mat-elevation-z8 custom-md-table inner-table">
+              <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef class="custom-md-table-header">Puzzel</th>
+                <td mat-cell *matCellDef="let element" class="rule-id">
+                    {{ element.id }}
+                    <button class="custom-icon-button" matTooltip="{{ methods.getEventDescription(element.id) }}"
+                            matTooltipPosition="right" matTooltipClass="custom-tool-tip">
+                      <mat-icon class="custom-icon">info_outline</mat-icon>
+                    </button>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef class="custom-md-table-header boolean-column">Opgelost</th>
+                <td mat-cell *matCellDef="let element" class="boolean-column">
+                  <ng-container *ngIf="element.status"><span class="check-mark">&#10004;</span></ng-container>
+                  <ng-container *ngIf="!element.status"><span class="cross">&#10006;</span></ng-container>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="done">
+                <th mat-header-cell *matHeaderCellDef class="custom-md-table-header">Handmatig afmaken</th>
+                <td mat-cell *matCellDef="let element">
+                  <button mat-button class="mat-raised-button mat-primary custom-md-button" (click)="methods.finishRule(element.id)"
+                          disabled="{{ app.getGameStateInGame() }}">wel gedaan</button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="methods.ruleColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: methods.ruleColumns;"></tr>
+            </table>
+
+            <div class="mat-elevation-z8">
+              <p class="custom-md-table-header hint-header">Stuur hint</p>
+              <mat-divider></mat-divider>
+              <div class="hint-selection">
+                <form (ngSubmit)="onSelectedHint()">
+                  <mat-form-field>
+                    <mat-select [(ngModel)]="hint" name="hint" placeholder="Hint">
+                      <mat-option *ngFor="let hint of getHintList(puzzle)" [value]="hint"> -{{ hint }} </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-form-field>
+                    <mat-select [(ngModel)]="topic" name="device" placeholder="Waar">
+                      <mat-option *ngFor="let device of app.deviceList.getDevicesWithLabel('hint')" [value]="device">
+                        -{{ device }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <button mat-button type="submit" class="mat-raised-button mat-primary custom-md-button hint-button">
+                    <mat-icon>send</mat-icon>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </mat-expansion-panel>
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="puzzleColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: puzzleColumns;"></tr>
+      <tr mat-row *matRowDef="let row; columns: methods.puzzleColumns;"></tr>
     </table>
   </div>
 </div>
