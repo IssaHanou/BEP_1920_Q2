@@ -20,6 +20,7 @@ type WorkingConfig struct {
 	StatusMap     map[string][]*Rule
 	RuleMap       map[string]*Rule
 	EventRuleMap  map[string]*Rule
+	PuzzleRuleMap map[string]*Rule
 	LabelMap      map[string][]*Component
 }
 
@@ -164,6 +165,7 @@ type InstructionSender interface {
 	SetTimer(string, ComponentInstruction)
 	HandleEvent(string)
 	SendLabelInstruction(string, []ComponentInstruction, string)
+	PrepareMessage(typeID string, message []ComponentInstruction) []ComponentInstruction
 }
 
 // Finished is a method that checks is the a rule have been finished, meaning if it reached its maximum number of executions

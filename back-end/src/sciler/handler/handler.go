@@ -119,12 +119,17 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 	contents := raw.Contents.(map[string]interface{})
 	value, ok := contents["completed"]
 	if !ok || reflect.TypeOf(value).Kind() != reflect.Bool {
-		logger.Errorf("received improperly structured confirmation message from device %s (no completed tag/boolean value)", raw.DeviceID)
+		logger.Errorf("received improperly structured confirmation message from device %s (no completed key or completed did not carry a boolean value)", raw.DeviceID)
 		return
 	}
 	original, ok := contents["instructed"]
 	if !ok {
-		logger.Errorf("received improperly structured confirmation message from device %s (no structured tag)", raw.DeviceID)
+		logger.Errorf("received improperly structured confirmation message from device %s (no instructed key)", raw.DeviceID)
+		return
+	}
+
+	if reflect.TypeOf(original) != reflect.TypeOf(map[string]interface{}{}) {
+		logger.Errorf("received improperly structured confirmation message from device %s (instructed key did not carry a map value)", raw.DeviceID)
 		return
 	}
 	msg := original.(map[string]interface{})
@@ -199,7 +204,7 @@ func (handler *Handler) handleInstruction(instruction map[string]interface{}, in
 	case "finish rule":
 		handler.onFinishRule(instruction["rule"].(string))
 	case "hint":
-		handler.onHint(instruction["value"].(string), instructor)
+		handler.onHint(instruction, instructor)
 	case "check config":
 		handler.onCheckConfig(instruction["config"], instruction["name"].(string))
 	case "use config":
@@ -256,10 +261,10 @@ func (handler *Handler) onFinishRule(ruleID string) {
 
 // onHint is the function to process the instruction `hint`
 // hint in instructed when the front-end submits a hint
-func (handler *Handler) onHint(hint string, instructor string) {
-	handler.sendInstruction("hint", []map[string]string{{
+func (handler *Handler) onHint(jsonData map[string]interface{}, instructor string) {
+	handler.sendInstruction(jsonData["topic"].(string), []map[string]string{{
 		"instruction":   "hint",
-		"value":         hint,
+		"value":         jsonData["value"].(string),
 		"instructed_by": instructor,
 	}})
 }

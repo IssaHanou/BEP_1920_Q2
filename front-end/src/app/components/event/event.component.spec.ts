@@ -1,43 +1,44 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
-import { HintComponent } from "./hint.component";
-import { FormsModule } from "@angular/forms";
-import { MqttModule, MqttService } from "ngx-mqtt";
-import { MQTT_SERVICE_OPTIONS } from "../../app.module";
-import { AppComponent } from "../../app.component";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import { Overlay } from "@angular/cdk/overlay";
+
+import { EventComponent } from "./event.component";
 import {
-  MatFormFieldModule,
-  MatInputModule,
-  MatOptionModule,
-  MatSelectModule,
-  MatExpansionModule
+  MatPaginatorModule,
+  MatTooltipModule,
+  MatSnackBar,
+  MatIconModule,
+  MatSortModule,
+  MatExpansionModule,
+  MatTableModule
 } from "@angular/material";
+import { MqttModule, MqttService } from "ngx-mqtt";
+import { AppComponent } from "../../app.component";
+import { Overlay } from "@angular/cdk/overlay";
+import { MQTT_SERVICE_OPTIONS } from "../../app.module";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
-describe("HintComponent", () => {
-  let component: HintComponent;
-  let fixture: ComponentFixture<HintComponent>;
+describe("EventComponent", () => {
+  let component: EventComponent;
+  let fixture: ComponentFixture<EventComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      declarations: [EventComponent],
       imports: [
-        FormsModule,
         MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
-        MatFormFieldModule,
-        MatInputModule,
-        MatSelectModule,
-        MatOptionModule,
+        MatTableModule,
+        MatTooltipModule,
+        MatIconModule,
         MatExpansionModule,
+        MatSortModule,
+        MatPaginatorModule,
         BrowserAnimationsModule
       ],
-      declarations: [HintComponent],
       providers: [MqttService, AppComponent, MatSnackBar, Overlay]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(HintComponent);
+    fixture = TestBed.createComponent(EventComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -48,6 +49,8 @@ describe("HintComponent", () => {
 
   it("should render header", () => {
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector("h3").textContent).toContain("Hints");
+    expect(compiled.querySelector("h3").textContent).toContain(
+      "Gebeurtenissen"
+    );
   });
 });

@@ -2,12 +2,12 @@
   <h3 class="header">Acties</h3>
   <div class="contents">
     <div>
-      <button mat-raised-button class="test" color=primary (click)="onClickTestButton()">test</button>
-      <button mat-raised-button class="reset" color=primary (click)="onClickResetButton()">reset</button>
+      <button mat-raised-button class="test custom-md-button" color=primary (click)="onClickTestButton()">test</button>
+      <button mat-raised-button class="reset custom-md-button" color=primary (click)="onClickResetButton()">reset</button>
     </div>
     <div>
       <ng-container *ngFor="let btn of getButtons()">
-        <button mat-raised-button class="generated-button" color=primary
+        <button mat-raised-button class="generated-button custom-md-button" color=primary
                 (click)="onClickCustomButton(btn.id)" disabled="{{ btn.disabled }}">
           {{ btn.id }}
         </button>

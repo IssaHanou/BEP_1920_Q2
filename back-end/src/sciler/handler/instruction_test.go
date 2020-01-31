@@ -66,24 +66,39 @@ func TestInstructionSetup(t *testing.T) {
 		Contents: map[string]interface{}{
 			"name": "Escape X",
 			"hints": map[string][]string{
-				"Telefoon puzzels": {"De knop verzend jouw volgorde", "Heb je al even gewacht?"},
-				"Control puzzel":   {"Zet de schuiven nauwkeurig"},
+				"Telefoon puzzels": {"De knop verzend jouw volgorde"},
 			},
-			"events": map[string]string{
-				"correctSequence": "De juiste volgorde van cijfers moet gedraaid worden.",
+			"events": []map[string]interface{}{
+				{
+					"id":          "correctSequence",
+					"status":      false,
+					"description": "De juiste volgorde van cijfers moet gedraaid worden.",
+					"puzzle":      true,
+					"eventName":   "Telefoon puzzels",
+				},
 			},
 			"cameras": []map[string]string{
-				{"link": "https://raccoon.games", "name": "camera1"},
-				{"link": "https://debrouwerij.io", "name": "camera2"},
+				{
+					"link": "https://raccoon.games",
+					"name": "camera1",
+				},
 			},
 			"buttons": []map[string]interface{}{
 				{
 					"id":       "start",
 					"disabled": false,
 				},
+			},
+			"devices": []map[string]interface{}{
 				{
-					"id":       "stop",
-					"disabled": true,
+					"id":          "front-end",
+					"description": "The operator webapp for managing a escape room",
+					"labels":      []string{},
+				},
+				{
+					"id":          "telephone",
+					"description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
+					"labels":      []string{"sound"},
 				},
 			},
 		},
@@ -95,24 +110,39 @@ func TestInstructionSetup(t *testing.T) {
 		Contents: map[string]interface{}{
 			"name": "Escape X",
 			"hints": map[string][]string{
-				"Telefoon puzzels": {"De knop verzend jouw volgorde", "Heb je al even gewacht?"},
-				"Control puzzel":   {"Zet de schuiven nauwkeurig"},
+				"Telefoon puzzels": {"De knop verzend jouw volgorde"},
 			},
-			"events": map[string]string{
-				"correctSequence": "De juiste volgorde van cijfers moet gedraaid worden.",
+			"events": []map[string]interface{}{
+				{
+					"id":          "correctSequence",
+					"status":      false,
+					"description": "De juiste volgorde van cijfers moet gedraaid worden.",
+					"puzzle":      true,
+					"eventName":   "Telefoon puzzels",
+				},
 			},
 			"cameras": []map[string]string{
-				{"link": "https://raccoon.games", "name": "camera1"},
-				{"link": "https://debrouwerij.io", "name": "camera2"},
+				{
+					"link": "https://raccoon.games",
+					"name": "camera1",
+				},
 			},
 			"buttons": []map[string]interface{}{
 				{
 					"id":       "stop",
 					"disabled": true,
 				},
+			},
+			"devices": []map[string]interface{}{
 				{
-					"id":       "start",
-					"disabled": false,
+					"id":          "telephone",
+					"description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
+					"labels":      []string{"sound"},
+				},
+				{
+					"id":          "front-end",
+					"description": "The operator webapp for managing a escape room",
+					"labels":      []string{},
 				},
 			},
 		},
@@ -126,7 +156,6 @@ func TestInstructionSetup(t *testing.T) {
 			"connection": false,
 			"status": map[string]interface{}{
 				"start":     false,
-				"stop":      false,
 				"gameState": "gereed"},
 		},
 	})
@@ -352,9 +381,12 @@ func TestOnInstructionMsgHint(t *testing.T) {
 		DeviceID: "front-end",
 		TimeSent: "05-12-2019 09:42:10",
 		Type:     "instruction",
-		Contents: []map[string]interface{}{{
-			"instruction": "hint",
-			"value":       "This is my hint"},
+		Contents: []map[string]interface{}{
+			{
+				"instruction": "hint",
+				"value":       "This is my hint",
+				"topic":       "hint",
+			},
 		},
 	}
 	communicatorMock := new(CommunicatorMock)
