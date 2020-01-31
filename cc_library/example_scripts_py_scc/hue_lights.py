@@ -35,7 +35,7 @@ class HueLights(Device):
         super().__init__(config)
         self.scene = "none"
         self.spots = [Spot(), Spot(), Spot(), Spot()]
-        self.hue_bridge = "http://192.168.0.106/"
+        self.hue_bridge = "http://192.168.0.107/"
         self.hue_user = "d3Vji9wgd150ttFBQM3wHl-DyXVBYWnZdO6ALHci"
         self.group = "Spotlights"
         self.header = {"Content-type": "application/json"}
@@ -125,7 +125,7 @@ class HueLights(Device):
             y = float(1 / 100 * action.get("value"))
             self.set_spot(spot, y=y)
 
-    def pub_to_hue(self):
+    def check_differences_and_publish(self, previous):
         url = None
         params = None
         head = self.spots[0]
@@ -144,7 +144,24 @@ class HueLights(Device):
                     + "/action"
             )
             params = json.dumps({"on": True, "bri": head.bri, "xy": [head.x, head.y], "transitiontime": 5})
+            self.pub_to_hue(url, params)
         else:
+            for i in range(len(self.spots)):
+                current = self.spots[i]
+                if current != previous[i]:
+                    url = (
+                            self.hue_bridge
+                            + "api/"
+                            + self.hue_user
+                            + "/lights/"
+                            + str(i+1)
+                            + "/state"
+                    )
+                    params = json.dumps({"on": True, "bri": current.bri, "xy": [current.x, current.y], "transitiontime": 5})
+                    self.pub_to_hue(url, params)
+
+
+    def pub_to_hue(self, url, params):
         print(url, params, self.header)
         resp = requests.put(url, data=params, headers=self.header)
         if resp.status_code == 200:
@@ -153,15 +170,16 @@ class HueLights(Device):
             self.log("Unable to publish template.")
         self.status_changed()
 
+
     def reset(self):
         self.scene = "none"
         self.spots = [Spot(), Spot(), Spot(), Spot()]
 
     def __loop(self):
-        previous = self.spots()
+        previous = self.spots
         while True:
             if self.spots != previous:
-                self.pub_to_hue()
+                self.check_differences_and_publish(previous)
                 previous = self.spots
                 time.sleep(1)
 
