@@ -119,12 +119,17 @@ func (handler *Handler) onConfirmationMsg(raw Message) {
 	contents := raw.Contents.(map[string]interface{})
 	value, ok := contents["completed"]
 	if !ok || reflect.TypeOf(value).Kind() != reflect.Bool {
-		logger.Errorf("received improperly structured confirmation message from device %s (no completed tag/boolean value)", raw.DeviceID)
+		logger.Errorf("received improperly structured confirmation message from device %s (no completed key or completed did not carry a boolean value)", raw.DeviceID)
 		return
 	}
 	original, ok := contents["instructed"]
 	if !ok {
-		logger.Errorf("received improperly structured confirmation message from device %s (no structured tag)", raw.DeviceID)
+		logger.Errorf("received improperly structured confirmation message from device %s (no instructed key)", raw.DeviceID)
+		return
+	}
+
+	if reflect.TypeOf(original) != reflect.TypeOf(map[string]interface{}{}) {
+		logger.Errorf("received improperly structured confirmation message from device %s (instructed key did not carry a map value)", raw.DeviceID)
 		return
 	}
 	msg := original.(map[string]interface{})

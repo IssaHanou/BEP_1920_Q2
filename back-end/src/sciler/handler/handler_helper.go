@@ -6,6 +6,7 @@ import (
 	logger "github.com/sirupsen/logrus"
 	"reflect"
 	"sciler/config"
+	"strings"
 	"time"
 )
 
@@ -75,6 +76,25 @@ func (handler *Handler) SendComponentInstruction(clientID string, instructions [
 		logger.Infof("sending instructions to %s: %s", clientID, fmt.Sprint(message.Contents))
 		handler.Communicator.Publish(clientID, string(jsonMessage), 3)
 	}
+}
+
+// PrepareMessage scans a message and if the instruction is of type status, if so the value of the message is replaced by the status of a device
+func (handler *Handler) PrepareMessage(typeID string, messages []config.ComponentInstruction) []config.ComponentInstruction {
+	res := make([]config.ComponentInstruction, len(messages))
+	device := handler.Config.Devices[typeID]
+	for i, message := range messages {
+		msg := message
+		instructionType := device.Output[message.ComponentID].Instructions[message.Instruction]
+		if instructionType == "status" { // when the instruction type is status
+			split := strings.Split(message.Value.(string), ".")
+			deviceID := split[0]
+			componentID := split[1]
+			status := handler.Config.Devices[deviceID].Status[componentID]
+			msg.Value = status // set status of message to retrieved status
+		}
+		res[i] = msg
+	}
+	return res
 }
 
 // SendLabelInstruction provides the action with a componentID from de LabelMap and a device to send it to

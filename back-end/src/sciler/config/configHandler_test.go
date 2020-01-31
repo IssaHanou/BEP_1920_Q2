@@ -207,6 +207,39 @@ func Test_CheckActionArray(t *testing.T) {
 		"instruction type does not match given value in an action")
 }
 
+func Test_CheckActionStatus(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckActionStatus.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"instruction type does not match given value in an action")
+}
+
+func Test_CheckActionStatus2(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckActionStatus2.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"instruction type is a string but not in the correct form")
+}
+
+func Test_CheckActionStatus3(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckActionStatus3.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"instruction type is a string but not in the correct form")
+}
+func Test_CheckActionStatus4(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckActionStatus4.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"instruction type is a string but not in the correct form")
+}
+
+func Test_CheckActionStatus5(t *testing.T) {
+	filename := "../../../resources/testing/wrong-types/testCheckActionStatus5.json"
+	assert.NotPanics(t,
+		func() { ReadFile(filename) })
+}
+
 func Test_CheckActionNoValueDevice(t *testing.T) {
 	filename := "../../../resources/testing/wrong-types/testCheckActionNoValueDevice.json"
 	assert.Panics(t,

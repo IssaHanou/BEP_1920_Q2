@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { Display } from "./display";
 import * as data from "../assets/display_config.json";
-import {Observable, Subscription, timer} from "rxjs";
+import { Observable, Subscription, timer } from "rxjs";
 
 @Component({
   selector: "app-root",
@@ -38,11 +38,9 @@ export class AppComponent implements OnInit {
         this.display.timeDur = this.display.timeDur - 1000;
       }
       if (this.display.timeDur <= 0) {
-          this.display.timeState = "stateIdle";
+        this.display.timeState = "stateIdle";
       }
-      this.displayTime = this.formatMS(
-        this.display.timeDur
-      );
+      this.displayTime = this.formatMS(this.display.timeDur);
     });
   }
 

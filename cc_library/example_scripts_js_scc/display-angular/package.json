@@ -20,9 +20,9 @@
     "@angular/platform-browser-dynamic": "~8.2.14",
     "@angular/router": "~8.2.14",
     "rxjs": "~6.4.0",
+    "sciler": "^0.1.7",
     "tslib": "^1.10.0",
-    "zone.js": "~0.9.1",
-    "sciler": "latest"
+    "zone.js": "~0.9.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.803.23",

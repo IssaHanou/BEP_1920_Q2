@@ -1,4 +1,4 @@
-const Device = require('sciler'); // production
+const Device = require("sciler"); // production
 
 export class Display extends Device {
   private hint: string;
