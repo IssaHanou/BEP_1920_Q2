@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { ManageComponent } from "./manage.component";
 import { MqttModule, MqttService } from "ngx-mqtt";
-import { AppModule, MQTT_SERVICE_OPTIONS } from "../../app.module";
+import { MQTT_SERVICE_OPTIONS } from "../../app.module";
 import { AppComponent } from "../../app.component";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Overlay } from "@angular/cdk/overlay";
@@ -36,17 +36,11 @@ describe("ManageComponent", () => {
   it("should have all buttons present", () => {
     const compiled = fixture.debugElement.nativeElement;
     expect(
-      compiled.getElementsByClassName("start").item(0).textContent
-    ).toContain("Start");
-    expect(
       compiled.getElementsByClassName("test").item(0).textContent
-    ).toContain("Test");
-    expect(
-      compiled.getElementsByClassName("stop").item(0).textContent
-    ).toContain("Stop");
+    ).toContain("test");
     expect(
       compiled.getElementsByClassName("reset").item(0).textContent
-    ).toContain("Reset");
+    ).toContain("reset");
   });
 
   it("should send test message on test button click", () => {
@@ -60,17 +54,6 @@ describe("ManageComponent", () => {
     expect(component.onClickTestButton).toHaveBeenCalled();
   });
 
-  it("should send start message on start button click", () => {
-    spyOn(component, "onClickStartButton");
-    const testButton = fixture.debugElement.nativeElement
-      .getElementsByClassName("start")
-      .item(0);
-    testButton.click();
-    fixture.detectChanges();
-
-    expect(component.onClickStartButton).toHaveBeenCalled();
-  });
-
   it("should send reset message on reset button click", () => {
     spyOn(component, "onClickResetButton");
     const testButton = fixture.debugElement.nativeElement
@@ -80,16 +63,5 @@ describe("ManageComponent", () => {
     fixture.detectChanges();
 
     expect(component.onClickResetButton).toHaveBeenCalled();
-  });
-
-  it("should send stop message on stop button click", () => {
-    spyOn(component, "onClickStopButton");
-    const testButton = fixture.debugElement.nativeElement
-      .getElementsByClassName("stop")
-      .item(0);
-    testButton.click();
-    fixture.detectChanges();
-
-    expect(component.onClickStopButton).toHaveBeenCalled();
   });
 });

@@ -1,16 +1,29 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
-import { Device } from "./device";
+import { Comp, Device } from "./device";
 import { AppComponent } from "../../app.component";
 import { MatSort, MatTableDataSource } from "@angular/material";
 
+/**
+ * The device component controls the device table in the "Apparaten" box on the home page.
+ */
 @Component({
   selector: "app-device",
   templateUrl: "./device.component.html",
   styleUrls: ["./device.component.css", "../../../assets/css/main.css"]
 })
 export class DeviceComponent implements OnInit {
-  deviceColumns: string[] = ["id", "connection", "component", "status"];
+  /**
+   * The keys used by the device table to retrieve data from the DataSource.
+   */
+  deviceColumns: string[] = ["id", "connection", "unfold", "test"];
+  /**
+   * The keys used by the component table to retrieve data from the component list.
+   */
+  componentColumns: string[] = ["component", "status"];
 
+  /**
+   * Control the sorting of the table.
+   */
   @ViewChild("DeviceTableSort", { static: true }) sort: MatSort;
 
   constructor(private app: AppComponent) {}
@@ -21,7 +34,7 @@ export class DeviceComponent implements OnInit {
    * Returns list of Device objects with their current status and connection.
    * Return in the form of map table data source, with sorting enabled.
    */
-  public getDeviceStatus(): MatTableDataSource<Device> {
+  public getDeviceList(): MatTableDataSource<Device> {
     const devices: Device[] = [];
     for (const device of this.app.deviceList.all.values()) {
       devices.push(device);
@@ -34,43 +47,41 @@ export class DeviceComponent implements OnInit {
   }
 
   /**
-   * Creates list of components (keys of status maps), in alphabetical order.
-   * Returns string with each component's value on new line.
+   * Returns list of Comp objects with their current status.
+   * For the front-end, only return the game state not the button pressed statuses.
    */
-  formatStatus(status: Map<string, any>) {
+  public getComponentList(deviceId: string): Comp[] {
+    const status = this.app.deviceList.getDevice(deviceId).status;
+    if (deviceId === "front-end") {
+      return [status.get("gameState")];
+    }
+    const ret = [];
     const keys = Array.from(status.keys());
     keys.sort();
-
-    let result = "";
     keys.forEach((key: string) => {
-      const value = status.get(key);
-      if (Array.isArray(value)) {
-        result += "[";
-        for (let i = 0; i < value.length; i++) {
-          result += value[i];
-          if (i < value.length - 1) {
-            result += ",";
-          }
-        }
-        result += "]\n";
-      } else {
-        result += value + "\n";
-      }
+      ret.push(status.get(key));
     });
-    return result;
+    return ret;
   }
 
   /**
-   * Creates list of components (keys of status maps), in alphabetical order.
-   * Returns string with each component on new line.
+   * In the table, show the front-end as device with name "operator scherm".
    */
-  getComponents(status: Map<string, any>) {
-    const keys = Array.from(status.keys());
-    keys.sort();
-    let result = "";
-    keys.forEach((key: string) => {
-      result += key + "\n";
-    });
-    return result;
+  getName(deviceId: string): string {
+    if (deviceId === "front-end") {
+      return "operator scherm";
+    } else {
+      return deviceId;
+    }
+  }
+
+  /**
+   * When button is pressed, test a single device.
+   * The test button can not be clicked when game is in play (timer is running).
+   */
+  testDevice(deviceId: string) {
+    this.app.sendInstruction([
+      { instruction: "test device", device: deviceId }
+    ]);
   }
 }

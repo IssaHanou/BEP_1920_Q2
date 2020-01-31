@@ -1,0 +1,41 @@
+{
+  "general": {
+    "name": "Escape X",
+    "duration": "30m",
+    "host": "localhost",
+    "port": 1883
+  },
+  "puzzles": [
+    {
+      "name": "Telefoon puzzels",
+      "rules": [
+        {
+          "id": "correctSequence",
+          "description": "De juiste volgorde van cijfers moet gedraaid worden.",
+          "limit": 1,
+          "conditions": {
+            "operator": "AND",
+            "list": []
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "front-end",
+              "message": [
+                {
+                  "instruction": "set state",
+                  "component_id": "gameState",
+                  "value": "newState"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "hints": [
+        "De knop verzend jouw volgorde",
+        "Heb je al even gewacht?"
+      ]
+    }
+  ]
+}

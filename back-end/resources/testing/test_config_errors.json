@@ -1,0 +1,366 @@
+{
+  "general": {
+    "name": "Escape X",
+    "duration": "30",
+    "host": "localhost2",
+    "port": 1884
+  },
+  "cameras": [
+    {"name": "camera1", "link": "https://raccoon.games"},
+    {"name": "camera2", "link": "https://debrouwerij.io"}
+  ],
+  "devices": [
+    {
+      "id": "controlBoard",
+      "description": "Control board with three switches, three slides with lights and one main switch.",
+      "input": {
+        "redSwitch": "boolean",
+        "orangeSwitch": "boolean",
+        "greenSwitch": "boolean",
+        "slider1": "numeric",
+        "slider2": "numeric",
+        "slider3": "numeric",
+        "mainSwitch": "boolean"
+      },
+      "output": {
+        "greenLight1": {
+          "type": "string",
+          "instructions": {
+            "interval": "numeric",
+            "delay": "numeric",
+            "state": "string"
+          }
+        },
+        "greenLight2": {
+          "type": "string",
+          "instructions": {
+            "interval": "numeric",
+            "delay": "numeric",
+            "state": "string"
+          }
+        },
+        "greenLight3": {
+          "type": "string",
+          "instructions": {
+            "interval": "numeric",
+            "delay": "numeric",
+            "state": "string"
+          }
+        },
+        "redLight1": {
+          "type": "string",
+          "instructions": {
+            "interval": "numeric",
+            "delay": "numeric",
+            "state": "string"
+          }
+        },
+        "redLight2": {
+          "type": "string",
+          "instructions": {
+            "interval": "numeric",
+            "delay": "numeric",
+            "state": "string"
+          }
+        },
+        "redLight3": {
+          "type": "string",
+          "instructions": {
+            "interval": "numeric",
+            "delay": "numeric",
+            "state": "string"
+          }
+        }
+      }
+    },
+    {
+      "id": "telephone",
+      "description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
+      "input": {
+        "turningWheel": "array"
+      },
+      "output": {
+        "audio": {
+          "type": "string",
+          "instructions": {
+            "play": "string"
+          }
+        },
+        "ringTone": {
+          "type": "string",
+          "instructions": {
+            "play": "string"
+          }
+        }
+      }
+    },
+    {
+      "id": "test device",
+      "description": "device that has all types of input",
+      "input": {
+        "numeric": "numeric",
+        "boolean": "boolean",
+        "string": "string",
+        "array": "array",
+        "custom": "custom"
+      },
+      "output": {}
+    }
+  ],
+  "timers": [
+    {
+      "id": "timer1",
+      "duration": "10x"
+    },
+    {
+      "id": "timer2",
+      "duration": "5s"
+    },
+    {
+      "id": "timer3",
+      "duration": "1m"
+    },
+    {
+      "id": "timer4",
+      "duration": "1h"
+    },
+    {
+      "id": "timer5",
+      "duration": "20s"
+    },
+    {
+      "id": "timer6",
+      "duration": "5s"
+    }
+  ],
+  "puzzles": [
+    {
+      "name": "Telefoon puzzels",
+      "rules": [
+        {
+          "id": "correctSequence",
+          "description": "De juiste volgorde van cijfers moet gedraaid worden.",
+          "limit": 7,
+          "conditions": {
+            "type": "device",
+            "type_id": "testDevice",
+            "constraints": {
+              "comparison": "eq",
+              "component_id": "turningWheel",
+              "value": [
+                0,
+                1,
+                2,
+                7
+              ]
+            }
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "controlBoard",
+              "message": [
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "interval",
+                  "value": 0.5
+                },
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "delay",
+                  "value": 0
+                },
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "state",
+                  "value": "blink"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "hints": [
+        "De knop verzend jouw volgorde",
+        "Heb je al even gewacht?"
+      ]
+    },
+    {
+      "name": "Control puzzel",
+      "rules": [
+        {
+          "id": "controlSwitch",
+          "description": "Als de grote switch wordt geflipt, worden alle condities gecheckt (tweede schuif en groene of rode switch aan) en gaat het lichtje branden en de telefoon ringt.",
+          "limit": 1,
+          "conditions": {
+            "operator": "AND",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "controlBoard",
+                "constraints": {
+                  "operator": "OR",
+                  "list": [
+                    {
+                      "component_id": "mainSwitch",
+                      "comparison": "eq",
+                      "value": true
+                    },
+                    {
+                      "component_id": "greenSwitch",
+                      "comparison": "eq",
+                      "value": true
+                    },
+                    {
+                      "component_id": "redSwitch",
+                      "comparison": "eq",
+                      "value": true
+                    },
+                    {
+                      "component_id": "slider2",
+                      "comparison": "lt",
+                      "value": 20
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "rule",
+                "type_id": "correctSequence",
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 2
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "telephone",
+              "message": [
+                {
+                  "component_id": "audio",
+                  "instruction": "play",
+                  "value": "audio1"
+                }
+              ]
+            },
+            {
+              "type": "device",
+              "type_id": "controlBoard",
+              "message": [
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "state",
+                  "value": "off"
+                },
+                {
+                  "component_id": "greenLight2",
+                  "instruction": "state",
+                  "value": "on"
+                },
+                {
+                  "component_id": "greenLight3",
+                  "instruction": "state",
+                  "value": "off"
+                },
+                {
+                  "component_id": "redLight1",
+                  "instruction": "state",
+                  "value": "on"
+                },
+                {
+                  "component_id": "redLight2",
+                  "instruction": "state",
+                  "value": "off"
+                },
+                {
+                  "component_id": "redLight3",
+                  "instruction": "state",
+                  "value": "on"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "hints": [
+        "Zet de schuiven nauwkeurig"
+      ]
+    }
+  ],
+  "general_events": [
+    {
+      "name": "Start",
+      "rules": [
+        {
+          "id": "telephoneRings",
+          "description": "Als het spel start, moet de telefoon na 1 minuut ringen.",
+          "limit": 1,
+          "conditions": {
+            "operator": "OR",
+            "list": [
+              {
+                "type": "timer",
+                "type_id": "timer1",
+                "constraints": {
+                  "operator": "AND",
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "value": true
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "telephone",
+              "message": [
+                {
+                  "component_id": "audio",
+                  "instruction": "play",
+                  "value": "audio1"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stop",
+      "rules": [
+        {
+          "id": "flipSwitch",
+          "description": "Als de knop omgaat, stopt het spel.",
+          "limit": 1,
+          "conditions": {
+            "type": "device",
+            "type_id": "controlBoard",
+            "constraints": {
+              "comparison": "eq",
+              "value": true,
+              "component_id": "mainSwitch"
+            }
+          },
+          "actions": [
+            {
+              "type": "timer",
+              "type_id": "timer10",
+              "message": [
+                {
+                  "instruction": "stop"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

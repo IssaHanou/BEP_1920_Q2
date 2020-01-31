@@ -5,6 +5,16 @@
     "host": "localhost",
     "port": 1883
   },
+  "cameras": [
+    {
+      "name": "camera1",
+      "link": "https://raccoon.games"
+    },
+    {
+      "name": "camera2",
+      "link": "https://debrouwerij.io"
+    }
+  ],
   "devices": [
     {
       "id": "controlBoard",
@@ -323,6 +333,16 @@
                   "value": "audio1"
                 }
               ]
+            },
+            {
+              "type": "timer",
+              "type_id": "timer2",
+              "message": [
+                {
+                  "instruction": "add",
+                  "value": "5m"
+                }
+              ]
             }
           ]
         }
@@ -353,6 +373,31 @@
                   "instruction": "stop"
                 }
               ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "button_events": [
+    {
+      "id": "rule",
+      "description": "desc",
+      "conditions": {
+        "type": "timer",
+        "type_id": "general",
+        "constraints": {
+          "comparison": "eq",
+          "value": true
+        }
+      },
+      "actions": [
+        {
+          "type": "timer",
+          "type_id": "general",
+          "message": [
+            {
+              "instruction": "stop"
             }
           ]
         }

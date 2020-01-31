@@ -1,24 +1,45 @@
 <div class="home-box device-box">
   <h3 class="header">Apparaten</h3>
   <div class="contents">
-    <table mat-table matSort #DeviceTableSort="matSort" [dataSource]="getDeviceStatus()" class="mat-elevation-z8 custom-md-table">
+    <table mat-table matSort #DeviceTableSort="matSort" [dataSource]="getDeviceList()"
+           class="mat-elevation-z8 custom-md-table">
       <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header"> Apparaat </th>
-        <td mat-cell *matCellDef="let element"> {{ element.id }} </td>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header">Apparaat</th>
+        <td mat-cell *matCellDef="let element"> {{ getName(element.id) }} </td>
       </ng-container>
       <ng-container matColumnDef="connection">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header"> Connectie </th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header">Connectie</th>
         <td mat-cell *matCellDef="let element" class="boolean-column">
-          <ng-container *ngIf="element.connection">&#10004;</ng-container>
-          <ng-container *ngIf="!element.connection">&#10006;</ng-container>
-        </td>      </ng-container>
-      <ng-container matColumnDef="component">
-        <th mat-header-cell *matHeaderCellDef class="custom-md-table-header"> Onderdeel </th>
-        <td mat-cell *matCellDef="let element" class="component-cell"> {{ getComponents(element.status) }} </td>
+          <ng-container *ngIf="element.connection"><span class="check-mark">&#10004;</span></ng-container>
+          <ng-container *ngIf="!element.connection"><span class="cross">&#10006;</span></ng-container>
+        </td>
       </ng-container>
-      <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef class="custom-md-table-header"> Status </th>
-        <td mat-cell *matCellDef="let element" class="component-cell"> {{ formatStatus(element.status) }} </td>
+      <ng-container matColumnDef="unfold">
+        <th mat-header-cell *matHeaderCellDef class="custom-md-table-header">Laat status zien</th>
+        <td mat-cell *matCellDef="let element" class="panel-cell">
+          <mat-expansion-panel class="status-panel" [expanded]="false">
+            <mat-expansion-panel-header collapsedHeight="*" expandedHeight="*">
+              status van onderdelen
+            </mat-expansion-panel-header>
+            <table mat-table [dataSource]="getComponentList(element.id)"
+                   class="mat-elevation-z8 custom-md-table component-table">
+                <ng-container matColumnDef="component">
+                  <td mat-cell *matCellDef="let comp" class="component-cell">{{ comp.id }}</td>
+                </ng-container>
+                <ng-container matColumnDef="status">
+                  <td mat-cell *matCellDef="let comp" class="status-cell">{{ comp.status }}</td>
+                </ng-container>
+              <tr mat-row *matRowDef="let compRow; columns: componentColumns;"></tr>
+            </table>
+          </mat-expansion-panel>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="test">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header class="test-column custom-md-table-header">Test</th>
+        <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
+          <button mat-button class="mat-raised-button test-column" color=primary
+                  disabled="{{ !app.getGameStateInGame() }}" (click)="testDevice(element.id)">test</button>
+        </td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="deviceColumns"></tr>

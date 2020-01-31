@@ -1,7 +1,10 @@
 import { Component, OnInit } from "@angular/core";
-import { Subscription, Observable, timer } from "rxjs";
 import { AppComponent } from "../../app.component";
+import { formatTime } from "./timer";
 
+/**
+ * The timer component is shown on the front-page in the "Tijd" box.
+ */
 @Component({
   selector: "app-timer",
   templateUrl: "./timer.component.html",
@@ -10,35 +13,26 @@ import { AppComponent } from "../../app.component";
 export class TimerComponent implements OnInit {
   constructor(private app: AppComponent) {}
 
-  private subscription: Subscription;
-  displayTime: string;
-  everySecond: Observable<number> = timer(0, 1000);
+  ngOnInit() {}
 
-  ngOnInit() {
-    this.subscription = this.everySecond.subscribe(seconds => {
-      for (const aTimer of this.app.timerList.getAll().values()) {
-        if (aTimer.state === "stateActive") {
-          aTimer.tick();
-        }
-        if (aTimer.duration <= 0) {
-          aTimer.state = "stateIdle";
-        }
-      }
-      this.displayTime = formatMS(
-        this.app.timerList.getTimer("general").getTimeLeft()
-      );
-    });
+  getDisplayTime() {
+    return this.app.displayTime;
   }
-}
 
-export function formatMS(timeInMS) {
-  const seconds = parseInt(((timeInMS / 1000) % 60).toString(), 10);
-  const minutes = parseInt(((timeInMS / (1000 * 60)) % 60).toString(), 10);
-  const hours = parseInt(((timeInMS / (1000 * 60 * 60)) % 24).toString(), 10);
-  const h = hours < 10 ? "0" + hours : hours;
-  const m = minutes < 10 ? "0" + minutes : minutes;
-  const s = seconds < 10 ? "0" + seconds : seconds;
-
-  return h + ":" + m + ":" + s;
-  // return moment(timeInMS).format("hh:mm:ss"); // TODO: Adds an hour
+  /**
+   * The done time is displayed when the game has started.
+   * It shows when the game will finish, depending on the current time and the duration of the game.
+   */
+  getDoneTime() {
+    const general = this.app.timerList.getTimer("general");
+    if (general !== null) {
+      if (general.getState() === "stateActive") {
+        const date = new Date();
+        const timeDiff =
+          date.getTime() + this.app.timerList.getTimer("general").duration;
+        const doneTime = formatTime(timeDiff, date.getTimezoneOffset());
+        return "Klaar om " + doneTime;
+      }
+    }
+  }
 }

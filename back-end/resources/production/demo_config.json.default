@@ -1,0 +1,666 @@
+{
+  "button_events": [
+    {
+      "actions": [
+        {
+          "message": [
+            {
+              "component_id": "redLight1",
+              "instruction": "turnOnOff",
+              "value": true
+            },
+            {
+              "component_id": "redLight2",
+              "instruction": "turnOnOff",
+              "value": true
+            },
+            {
+              "component_id": "redLight3",
+              "instruction": "turnOnOff",
+              "value": true
+            },
+            {
+              "component_id": "greenLight1",
+              "instruction": "turnOnOff",
+              "value": false
+            },
+            {
+              "component_id": "greenLight2",
+              "instruction": "turnOnOff",
+              "value": false
+            },
+            {
+              "component_id": "greenLight3",
+              "instruction": "turnOnOff",
+              "value": false
+            }
+          ],
+          "type": "device",
+          "type_id": "controlBoard"
+        },
+        {
+          "message": [
+            {
+              "instruction": "start"
+            }
+          ],
+          "type": "timer",
+          "type_id": "general"
+        },
+        {
+          "message": [
+            {
+              "component_id": "hint",
+              "instruction": "hint",
+              "value": "Hoeveel kerstballen hangen er ongeveer in de boom?"
+            }
+          ],
+          "type": "device",
+          "type_id": "display"
+        },
+        {
+          "message": [
+            {
+              "component_id": "door",
+              "instruction": "open",
+              "value": true
+            }
+          ],
+          "type": "device",
+          "type_id": "door"
+        }
+      ],
+      "conditions": {},
+      "description": "Als het spel start, moeten alle rode leds aan gaan en de groene uit",
+      "id": "start",
+      "limit": 1
+    },
+    {
+      "actions": [
+        {
+          "message": [
+            {
+              "component_id": "redLight1",
+              "instruction": "turnOnOff",
+              "value": false
+            },
+            {
+              "component_id": "redLight2",
+              "instruction": "turnOnOff",
+              "value": false
+            },
+            {
+              "component_id": "redLight3",
+              "instruction": "turnOnOff",
+              "value": false
+            },
+            {
+              "component_id": "greenLight1",
+              "instruction": "turnOnOff",
+              "value": false
+            },
+            {
+              "component_id": "greenLight2",
+              "instruction": "turnOnOff",
+              "value": false
+            },
+            {
+              "component_id": "greenLight3",
+              "instruction": "turnOnOff",
+              "value": false
+            }
+          ],
+          "type": "device",
+          "type_id": "controlBoard"
+        },
+        {
+          "message": [
+            {
+              "component_id": "door",
+              "instruction": "open",
+              "value": false
+            }
+          ],
+          "type": "device",
+          "type_id": "door"
+        },
+        {
+          "message": [
+            {
+              "instruction": "pause"
+            }
+          ],
+          "type": "timer",
+          "type_id": "general"
+        }
+      ],
+      "conditions": {},
+      "description": "Als het spel stopt, moeten alle lichten uitgaan",
+      "id": "stop",
+      "limit": 1
+    }
+  ],
+  "cameras": [],
+  "devices": [
+    {
+      "description": "Control board with three switches, three slides with lights and one main switch.",
+      "id": "controlBoard",
+      "input": {
+        "greenSwitch": "boolean",
+        "mainSwitch": "boolean",
+        "orangeSwitch": "boolean",
+        "redSwitch": "boolean",
+        "slider1": "numeric",
+        "slider2": "numeric",
+        "slider3": "numeric"
+      },
+      "output": {
+        "greenLight1": {
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          },
+          "type": "string"
+        },
+        "greenLight2": {
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          },
+          "type": "string"
+        },
+        "greenLight3": {
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          },
+          "type": "string"
+        },
+        "redLight1": {
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          },
+          "type": "string"
+        },
+        "redLight2": {
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          },
+          "type": "string"
+        },
+        "redLight3": {
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          },
+          "type": "string"
+        }
+      }
+    },
+    {
+      "description": "displays messages",
+      "id": "display",
+      "input": {},
+      "output": {
+        "hint": {
+          "instructions": {
+            "hint": "string"
+          },
+          "type": "string"
+        }
+      }
+    },
+    {
+      "description": "device that controls a door magnet through a relay",
+      "id": "door",
+      "input": {},
+      "output": {
+        "door": {
+          "instructions": {
+            "open": "boolean"
+          },
+          "type": "string"
+        }
+      }
+    },
+    {
+      "description": "Keypad with input 4 numbers",
+      "id": "keypad",
+      "input": {
+        "code": "numeric"
+      },
+      "output": {}
+    }
+  ],
+  "general": {
+    "duration": "5m",
+    "host": "localhost",
+    "name": "Demo week 6",
+    "port": 1883
+  },
+  "general_events": [
+    {
+      "name": "hints",
+      "rules": [
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "hint",
+                  "instruction": "hint",
+                  "value": "dat is te laag"
+                }
+              ],
+              "type": "device",
+              "type_id": "display"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "lte",
+                      "component_id": "code",
+                      "value": 44
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "keypad"
+              },
+              {
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                },
+                "type": "rule",
+                "type_id": "start"
+              },
+              {
+                "constraints": {
+                  "comparison": "lte",
+                  "value": 2
+                },
+                "type": "rule",
+                "type_id": "codedeur"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "te laag hint",
+          "id": "hint1",
+          "limit": 100
+        },
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "hint",
+                  "instruction": "hint",
+                  "value": "dat is te hoog"
+                }
+              ],
+              "type": "device",
+              "type_id": "display"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "gte",
+                      "component_id": "code",
+                      "value": 46
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "keypad"
+              },
+              {
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                },
+                "type": "rule",
+                "type_id": "start"
+              },
+              {
+                "constraints": {
+                  "comparison": "lte",
+                  "value": 2
+                },
+                "type": "rule",
+                "type_id": "codedeur"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "te hoog hint",
+          "id": "hint2",
+          "limit": 100
+        }
+      ]
+    },
+    {
+      "name": "Stop Time up",
+      "rules": [
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "hint",
+                  "instruction": "hint",
+                  "value": "Je tijd is voorbij!"
+                }
+              ],
+              "type": "device",
+              "type_id": "display"
+            },
+            {
+              "message": [
+                {
+                  "component_id": "redLight1",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "redLight2",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "redLight3",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "greenLight2",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "greenLight3",
+                  "instruction": "turnOnOff",
+                  "value": true
+                }
+              ],
+              "type": "device",
+              "type_id": "controlBoard"
+            }
+          ],
+          "conditions": {
+            "constraints": {
+              "comparison": "eq",
+              "value": true
+            },
+            "type": "timer",
+            "type_id": "general"
+          },
+          "description": "Na de duration van het spel faalt de groep",
+          "id": "time up",
+          "limit": 1
+        }
+      ]
+    },
+    {
+      "name": "Stop Done",
+      "rules": [
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "hint",
+                  "instruction": "hint",
+                  "value": "Puzzle opgelost!"
+                }
+              ],
+              "type": "device",
+              "type_id": "display"
+            },
+            {
+              "message": [
+                {
+                  "instruction": "pause"
+                }
+              ],
+              "type": "timer",
+              "type_id": "general"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                },
+                "type": "rule",
+                "type_id": "drank"
+              },
+              {
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                },
+                "type": "rule",
+                "type_id": "codedeur"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "Puzzles zijn opgelost dus time stop",
+          "id": "Puzzles done",
+          "limit": 1
+        }
+      ]
+    }
+  ],
+  "puzzles": [
+    {
+      "hints": [
+        "Zet de schuiven nauwkeurig"
+      ],
+      "name": "puzzel drank",
+      "rules": [
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "redLight1",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "greenLight1",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "redLight2",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "greenLight2",
+                  "instruction": "turnOnOff",
+                  "value": true
+                },
+                {
+                  "component_id": "redLight3",
+                  "instruction": "turnOnOff",
+                  "value": false
+                },
+                {
+                  "component_id": "greenLight3",
+                  "instruction": "turnOnOff",
+                  "value": true
+                }
+              ],
+              "type": "device",
+              "type_id": "controlBoard"
+            },
+            {
+              "message": [
+                {
+                  "component_id": "hint",
+                  "instruction": "hint",
+                  "value": "We kunnen nu gaan zuipon!"
+                }
+              ],
+              "type": "device",
+              "type_id": "display"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "lte",
+                      "component_id": "slider1",
+                      "value": 80
+                    },
+                    {
+                      "comparison": "gte",
+                      "component_id": "slider1",
+                      "value": 10
+                    },
+                    {
+                      "comparison": "lte",
+                      "component_id": "slider2",
+                      "value": 10
+                    },
+                    {
+                      "comparison": "gte",
+                      "component_id": "slider2",
+                      "value": 0
+                    },
+                    {
+                      "comparison": "lte",
+                      "component_id": "slider3",
+                      "value": 100
+                    },
+                    {
+                      "comparison": "gte",
+                      "component_id": "slider3",
+                      "value": 80
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "controlBoard"
+              },
+              {
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                },
+                "type": "rule",
+                "type_id": "codedeur"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "Wanneer de rode switch op true staat en de slider 100, dan sturen we een hint met 'puzzle rood opgelost'",
+          "id": "drank",
+          "limit": 1
+        }
+      ]
+    },
+    {
+      "hints": [
+        "Zet de schuiven nauwkeurig"
+      ],
+      "name": "puzzel keypad to door",
+      "rules": [
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "door",
+                  "instruction": "open",
+                  "value": false
+                }
+              ],
+              "type": "device",
+              "type_id": "door"
+            },
+            {
+              "message": [
+                {
+                  "component_id": "hint",
+                  "instruction": "hint",
+                  "value": "hoorde ik daar een klik?"
+                }
+              ],
+              "type": "device",
+              "type_id": "display"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "component_id": "code",
+                      "value": 45
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "keypad"
+              },
+              {
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                },
+                "type": "rule",
+                "type_id": "start"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "er moet een code gestuurd worden, dan gaat de magneet open",
+          "id": "codedeur",
+          "limit": 1
+        }
+      ]
+    }
+  ],
+  "timers": [
+    {
+      "duration": "10s",
+      "id": "timer1"
+    },
+    {
+      "duration": "5s",
+      "id": "timer2"
+    }
+  ]
+}

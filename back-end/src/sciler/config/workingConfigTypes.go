@@ -2,20 +2,25 @@ package config
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
+	logger "github.com/sirupsen/logrus"
 	"reflect"
 	"time"
 )
 
-// WorkingConfig has additional fields to ReadConfig, with lists of conditions, constraints and actions.
+// WorkingConfig has additional includes all information necessary in an escape room
+// some maps are also cached in order to assure faster message handling
 type WorkingConfig struct {
 	General       General
+	Cameras       []Camera
 	Puzzles       []*Puzzle
 	GeneralEvents []*GeneralEvent
+	ButtonEvents  map[string]*Rule
 	Devices       map[string]*Device
 	Timers        map[string]*Timer
 	StatusMap     map[string][]*Rule
 	RuleMap       map[string]*Rule
+	EventRuleMap  map[string]*Rule
+	LabelMap      map[string][]*Component
 }
 
 // Timer is a timer in the escape game
@@ -26,7 +31,7 @@ type Timer struct {
 	T         *time.Timer
 	State     string
 	Ending    func()
-	Finish    bool
+	Finished  bool
 }
 
 // newTimer create a new timer
@@ -34,12 +39,8 @@ func newTimer(id string, d time.Duration) *Timer {
 	t := new(Timer)
 	t.ID = id
 	t.Duration = d
-	t.Finish = false
+	t.Finished = false
 	t.State = "stateIdle"
-	t.Ending = func() {
-		t.State = "stateExpired"
-		t.Finish = true
-	}
 	return t
 }
 
@@ -49,56 +50,102 @@ func (t *Timer) GetTimeLeft() (time.Duration, string) {
 	if t.State == "stateActive" {
 		dif := time.Now().Sub(t.StartedAt)
 		left = t.Duration - dif
-	} else {
+	} else if t.State == "stateIdle" {
 		left = t.Duration
 	}
 	return left, t.State
 }
 
-// Start starts Timer that will send the current time on its channel after at least duration d.
-func (t *Timer) Start(handler InstructionSender) bool {
+// Start starts Timer that executes handler.HandleEvent(t.ID) after duration d.
+// Can not start if timer is not state Idle
+func (t *Timer) Start(handler InstructionSender) error {
 	if t.State != "stateIdle" {
-		return false
+		return fmt.Errorf("timer %v does not have an Idle state and can not be started", t.ID)
 	}
 	t.StartedAt = time.Now()
 	t.State = "stateActive"
 	t.Ending = func() {
 		t.State = "stateExpired"
-		t.Finish = true
-		logrus.Info("timer finished", t.ID)
+		t.Finished = true
+		logger.Infof("timer %v finished", t.ID)
 		handler.HandleEvent(t.ID)
 	}
 	t.T = time.AfterFunc(t.Duration, t.Ending)
-	logrus.Info("timer started for ", t.Duration)
-	return true
+	logger.Infof("timer %v started for %v", t.ID, t.Duration)
+	return nil
 }
 
-// Pause make a timer pause
-func (t *Timer) Pause() bool {
+// Pause sets the timer to Idle and sets new duration to the time left
+// can not pause if timer is not state Active
+func (t *Timer) Pause() error {
 	if t.State != "stateActive" {
-		return false
+		return fmt.Errorf("timer %v does not have a Active state and can not be paused", t.ID)
 	}
-	if !t.T.Stop() {
-		t.State = "stateExpired"
-		return false
-	}
+	t.T.Stop()
+	t.Duration, _ = t.GetTimeLeft()
 	t.State = "stateIdle"
-	dur := time.Now().Sub(t.StartedAt)
-	t.Duration = t.Duration - dur
-	logrus.Info("timer paused with ", t.Duration, " left")
-	return true
+	logger.Infof("timer paused with %v left", t.Duration)
+	return nil
+}
+
+// AddSubTime add or subtract time to a timer
+// can only subtract if that time is equally left
+// can only add or subtract time if the state is not Expired
+func (t *Timer) AddSubTime(handler InstructionSender, time time.Duration, add bool) error {
+	if t.State == "stateIdle" {
+		if add {
+			t.Duration = t.Duration + time
+			logger.Infof("timer %v added %v to duration and now has a duration of %v", t.ID, time, t.Duration)
+		} else {
+			if t.Duration > time {
+				t.Duration = t.Duration - time
+				logger.Infof("timer %v subtracted %v to duration and now has a duration of %v", t.ID, time, t.Duration)
+			} else {
+				return fmt.Errorf("timer %v could not subtract %v since there is only %v left", t.ID, time, t.Duration)
+			}
+		}
+		return nil
+	} else if t.State == "stateActive" {
+		t.Pause()
+		err := t.AddSubTime(handler, time, add)
+		t.Start(handler)
+		return err
+	} else if t.State == "stateExpired" {
+		return fmt.Errorf("timer %v could not be edited since it is already Expired", t.ID)
+	}
+	return fmt.Errorf("timer %v could not be edited because there is something wrong with its state: %v", t.ID, t.State)
 }
 
 // Stop make a timer stop
-func (t *Timer) Stop() bool {
-	if t.State != "stateActive" {
-		return false
+// can not stop timer that has state Expired
+func (t *Timer) Stop() error {
+	if t.State == "stateExpired" {
+		return fmt.Errorf("timer %v is already Expired and can not be stopped again", t.ID)
 	}
-	t.StartedAt = time.Now()
+	if t.State == "stateIdle" {
+		t.Duration = 0 * time.Second
+	} else {
+		t.T.Stop()
+	}
 	t.State = "stateExpired"
+
+	logger.Infof("timer %v stopped and set to Expired without handling it's actions", t.ID)
+	return nil
+}
+
+// Done finishes the timer as if it ran out of time
+// cannot finish a timer that is already Expired
+func (t *Timer) Done(handler InstructionSender) error {
+	if t.State == "stateExpired" {
+		return fmt.Errorf("timer %v is already Expired and can not be finished again", t.ID)
+	}
+	if t.State == "stateIdle" {
+		t.Start(handler)
+	}
+	t.Ending()
 	t.T.Stop()
-	logrus.Info("timer stopped")
-	return true
+	logger.Infof("timer %v stopped and set to Expired, actions are being handled", t.ID)
+	return nil
 }
 
 // Rule is a struct that describes how action flow is handled in the escape room.
@@ -113,18 +160,24 @@ type Rule struct {
 
 // InstructionSender is an interface needed for preventing cyclic imports
 type InstructionSender interface {
-	SendInstruction(string, []ComponentInstruction)
+	SendComponentInstruction(string, []ComponentInstruction, string)
 	SetTimer(string, ComponentInstruction)
 	HandleEvent(string)
+	SendLabelInstruction(string, []ComponentInstruction, string)
+}
+
+// Finished is a method that checks is the a rule have been finished, meaning if it reached its maximum number of executions
+func (r *Rule) Finished() bool {
+	return r.Executed == r.Limit && r.Limit != 0
 }
 
 // Execute performs all actions of a rule
 func (r *Rule) Execute(handler InstructionSender) {
 	for _, action := range r.Actions {
-		action.Execute(handler)
+		go action.Execute(handler)
 	}
 	r.Executed++
-	logrus.Infof("Executed rule %s", r.ID)
+	logger.Infof("executed actions of rule with id %s", r.ID)
 	handler.HandleEvent(r.ID)
 }
 
@@ -174,6 +227,7 @@ type Event interface {
 	GetRules() []*Rule
 }
 
+// compare is a method used to perform a comparison between to variables and a comparator string
 func compare(param1 interface{}, param2 interface{}, comparision string) bool {
 	if param1 == nil {
 		return false
@@ -194,11 +248,18 @@ func compare(param1 interface{}, param2 interface{}, comparision string) bool {
 		return numericToFloat64(param1) >= numericToFloat64(param2)
 	case "contains":
 		return contains(param1, param2)
+	case "not":
+		if reflect.TypeOf(param1).Kind() == reflect.Int || reflect.TypeOf(param2).Kind() == reflect.Int {
+			return numericToFloat64(param1) != numericToFloat64(param2)
+		}
+		return !reflect.DeepEqual(param1, param2)
 	default:
-		panic(fmt.Sprintf("cannot compare on: %s", comparision))
+		// This case is already handled to give error in checkConstraint
+		return false
 	}
 }
 
+// numericToFloat64 checks if numeric value is int or float64 and converts it to a float64 (if it wasn't already)
 func numericToFloat64(input interface{}) float64 {
 	switch input.(type) {
 	case float64:
@@ -206,10 +267,12 @@ func numericToFloat64(input interface{}) float64 {
 	case int:
 		return float64(input.(int))
 	default:
-		panic(fmt.Sprintf("%v, is not of type Numeric, it is of type %s", input, reflect.TypeOf(input).Kind()))
+		// This case is already handled to give error in checkConstraint
+		return 0
 	}
 }
 
+// contains is a function that checks if a slice contains an element
 func contains(list interface{}, element interface{}) bool {
 	slice := reflect.ValueOf(list)
 	for i := 0; i < slice.Len(); i++ {
@@ -237,15 +300,15 @@ type Condition struct {
 	Constraints LogicalConstraint
 }
 
+// Component is a struct that links a component id with a device id
+type Component struct {
+	ID     string
+	Device *Device
+}
+
 // GetConditionIDs returns a slice of all condition type IDs in the LogicalCondition
 func (condition Condition) GetConditionIDs() []string {
 	return []string{condition.TypeID}
-}
-
-// checkConstraints is a method that checks types and comparator operators
-func (condition Condition) checkConstraints(config WorkingConfig) error {
-	// todo check if type id exists
-	return condition.Constraints.checkConstraints(condition, config)
 }
 
 // Resolve is a method that checks if a condition is met
@@ -258,97 +321,6 @@ type Constraint struct {
 	Comparison  string
 	ComponentID string
 	Value       interface{}
-}
-
-// checkConstraints is a method that checks types and comparator operators
-func (constraint Constraint) checkConstraints(condition Condition, config WorkingConfig) error {
-	switch condition.Type {
-	case "device":
-		{
-			if device, ok := config.Devices[condition.TypeID]; ok { // checks if device can be found in the map, if so, it is stored in variable device
-
-				valueType := reflect.TypeOf(constraint.Value).Kind()
-				comparision := constraint.Comparison
-				if inputType, ok := device.Input[constraint.ComponentID]; ok {
-					switch inputType {
-					case "string":
-						{
-							if valueType != reflect.String {
-								return fmt.Errorf("input type string expected but %s found as type of value %v", valueType.String(), constraint.Value)
-							}
-							if comparision != "eq" {
-								return fmt.Errorf("comparision %s not allowed on a string", comparision)
-							}
-						}
-					case "boolean":
-						{
-							if valueType != reflect.Bool {
-								return fmt.Errorf("input type boolean expected but %s found as type of value %v", valueType.String(), constraint.Value)
-							}
-							if comparision != "eq" {
-								return fmt.Errorf("comparision %s not allowed on a boolean", comparision)
-							}
-						}
-					case "numeric":
-						{
-							if valueType != reflect.Int && valueType != reflect.Float64 {
-								return fmt.Errorf("input type numeric expected but %s found as type of value %v", valueType.String(), constraint.Value)
-							}
-							if comparision == "contains" {
-								return fmt.Errorf("comparision %s not allowed on a numeric", comparision)
-							}
-						}
-					case "array":
-						{
-							if valueType != reflect.Slice {
-								return fmt.Errorf("input type array/slice expected but %s found as type of value %v", valueType.String(), constraint.Value)
-							}
-							if comparision != "contains" && comparision != "eq" {
-								return fmt.Errorf("comparision %s not allowed on an array", comparision)
-							}
-						}
-					default:
-						// todo custom types
-						return fmt.Errorf("custom types like: %s, are not yet implemented", inputType)
-					}
-				} else {
-					return fmt.Errorf("component with id %s not found in map", constraint.ComponentID)
-				}
-			} else {
-				return fmt.Errorf("device with id %s not found in map", condition.TypeID)
-			}
-		}
-	case "timer":
-		if _, ok := config.Timers[condition.TypeID]; ok {
-			valueType := reflect.TypeOf(constraint.Value).Kind()
-			comparision := constraint.Comparison
-			if valueType != reflect.Bool {
-				return fmt.Errorf("input type boolean expected but %s found as type of value %v", valueType.String(), constraint.Value)
-			}
-			if comparision != "eq" {
-				return fmt.Errorf("comparision %s not allowed on a boolean", comparision)
-			}
-
-		} else {
-			return fmt.Errorf("timer with id %s not found in map", condition.TypeID)
-		}
-	case "rule":
-		if _, ok := config.RuleMap[condition.TypeID]; ok { // checks if rule can be found in the map, if so, it is stored in variable device
-			valueType := reflect.TypeOf(constraint.Value).Kind()
-			comparision := constraint.Comparison
-			if valueType != reflect.Int && valueType != reflect.Float64 {
-				return fmt.Errorf("value type numeric expected but %s found as type of value %v", valueType.String(), constraint.Value)
-			}
-			if comparision == "contains" {
-				return fmt.Errorf("comparision %s not allowed on rule", comparision)
-			}
-		} else {
-			return fmt.Errorf("rule with id %s not found in map", condition.TypeID)
-		}
-	default:
-		return fmt.Errorf("invalid type of condition: %v", condition.Type)
-	}
-	return nil
 }
 
 // Resolve is a method that checks if a constraint is met
@@ -368,18 +340,19 @@ func (constraint Constraint) Resolve(condition Condition, config WorkingConfig) 
 	case "timer":
 		{
 			timer := config.Timers[condition.TypeID]
-			return compare(timer.Finish, constraint.Value, constraint.Comparison)
+			return compare(timer.Finished, constraint.Value, constraint.Comparison)
 
 		}
 	default:
-		panic(fmt.Sprintf("cannot resolve constraint %v because condition.type is an unknown type, this should already be checked when reading in the JSON", constraint))
+		// This case is already handled to give error in checkConstraint
+		return false
 	}
 }
 
 // LogicalCondition is an interface for operators and conditions
 type LogicalCondition interface {
 	Resolve(config WorkingConfig) bool
-	checkConstraints(config WorkingConfig) error
+	checkConditions(config WorkingConfig, ruleID string) []string
 	GetConditionIDs() []string
 }
 
@@ -395,17 +368,6 @@ func (and AndCondition) GetConditionIDs() []string {
 		IDs = append(IDs, logic.GetConditionIDs()...)
 	}
 	return IDs
-}
-
-// checkConstraints is a method that checks types and comparator operators
-func (and AndCondition) checkConstraints(config WorkingConfig) error {
-	for _, logic := range and.logics {
-		err := logic.checkConstraints(config)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 // Resolve is a method that checks if a condition is met
@@ -431,17 +393,6 @@ func (or OrCondition) GetConditionIDs() []string {
 	return IDs
 }
 
-// checkConstraints is a method that checks types and comparator operators
-func (or OrCondition) checkConstraints(config WorkingConfig) error {
-	for _, logic := range or.logics {
-		err := logic.checkConstraints(config)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 // Resolve is a method that checks if a condition is met
 func (or OrCondition) Resolve(config WorkingConfig) bool {
 	result := false
@@ -454,7 +405,7 @@ func (or OrCondition) Resolve(config WorkingConfig) bool {
 // LogicalConstraint is an interface for operators and constraints
 type LogicalConstraint interface {
 	Resolve(condition Condition, config WorkingConfig) bool
-	checkConstraints(condition Condition, config WorkingConfig) error
+	checkConstraints(condition Condition, config WorkingConfig, ruleID string) []string
 }
 
 // AndConstraint is an operator which implement the LogicalConstraint interface
@@ -462,19 +413,8 @@ type AndConstraint struct {
 	logics []LogicalConstraint
 }
 
-// checkConstraints is a method that checks types and comparator operators
-func (and AndConstraint) checkConstraints(condition Condition, config WorkingConfig) error {
-	for _, logic := range and.logics {
-		err := logic.checkConstraints(condition, config)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 // Resolve is a method that checks if a constraint is met
-func (and AndConstraint) Resolve(condition Condition, config WorkingConfig) bool { // todo: make lazy
+func (and AndConstraint) Resolve(condition Condition, config WorkingConfig) bool {
 	result := true
 	for _, logic := range and.logics {
 		result = result && logic.Resolve(condition, config)
@@ -487,19 +427,8 @@ type OrConstraint struct {
 	logics []LogicalConstraint
 }
 
-// checkConstraints is a method that checks types and comparator operators
-func (or OrConstraint) checkConstraints(condition Condition, config WorkingConfig) error {
-	for _, logic := range or.logics {
-		err := logic.checkConstraints(condition, config)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 // Resolve is a method that checks if a constraint is met
-func (or OrConstraint) Resolve(condition Condition, config WorkingConfig) bool { // todo: make lazy
+func (or OrConstraint) Resolve(condition Condition, config WorkingConfig) bool {
 	result := false
 	for _, logic := range or.logics {
 		result = result || logic.Resolve(condition, config)

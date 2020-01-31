@@ -4,13 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/sirupsen/logrus"
+	logger "github.com/sirupsen/logrus"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"reflect"
 	"sciler/config"
 	"time"
 )
 
-// Message is a type that follows the structure all messages have, described in resources/message_manual.md
+// Message is a type that follows the structure all messages have, described in resources/manuals/message_manual.md
 type Message struct {
 	DeviceID string      `json:"device_id"`
 	TimeSent string      `json:"time_sent"`
@@ -18,29 +21,33 @@ type Message struct {
 	Contents interface{} `json:"contents"`
 }
 
-// Communicator interface is an interface for mqtt communication
+// Communicator interface is an interface for communication.Communicator, it had the methods needed in the handler
 type Communicator interface {
-	Start(handler mqtt.MessageHandler, onStart func())
 	Publish(topic string, message string, retrials int)
+	Start()
 }
 
-// Handler is a type that mqqt handlers have
+// Handler is the mqtt.MessageHandler used in the whole S.C.I.L.E.R. system
 type Handler struct {
 	Config       config.WorkingConfig
 	ConfigFile   string
 	Communicator Communicator
 }
 
-// NewHandler is the actual MessageHandler
+// NewHandler is the actual MessageHandler called when a message is received
+// The function processes the JSON payload and logs and error if this fails
+// The Message Mapper is called if the JSON is correct to process the contents
 func (handler *Handler) NewHandler(client mqtt.Client, message mqtt.Message) {
 	var raw Message
 	if err := json.Unmarshal(message.Payload(), &raw); err != nil {
-		logrus.Errorf("invalid JSON received: %v", err)
+		logger.Errorf("invalid JSON received: %v", err)
+	} else {
+		handler.msgMapper(raw)
 	}
-	handler.msgMapper(raw)
 }
 
-// msgMapper sends the right message through to the right function
+// msgMapper sends the message through to the right function, filtering on Message.Type
+// If the type is not instruction, status, confirmation, or connection, an error is logged
 func (handler *Handler) msgMapper(raw Message) {
 	switch raw.Type {
 	case "instruction":
@@ -50,9 +57,6 @@ func (handler *Handler) msgMapper(raw Message) {
 	case "status":
 		{
 			handler.onStatusMsg(raw)
-			handler.SendStatus(raw.DeviceID)
-			handler.HandleEvent(raw.DeviceID)
-			handler.SendEventStatus()
 		}
 	case "confirmation":
 		{
@@ -64,369 +68,269 @@ func (handler *Handler) msgMapper(raw Message) {
 		}
 	default:
 		{
-			logrus.Error("message received from ", raw.DeviceID,
-				", but no message type could be found for: ", raw.Type)
+			logger.Errorf("message received from %s, but no message type could be found for: %v", raw.DeviceID, raw.Type)
 		}
 	}
-
 }
 
-// onConnectionMsg is the function to process connection messages.
+// onStatusMsg is the function to process status messages.
+// front-end sends status message with button = true, then immediately button = false,
+// and already updates its own state, faster than the back-end messages are received again,
+// so we don't send again, as otherwise it has already reset to false, then receives messages for true false again.
+func (handler *Handler) onStatusMsg(raw Message) {
+	handler.updateStatus(raw)
+	if raw.DeviceID != "front-end" {
+		handler.sendStatus(raw.DeviceID)
+	}
+	handler.sendFrontEndStatus(raw)
+	handler.HandleEvent(raw.DeviceID)
+	handler.sendEventStatus()
+}
+
+// onConnectionMsg is the function to process connection messages from devices
+// If the device is in the config, and the message is properly structured, the connection status of the device is updated
+// After updating the connection status, the new status is send to the front-end
+// If the message is from the front-end, the SendSetup function is called
 func (handler *Handler) onConnectionMsg(raw Message) {
 	contents := raw.Contents.(map[string]interface{})
 	device, ok := handler.Config.Devices[raw.DeviceID]
 	if !ok {
-		logrus.Error("connection message received from device " + raw.DeviceID + ", which is not in the config")
+		logger.Warnf("connection message received from device %s which is not in the config", raw.DeviceID)
 	} else {
-		logrus.Info("connection message received from: ", raw.DeviceID)
+		logger.Infof("connection message received from: %s", raw.DeviceID)
 		value, ok2 := contents["connection"]
 		if !ok2 || reflect.TypeOf(value).Kind() != reflect.Bool {
-			logrus.Error("received improperly structured connection message from device " + raw.DeviceID)
+			logger.Errorf("received improperly structured connection message from device %s", raw.DeviceID)
 		} else {
 			device.Connection = value.(bool)
 			handler.Config.Devices[raw.DeviceID] = device
-			logrus.Info("setting connection status of ", raw.DeviceID, " to ", value)
-			handler.SendStatus(raw.DeviceID)
+			logger.Infof("setting connection status of %s to %v", raw.DeviceID, value)
+			handler.sendStatus(raw.DeviceID)
+			if raw.DeviceID == "front-end" && !value.(bool) { // when a front-end disconnect, check if another front-end is connected (maybe multiple front-ends are running
+				handler.SendSetup()
+			}
 		}
 	}
 }
 
-// compareType compares a reflect.Kind and a string type and returns an error if not the same
-func compareType(valueType reflect.Kind, inputType string) error {
-	switch inputType {
-	case "string":
-		{
-			if valueType != reflect.String {
-				return fmt.Errorf("status type string expected but %s found as type", valueType.String())
-			}
-		}
-	case "boolean":
-		{
-			if valueType != reflect.Bool {
-				return fmt.Errorf("status type boolean expected but %s found as type", valueType.String())
-			}
-		}
-	case "numeric":
-		{
-			if valueType != reflect.Int && valueType != reflect.Float64 {
-				return fmt.Errorf("status type numeric expected but %s found as type", valueType.String())
-			}
-		}
-	case "array":
-		{
-			if valueType != reflect.Slice {
-				return fmt.Errorf("status type array/slice expected but %s found as type", valueType.String())
-			}
-		}
-	default:
-		// todo custom types
-		return fmt.Errorf("custom types like: %s, are not yet implemented", inputType)
-	}
-	return nil
-}
-
-// checkStatusType checks if the type of the status change is correct for the component
-func (handler *Handler) checkStatusType(device config.Device, status interface{}, component string) error {
-	valueType := reflect.TypeOf(status).Kind()
-	if inputType, ok := device.Input[component]; ok {
-		if err := compareType(valueType, inputType); err != nil {
-			return fmt.Errorf("%v with status %v for component %s", err, status, component)
-		}
-	} else if output, ok2 := device.Output[component]; ok2 {
-		if err := compareType(valueType, output.Type); err != nil {
-			return fmt.Errorf("%v with status %v for component %s", err, status, component)
-		}
-	} else {
-		return fmt.Errorf("status message received from component %s, which is not in the config under device %s", component, device.ID)
-	}
-	return nil
-}
-
-//onStatusMsg is the function to process status messages.
-func (handler *Handler) onStatusMsg(raw Message) {
-	contents := raw.Contents.(map[string]interface{})
-	if device, ok := handler.Config.Devices[raw.DeviceID]; ok {
-		logrus.Info("status message received from: " + raw.DeviceID + ", status: " + fmt.Sprint(raw.Contents))
-		for k, v := range contents {
-			err := handler.checkStatusType(*device, v, k)
-			if err != nil {
-				logrus.Error(err)
-			} else {
-				handler.Config.Devices[raw.DeviceID].Status[k] = v
-			}
-		}
-	} else {
-		logrus.Error("status message received from device ", raw.DeviceID, ", which is not in the config")
-	}
-}
-
-//onConfirmationMsg is the function to process confirmation messages.
+// onConfirmationMsg is the function to process confirmation messages.
+// If the message is properly structured, the success status of the instruction is logged
 func (handler *Handler) onConfirmationMsg(raw Message) {
 	contents := raw.Contents.(map[string]interface{})
 	value, ok := contents["completed"]
 	if !ok || reflect.TypeOf(value).Kind() != reflect.Bool {
-		logrus.Errorf("received improperly structured confirmation message from device " + raw.DeviceID)
+		logger.Errorf("received improperly structured confirmation message from device %s (no completed tag/boolean value)", raw.DeviceID)
 		return
 	}
 	original, ok := contents["instructed"]
 	if !ok {
-		logrus.Errorf("received improperly structured confirmation message from device " + raw.DeviceID)
+		logger.Errorf("received improperly structured confirmation message from device %s (no structured tag)", raw.DeviceID)
 		return
 	}
 	msg := original.(map[string]interface{})
 	instructionContents, err := getMapSlice(msg["contents"])
 	if err != nil {
-		logrus.Errorf(err.Error())
+		logger.Errorf(err.Error())
 		return
 	}
+	handler.forwardConfirmation(instructionContents, raw, value.(bool))
 
+	// If a message is received from a device,
+	// it can be concluded that the device has positive connection status,
+	// and thus it's connection status is set to true
+	handler.connected(raw.DeviceID)
+}
+
+// forwardConfirmation sends a received confirmation message on to the front-end
+func (handler *Handler) forwardConfirmation(instructionContents []map[string]interface{}, raw Message, value bool) {
 	var instructionString string
 	for _, instruction := range instructionContents {
+		// Each instruction is added to a string for proper logging
 		instructionString += fmt.Sprintf("%s", instruction["instruction"])
 		// If original message to which device responded with confirmation was sent by front-end,
 		// pass confirmation through
 		if instruction["instructed_by"] == "front-end" {
 			jsonMessage, _ := json.Marshal(raw)
 			handler.Communicator.Publish("front-end", string(jsonMessage), 3)
-			logrus.Infof("sending confirmation to front-end for instruction %v", instruction["instruction"])
+			logger.Infof("sending confirmation to front-end for instruction %v", instruction["instruction"])
 		}
 	}
-
-	if !value.(bool) {
-		logrus.Warn("device " + raw.DeviceID + " did not complete instructions: " +
-			instructionString + " at " + raw.TimeSent)
+	if !value {
+		logger.Warnf("device %s did not complete instructions: %v at %v", raw.DeviceID,
+			instructionString, raw.TimeSent)
 	} else {
-		logrus.Info("device " + raw.DeviceID + " completed instructions: " +
-			instructionString + " at " + raw.TimeSent)
-	}
-
-	con, ok := handler.Config.Devices[raw.DeviceID]
-	if !ok {
-		logrus.Errorf("device %s was not found in config", raw.DeviceID)
-	} else {
-		con.Connection = true
-		handler.Config.Devices[raw.DeviceID] = con
+		logger.Infof("device %s completed instructions: %v at %v", raw.DeviceID,
+			instructionString, raw.TimeSent)
 	}
 }
 
-// SendStatus sends all status and connection data of a device to the front-end.
-// Information retrieved from config.
-func (handler *Handler) SendStatus(deviceID string) {
-	var message Message
-	if device, ok := handler.Config.Devices[deviceID]; ok {
-		message = Message{
-			DeviceID: "back-end",
-			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-			Type:     "status",
-			Contents: map[string]interface{}{
-				"id":         device.ID,
-				"status":     device.Status,
-				"connection": device.Connection,
-			},
-		}
-	} else if timer, ok2 := handler.Config.Timers[deviceID]; ok2 {
-		duration, _ := timer.GetTimeLeft()
-		message = Message{
-			DeviceID: "back-end",
-			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-			Type:     "time",
-			Contents: map[string]interface{}{
-				"id":       timer.ID,
-				"duration": duration.Milliseconds(),
-				"state":    timer.State,
-			},
-		}
-	} else {
-		logrus.Errorf("error occurred while sending status of %s, since it is not recognised as a device or timer", deviceID)
-		return
-	}
-	jsonMessage, _ := json.Marshal(&message)
-	logrus.Info("sending status data to front-end: " + fmt.Sprint(message.Contents))
-	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
-}
-
-// SendEventStatus sends the status of events to the front-end
-func (handler *Handler) SendEventStatus() {
-	status := handler.getEventStatus()
-	message := Message{
-		DeviceID: "back-end",
-		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "event status",
-		Contents: status,
-	}
-	jsonMessage, _ := json.Marshal(&message)
-	logrus.Info("sending event status to front-end")
-	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
-}
-
-// returns json list with json objects with keys ["id", "status"]
-// status is json object with key ruleName and value true (if executed == limit) or false
-func (handler *Handler) getEventStatus() []map[string]interface{} {
-	var list []map[string]interface{}
-	for _, rule := range handler.Config.RuleMap {
-		var status = make(map[string]interface{})
-		status["id"] = rule.ID
-		// TODO when is puzzle finished
-		status["status"] = rule.Executed == rule.Limit
-		status["description"] = rule.Description
-		list = append(list, status)
-	}
-	return list
-}
-
-// SendInstruction sends a list of instructions to a client
-func (handler *Handler) SendInstruction(clientID string, instructions []config.ComponentInstruction) {
-	message := Message{
-		DeviceID: "back-end",
-		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "instruction",
-		Contents: instructions,
-	}
-	jsonMessage, _ := json.Marshal(&message)
-	logrus.Infof("sending instruction data to %s: %s", clientID, fmt.Sprint(message.Contents))
-	handler.Communicator.Publish(clientID, string(jsonMessage), 3)
-}
-
-// onInstructionMsg is the function to process instruction messages.
+// onInstructionMsg is the function to process instruction messages
+// If the message is properly structured, the instruction in the message is followed
+// Currently, only instructions messages from the front-end are supported
+// The actions to take are decided by Message.Contents.instruction
 func (handler *Handler) onInstructionMsg(raw Message) {
-	logrus.Info("instruction message received from: ", raw.DeviceID)
-
+	logger.Infof("instruction message received from: %s", raw.DeviceID)
 	instructions, err := getMapSlice(raw.Contents)
 	if err != nil {
-		logrus.Error(err)
+		logger.Error(err)
 		return
 	}
 
 	for _, instruction := range instructions {
 		if raw.DeviceID == "front-end" {
-			switch instruction["instruction"] {
-
-			case "test all":
-				{
-					message := Message{
-						DeviceID: "back-end",
-						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-						Type:     "instruction",
-						Contents: []map[string]interface{}{{
-							"instruction":   "test",
-							"instructed_by": raw.DeviceID},
-						},
-					}
-					jsonMessage, _ := json.Marshal(&message)
-					handler.Communicator.Publish("client-computers", string(jsonMessage), 3)
-				}
-			case "reset all":
-				{
-					message := Message{
-						DeviceID: "back-end",
-						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-						Type:     "instruction",
-						Contents: []map[string]interface{}{{
-							"instruction":   "reset",
-							"instructed_by": raw.DeviceID},
-						},
-					}
-					jsonMessage, _ := json.Marshal(&message)
-					handler.Communicator.Publish("client-computers", string(jsonMessage), 3)
-					handler.Communicator.Publish("front-end", string(jsonMessage), 3)
-
-					handler.Config = config.ReadFile(handler.ConfigFile)
-					handler.SendStatus("general")
-				}
-			case "send status":
-				{
-					for _, device := range handler.Config.Devices {
-						handler.SendStatus(device.ID)
-					}
-					for _, timer := range handler.Config.Timers {
-						handler.SendStatus(timer.ID)
-					}
-					handler.SendEventStatus()
-				}
-			case "send name":
-				{
-					message := Message{
-						DeviceID: "back-end",
-						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-						Type:     "name",
-						Contents: map[string]string{
-							"name": handler.Config.General.Name,
-						},
-					}
-					jsonMessage, _ := json.Marshal(&message)
-					handler.Communicator.Publish("front-end", string(jsonMessage), 3)
-				}
-			case "hint":
-				{
-					message := Message{
-						DeviceID: "back-end",
-						TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-						Type:     "instruction",
-						Contents: []map[string]interface{}{{
-							"instruction":   "hint",
-							"value":         instruction["value"],
-							"instructed_by": raw.DeviceID},
-						},
-					}
-					jsonMessage, _ := json.Marshal(&message)
-					handler.Communicator.Publish("hint", string(jsonMessage), 3)
-				}
-			}
+			handler.handleInstruction(instruction, "front-end")
 		} else {
-			logrus.Warnf("%s, tried to instruct the back-end, only the front-end is allowed to instruct the back-end", raw.DeviceID)
+			logger.Warnf("%s, tried to instruct the back-end, only the front-end is allowed to instruct the back-end", raw.DeviceID)
 		}
 	}
 }
 
-// HandleEvent is a function that checks and possible executes all rules according to the given (device/rule/timer) id
-func (handler *Handler) HandleEvent(id string) {
-	if rules, ok := handler.Config.StatusMap[id]; ok {
-		for _, rule := range rules {
-			if rule.Executed < rule.Limit && rule.Conditions.Resolve(handler.Config) {
-				rule.Execute(handler)
-			}
-		}
+// handleInstruction is the function to process an instruction given the ID of the instructor
+func (handler *Handler) handleInstruction(instruction map[string]interface{}, instructor string) {
+	switch instruction["instruction"] {
+	case "send setup":
+		handler.SendSetup()
+	case "reset all":
+		handler.onResetAll(instructor)
+	case "test all":
+		handler.onTestAll(instructor)
+	case "test device":
+		handler.onTestDevice(instruction["device"].(string), instructor)
+	case "finish rule":
+		handler.onFinishRule(instruction["rule"].(string))
+	case "hint":
+		handler.onHint(instruction["value"].(string), instructor)
+	case "check config":
+		handler.onCheckConfig(instruction["config"], instruction["name"].(string))
+	case "use config":
+		handler.onUseConfig(instruction["config"], instruction["file"].(string))
+	default:
+		logger.Warnf("%s is an unknown instruction", instruction["instruction"])
 	}
 }
 
-func getMapSlice(input interface{}) ([]map[string]interface{}, error) {
-	bytes, _ := json.Marshal(input)
-	var output []map[string]interface{} // dirty trick to go from interface{} to []map[string]interface{}
-	err := json.Unmarshal(bytes, &output)
-	if err != nil {
-		return nil, err
-	}
-	return output, nil
+// onResetAll is the function to process the instruction `reset all`
+// reset all is instructed when the reset button is clicked in the front-end
+func (handler *Handler) onResetAll(deviceID string) {
+	handler.sendInstruction("client-computers", []map[string]string{{
+		"instruction":   "reset",
+		"instructed_by": deviceID,
+	}})
+	handler.sendInstruction("front-end", []map[string]string{{
+		"instruction":   "reset",
+		"instructed_by": deviceID,
+	}})
+	handler.Config = config.ReadFile(handler.ConfigFile)
+	handler.SendSetup()
 }
 
-// GetStatus asks devices to send status
-func (handler *Handler) GetStatus(deviceID string) {
+// onTestAll is the function to process the instruction `test all`
+// test all is instructed when the test button is clicked in the front-end
+func (handler *Handler) onTestAll(instructor string) {
+	handler.sendInstruction("client-computers", []map[string]string{{
+		"instruction":   "test",
+		"instructed_by": instructor,
+	}})
+}
+
+// onTestDevice is the function to process the instruction `test device`
+// test device is instructed when the test button of a device is clicked in the front-end
+func (handler *Handler) onTestDevice(deviceID string, instructor string) {
+	handler.sendInstruction(deviceID, []map[string]string{{
+		"instruction":   "test",
+		"instructed_by": instructor,
+	}})
+}
+
+// onResetAll is the function to process the instruction `finish rule`
+// finish rule is instructed when the "puzzel eindigen" button of a rule is clicked in the front-end
+func (handler *Handler) onFinishRule(ruleID string) {
+	rule, ok := handler.Config.RuleMap[ruleID]
+	if !ok {
+		logger.Errorf("could not find rule with id %s in map", ruleID)
+	} else {
+		rule.Execute(handler)
+	}
+	handler.sendEventStatus()
+}
+
+// onHint is the function to process the instruction `hint`
+// hint in instructed when the front-end submits a hint
+func (handler *Handler) onHint(hint string, instructor string) {
+	handler.sendInstruction("hint", []map[string]string{{
+		"instruction":   "hint",
+		"value":         hint,
+		"instructed_by": instructor,
+	}})
+}
+
+// onCheckConfig is the function to process the instruction `check config`
+// checks the config and sends a message containing all errors it could find
+func (handler *Handler) onCheckConfig(configToRead interface{}, fileName string) {
 	message := Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "instruction",
-		Contents: []map[string]interface{}{
-			{"instruction": "status update"},
+		Type:     "config",
+		Contents: map[string]interface{}{
+			"name":   fileName,
+			"errors": handler.checkConfig(configToRead),
 		},
 	}
 	jsonMessage, _ := json.Marshal(&message)
-	logrus.Info("sending status request to client computer: ", deviceID, fmt.Sprint(message.Contents))
-	handler.Communicator.Publish(deviceID, string(jsonMessage), 3)
+	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
 }
 
-// SetTimer starts given timer
-func (handler *Handler) SetTimer(timerID string, instructions config.ComponentInstruction) {
-	switch instructions.Instruction {
-	case "start":
-		handler.Config.Timers[timerID].Start(handler)
-	case "pause":
-		handler.Config.Timers[timerID].Pause()
-	case "add": // TODO: implement timer Add
-	case "subtract": // TODO: implement timer subtract
-	case "stop":
-		handler.Config.Timers[timerID].Stop()
-	default:
-		logrus.Warnf("error occurred while reading timer instruction message: %v", instructions.Instruction)
+// onUseConfig is the function to process the instruction `use config`
+// checks the config and if it found no errors, it saves and uses this config
+func (handler *Handler) onUseConfig(configToRead interface{}, fileName string) {
+	// check if the config can be used, if so use and send message
+	if len(handler.checkConfig(configToRead)) == 0 {
+		handler.useConfig(configToRead, fileName)
+		message := Message{
+			DeviceID: "back-end",
+			TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+			Type:     "new config",
+			Contents: map[string]string{"name": fileName},
+		}
+		jsonMessage, _ := json.Marshal(&message)
+		handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+		handler.SendSetup()
 	}
-	handler.SendStatus(timerID)
+}
+
+// useConfig uses new config and save this config to file
+// warning this config should be checked first before using the config
+func (handler *Handler) useConfig(configToRead interface{}, fileName string) {
+	jsonBytes, _ := json.Marshal(configToRead)
+	newConfig, _ := config.ReadJSON(jsonBytes)
+	dir, _ := os.Getwd()
+	fullFileName := filepath.Join(dir, "back-end", "resources", "production", fileName)
+	err := ioutil.WriteFile(fullFileName, jsonBytes, 0644)
+	if err != nil {
+		logger.Error(err)
+	}
+	handler.Config = newConfig
+	handler.ConfigFile = fullFileName
+}
+
+// checkConfig checks the config, if it finds any errors in processing the config,
+// it will return a list of all found errors, if this slice is empty,
+// the config contains no errors and can be used safely
+func (handler *Handler) checkConfig(configToRead interface{}) []string {
+	errors := make([]string, 0)
+	jsonBytes, err := json.Marshal(configToRead)
+	if err != nil {
+		errors = append(errors, fmt.Sprintf("level I - JSON error: could not unmarshal json, %v", err))
+	} else {
+		newConfig, errorList := config.ReadJSON(jsonBytes)
+
+		if newConfig.General.Host != handler.Config.General.Host {
+			errorList = append(errorList, "level IV - system error: host: different from current host for front and back-end")
+		}
+		if newConfig.General.Port != handler.Config.General.Port {
+			errorList = append(errorList, "level IV - system error: port: different from current port for front and back-end")
+		}
+		errors = append(errors, errorList...)
+	}
+	return errors
 }

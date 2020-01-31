@@ -1,37 +1,70 @@
-/*Global variables - don't work*/
+/*Global variables - don't work - but keep track of general colors and fonts used.*/
 :root {
   --mat-primary: #3f51b5;
+  --mat-secondary: #EEEEEE;
   --mat-font: Roboto, "Helvetica Neue", sans-serif;
 }
 
 
-/*General styling*/
-body {
+/*General styling, setting background colors.*/
+body { /*body of the index.html*/
   background-color: #3f51b5;
-  max-height: 100%;
   min-width: 350px;
 }
-.home{
-  display: flex;
+.main { /*div of app.html*/
   flex-direction: column;
   flex-wrap: wrap;
   justify-content: center;
 }
+.main-content { /*sidenav content*/
+  background-color: #3f51b5;
+  padding: 10px;
+}
+
+/**Menu styling, such that the menu is always the same size, which exactly fits three items.*/
 .menu {
   background-color: #EEEEEE;
+  height: 155px;
 }
-.home-header {
-  max-width: 100%;
+.menu-list {
+  height: 145px;
+}
+.nav-item {
   font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+
+/*Tables for devices and events*/
+.custom-md-table {
+  width: 100%;
+  background-color: #EEEEEE;
+  text-align: left;
+}
+.custom-md-table-header {
+  font-weight: bold;
+}
+.boolean-column {
   text-align: center;
 }
-.title-box, .subtitle-box {
-  display: inline-block;
-  margin: 0px 10px 0px 10px;
+
+
+/*Other components throughout the application*/
+.custom-md-button, button {
+  margin: 5px;
+  font-size: 16px;
+  border-radius: 4px;
+}
+.check-mark {
+  color: green !important;
+}
+.cross {
+  color: red !important;
 }
 
 
-/*Boxes on home page*/
+
+/*Boxes on home page, which contain a header and contents box,
+ and should be spaced apart from each other.*/
 .home-box {
   font-family: Roboto, "Helvetica Neue", sans-serif;
   margin: 0 30px 0;
@@ -44,9 +77,6 @@ body {
   margin-bottom: 5px;
   padding: 5px;
 }
-.subtitle, .title {
-  color: #EEEEEE;
-}
 .home-box .contents {
   background-color: #EEEEEE;
   padding: 5px;
@@ -57,74 +87,34 @@ body {
 
 
 
-/*Small screens should have small margin*/
-@media only screen and (max-width: 400px) {
+/*Small screens should have little 'white space'*/
+@media only screen and (max-width: 1100px) {
+  @media only screen and (min-width: 650px) {
+    .left {
+      margin: 0 5px 0 0;
+    }
+  }
   .home-box {
-    margin: 5px;
+    margin: 0;
   }
-  .subtitle, .title {
-    font-size: 24px
+  .main-content {
+    padding: 0;
   }
-  .rule-id {
-    white-space: normal;
-    width: 100px;
+  .home-box .contents {
+    padding: 0;
   }
 }
-@media only screen and (min-width: 650px) and (max-width: 700px) {
-  .home-box {
-    margin: 5px;
-  }
-}
+
 /*Define grid home page for large screens*/
 @media only screen and (min-width: 650px) {
-
-  .timer-box {grid-area: timer; row-span: 2}
-  .manage-box {grid-area: manage; row-span: 2}
-  .hint-box {grid-area: hint; row-span: 2}
-  .device-box {grid-area: device; row-span: 3}
-  .puzzle-box {grid-area: puzzle; row-span: 3}
+  .timer-box {grid-area: timer}
+  .manage-box {grid-area: manage}
+  .hint-box {grid-area: hint}
+  .device-box {grid-area: device}
+  .puzzle-box {grid-area: puzzle}
 
   .home-content {
     display: grid;
-    grid-template-columns: 40% 60%;
+    grid-template-columns: 50% 50%;
   }
 }
-
-
-
-/*Tables for devices and events*/
-.custom-md-table {
-  width: 100%;
-  background-color: #EEEEEE;
-  text-align: left;
-  max-height: 100px;
-}
-.custom-md-table-header {
-  font-weight: bold;
-}
-.custom-md-table-page {
-  background-color: #EEEEEE;
-}
-.boolean-column {
-  width: 70px;
-  text-align: center;
-}
-
-.rule-id {
-  white-space: nowrap;
-  min-width: 20%;
-}
-.rule-status {
-  width: 70px;
-}
-
-
-
-/*Other components*/
-.custom-md-button, button {
-  margin: 5px;
-  font-size: 16px;
-  border-radius: 4px;
-}
-
-

@@ -1,0 +1,72 @@
+<div #cameraBox id="cameraBox" class="home-box camera-box">
+  <!--If in full screen only show the camera title with the full screen button-->
+  <div class="header full-screen-title" *ngIf="fullScreen">
+    <h3 class="camera-title">
+      Camera
+      <span>
+        <button mat-icon-button (click)="setFullScreen()" style="vertical-align: center">
+          <mat-icon>fullscreen</mat-icon>
+        </button>
+      </span>
+    </h3>
+  </div>
+  <div class="header" *ngIf="!fullScreen">
+    <!--If not in full screen, the header is the full dropdown expansion panel-->
+    <mat-expansion-panel #expansionPanel [expanded]="true">
+      <mat-expansion-panel-header (click)="expandPanel(expansionPanel, $event)">
+        <h3 class="camera-title">
+          Camera
+          <span (click)="$event.stopPropagation()">
+            <button mat-icon-button (click)="setFullScreen()" style="vertical-align: center">
+              <mat-icon>fullscreen</mat-icon>
+            </button>
+          </span>
+        </h3>
+      </mat-expansion-panel-header>
+
+      <div class="camera-selection" *ngIf="!fullScreen">
+        <div class="left">
+          <form (ngSubmit)="setSrc()" class="camera-title">
+            <mat-form-field>
+              <mat-select [formControl]="selectedCameraControl" placeholder="Kies camera"
+                          (selectionChange)="setSrc()">
+                <mat-option *ngFor="let camera of allCameras()" [value]="camera.name">{{ camera.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </form>
+        </div>
+        <div class="center">
+          <mat-checkbox [(ngModel)]="openSecond">Open tweede camera</mat-checkbox>
+        </div>
+        <div class="right">
+          <ng-container *ngIf="openSecond">
+            <form (ngSubmit)="setSrc()" class="camera-title">
+              <mat-form-field>
+                <mat-select [formControl]="selectedCameraControl2" placeholder="Kies camera"
+                            (selectionChange)="setSrc2()">
+                  <mat-option *ngFor="let camera of allCameras()" [value]="camera.name">{{ camera.name }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </form>
+          </ng-container>
+        </div>
+      </div>
+    </mat-expansion-panel>
+  </div>
+
+  <div #contents class="contents">
+    <div class="normal feed-box" *ngIf="!openSecond">
+      <iframe [src]="cameraFeedSrc" class="camera-feed" allowFullScreen></iframe>
+    </div>
+
+    <div class="split-screen" *ngIf="openSecond">
+      <div class="feed-box first-box">
+        <iframe [src]="cameraFeedSrc" class="camera-feed" allowFullScreen></iframe>
+      </div>
+
+      <div class="feed-box second-box" *ngIf="openSecond">
+        <iframe [src]="cameraFeedSrc2" class="camera-feed" allowFullScreen></iframe>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,7 +1,7 @@
 {
   "general": {
     "name": "Escape X",
-    "duration": "00:30:00",
+    "duration": "30m",
     "host": "localhost",
     "port": 1883
   },
@@ -55,7 +55,7 @@
         {
           "id": "rule",
           "description": "My rule",
-          "limit": 0,
+          "limit": 1,
           "conditions": {
             "type": "device",
             "type_id": "display",
@@ -64,7 +64,29 @@
               "value": "test",
               "comparison": "eq"
             }
-          }
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "display",
+              "message": [
+                {
+                  "component_id": "display",
+                  "instruction": "hint",
+                  "value": "it tested!"
+                }
+              ]
+            },
+            {
+              "type": "timer",
+              "type_id": "general",
+              "message": [
+                {
+                  "instruction": "pause"
+                }
+              ]
+            }
+          ]
         }
       ]
     }

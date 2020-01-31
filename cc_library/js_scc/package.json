@@ -1,0 +1,16 @@
+{
+  "name": "sciler",
+  "version": "0.1.5",
+  "main": "index.js",
+  "license": "GNU General Public License v3 (GPL)",
+  "dependencies": {
+    "paho-mqtt": "^1.1.0"
+  },
+  "devDependencies": {
+    "prettier": "1.19.1"
+  },
+  "preserveSymlinks": true,
+  "scripts": {
+    "format": "prettier --write **/*.js --config .prettier.config.js"
+  }
+}

@@ -25,10 +25,9 @@ describe("DeviceComponent", () => {
   });
 
   it("should set status", () => {
-    console.log(device);
-    expect(device.getValue("door")).toBe(true);
+    expect(device.getValue("door").status).toBe(true);
     const jsonData = JSON.parse(`{ "door" : false }`);
     device.updateStatus(jsonData);
-    expect(device.connection).toBe(false);
+    expect(device.getValue("door").status).toBe(false);
   });
 });

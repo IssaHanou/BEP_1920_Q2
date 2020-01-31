@@ -1,0 +1,18 @@
+{
+  "general": {
+    "name": "Escape X",
+    "duration": "30m",
+    "host": "localhost",
+    "port": 1883
+  },
+  "timers": [
+    {
+      "id": "timer1",
+      "duration": "10s"
+    },
+    {
+      "id": "timer1",
+      "duration": "5s"
+    }
+  ]
+}

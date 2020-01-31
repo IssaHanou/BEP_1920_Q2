@@ -1,0 +1,58 @@
+/**Size of iframe**/
+.camera-box .contents {
+  height: 70vh;
+  background-color: #EEEEEE;
+}
+.feed-box {
+  height: 100%;
+}
+.camera-feed {
+  height: 100%;
+  width: 100%;
+}
+@media only screen and (max-height: 500px) {
+  .camera-box .contents {
+    height: 50vh;
+  }
+}
+
+/**Camera title styling**/
+.camera-title {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  color: #3f51b5;
+  margin: 0;
+}
+.full-screen-title {
+  max-height: 50px;
+}
+
+/**Width of drop down**/
+.mat-form-field {
+  width: 100%;
+}
+
+/**Camera selection*/
+.left, .center, .right {
+  float: left;
+  width: 33%;
+}
+.center {
+  text-align: center;
+}
+
+/**Two cameras*/
+.split-screen .first-box, .split-screen .second-box {
+  float: left;
+  width: 50%;
+}
+.split-screen {
+  height: 100%;
+}
+/**On small screens, put the cameras underneath each other*/
+@media only screen and (max-width: 600px) {
+  .split-screen .first-box, .split-screen .second-box {
+    float: none;
+    width: 100%;
+  }
+}
+

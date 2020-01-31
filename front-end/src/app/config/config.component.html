@@ -1,0 +1,46 @@
+<div class="home-box config-box">
+  <h3 class="header">Configuratie</h3>
+  <div class="contents">
+    <div class="file-input">
+      <label class="mat-raised-button mat-primary custom-md-button config-button" for="inputFile">Upload configuratie</label>
+      <input type="file" accept="application/json" id="inputFile" ref="fileInput" class="original-config-button"
+             (click)="resetCurrentFile($event)" (change)="checkFile($event.target.files)">
+    </div>
+    <p class="uploadString">{{ getUploaded() }}</p>
+    <div *ngIf="getUploaded() != '' && !noErrors()">
+      <div class="information-box">
+        <mat-expansion-panel #expansionPanel [expanded]="true">
+          <mat-expansion-panel-header>
+            <h3>Uitleg</h3>
+          </mat-expansion-panel-header>
+          <p>Er zijn vier error levels:</p>
+          <p>level I: JSON of bestandserror. Dit wordt gegeven als de JSON niet geparsed kan worden om verzonden te worden
+            of als de JSON niet omgezet kan worden in een ReadConfig object in the ReadJSON method van de ConfigHandler.
+            Deze errors komen per 1.</p>
+          <p>level II: formatting errors, zoals missende json keys of verkeerde types data.
+            Deze error wordt gegeven in de ConfigHandler als de ReadConfig om wordt gezet naar een WorkingConfig.</p>
+          <p>level III: implementatie errors, bijvoorbeeld referentie ID's die niet kunnen worden gevonden.
+            Deze error wordt gegeven bij het aanmaken van de maps met cached data en tijdens het checken van de data in checkConfig.
+            De error geeft aan op welke rule uit de configuratie het fout ging en mogelijk ook bij welke actie of constraint.</p>
+          <p>level IV: systeem error: wanneer de nieuwe configuratie niet aansluit op de huidige configuratie
+            omdat de broker host anders staat ingesteld.
+            Deze error wordt gegooid in the MessageHandler, in checkConfig.</p>
+        </mat-expansion-panel>
+      </div>
+      <div class="file-output-errors">
+        <mat-list class="error-list">
+          <mat-list-item class="error-list-title">Errors</mat-list-item>
+          <mat-list-item *ngFor="let error of getErrors()">{{ error }}</mat-list-item>
+        </mat-list>
+      </div>
+    </div>
+    <div *ngIf="getUploaded() != '' && noErrors()" class="file-output-no-errors">
+      <mat-list class="error-list">
+        <mat-list-item class="error-list-title">Errors</mat-list-item>
+        <mat-list-item>Geen errors gevonden!</mat-list-item>
+      </mat-list>
+      <button routerLink="/" class="mat-raised-button mat-primary custom-md-button config-button"
+              (click)="sendConfig()">Gebruik configuratie</button>
+    </div>
+  </div>
+</div>

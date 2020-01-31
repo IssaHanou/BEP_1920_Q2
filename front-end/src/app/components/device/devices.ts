@@ -1,7 +1,7 @@
 import { Device } from "./device";
 
 /**
- * Devices has a Map all containing all devices with a key that is the same as the id.
+ * Class keeping track of the devices, through use of map with device id's.
  */
 export class Devices {
   all: Map<string, Device>;
@@ -11,8 +11,8 @@ export class Devices {
   }
 
   /**
-   * setDevice either updates an existing Device with the update methods or creates a new one.
-   * @param jsonData json object with keys id, status and connection.
+   * Set the new status and connection state of a certain device.
+   * If the device did not yet exist, create a new one.
    */
   setDevice(jsonData) {
     if (this.all.has(jsonData.id)) {
@@ -24,10 +24,21 @@ export class Devices {
   }
 
   /**
-   * getDevice is a getter for devices
-   * @param dev device id
+   * Update the status of device front-end.
+   * Update the component with id to status.
    */
-  getDevice(dev) {
+  updateDevice(id, status) {
+    if (this.all.has("front-end")) {
+      const newStatus = {};
+      newStatus[id] = status;
+      this.all.get("front-end").updateStatus(newStatus);
+    }
+  }
+
+  /**
+   * Return device with id dev.
+   */
+  getDevice(dev: string) {
     if (this.all.has(dev)) {
       return this.all.get(dev);
     } else {
