@@ -17,6 +17,14 @@ How to use Hue Lights with S.C.I.L.E.R.:
 """
 
 
+class Spot():
+
+    def __init__(self, x=0.3, y=0.3, bri=100):
+        self.x = x
+        self.y = y
+        self.bri = bri
+
+
 class HueLights(Device):
     def __init__(self):
         two_up = os.path.abspath(os.path.join(__file__, ".."))
@@ -26,9 +34,7 @@ class HueLights(Device):
         config = open(file=abs_file_path)
         super().__init__(config)
         self.scene = "none"
-        self.bri = 0
-        self.x = 0
-        self.y = 0
+        self.spots = [Spot(), Spot(), Spot(), Spot()]
         self.hue_bridge = "http://192.168.0.106/"
         self.hue_user = "d3Vji9wgd150ttFBQM3wHl-DyXVBYWnZdO6ALHci"
         self.group = "Spotlights"
@@ -62,8 +68,6 @@ class HueLights(Device):
                      data=params,
                      headers=self.header,
                      )
-        time.sleep(2)
-        self.pub_to_hue(url)
 
     def set_scene(self, data):
         self.scene = data.get("value")
@@ -85,38 +89,52 @@ class HueLights(Device):
         self.status_changed()
 
     def set_manual(self, comp, data):
-        self.bri = data[1]
-        self.x = data[2][0]
-        self.y = data[2][1]
+        bri = data[1]
+        x = data[2][0]
+        y = data[2][1]
         if comp == "all":
-            url = (
-                    self.hue_bridge
-                    + "api/"
-                    + self.hue_user
-                    + "/groups/"
-                    + self.group
-                    + "/action"
-            )
+            for i in range(len(self.spots)):
+                self.set_spot(i + 1, x, y, bri)
         else:
-            url = (
-                    self.hue_bridge
-                    + "api/"
-                    + self.hue_user
-                    + "/lights/"
-                    + comp[-1:]
-                    + "/state"
-            )
-        self.pub_to_hue(url)
+            self.set_spot(comp[-1:], x, y, bri)
+
+    def set_spot(self, spot, x=None, y=None, bri=None):
+        if x:
+            self.spots[spot].x = x
+        if y:
+            self.spots[spot].y = y
+        if bri:
+            self.spots[spot].bri = bri
 
     def set_single(self, action):
+        component = action.get("component")
+        if component == "all":
+            for i in range(len(self.spots)):
+                self.set_single_spot(i + 1, action)
+        else:
+            self.set_spot(component[-1:], action)
+
+    def set_single_spot(self, spot, action):
         if action.get("instruction") == "bri":
-            # self.bri = action.get("value") * 2.5
-            self.bri = 100
+            bri = int(action.get("value") * 2.54)
+            self.set_spot(spot, bri=bri)
         elif action.get("instruction") == "x":
-            self.x = float(1 / 100 * action.get("value"))
+            x = float(1 / 100 * action.get("value"))
+            self.set_spot(spot, x=x)
         elif action.get("instruction") == "y":
-            self.y = float(1 / 100 * action.get("value"))
-        if action.get("component_id") == "all":
+            y = float(1 / 100 * action.get("value"))
+            self.set_spot(spot, y=y)
+
+    def pub_to_hue(self):
+        url = None
+        params = None
+        head = self.spots[0]
+        allEqual = True
+        for spot in self.spots:
+            if spot != head:
+                allEqual = False
+
+        if allEqual:
             url = (
                     self.hue_bridge
                     + "api/"
@@ -125,19 +143,8 @@ class HueLights(Device):
                     + self.group
                     + "/action"
             )
+            params = json.dumps({"on": True, "bri": head.bri, "xy": [head.x, head.y], "transitiontime": 5})
         else:
-            url = (
-                    self.hue_bridge
-                    + "api/"
-                    + self.hue_user
-                    + "/lights/"
-                    + action.get("component_id")[-1:]
-                    + "/state"
-            )
-        self.pub_to_hue(url)
-
-    def pub_to_hue(self, url):
-        params = json.dumps({"on": True, "bri": self.bri, "xy": [self.x, self.y]})
         print(url, params, self.header)
         resp = requests.put(url, data=params, headers=self.header)
         if resp.status_code == 200:
@@ -148,34 +155,18 @@ class HueLights(Device):
 
     def reset(self):
         self.scene = "none"
-        self.bri = 100
-        self.x = 0.3
-        self.y = 0.3
-        url = (
-                self.hue_bridge
-                + "api/"
-                + self.hue_user
-                + "/groups/"
-                + self.group
-                + "/action"
-        )
-        self.pub_to_hue(url)
+        self.spots = [Spot(), Spot(), Spot(), Spot()]
 
     def __loop(self):
-        url = (
-                self.hue_bridge
-                + "api/"
-                + self.hue_user
-                + "/groups/"
-                + self.group
-                + "/action"
-        )
+        previous = self.spots()
         while True:
-            time.sleep(1)
-            self.pub_to_hue(url)
+            if self.spots != previous:
+                self.pub_to_hue()
+                previous = self.spots
+                time.sleep(1)
 
     def main(self):
-        self.start()
+        self.start(self.__loop)
 
 
 if __name__ == "__main__":
