@@ -19,9 +19,8 @@
     "@angular/platform-browser": "~8.2.14",
     "@angular/platform-browser-dynamic": "~8.2.14",
     "@angular/router": "~8.2.14",
-    "js-scc": "0.0.8",
     "rxjs": "~6.4.0",
-    "sciler": "^0.1.7",
+    "sciler": "latest",
     "tslib": "^1.10.0",
     "zone.js": "~0.9.1"
   },
