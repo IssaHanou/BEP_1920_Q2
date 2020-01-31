@@ -145,7 +145,7 @@ This can be displayed in the front-end, so should be readable and in Dutch.
     - `message` in case of type `device`: this defines a list of componentInstructions which have a:
         - `component_id`: this will be the id of a component in a timer or device
         - `instruction`: one of the instructions specified for this device and component
-        - `value`: this is the value for the instruction of the type specified for this device and component, in case this type is "status", a string in the form "`device_id`.`component_id`" should be specified. 
+        - `value`: this is the value for the instruction of the type specified for this device and component, in case this type is "status", a string in the form "`device_id.component_id`" should be specified. 
     - `message` in case of type `timer`:   
            - `instruction`: one of the instructions for timer, e.g. `start`, `stop`, `pause`, `done`, `add`, `subtract`
            - `value`: optional, in case of `add` and `subtract` a time should be given in format XhXmXs 

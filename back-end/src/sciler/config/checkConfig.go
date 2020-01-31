@@ -211,11 +211,13 @@ func (config *WorkingConfig) checkStatusInstructionType(status string, ruleID st
 	if len(split) == 2 {
 		deviceID := split[0]
 		componentID := split[1]
-		if device := config.Devices[deviceID]; device != nil {
-			if device.Input[componentID] != "" || device.Output[componentID].Type != "" {
-				return nil
+		if device, ok := config.Devices[deviceID]; ok {
+			if _, input := device.Input[componentID]; !input {
+				if _, output := device.Output[componentID]; !output {
+					return fmt.Errorf("level III - implementation error: on rule %s's actions: instruction type status expected in the form of `deviceID.component` but component with ID %v not found", ruleID, componentID)
+				}
 			}
-			return fmt.Errorf("level III - implementation error: on rule %s's actions: instruction type status expected in the form of `deviceID.component` but component with ID %v not found", ruleID, componentID)
+			return nil // an input or an output exist for the specified device_id and component_id
 		}
 		return fmt.Errorf("level III - implementation error: on rule %s's actions: instruction type status expected in the form of `deviceID.component` but device with ID %v not found", ruleID, deviceID)
 	}
