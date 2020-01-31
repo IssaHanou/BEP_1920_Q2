@@ -1,6 +1,7 @@
 import json
 import os
 import time
+from copy import copy, deepcopy
 
 import requests
 from sciler.device import Device
@@ -24,6 +25,12 @@ class Spot():
         self.y = y
         self.bri = bri
 
+    def __str__(self):
+        return "x: " + str(self.x) + ", y;" + str(self.y) + ", bri: " + str(self.bri)
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y and self.bri == other.bri
+
 
 class HueLights(Device):
     def __init__(self):
@@ -35,7 +42,7 @@ class HueLights(Device):
         super().__init__(config)
         self.scene = "none"
         self.spots = [Spot(), Spot(), Spot(), Spot()]
-        self.hue_bridge = "http://192.168.0.107/"
+        self.hue_bridge = "http://192.168.1.107/"
         self.hue_user = "d3Vji9wgd150ttFBQM3wHl-DyXVBYWnZdO6ALHci"
         self.group = "Spotlights"
         self.header = {"Content-type": "application/json"}
@@ -94,7 +101,7 @@ class HueLights(Device):
         y = data[2][1]
         if comp == "all":
             for i in range(len(self.spots)):
-                self.set_spot(i + 1, x, y, bri)
+                self.set_spot(i, x, y, bri)
         else:
             self.set_spot(comp[-1:], x, y, bri)
 
@@ -107,10 +114,10 @@ class HueLights(Device):
             self.spots[spot].bri = bri
 
     def set_single(self, action):
-        component = action.get("component")
+        component = action.get("component_id")
         if component == "all":
             for i in range(len(self.spots)):
-                self.set_single_spot(i + 1, action)
+                self.set_single_spot(i, action)
         else:
             self.set_spot(component[-1:], action)
 
@@ -129,12 +136,13 @@ class HueLights(Device):
         url = None
         params = None
         head = self.spots[0]
-        allEqual = True
+        all_spots_are_equal = True
         for spot in self.spots:
             if spot != head:
-                allEqual = False
+                all_spots_are_equal = False
 
-        if allEqual:
+        if all_spots_are_equal:
+            print("CHANGING ALL")
             url = (
                     self.hue_bridge
                     + "api/"
@@ -149,17 +157,18 @@ class HueLights(Device):
             for i in range(len(self.spots)):
                 current = self.spots[i]
                 if current != previous[i]:
+                    print("CHANGING", i)
                     url = (
                             self.hue_bridge
                             + "api/"
                             + self.hue_user
                             + "/lights/"
-                            + str(i+1)
+                            + str(i + 1)
                             + "/state"
                     )
-                    params = json.dumps({"on": True, "bri": current.bri, "xy": [current.x, current.y], "transitiontime": 5})
+                    params = json.dumps(
+                        {"on": True, "bri": current.bri, "xy": [current.x, current.y], "transitiontime": 5})
                     self.pub_to_hue(url, params)
-
 
     def pub_to_hue(self, url, params):
         print(url, params, self.header)
@@ -170,17 +179,16 @@ class HueLights(Device):
             self.log("Unable to publish template.")
         self.status_changed()
 
-
     def reset(self):
         self.scene = "none"
         self.spots = [Spot(), Spot(), Spot(), Spot()]
 
     def __loop(self):
-        previous = self.spots
+        previous = deepcopy(self.spots)
         while True:
             if self.spots != previous:
                 self.check_differences_and_publish(previous)
-                previous = self.spots
+                previous = deepcopy(self.spots)
                 time.sleep(1)
 
     def main(self):
