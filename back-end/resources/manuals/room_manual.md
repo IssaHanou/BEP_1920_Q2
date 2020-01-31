@@ -50,7 +50,7 @@ This will be a list of all the time-related actions/conditions. all timers have 
 ### Puzzles
 This will be a list of puzzle objects, which have the following properties:
 
-- `name`: name of puzzle. This can be displayed in the front-end, so should be readable and in Dutch. 
+- `name`: name of puzzle. This can be displayed in the front-end, so should be readable and in Dutch. This name should be unique, also compared to the general event names.  
 - `rules`: array of rule objects (see below)
 - `hints`: array of hints (strings), specific to each puzzle. 
 These can be displayed in the front-end, so should be readable and in Dutch. 

@@ -4,6 +4,7 @@ export class Display extends Device {
   private hint: string;
   private timeDur: number;
   private timeState: string;
+
   constructor(config) {
     super(config, function(date, level, message) {
       const formatDate = function(date) {
