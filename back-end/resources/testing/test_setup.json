@@ -60,16 +60,7 @@
         }
       ],
       "hints": [
-        "De knop verzend jouw volgorde",
-        "Heb je al even gewacht?"
-      ]
-    },
-    {
-      "name": "Control puzzel",
-      "rules": [
-      ],
-      "hints": [
-        "Zet de schuiven nauwkeurig"
+        "De knop verzend jouw volgorde"
       ]
     }
   ],

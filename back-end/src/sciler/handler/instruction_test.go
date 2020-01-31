@@ -66,8 +66,7 @@ func TestInstructionSetup(t *testing.T) {
 		Contents: map[string]interface{}{
 			"name": "Escape X",
 			"hints": map[string][]string{
-				"Telefoon puzzels": {"De knop verzend jouw volgorde", "Heb je al even gewacht?"},
-				"Control puzzel":   {"Zet de schuiven nauwkeurig"},
+				"Telefoon puzzels": {"De knop verzend jouw volgorde"},
 			},
 			"events": []map[string]interface{}{
 				{
@@ -111,8 +110,7 @@ func TestInstructionSetup(t *testing.T) {
 		Contents: map[string]interface{}{
 			"name": "Escape X",
 			"hints": map[string][]string{
-				"Telefoon puzzels": {"De knop verzend jouw volgorde", "Heb je al even gewacht?"},
-				"Control puzzel":   {"Zet de schuiven nauwkeurig"},
+				"Telefoon puzzels": {"De knop verzend jouw volgorde"},
 			},
 			"events": []map[string]interface{}{
 				{
