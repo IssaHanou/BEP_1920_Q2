@@ -9,19 +9,15 @@ except ImportError:
 import asyncio
 
 
-class Keypad(Device):
-    currentValue = ""
+class Scanner(Device):
 
     def get_status(self):
         """
         Returns status of all custom components, in json format.90311031
 
         """
-        if self.currentValue == "":
-            return {"code": 0}
-
         return {
-            "code": int(self.currentValue),
+            "code": self.code,
             "scanned": [self.scanned[len(self.scanned) - 2], self.scanned[len(self.scanned) - 1]]
         }
 
@@ -45,18 +41,18 @@ class Keypad(Device):
         """
         Defines a reset sequence for device.
         """
-        self.currentValue = ""
+        self.code = 0
         self.scanned = [0, 0]
-        self.status_changed()
         self.log("reset")
 
     def __init__(self):
         two_up = os.path.abspath(os.path.join(__file__, ".."))
-        rel_path = "keypad.json"
+        rel_path = "scanner.json"
         abs_file_path = os.path.join(two_up, rel_path)
         abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
         config = open(file=abs_file_path)
         super().__init__(config)
+        self.code = 0
         self.scanned = [0, 0]
 
     def main(self):
@@ -67,28 +63,32 @@ class Keypad(Device):
         """
 
         def async_loop():
-            card_reader = NumpadReader(
-                result_handler=self.reader_handle_result,
-                status_change=self.reader_status_changed,
-                log=self.log,
-                usb_path="/dev/input/event0",
-            )
-            loop = asyncio.get_event_loop()
-
-            loop.run_until_complete(asyncio.gather(card_reader.start()))
+            while True:
+                self.code = eval(input())
+                print(self.code)
+                self.scanned.append(self.code)
+                print(self.scanned)
+                self.status_changed()
+            # card_reader = NumpadReader(
+            #     result_handler=self.reader_handle_result,
+            #     status_change=self.reader_status_changed,
+            #     log=self.log,
+            #     usb_path="/dev/input/event0",
+            # )
+            # loop = asyncio.get_event_loop()
+            #
+            # loop.run_until_complete(asyncio.gather(card_reader.start()))
 
         self.start(loop=async_loop)
 
     def reader_handle_result(self, result):
         self.log("Submitted code: {}".format(result))
         self.currentValue = result
-        self.scanned.append(eval(result))
         self.status_changed()
 
     def reader_status_changed(self, result):
         self.log("Current status: {}".format(result))
         self.currentValue = result
-        self.scanned.append(eval(result))
         self.status_changed()
 
 
@@ -160,5 +160,5 @@ class NumpadReader:
 
 
 if __name__ == "__main__":
-    device = Keypad()
+    device = Scanner()
     device.main()
