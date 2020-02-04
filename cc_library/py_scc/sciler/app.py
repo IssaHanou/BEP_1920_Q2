@@ -118,7 +118,6 @@ class Sciler:
         :param topic: topic to publish to
         :param json_message: message to publish in json formatting
         """
-        #
         self.client.publish(topic, json_message, 1)
         message_type = topic + " message published"
         logging.info((message_type, json_message))
@@ -320,11 +319,12 @@ class Sciler:
         """
         success = self.device.perform_instruction(action)
         if success:
-            logging.info(("instruction performed", action.instruction))
+            logging.info(("instruction performed", action.get("instruction")))
+            return True
         else:
             logging.warning(
                 (
-                    "instruction: " + action.instruction + " could not be performed",
+                    "instruction: " + action.get("instruction") + " could not be performed",
                     action,
                 )
             )
