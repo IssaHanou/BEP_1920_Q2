@@ -1,6 +1,6 @@
 {
   "id": "keypad",
-  "host": "192.168.1.103",
+  "host": "localhost",
   "port": 1883,
   "labels": []
 }

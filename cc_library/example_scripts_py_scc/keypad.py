@@ -22,7 +22,10 @@ class Keypad(Device):
 
         return {
             "code": int(self.currentValue),
-            "scanned": [self.scanned[len(self.scanned) - 2], self.scanned[len(self.scanned) - 1]]
+            "scanned": [
+                self.scanned[len(self.scanned) - 2],
+                self.scanned[len(self.scanned) - 1],
+            ],
         }
 
     def perform_instruction(self, contents):
@@ -94,7 +97,7 @@ class Keypad(Device):
 
 class NumpadReader:
     def __init__(
-            self, result_handler, status_change, usb_path="/dev/input/event0", log=print
+        self, result_handler, status_change, usb_path="/dev/input/event0", log=print
     ):
         self.word = ""
         self.device = InputDevice(usb_path)
