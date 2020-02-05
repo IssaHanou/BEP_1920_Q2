@@ -72,15 +72,18 @@ class Sciler:
         """
         logging.log(level=level, msg=msg)
 
-    def start(self, loop=None, stop=None):
+    def start(self, loop=None, stop=None, blocking=True):
         """
         Starting method to call from the starting script.
         :param loop: possible event loop
         :param stop: possible end function
+        :param blocking: when True, block until keyboard interrupt
         """
         self.__connect()
         try:
-            if loop:
+            if not blocking:
+                self.client.loop_start()
+            elif loop:
                 self.client.loop_start()
                 loop()
             else:
@@ -92,7 +95,19 @@ class Sciler:
                 stop()
             if loop:
                 self.client.loop_stop()
-            self.__stop()
+            if blocking:
+                self.__stop()
+            else:
+                # Callee must call `stop()` method themselves.
+                pass
+        
+    def stop(self):
+        """
+        Stop method for use when the client has been started in non-blocking mode.
+        """
+        logging.info("stop method called, stopping client loop")
+        self.client.loop_stop()
+        self.__stop()
 
     def __stop(self):
         """
