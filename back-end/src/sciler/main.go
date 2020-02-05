@@ -15,6 +15,12 @@ import (
 )
 
 func main() {
+	defer func() {
+		if r := recover(); r != nil {
+			logger.Panicf("Recovered panic: %v", r)
+		}
+	}()
+
 	// set maximum number of cores
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
@@ -61,6 +67,7 @@ func setupLogger(dir string) {
 
 	// setting up (colorable) console output
 	logger.SetOutput(colorable.NewColorableStdout())
+	logger.SetLevel(logger.DebugLevel)
 	logger.SetFormatter(&logger.TextFormatter{
 		ForceColors:     true,
 		FullTimestamp:   true,
