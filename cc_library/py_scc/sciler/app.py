@@ -324,7 +324,9 @@ class Sciler:
         else:
             logging.warning(
                 (
-                    "instruction: " + action.get("instruction") + " could not be performed",
+                    "instruction: "
+                    + action.get("instruction")
+                    + " could not be performed",
                     action,
                 )
             )
