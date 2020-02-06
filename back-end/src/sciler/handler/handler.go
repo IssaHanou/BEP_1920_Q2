@@ -231,6 +231,9 @@ func (handler *Handler) onResetAll(deviceID string) {
 		"instruction":   "reset",
 		"instructed_by": deviceID,
 	}})
+	for _, timer := range handler.Config.Timers {
+		_ = timer.Stop()
+	}
 	handler.Config = config.ReadFile(handler.ConfigFile)
 	handler.SendSetup()
 }
