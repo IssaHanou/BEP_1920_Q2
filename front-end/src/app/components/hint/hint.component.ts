@@ -27,7 +27,7 @@ export class HintComponent {
    */
   getHintLog(): string[] {
     const list = [];
-    for (const hint of this.app.deviceList.all.get("front-end").status.get("hintLog").status) {
+    for (const hint of this.app.deviceList.all.get("front-end").statusMap.get("hintLog").componentStatus) {
       list.push(hint + "\n");
     }
     return list;
