@@ -38,10 +38,16 @@ type Handler struct {
 // The function processes the JSON payload and logs and error if this fails
 // The Message Mapper is called if the JSON is correct to process the contents
 func (handler *Handler) NewHandler(client mqtt.Client, message mqtt.Message) {
+	defer func() {
+		if r := recover(); r != nil {
+			logger.Panicf("Recovered panic: %v", r)
+		}
+	}()
 	var raw Message
 	if err := json.Unmarshal(message.Payload(), &raw); err != nil {
 		logger.Errorf("invalid JSON received: %v", err)
 	} else {
+		logger.Debugf("message received: %v", raw)
 		handler.msgMapper(raw)
 	}
 }
