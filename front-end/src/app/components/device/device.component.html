@@ -30,10 +30,10 @@
             <table mat-table [dataSource]="getComponentList(element.id)"
                    class="mat-elevation-z8 custom-md-table component-table">
                 <ng-container matColumnDef="component">
-                  <td mat-cell *matCellDef="let comp" class="component-cell">{{ comp?.id }}</td>
+                  <td mat-cell *matCellDef="let comp" class="component-cell">{{ comp.id }}</td>
                 </ng-container>
                 <ng-container matColumnDef="status">
-                  <td mat-cell *matCellDef="let comp" class="status-cell">{{ comp?.status }}</td>
+                  <td mat-cell *matCellDef="let comp" class="status-cell">{{ comp.status }}</td>
                 </ng-container>
               <tr mat-row *matRowDef="let compRow; columns: componentColumns;"></tr>
             </table>

@@ -156,7 +156,9 @@ func TestInstructionSetup(t *testing.T) {
 			"connection": false,
 			"status": map[string]interface{}{
 				"start":     false,
-				"gameState": "gereed"},
+				"gameState": "gereed",
+				"hintLog":   []string{},
+			},
 		},
 	})
 	messageEventStatus, _ := json.Marshal(Message{
