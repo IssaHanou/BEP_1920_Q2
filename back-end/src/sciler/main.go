@@ -15,6 +15,12 @@ import (
 )
 
 func main() {
+	defer func() {
+		if r := recover(); r != nil {
+			logger.Panicf("Recovered panic: %v", r)
+		}
+	}()
+
 	// set maximum number of cores
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
@@ -26,6 +32,14 @@ func main() {
 	// configure logger
 	setupLogger(dir)
 
+	// start Application
+	startApplication(dir)
+
+	// prevent exit
+	select {}
+}
+
+func startApplication(dir string) {
 	filename := filepath.Join(dir, "back-end", "resources", "production", "room_config.json")
 	configurations := config.ReadFile(filename)
 	logger.Infof("configurations read from: %v", filename)
@@ -37,9 +51,6 @@ func main() {
 
 	logger.Infof("attempting to connect to broker at %s on port %v", configurations.General.Host, configurations.General.Port)
 	messageHandler.Communicator.Start()
-
-	// prevent exit
-	select {}
 }
 
 // setupLogger configures the logger such that both to file and console log messages are printed in the correct format
@@ -61,6 +72,7 @@ func setupLogger(dir string) {
 
 	// setting up (colorable) console output
 	logger.SetOutput(colorable.NewColorableStdout())
+	logger.SetLevel(logger.DebugLevel)
 	logger.SetFormatter(&logger.TextFormatter{
 		ForceColors:     true,
 		FullTimestamp:   true,
