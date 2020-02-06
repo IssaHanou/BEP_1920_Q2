@@ -222,6 +222,41 @@ func TestOnStatusMsgWrongType(t *testing.T) {
 	}
 }
 
+func TestOnStatusMsgNilType(t *testing.T) {
+	handler := getTestHandler()
+	msg := Message{
+		DeviceID: "TestDevice",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "status",
+		Contents: map[string]interface{}{
+			"testComponent1": nil,
+		},
+	}
+	handler.updateStatus(msg)
+
+	tests := []struct {
+		name      string
+		component string
+	}{
+		{
+			name:      "component1 test",
+			component: "testComponent1",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, ok := handler.Config.Devices["TestDevice"].Status[tt.component]
+			assert.Equal(t, false, ok,
+				"component should not been updated in device because it was nil")
+			assert.NotPanics(t, func() {
+				handler.updateStatus(msg)
+			},
+				"component should not been updated in device because it was nil")
+		})
+	}
+}
+
 func TestMsgMapperStatus(t *testing.T) {
 	handler := getTestHandler()
 	msg := Message{
