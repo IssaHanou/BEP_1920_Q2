@@ -32,6 +32,14 @@ func main() {
 	// configure logger
 	setupLogger(dir)
 
+	// start Application
+	startApplication(dir)
+
+	// prevent exit
+	select {}
+}
+
+func startApplication(dir string) {
 	filename := filepath.Join(dir, "back-end", "resources", "production", "room_config.json")
 	configurations := config.ReadFile(filename)
 	logger.Infof("configurations read from: %v", filename)
@@ -43,9 +51,6 @@ func main() {
 
 	logger.Infof("attempting to connect to broker at %s on port %v", configurations.General.Host, configurations.General.Port)
 	messageHandler.Communicator.Start()
-
-	// prevent exit
-	select {}
 }
 
 // setupLogger configures the logger such that both to file and console log messages are printed in the correct format
