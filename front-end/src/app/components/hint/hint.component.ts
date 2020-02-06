@@ -1,6 +1,5 @@
 import { Component } from "@angular/core";
 import { AppComponent } from "../../app.component";
-import { Hint } from "./hint";
 
 /**
  * The hint component controls the sending of hints in the "Hint" box on the home pgae.
@@ -28,8 +27,8 @@ export class HintComponent {
    */
   getHintLog(): string[] {
     const list = [];
-    for (const hint of this.app.sentHints) {
-      list.push(hint);
+    for (const hint of this.app.deviceList.all.get("front-end").status.get("hintLog").status) {
+      list.push(hint + "\n");
     }
     return list;
   }
