@@ -217,6 +217,7 @@ func (handler *Handler) HandleEvent(id string) {
 			}
 		}
 	}
+	handler.sendEventStatus()
 }
 
 // sendEventStatus sends the status of events to the front-end

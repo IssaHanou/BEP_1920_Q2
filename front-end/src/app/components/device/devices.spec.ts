@@ -32,7 +32,7 @@ describe("DeviceComponent", () => {
         }
     `);
     devices.setDevice(jsonData);
-    expect(devices.getDevice("Door").getValue("door").status).toBe(true);
+    expect(devices.getDevice("Door").getValue("door").componentStatus).toBe(true);
     const jsonData2 = JSON.parse(`{
           "id": "Door",
           "status": {"door": false},
@@ -40,6 +40,6 @@ describe("DeviceComponent", () => {
         }
     `);
     devices.setDevice(jsonData2);
-    expect(devices.getDevice("Door").getValue("door").status).toBe(false);
+    expect(devices.getDevice("Door").getValue("door").componentStatus).toBe(false);
   });
 });
