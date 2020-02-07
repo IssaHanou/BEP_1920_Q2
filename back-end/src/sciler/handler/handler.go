@@ -231,6 +231,9 @@ func (handler *Handler) onResetAll(deviceID string) {
 		"instruction":   "reset",
 		"instructed_by": deviceID,
 	}})
+	for _, timer := range handler.Config.Timers {
+		_ = timer.Stop()
+	}
 	handler.Config = config.ReadFile(handler.ConfigFile)
 	handler.SendSetup()
 }
@@ -253,7 +256,7 @@ func (handler *Handler) onTestDevice(deviceID string, instructor string) {
 	}})
 }
 
-// onResetAll is the function to process the instruction `finish rule`
+// onFinishRule is the function to process the instruction `finish rule`
 // finish rule is instructed when the "puzzel eindigen" button of a rule is clicked in the front-end
 func (handler *Handler) onFinishRule(ruleID string) {
 	rule, ok := handler.Config.RuleMap[ruleID]
