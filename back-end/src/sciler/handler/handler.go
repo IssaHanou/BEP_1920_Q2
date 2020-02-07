@@ -90,7 +90,6 @@ func (handler *Handler) onStatusMsg(raw Message) {
 	}
 	handler.sendFrontEndStatus(raw)
 	handler.HandleEvent(raw.DeviceID)
-	handler.sendEventStatus()
 }
 
 // onConnectionMsg is the function to process connection messages from devices
