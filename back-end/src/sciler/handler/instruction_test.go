@@ -253,7 +253,7 @@ func TestOnInstructionMsgFinishRule(t *testing.T) {
 	communicatorMock.On("Publish", "display", string(instHintMessage), 3)
 	handler.onInstructionMsg(msg)
 	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 4)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 5)
 }
 
 func TestOnInstructionMsgFinishRuleLabel(t *testing.T) {
@@ -283,10 +283,10 @@ func TestOnInstructionMsgFinishRuleLabel(t *testing.T) {
 	},
 	)
 	communicatorMock.On("Publish", "display2", string(instMessage), 3).Once()
-	communicatorMock.On("Publish", "front-end", mock.Anything, 3).Once()
+	communicatorMock.On("Publish", "front-end", mock.Anything, 3).Times(2)
 	handler.onInstructionMsg(msg)
 	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
 }
 
 func TestOnInstructionMsgHint(t *testing.T) {
@@ -320,6 +320,60 @@ func TestOnInstructionMsgHint(t *testing.T) {
 	communicatorMock.On("Publish", "hint", string(returnMessage), 3)
 	handler.onInstructionMsg(msg)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+}
+
+func TestOnInstructionMsgHintNoTopic(t *testing.T) {
+	handler := getTestHandler()
+	msg := map[string]interface{}{
+		"instruction": "hint",
+		"value":       "hint",
+	}
+
+	before := handler.Config
+	handler.onHint(msg, "front-end")
+	assert.Equal(t, before, handler.Config,
+		"Nothing should have been changed after an invalid hint instruction message was sent, with no topic")
+}
+
+func TestOnInstructionMsgHintNoValue(t *testing.T) {
+	handler := getTestHandler()
+	msg := map[string]interface{}{
+		"instruction": "hint",
+		"topic":       "hint",
+	}
+
+	before := handler.Config
+	handler.onHint(msg, "front-end")
+	assert.Equal(t, before, handler.Config,
+		"Nothing should have been changed after an invalid hint instruction message was sent, with no value")
+}
+
+func TestOnInstructionMsgHintNilValue(t *testing.T) {
+	handler := getTestHandler()
+	msg := map[string]interface{}{
+		"instruction": "hint",
+		"value":       nil,
+		"topic":       "hint",
+	}
+
+	before := handler.Config
+	handler.onHint(msg, "front-end")
+	assert.Equal(t, before, handler.Config,
+		"Nothing should have been changed after an invalid hint instruction message was sent, with nil value")
+}
+
+func TestOnInstructionMsgHintNilTopic(t *testing.T) {
+	handler := getTestHandler()
+	msg := map[string]interface{}{
+		"instruction": "hint",
+		"value":       "hint",
+		"topic":       nil,
+	}
+
+	before := handler.Config
+	handler.onHint(msg, "front-end")
+	assert.Equal(t, before, handler.Config,
+		"Nothing should have been changed after an invalid hint instruction message was sent, with nil topic")
 }
 
 func TestOnInstructionMsgMapper(t *testing.T) {
