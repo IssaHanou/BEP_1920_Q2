@@ -56,8 +56,8 @@ func (handler *Handler) NewHandler(client mqtt.Client, message mqtt.Message) {
 // and other types of messages should have contents in form of map[string]interface
 func (handler *Handler) checkContentsStructure(raw Message) bool {
 	if raw.Type == "instruction" {
-		if reflect.TypeOf(raw.Contents) != reflect.TypeOf(make([]map[string]interface{}, 0)) {
-			logger.Errorf("instruction message not in correct format of []map[string]interface, but was %v", reflect.TypeOf(raw.Contents))
+		if reflect.TypeOf(raw.Contents).Kind() != reflect.Slice {
+			logger.Errorf("instruction message not in correct format of []interface ([]map[string]interface), but was %v", reflect.TypeOf(raw.Contents))
 			return false
 		}
 		return true

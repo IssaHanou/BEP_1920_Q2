@@ -525,6 +525,23 @@ func TestMsgMapperIllegalType(t *testing.T) {
 		"Nothing should have been changed after an incorrect message type")
 }
 
+func TestInvalidInstructionMessage(t *testing.T) {
+	handler := getTestHandler()
+	msg := Message{
+		DeviceID: "front-end",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "instruction",
+		Contents: map[string]interface{}{
+			"instruction": "send setup",
+		},
+	}
+
+	before := handler.Config
+	handler.msgMapper(msg)
+	assert.Equal(t, before, handler.Config,
+		"Nothing should have been changed after an incorrectly structured instruction message")
+}
+
 func TestLimitRule(t *testing.T) {
 	communicatorMock := new(CommunicatorMock)
 	workingConfig := config.ReadFile("../../../resources/testing/test_singleEvent.json")
