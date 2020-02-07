@@ -134,6 +134,10 @@ func (handler *Handler) sendInstruction(clientID string, instructions []map[stri
 // If the device is in the config, and the status types are correct, the device status gets updated
 // if the device is the front-end, handleFrontEndStatus() is called
 func (handler *Handler) updateStatus(raw Message) {
+	if reflect.TypeOf(raw.Contents) != reflect.TypeOf(make(map[string]interface{})) {
+		logger.Errorf("status message not in correct format of map[string]interface, but was %v", reflect.TypeOf(raw.Contents))
+		return
+	}
 	contents := raw.Contents.(map[string]interface{})
 	if device, ok := handler.Config.Devices[raw.DeviceID]; ok {
 		logger.Infof("status message received from: %s", raw.DeviceID)

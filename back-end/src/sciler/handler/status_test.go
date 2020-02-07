@@ -112,6 +112,25 @@ func TestOnStatusMsgOtherDevice(t *testing.T) {
 		"Device should not exist in devices because it was not in config")
 }
 
+func TestOnStatusMsgNoMapContents(t *testing.T) {
+	handler := getTestHandler()
+	msg := Message{
+		DeviceID: "TestDevice",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "status",
+		Contents: []map[string]interface{}{
+			{
+				"testComponent0": true,
+			},
+		},
+	}
+	handler.updateStatus(msg)
+
+	_, ok := handler.Config.Devices["TestDevice"].Status["wrongComponent"]
+	assert.Equal(t, false, ok,
+		"status should not be updated because the status message did not have a map as contents")
+}
+
 func TestOnStatusMsgWrongComponent(t *testing.T) {
 	handler := getTestHandler()
 	msg := Message{

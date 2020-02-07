@@ -242,7 +242,7 @@ func TestOnConnectionMsgInvalid(t *testing.T) {
 	}
 	handler.onConnectionMsg(msg)
 	assert.Equal(t, false, handler.Config.Devices["TestDevice"].Connection,
-		"Device should not set connection to true on incorrect connection message")
+		"Device should not set connection to true on incorrect connection message, with no connected key in contents")
 }
 
 func TestOnConnectionMsgInvalid2(t *testing.T) {
@@ -256,7 +256,24 @@ func TestOnConnectionMsgInvalid2(t *testing.T) {
 	}
 	handler.onConnectionMsg(msg)
 	assert.Equal(t, false, handler.Config.Devices["TestDevice"].Connection,
-		"Device should not set connection to true on incorrect connection message")
+		"Device should not set connection to true on incorrect connection message, with no boolean connected value")
+}
+
+func TestOnConnectionMsgInvalid3(t *testing.T) {
+	handler := getTestHandler()
+	msg := Message{
+		DeviceID: "TestDevice",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "connection",
+		Contents: []map[string]interface{}{
+			{
+				"connected": "true",
+			},
+		},
+	}
+	handler.onConnectionMsg(msg)
+	assert.Equal(t, false, handler.Config.Devices["TestDevice"].Connection,
+		"Device should not set connection to true on incorrect connection message with no map value contents")
 }
 
 func TestMsgMapperConnection(t *testing.T) {
@@ -592,15 +609,15 @@ func TestGetMapSliceInvalidConfirmation(t *testing.T) {
 		DeviceID: "back-end",
 		TimeSent: "05-12-2019 09:42:10",
 		Type:     "confirmation",
-		Contents: []map[string]interface{}{
-			{"completed": true,
-				"instructed": map[string]interface{}{
-					"device_id": "front-end",
-					"contents":  "test",
-				}},
+		Contents: map[string]interface{}{
+			"completed": true,
+			"instructed": map[string]interface{}{
+				"device_id": "front-end",
+				"contents":  "test",
+			},
 		},
 	}
-	assert.Panics(t, func() { handler.onConfirmationMsg(msg) }, "Should throw error with invalid contents")
+	assert.NotPanics(t, func() { handler.onConfirmationMsg(msg) }, "Should log error with invalid contents")
 }
 
 func TestGetMapSliceInvalidInstruction(t *testing.T) {
