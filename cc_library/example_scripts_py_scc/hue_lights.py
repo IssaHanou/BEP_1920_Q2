@@ -1,7 +1,7 @@
 import json
 import os
 import time
-from copy import copy, deepcopy
+from copy import deepcopy
 
 import requests
 from sciler.device import Device
@@ -19,7 +19,6 @@ How to use Hue Lights with S.C.I.L.E.R.:
 
 
 class Spot:
-
     def __init__(self, x=0.3, y=0.3, bri=100):
         self.x = x
         self.y = y
@@ -65,16 +64,17 @@ class HueLights(Device):
 
     def test(self):
         params = json.dumps({"on": True, "bri": 200, "xy": [0.3, 0.3]})
-        url = (self.hue_bridge
-               + "api/"
-               + self.hue_user
-               + "/groups/"
-               + self.group
-               + "/action")
-        requests.put(url,
-                     data=params,
-                     headers=self.header,
-                     )
+        url = (
+            self.hue_bridge
+            + "api/"
+            + self.hue_user
+            + "/groups/"
+            + self.group
+            + "/action"
+        )
+        requests.put(
+            url, data=params, headers=self.header,
+        )
 
     def set_scene(self, data):
         self.scene = data.get("value")
@@ -144,14 +144,21 @@ class HueLights(Device):
         if all_spots_are_equal:
             print("CHANGING ALL")
             url = (
-                    self.hue_bridge
-                    + "api/"
-                    + self.hue_user
-                    + "/groups/"
-                    + self.group
-                    + "/action"
+                self.hue_bridge
+                + "api/"
+                + self.hue_user
+                + "/groups/"
+                + self.group
+                + "/action"
             )
-            params = json.dumps({"on": True, "bri": head.bri, "xy": [head.x, head.y], "transitiontime": 5})
+            params = json.dumps(
+                {
+                    "on": True,
+                    "bri": head.bri,
+                    "xy": [head.x, head.y],
+                    "transitiontime": 5,
+                }
+            )
             self.pub_to_hue(url, params)
         else:
             for i in range(len(self.spots)):
@@ -159,15 +166,21 @@ class HueLights(Device):
                 if current != previous[i]:
                     print("CHANGING", i)
                     url = (
-                            self.hue_bridge
-                            + "api/"
-                            + self.hue_user
-                            + "/lights/"
-                            + str(i + 1)
-                            + "/state"
+                        self.hue_bridge
+                        + "api/"
+                        + self.hue_user
+                        + "/lights/"
+                        + str(i + 1)
+                        + "/state"
                     )
                     params = json.dumps(
-                        {"on": True, "bri": current.bri, "xy": [current.x, current.y], "transitiontime": 5})
+                        {
+                            "on": True,
+                            "bri": current.bri,
+                            "xy": [current.x, current.y],
+                            "transitiontime": 5,
+                        }
+                    )
                     self.pub_to_hue(url, params)
 
     def pub_to_hue(self, url, params):
