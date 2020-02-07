@@ -501,7 +501,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
     if (puzzleName !== "") {
       puzzleName = ", over puzzel: " + puzzleName;
     }
-    if (topicToSend === "alle hint apparaten" || topicToSend === "") {
+    if (topicToSend === undefined || topicToSend === "alle hint apparaten" || topicToSend === "") {
       topicToSend = "hint"; // hints to all devices should be published to topic hint
     }
     this.sendInstruction([
