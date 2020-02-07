@@ -270,6 +270,7 @@ func (handler *Handler) onHint(jsonData map[string]interface{}, instructor strin
 	if jsonData["topic"] == nil || reflect.TypeOf(jsonData["topic"]).Kind() != reflect.String ||
 		jsonData["value"] == nil || reflect.TypeOf(jsonData["value"]).Kind() != reflect.String {
 		logger.Errorf("the hint instruction did not contain a string 'topic' or string 'value', but was %v", jsonData)
+		return
 	}
 	handler.sendInstruction(jsonData["topic"].(string), []map[string]string{{
 		"instruction":   "hint",
