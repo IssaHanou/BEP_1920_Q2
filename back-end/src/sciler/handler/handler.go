@@ -48,8 +48,27 @@ func (handler *Handler) NewHandler(client mqtt.Client, message mqtt.Message) {
 		logger.Errorf("invalid JSON received: %v", err)
 	} else {
 		logger.Debugf("message received: %v", raw)
-		handler.msgMapper(raw)
+		if ok := handler.checkContentsStructure(raw); ok {
+			handler.msgMapper(raw)
+		}
 	}
+}
+
+// checkContentsStructure check if instruction messages contents are in form of []map[string]interface
+// and other types of messages should have contents in form of map[string]interface
+func (handler *Handler) checkContentsStructure(raw Message) bool {
+	if raw.Type == "instruction" {
+		if reflect.TypeOf(raw.Contents) != reflect.TypeOf(make([]map[string]interface{}, 0)) {
+			logger.Errorf("instruction message not in correct format of []map[string]interface, but was %v", reflect.TypeOf(raw.Contents))
+			return false
+		}
+		return true
+	}
+	if reflect.TypeOf(raw.Contents) != reflect.TypeOf(make(map[string]interface{})) {
+		logger.Errorf("%s message not in correct format of map[string]interface, but was %v", raw.Type, reflect.TypeOf(raw.Contents))
+		return false
+	}
+	return true
 }
 
 // msgMapper sends the message through to the right function, filtering on Message.Type
@@ -98,10 +117,6 @@ func (handler *Handler) onStatusMsg(raw Message) {
 // After updating the connection status, the new status is send to the front-end
 // If the message is from the front-end, the SendSetup function is called
 func (handler *Handler) onConnectionMsg(raw Message) {
-	if reflect.TypeOf(raw.Contents) != reflect.TypeOf(make(map[string]interface{})) {
-		logger.Errorf("connection message not in correct format of map[string]interface, but was %v", reflect.TypeOf(raw.Contents))
-		return
-	}
 	contents := raw.Contents.(map[string]interface{})
 	device, ok := handler.Config.Devices[raw.DeviceID]
 	if !ok {
@@ -125,10 +140,6 @@ func (handler *Handler) onConnectionMsg(raw Message) {
 
 // If the message is properly structured, the success status of the instruction is logged
 func (handler *Handler) onConfirmationMsg(raw Message) {
-	if reflect.TypeOf(raw.Contents) != reflect.TypeOf(make(map[string]interface{})) {
-		logger.Errorf("confirmation message not in correct format of map[string]interface, but was %v", reflect.TypeOf(raw.Contents))
-		return
-	}
 	msg, value := handler.getConfirmationContents(raw)
 	if msg == nil {
 		return
