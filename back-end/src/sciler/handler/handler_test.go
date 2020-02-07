@@ -271,7 +271,7 @@ func TestOnConnectionMsgInvalid3(t *testing.T) {
 			},
 		},
 	}
-	handler.onConnectionMsg(msg)
+	handler.msgMapper(msg)
 	assert.Equal(t, false, handler.Config.Devices["TestDevice"].Connection,
 		"Device should not set connection to true on incorrect connection message with no map value contents")
 }

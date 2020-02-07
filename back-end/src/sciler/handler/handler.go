@@ -48,9 +48,7 @@ func (handler *Handler) NewHandler(client mqtt.Client, message mqtt.Message) {
 		logger.Errorf("invalid JSON received: %v", err)
 	} else {
 		logger.Debugf("message received: %v", raw)
-		if ok := handler.checkContentsStructure(raw); ok {
-			handler.msgMapper(raw)
-		}
+		handler.msgMapper(raw)
 	}
 }
 
@@ -74,26 +72,28 @@ func (handler *Handler) checkContentsStructure(raw Message) bool {
 // msgMapper sends the message through to the right function, filtering on Message.Type
 // If the type is not instruction, status, confirmation, or connection, an error is logged
 func (handler *Handler) msgMapper(raw Message) {
-	switch raw.Type {
-	case "instruction":
-		{
-			handler.onInstructionMsg(raw)
-		}
-	case "status":
-		{
-			handler.onStatusMsg(raw)
-		}
-	case "confirmation":
-		{
-			handler.onConfirmationMsg(raw)
-		}
-	case "connection":
-		{
-			handler.onConnectionMsg(raw)
-		}
-	default:
-		{
-			logger.Errorf("message received from %s, but no message type could be found for: %v", raw.DeviceID, raw.Type)
+	if ok := handler.checkContentsStructure(raw); ok {
+		switch raw.Type {
+		case "instruction":
+			{
+				handler.onInstructionMsg(raw)
+			}
+		case "status":
+			{
+				handler.onStatusMsg(raw)
+			}
+		case "confirmation":
+			{
+				handler.onConfirmationMsg(raw)
+			}
+		case "connection":
+			{
+				handler.onConnectionMsg(raw)
+			}
+		default:
+			{
+				logger.Errorf("message received from %s, but no message type could be found for: %v", raw.DeviceID, raw.Type)
+			}
 		}
 	}
 }

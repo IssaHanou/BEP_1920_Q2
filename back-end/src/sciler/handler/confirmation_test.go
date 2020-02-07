@@ -251,7 +251,7 @@ func TestOnConfirmationMsgIncorrect7(t *testing.T) {
 		},
 	}
 	before := handler.Config
-	handler.onConfirmationMsg(msg)
+	handler.msgMapper(msg)
 	assert.Equal(t, before, handler.Config,
 		"Device should not alter config upon invalid confirmation message with no map contents in the message")
 }

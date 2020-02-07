@@ -124,7 +124,7 @@ func TestOnStatusMsgNoMapContents(t *testing.T) {
 			},
 		},
 	}
-	handler.updateStatus(msg)
+	handler.msgMapper(msg)
 
 	_, ok := handler.Config.Devices["TestDevice"].Status["wrongComponent"]
 	assert.Equal(t, false, ok,
