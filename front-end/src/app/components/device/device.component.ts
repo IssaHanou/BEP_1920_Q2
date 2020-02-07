@@ -49,10 +49,14 @@ export class DeviceComponent implements OnInit {
   /**
    * Returns list of Comp objects with their current status.
    * For the front-end, only return the game state not the button pressed statuses.
+   * When devices are not intialized yet, return empty list.
    */
   public getComponentList(deviceId: string): Comp[] {
-    const status = this.app.deviceList.getDevice(deviceId).status;
-    if (deviceId === "front-end") {
+    if (this.app.deviceList.getDevice(deviceId) == null) {
+      return [];
+    }
+    const status = this.app.deviceList.getDevice(deviceId).statusMap;
+    if (deviceId === "front-end" && status.has("gameState")) {
       return [status.get("gameState")];
     }
     const ret = [];

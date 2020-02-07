@@ -120,6 +120,8 @@ func generateFrontendDevice(config *WorkingConfig) *Device {
 		status[btn.ID] = false
 	}
 	status["gameState"] = "gereed"
+	status["hintLog"] = []string{}
+	input["hintLog"] = "array"
 	return &(Device{
 		ID:          "front-end",
 		Description: "The operator webapp for managing a escape room",

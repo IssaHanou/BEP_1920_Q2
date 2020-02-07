@@ -141,6 +141,12 @@ func TestOnStatusMsgFrontEnd(t *testing.T) {
 		Contents: map[string]interface{}{
 			"stop": true},
 	}
+	eventStatusMessage, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		Type:     "event status",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Contents: nil,
+	})
 	timerGeneralMessage, _ := json.Marshal(Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
@@ -151,11 +157,12 @@ func TestOnStatusMsgFrontEnd(t *testing.T) {
 			"id":       "general",
 		},
 	})
+	communicatorMock.On("Publish", "front-end", string(eventStatusMessage), 3)
 	communicatorMock.On("Publish", "front-end", string(timerGeneralMessage), 3)
 	communicatorMock.On("Publish", "time", string(timerGeneralMessage), 3)
 	go handler.updateStatus(msg)
 	time.Sleep(100 * time.Millisecond)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
 }
 
 func TestOnStatusMsgWrongType(t *testing.T) {

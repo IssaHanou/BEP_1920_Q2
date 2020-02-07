@@ -39,7 +39,6 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   deviceList: Devices;
   allEventsList: Events;
   manageButtons: Buttons;
-  sentHints: string[];
   hintList: Hint[];
   configErrorList: string[];
   uploadedConfig = "";
@@ -106,10 +105,10 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
     this.hintList = [];
     this.configErrorList = [];
     this.cameras = [];
-    this.sentHints = [];
     this.timerList = new Timers();
     const generalTimer = { id: "general", duration: 0, state: "stateIdle" };
     this.timerList.setTimer(generalTimer);
+    this.resetFrontEndStatus();
   }
 
   /**
@@ -320,10 +319,10 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
   sendStatusFrontEnd() {
     const device = this.deviceList.getDevice("front-end");
     if (device != null) {
-      const statusMap = device.status;
+      const statusMap = device.statusMap;
       const statusMsg = {};
       for (const key of statusMap.keys()) {
-        statusMsg[key] = statusMap.get(key).status; // get the status from Comp
+        statusMsg[key] = statusMap.get(key).componentStatus; // get the status from Comp
       }
       this.sendStatus(statusMsg);
     }
@@ -338,6 +337,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
       statusMsg.set(key, false);
     }
     statusMsg.set("gameState", "gereed");
+    statusMsg.set("hintLog", []);
     this.deviceList.setDevice({
       id: "front-end",
       connection: true,
@@ -501,16 +501,6 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
     if (puzzleName !== "") {
       puzzleName = ", over puzzel: " + puzzleName;
     }
-    this.sentHints.push(
-      "Hint: " +
-        hint +
-        puzzleName +
-        ", verzonden naar: " +
-        topicToSend +
-        ", om: " +
-        this.getCurrentTime() +
-        "\n"
-    );
     if (topicToSend === "alle hint apparaten" || topicToSend === "") {
       topicToSend = "hint"; // hints to all devices should be published to topic hint
     }
@@ -521,6 +511,15 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
         topic: topicToSend
       }
     ]);
+    const hintMessage = "Hint: " +
+      hint +
+      puzzleName +
+      ", verzonden naar: " +
+      topicToSend +
+      ", om: " +
+      this.getCurrentTime();
+    this.deviceList.all.get("front-end").statusMap.get("hintLog").componentStatus.push(hintMessage);
+    this.sendStatusFrontEnd();
   }
 
   /**
