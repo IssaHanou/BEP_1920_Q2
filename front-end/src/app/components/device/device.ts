@@ -3,7 +3,7 @@
  */
 export class Device {
   id: string;
-  status: Map<string, Comp>;
+  statusMap: Map<string, Comp>;
   connection: boolean;
   description: string;
   labels: string[];
@@ -12,7 +12,7 @@ export class Device {
     this.id = jsonData.id;
     this.labels = jsonData.labels;
     this.description = jsonData.description;
-    this.status = new Map<string, Comp>();
+    this.statusMap = new Map<string, Comp>();
     if (jsonData.hasOwnProperty("status")) {
       this.updateStatus(jsonData.status);
     }
@@ -34,12 +34,11 @@ export class Device {
    * @param jsonStatus json object containing components as key with status as value.
    */
   updateStatus(jsonStatus) {
-    const keys = Object.keys(jsonStatus);
-    for (const key of keys) {
-      if (this.status.has(key)) {
-        this.status.get(key).status = jsonStatus[key];
+    for (const key of Object.keys(jsonStatus)) {
+      if (this.statusMap.has(key)) {
+        this.statusMap.get(key).componentStatus = jsonStatus[key];
       } else {
-        this.status.set(key, new Comp(key, jsonStatus[key]));
+        this.statusMap.set(key, new Comp(key, jsonStatus[key]));
       }
     }
   }
@@ -49,7 +48,7 @@ export class Device {
    * @param comp component id
    */
   getValue(comp) {
-    return this.status.get(comp);
+    return this.statusMap.get(comp);
   }
 }
 
@@ -58,10 +57,10 @@ export class Device {
  */
 export class Comp {
   id: string;
-  status: any;
+  componentStatus: any;
 
   constructor(id, status) {
     this.id = id;
-    this.status = status;
+    this.componentStatus = status;
   }
 }

@@ -109,7 +109,6 @@ func (handler *Handler) onStatusMsg(raw Message) {
 	}
 	handler.sendFrontEndStatus(raw)
 	handler.HandleEvent(raw.DeviceID)
-	handler.sendEventStatus()
 }
 
 // onConnectionMsg is the function to process connection messages from devices
@@ -309,6 +308,11 @@ func (handler *Handler) onFinishRule(ruleID string) {
 // hint in instructed when the front-end submits a hint
 // The parsed instruction parameters are only created in front-end, so additional checks are not necessary.
 func (handler *Handler) onHint(jsonData map[string]interface{}, instructor string) {
+	if jsonData["topic"] == nil || reflect.TypeOf(jsonData["topic"]).Kind() != reflect.String ||
+		jsonData["value"] == nil || reflect.TypeOf(jsonData["value"]).Kind() != reflect.String {
+		logger.Errorf("the hint instruction did not contain a string 'topic' or string 'value', but was %v", jsonData)
+		return
+	}
 	handler.sendInstruction(jsonData["topic"].(string), []map[string]string{{
 		"instruction":   "hint",
 		"value":         jsonData["value"].(string),
