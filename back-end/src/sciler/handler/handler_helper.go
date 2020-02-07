@@ -476,6 +476,9 @@ func compareType(valueType reflect.Kind, inputType string) error {
 // param status the incoming status needed to be type-checked
 // param component the component that should get that status
 func (handler *Handler) checkStatusType(device config.Device, status interface{}, component string) error {
+	if status == nil {
+		return fmt.Errorf("nil found as status for component %s", component)
+	}
 	valueType := reflect.TypeOf(status).Kind()
 	if inputType, ok := device.Input[component]; ok {
 		if err := compareType(valueType, inputType); err != nil {
