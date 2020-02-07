@@ -1,7 +1,6 @@
 import os
 from sciler.device import Device
 
-
 try:
     from evdev import InputDevice, categorize, ecodes
 except ImportError:
@@ -15,12 +14,19 @@ class Keypad(Device):
 
     def get_status(self):
         """
-        Returns status of all custom components, in json format.
+        Returns status of all custom components, in json format.90311031
+
         """
         if self.currentValue == "":
             return {"code": 0}
 
-        return {"code": int(self.currentValue)}
+        return {
+            "code": int(self.currentValue),
+            "scanned": [
+                self.scanned[len(self.scanned) - 2],
+                self.scanned[len(self.scanned) - 1],
+            ],
+        }
 
     def perform_instruction(self, contents):
         """
@@ -43,6 +49,7 @@ class Keypad(Device):
         Defines a reset sequence for device.
         """
         self.currentValue = ""
+        self.scanned = [0, 0]
         self.status_changed()
         self.log("reset")
 
@@ -53,6 +60,7 @@ class Keypad(Device):
         abs_file_path = os.path.abspath(os.path.realpath(abs_file_path))
         config = open(file=abs_file_path)
         super().__init__(config)
+        self.scanned = [0, 0]
 
     def main(self):
         """
@@ -77,11 +85,13 @@ class Keypad(Device):
     def reader_handle_result(self, result):
         self.log("Submitted code: {}".format(result))
         self.currentValue = result
+        self.scanned.append(eval(result))
         self.status_changed()
 
     def reader_status_changed(self, result):
         self.log("Current status: {}".format(result))
         self.currentValue = result
+        self.scanned.append(eval(result))
         self.status_changed()
 
 

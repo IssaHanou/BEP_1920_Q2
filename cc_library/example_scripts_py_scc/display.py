@@ -37,7 +37,13 @@ class Display(Device):
         self.status_changed()
 
     def show_time(self, data):
-        print(data.get("id"), "lasts", data.get("duration"),  "and is currently", data.get("state"))
+        print(
+            data.get("id"),
+            "lasts",
+            data.get("duration"),
+            "and is currently",
+            data.get("state"),
+        )
         self.status_changed()
 
     def reset(self):
