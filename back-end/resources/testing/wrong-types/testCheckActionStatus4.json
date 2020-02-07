@@ -1,0 +1,72 @@
+{
+  "general": {
+    "name": "Escape X",
+    "duration": "30m",
+    "host": "localhost",
+    "port": 1883
+  },
+  "timers": [],
+  "devices": [
+    {
+      "id": "tester",
+      "description": "test device",
+      "input": {},
+      "output": {
+        "light": {
+          "type": "string",
+          "instructions": {
+            "set color": "status"
+          }
+        }
+      }
+    }
+  ],
+  "puzzles": [
+    {
+      "name": "test",
+      "rules": [
+        {
+          "id": "test",
+          "description": "test",
+          "limit": 1,
+          "conditions": {
+            "operator": "AND",
+            "list": [
+              {
+                "type": "device",
+                "type_id": "tester",
+                "constraints": {
+                  "operator": "OR",
+                  "list": [
+                    {
+                      "component_id": "light",
+                      "comparison": "eq",
+                      "value": "blue"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "tester",
+              "message": [
+                {
+                  "component_id": "light",
+                  "instruction": "set color",
+                  "value": "tester.non existing component"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "hints": [
+        "Zet de schuiven nauwkeurig"
+      ]
+    }
+  ],
+  "general_events": []
+}

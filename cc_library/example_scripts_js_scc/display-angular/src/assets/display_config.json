@@ -1,6 +1,6 @@
 {
   "id": "display-angular",
   "host": "localhost",
-  "labels": ["hint"],
+  "labels": ["hint", "time"],
   "port": 8083
 }

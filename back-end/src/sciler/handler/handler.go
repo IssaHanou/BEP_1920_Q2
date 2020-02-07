@@ -38,48 +38,77 @@ type Handler struct {
 // The function processes the JSON payload and logs and error if this fails
 // The Message Mapper is called if the JSON is correct to process the contents
 func (handler *Handler) NewHandler(client mqtt.Client, message mqtt.Message) {
+	defer func() {
+		if r := recover(); r != nil {
+			logger.Panicf("Recovered panic: %v", r)
+		}
+	}()
 	var raw Message
 	if err := json.Unmarshal(message.Payload(), &raw); err != nil {
 		logger.Errorf("invalid JSON received: %v", err)
 	} else {
+		logger.Debugf("message received: %v", raw)
 		handler.msgMapper(raw)
 	}
+}
+
+// checkContentsStructure check if instruction messages contents are in form of []map[string]interface
+// and other types of messages should have contents in form of map[string]interface
+func (handler *Handler) checkContentsStructure(raw Message) bool {
+	if raw.Type == "instruction" {
+		if reflect.TypeOf(raw.Contents).Kind() != reflect.Slice {
+			logger.Errorf("instruction message not in correct format of []interface ([]map[string]interface), but was %v", reflect.TypeOf(raw.Contents))
+			return false
+		}
+		return true
+	}
+	if reflect.TypeOf(raw.Contents) != reflect.TypeOf(make(map[string]interface{})) {
+		logger.Errorf("%s message not in correct format of map[string]interface, but was %v", raw.Type, reflect.TypeOf(raw.Contents))
+		return false
+	}
+	return true
 }
 
 // msgMapper sends the message through to the right function, filtering on Message.Type
 // If the type is not instruction, status, confirmation, or connection, an error is logged
 func (handler *Handler) msgMapper(raw Message) {
-	switch raw.Type {
-	case "instruction":
-		{
-			handler.onInstructionMsg(raw)
-		}
-	case "status":
-		{
-			handler.onStatusMsg(raw)
-		}
-	case "confirmation":
-		{
-			handler.onConfirmationMsg(raw)
-		}
-	case "connection":
-		{
-			handler.onConnectionMsg(raw)
-		}
-	default:
-		{
-			logger.Errorf("message received from %s, but no message type could be found for: %v", raw.DeviceID, raw.Type)
+	if ok := handler.checkContentsStructure(raw); ok {
+		switch raw.Type {
+		case "instruction":
+			{
+				handler.onInstructionMsg(raw)
+			}
+		case "status":
+			{
+				handler.onStatusMsg(raw)
+			}
+		case "confirmation":
+			{
+				handler.onConfirmationMsg(raw)
+			}
+		case "connection":
+			{
+				handler.onConnectionMsg(raw)
+			}
+		default:
+			{
+				logger.Errorf("message received from %s, but no message type could be found for: %v", raw.DeviceID, raw.Type)
+			}
 		}
 	}
 }
 
 // onStatusMsg is the function to process status messages.
+// front-end sends status message with button = true, then immediately button = false,
+// and already updates its own state, faster than the back-end messages are received again,
+// so we don't send again, as otherwise it has already reset to false, then receives messages for true false again.
 func (handler *Handler) onStatusMsg(raw Message) {
 	handler.updateStatus(raw)
-	handler.sendStatus(raw.DeviceID)
+	if raw.DeviceID != "front-end" {
+		handler.sendStatus(raw.DeviceID)
+	}
 	handler.sendFrontEndStatus(raw)
 	handler.HandleEvent(raw.DeviceID)
-	handler.sendEventStatus()
 }
 
 // onConnectionMsg is the function to process connection messages from devices
@@ -108,32 +137,54 @@ func (handler *Handler) onConnectionMsg(raw Message) {
 	}
 }
 
-// onConfirmationMsg is the function to process confirmation messages.
 // If the message is properly structured, the success status of the instruction is logged
 func (handler *Handler) onConfirmationMsg(raw Message) {
-	contents := raw.Contents.(map[string]interface{})
-	value, ok := contents["completed"]
-	if !ok || reflect.TypeOf(value).Kind() != reflect.Bool {
-		logger.Errorf("received improperly structured confirmation message from device %s (no completed tag/boolean value)", raw.DeviceID)
+	msg, value := handler.getConfirmationContents(raw)
+	if msg == nil {
 		return
 	}
-	original, ok := contents["instructed"]
+	msgContents, ok := msg["contents"]
 	if !ok {
-		logger.Errorf("received improperly structured confirmation message from device %s (no structured tag)", raw.DeviceID)
+		logger.Errorf("received improperly structured confirmation message from device %s (there was no contents in the instructed msg value)", raw.DeviceID)
 		return
 	}
-	msg := original.(map[string]interface{})
-	instructionContents, err := getMapSlice(msg["contents"])
+	instructionContents, err := getMapSlice(msgContents)
 	if err != nil {
 		logger.Errorf(err.Error())
 		return
 	}
-	handler.forwardConfirmation(instructionContents, raw, value.(bool))
+	handler.forwardConfirmation(instructionContents, raw, value)
 
 	// If a message is received from a device,
 	// it can be concluded that the device has positive connection status,
 	// and thus it's connection status is set to true
 	handler.connected(raw.DeviceID)
+}
+
+// getConfirmationContents checks the information in the message to be properly structured and returns a nil content if otherwise.
+func (handler *Handler) getConfirmationContents(raw Message) (map[string]interface{}, bool) {
+	contents := raw.Contents.(map[string]interface{})
+	value, ok := contents["completed"]
+	if !ok {
+		logger.Errorf("received improperly structured confirmation message from device %s (no completed key)", raw.DeviceID)
+		return nil, false
+	}
+	if reflect.TypeOf(value).Kind() != reflect.Bool {
+		logger.Errorf("received improperly structured confirmation message from device %s (completed was not a boolean value)", raw.DeviceID)
+		return nil, false
+	}
+	original, ok := contents["instructed"]
+	if !ok {
+		logger.Errorf("received improperly structured confirmation message from device %s (no instructed key)", raw.DeviceID)
+		return nil, false
+	}
+
+	if reflect.TypeOf(original) != reflect.TypeOf(map[string]interface{}{}) {
+		logger.Errorf("received improperly structured confirmation message from device %s (instructed was not a map value)", raw.DeviceID)
+		return nil, false
+	}
+	msg := original.(map[string]interface{})
+	return msg, value.(bool)
 }
 
 // forwardConfirmation sends a received confirmation message on to the front-end
@@ -181,6 +232,7 @@ func (handler *Handler) onInstructionMsg(raw Message) {
 }
 
 // handleInstruction is the function to process an instruction given the ID of the instructor
+// The parsed instruction parameters are only created in front-end, so additional checks are not necessary.
 func (handler *Handler) handleInstruction(instruction map[string]interface{}, instructor string) {
 	switch instruction["instruction"] {
 	case "send setup":
@@ -194,7 +246,7 @@ func (handler *Handler) handleInstruction(instruction map[string]interface{}, in
 	case "finish rule":
 		handler.onFinishRule(instruction["rule"].(string))
 	case "hint":
-		handler.onHint(instruction["value"].(string), instructor)
+		handler.onHint(instruction, instructor)
 	case "check config":
 		handler.onCheckConfig(instruction["config"], instruction["name"].(string))
 	case "use config":
@@ -215,6 +267,9 @@ func (handler *Handler) onResetAll(deviceID string) {
 		"instruction":   "reset",
 		"instructed_by": deviceID,
 	}})
+	for _, timer := range handler.Config.Timers {
+		_ = timer.Stop()
+	}
 	handler.Config = config.ReadFile(handler.ConfigFile)
 	handler.SendSetup()
 }
@@ -237,7 +292,7 @@ func (handler *Handler) onTestDevice(deviceID string, instructor string) {
 	}})
 }
 
-// onResetAll is the function to process the instruction `finish rule`
+// onFinishRule is the function to process the instruction `finish rule`
 // finish rule is instructed when the "puzzel eindigen" button of a rule is clicked in the front-end
 func (handler *Handler) onFinishRule(ruleID string) {
 	rule, ok := handler.Config.RuleMap[ruleID]
@@ -251,10 +306,16 @@ func (handler *Handler) onFinishRule(ruleID string) {
 
 // onHint is the function to process the instruction `hint`
 // hint in instructed when the front-end submits a hint
-func (handler *Handler) onHint(hint string, instructor string) {
-	handler.sendInstruction("hint", []map[string]string{{
+// The parsed instruction parameters are only created in front-end, so additional checks are not necessary.
+func (handler *Handler) onHint(jsonData map[string]interface{}, instructor string) {
+	if jsonData["topic"] == nil || reflect.TypeOf(jsonData["topic"]).Kind() != reflect.String ||
+		jsonData["value"] == nil || reflect.TypeOf(jsonData["value"]).Kind() != reflect.String {
+		logger.Errorf("the hint instruction did not contain a string 'topic' or string 'value', but was %v", jsonData)
+		return
+	}
+	handler.sendInstruction(jsonData["topic"].(string), []map[string]string{{
 		"instruction":   "hint",
-		"value":         hint,
+		"value":         jsonData["value"].(string),
 		"instructed_by": instructor,
 	}})
 }

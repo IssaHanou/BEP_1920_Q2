@@ -12,9 +12,12 @@ This is the library to create devices to work together with the SCILER system
 - in order to do this:
     - implement `get_status()` which should return a dictionary of the current status
     - implement `perform_instruction(action)` which should return a boolean of whether the instruction can be performed, where action has:
-        - `instruction`: string with the name of the instruction
-        - `value`: any type with a value specific for this instruction
-        - `component_id`: string with the name of the component for which the instruction is meant (can be undefined) 
+        - `instruction`: string with the name of the instruction (special case `time`)
+        - `value`: any type with a value specific for this instruction (not in case of `time` instruction )
+        - `component_id`: string with the name of the component for which the instruction is meant (not in case of `time` instruction ) (can be undefined) 
+        - `id` in case of `time` instruction: string id of timer (`general` is the main duration of the escape room)
+        - `duration` in case of `time` instruction: integer in milliseconds
+        - `state` in case of `time` instruction: string of state of timer (`stateActive`, `stateIdle`, or `stateExpired`)    
     - implement `test()` which returns nothing, this method should do something visible so the operator can test this device works correctly
     - implement `reset()` which returns nothing, this method should make the device return to its starting state so that the escape room can be started again
     - create a constructor which calls the constructor of `Device` with `super(config, logger)` where:
@@ -110,6 +113,25 @@ example of `main()` with loop and stop:
         self.setup_events()
         self.start(loop=self.loop, stop=GPIO.cleanup)
 ```
+
+##### To run on boot
+- use tool like supervisord:
+- run `sudo apt-get install supervisor`
+- run `sudo nano /etc/supervisor/conf.d/<devicename>.conf` and save:
+```
+[program:devicename]
+directory=/home/pi
+command=python3 devicename.py
+user=pi
+group_name=pi
+stdout_logfile=/home/pi/sciler_logs/logs_devicename.txt
+redirect_stderr=true
+autostart=true
+autorestart=true
+```
+- run `sudo supervisorctl reread` and `sudo supervisorctl update`
+- run `sudo supervisorctl` to check status
+
 
 ## License
 This library is licensed with GNU GPL v3, see `LICENSE.md`.

@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
-import { Device } from "./device";
+import { Comp, Device } from "./device";
 import { AppComponent } from "../../app.component";
 import { MatSort, MatTableDataSource } from "@angular/material";
 
@@ -13,23 +13,20 @@ import { MatSort, MatTableDataSource } from "@angular/material";
 })
 export class DeviceComponent implements OnInit {
   /**
-   * The keys used by the table to retrieve data from the DataSource
+   * The keys used by the device table to retrieve data from the DataSource.
    */
-  deviceColumns: string[] = ["id", "connection", "component", "status", "test"];
-
+  deviceColumns: string[] = ["id", "connection", "unfold", "test"];
   /**
-   * Map keeping track of which rows are collapsed.
+   * The keys used by the component table to retrieve data from the component list.
    */
-  collapsed: Map<string, boolean>;
+  componentColumns: string[] = ["component", "status"];
 
   /**
    * Control the sorting of the table.
    */
   @ViewChild("DeviceTableSort", { static: true }) sort: MatSort;
 
-  constructor(private app: AppComponent) {
-    this.collapsed = new Map<string, boolean>();
-  }
+  constructor(private app: AppComponent) {}
 
   ngOnInit() {}
 
@@ -41,9 +38,6 @@ export class DeviceComponent implements OnInit {
     const devices: Device[] = [];
     for (const device of this.app.deviceList.all.values()) {
       devices.push(device);
-      if (!this.collapsed.has(device.id)) {
-        this.collapsed.set(device.id, false);
-      }
     }
     devices.sort((a: Device, b: Device) => a.id.localeCompare(b.id));
 
@@ -53,61 +47,41 @@ export class DeviceComponent implements OnInit {
   }
 
   /**
-   * Creates list of components (keys of status maps), in alphabetical order.
-   * Returns string with each component on new line.
-   * If components are collapsed, return default.
+   * Returns list of Comp objects with their current status.
+   * For the front-end, only return the game state not the button pressed statuses.
+   * When devices are not intialized yet, return empty list.
    */
-  getComponents(status: Map<string, any>, deviceId: string): any {
-    if (!this.collapsed.get(deviceId)) {
-      return "open onderdelen en status";
-    } else if (status.size === 0) {
-      return "geen status";
-    } else {
-      const keys = Array.from(status.keys());
-
-      keys.sort();
-      let result = "";
-      keys.forEach((key: string) => {
-        result += key + "\n";
-      });
-      return result;
+  public getComponentList(deviceId: string): Comp[] {
+    if (this.app.deviceList.getDevice(deviceId) == null) {
+      return [];
     }
+    const status = this.app.deviceList.getDevice(deviceId).statusMap;
+    if (deviceId === "front-end" && status.has("gameState")) {
+      return [status.get("gameState")];
+    }
+    const ret = [];
+    const keys = Array.from(status.keys());
+    keys.sort();
+    keys.forEach((key: string) => {
+      ret.push(status.get(key));
+    });
+    return ret;
   }
 
   /**
-   * Creates list of components (keys of status maps), in alphabetical order.
-   * Returns string with each component's value on new line.
-   * If components are collapse, return nothing.
+   * In the table, show the front-end as device with name "operator scherm".
    */
-  formatStatus(status: Map<string, any>, deviceId: string): string {
-    if (!this.collapsed.get(deviceId)) {
-      return "";
+  getName(deviceId: string): string {
+    if (deviceId === "front-end") {
+      return "operator scherm";
     } else {
-      const keys = Array.from(status.keys());
-      keys.sort();
-
-      let result = "";
-      keys.forEach((key: string) => {
-        const value = status.get(key);
-        if (Array.isArray(value)) {
-          result += "[";
-          for (let i = 0; i < value.length; i++) {
-            result += value[i];
-            if (i < value.length - 1) {
-              result += ",";
-            }
-          }
-          result += "]\n";
-        } else {
-          result += value + "\n";
-        }
-      });
-      return result;
+      return deviceId;
     }
   }
 
   /**
    * When button is pressed, test a single device.
+   * The test button can not be clicked when game is in play (timer is running).
    */
   testDevice(deviceId: string) {
     this.app.sendInstruction([
@@ -116,12 +90,9 @@ export class DeviceComponent implements OnInit {
   }
 
   /**
-   * Clicking a row should unfold the components and their statuses.
-   * Clicking again should collapse.
-   * @param row the row to collapse with full device data
+   * Returns the description of a device with id.
    */
-  collapseComponents(row) {
-    const oldValue = this.collapsed.get(row.id);
-    this.collapsed.set(row.id, !oldValue);
+  public getDeviceDescription(id: string) {
+    return this.app.deviceList.all.get(id).description;
   }
 }

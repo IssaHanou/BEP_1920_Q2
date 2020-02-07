@@ -25,6 +25,13 @@
           <p>level IV: systeem error: wanneer de nieuwe configuratie niet aansluit op de huidige configuratie
             omdat de broker host anders staat ingesteld.
             Deze error wordt gegooid in the MessageHandler, in checkConfig.</p>
+          <br>
+          <p>De "conditions" moet de volgende structuur hebben:</p>
+          <p>1. object met "type" (string), "type_id" (string), "constraints" (zie onder). of</p>
+          <p>2. object met "operator" (string), "list" ([]condition, zoals 1 of 2).</p>
+          <p>De "constraints" moet de volgende structuur hebben:</p>
+          <p>a. object met "component_id" (string), "comparison" (string), "value" (type gedefinieerd in config). of:</p>
+          <p>b. object met "operator" (string), "list" ([]constraint, coals a of b).</p>
         </mat-expansion-panel>
       </div>
       <div class="file-output-errors">

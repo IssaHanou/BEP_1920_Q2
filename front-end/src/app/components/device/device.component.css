@@ -1,15 +1,48 @@
-.mat-row:hover {
-  background-color: #DBDBDB;
-}
-
-.component-cell {
-  white-space: pre-line;
-}
+/*Keep space between component and its status*/
 .comp-pad-right {
   padding-right: 5px;
 }
 
+/*Styling the status expansion panels.*/
+::ng-deep .status-panel .mat-expansion-panel-body {
+  padding: 0;
+}
+.mat-expansion-panel {
+  background-color: #EEEEEE;
+}
+.mat-expansion-panel-header {
+  background-color: #EEEEEE;
+  height: 30px !important;
+}
+.panel-cell {
+  vertical-align: top;
+}
+.component-table .mat-row {
+  height: auto;
+}
+.component-table .mat-cell {
+  padding: 2px 2px 2px 2px;
+}
+.component-cell {
+  text-align: left;
+}
+.status-cell {
+  text-align: right;
+}
+
+/*Button columns should be button width.*/
+.test-column {
+  width: 64px;
+}
+
+/*With small screens, do not show test button*/
 @media only screen and (max-width: 470px) {
+  .test-column {
+    display: none;
+  }
+}
+
+@media only screen and (min-width: 700px) and (max-width: 900px) {
   .test-column {
     display: none;
   }

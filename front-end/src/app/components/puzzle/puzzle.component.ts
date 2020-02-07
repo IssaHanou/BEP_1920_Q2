@@ -1,7 +1,6 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
-import { MatSort, MatTableDataSource } from "@angular/material";
+import { Component, OnInit } from "@angular/core";
 import { AppComponent } from "../../app.component";
-import { Puzzle } from "./puzzle";
+import { EventsMethods } from "../EventsMethods";
 
 /**
  * The puzzle component controls the puzzles tables and is shown in the "Puzzels" box on the home page.
@@ -9,56 +8,57 @@ import { Puzzle } from "./puzzle";
 @Component({
   selector: "app-puzzle",
   templateUrl: "./puzzle.component.html",
-  styleUrls: ["./puzzle.component.css", "../../../assets/css/main.css"]
+  styleUrls: [
+    "./puzzle.component.css",
+    "../../../assets/css/main.css",
+    "./../events.css"
+  ],
+  providers: [EventsMethods]
 })
 export class PuzzleComponent implements OnInit {
   /**
-   * The keys used by the table to retrieve data from the DataSource
+   * Hint to send for a certain puzzle.
    */
-  puzzleColumns: string[] = ["id", "status", "description", "done"];
+  hint: string;
 
   /**
-   * Control the sorting of the table.
+   * Topic to which a hint must be sent.
    */
-  @ViewChild("PuzzleTableSort", { static: true }) sort: MatSort;
+  topic: string;
 
-  constructor(private app: AppComponent) {}
+  constructor(private app: AppComponent, private methods: EventsMethods) {
+    this.hint = "";
+    this.topic = "";
+  }
 
   ngOnInit() {}
 
   /**
-   * Returns list of Puzzle objects with their current status.
-   * Return in the form of map table data source, with sorting enabled.
+   * Hint list used for selection of predefined hints.
+   * This is generated each time from the app hint list, to ensure updated version.
    */
-  public getPuzzleStatus(): MatTableDataSource<Puzzle> {
-    const puzzles: Puzzle[] = [];
-    for (const puzzle of this.app.puzzleList.all.values()) {
-      puzzles.push(puzzle);
-    }
-    puzzles.sort((a: Puzzle, b: Puzzle) => a.id.localeCompare(b.id));
-
-    const dataSource = new MatTableDataSource<Puzzle>(puzzles);
-    dataSource.sort = this.sort;
-    return dataSource;
-  }
-
-  /**
-   * When button in the table is pressed, manually override the finished status of rule in back-end.
-   */
-  finishRule(ruleId: string) {
-    this.app.sendInstruction([{ instruction: "finish rule", rule: ruleId }]);
-  }
-
-  /**
-   * Only if the game is running can a rule be executed manually.
-   */
-  getGameStateInGame() {
-    const general = this.app.timerList.getTimer("general");
-    if (general !== null) {
-      if (general.getState() === "stateActive") {
-        return false;
+  getHintList(puzzle: string): string[] {
+    const list = [];
+    for (const obj of this.app.hintList) {
+      if (obj.puzzle === puzzle) {
+        for (const hint of obj.hints) {
+          list.push(hint);
+        }
+        return list;
       }
     }
-    return true;
+  }
+
+  /**
+   * When a hint has been chosen for a puzzle, a device (topic) has been chosen to send to
+   * and the accompanying send button is clicked,
+   * the selected hint is sent as instruction to hint devices.
+   */
+  onSelectedHint(puzzleName: string) {
+    if (this.hint !== undefined && this.hint !== "") {
+      this.app.sendHint(this.hint, this.topic, puzzleName);
+    }
+    this.hint = "";
+    this.topic = "";
   }
 }

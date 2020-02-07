@@ -6,7 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"math"
-	"sciler/communication"
 	"sciler/config"
 	"testing"
 	"time"
@@ -69,7 +68,9 @@ func getTestHandler() *Handler {
 		},
 	}
 	messageHandler := Handler{Config: workingConfig, ConfigFile: "fake file name"}
-	communicator := communication.NewCommunicator(workingConfig, messageHandler.NewHandler, func() {})
+	communicator := new(CommunicatorMock)
+	communicator.On("Publish", "front-end", mock.Anything, 3)
+	communicator.On("Publish", "time", mock.Anything, 3)
 	messageHandler.Communicator = communicator
 	return &messageHandler
 }
@@ -78,6 +79,7 @@ func getTestHandler() *Handler {
 func TestHandler_SetTimer_Start(t *testing.T) {
 	handler := getTestHandler()
 	content := config.ComponentInstruction{Instruction: "start"}
+
 	assert.Equal(t, "stateIdle", handler.Config.Timers["TestTimer"].State)
 	handler.SetTimer("TestTimer", content)
 	assert.Equal(t, "stateActive", handler.Config.Timers["TestTimer"].State)
@@ -226,7 +228,7 @@ func TestOnConnectionMsgFrontEnd(t *testing.T) {
 
 	communicatorMock.On("Publish", mock.AnythingOfType("string"), mock.AnythingOfType("string"), 3)
 	handler.msgMapper(msg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 8)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 9)
 }
 
 func TestOnConnectionMsgInvalid(t *testing.T) {
@@ -240,7 +242,7 @@ func TestOnConnectionMsgInvalid(t *testing.T) {
 	}
 	handler.onConnectionMsg(msg)
 	assert.Equal(t, false, handler.Config.Devices["TestDevice"].Connection,
-		"Device should not set connection to true on incorrect connection message")
+		"Device should not set connection to true on incorrect connection message, with no connected key in contents")
 }
 
 func TestOnConnectionMsgInvalid2(t *testing.T) {
@@ -254,7 +256,24 @@ func TestOnConnectionMsgInvalid2(t *testing.T) {
 	}
 	handler.onConnectionMsg(msg)
 	assert.Equal(t, false, handler.Config.Devices["TestDevice"].Connection,
-		"Device should not set connection to true on incorrect connection message")
+		"Device should not set connection to true on incorrect connection message, with no boolean connected value")
+}
+
+func TestOnConnectionMsgInvalid3(t *testing.T) {
+	handler := getTestHandler()
+	msg := Message{
+		DeviceID: "TestDevice",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "connection",
+		Contents: []map[string]interface{}{
+			{
+				"connected": "true",
+			},
+		},
+	}
+	handler.msgMapper(msg)
+	assert.Equal(t, false, handler.Config.Devices["TestDevice"].Connection,
+		"Device should not set connection to true on incorrect connection message with no map value contents")
 }
 
 func TestMsgMapperConnection(t *testing.T) {
@@ -396,7 +415,7 @@ func TestHandleSingleEvent(t *testing.T) {
 	communicatorMock.On("Publish", "controlBoard", string(messageInstruction), 3)
 	handler.msgMapper(msg)
 	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 4)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 5)
 	// if this test becomes flaky (only when this test takes longer then 1 second),
 	// (message expected includes time...), replace the messages with 'mock.Anything'
 }
@@ -445,7 +464,44 @@ func TestHandleDoubleEvent(t *testing.T) {
 	communicatorMock.On("Publish", "controlBoard", string(messageInstruction), 3)
 	handler.msgMapper(msg)
 	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 4)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 6)
+	// if this test becomes flaky (only when this test takes longer then 1 second),
+	// (message expected includes time...), replace the messages with 'mock.Anything'
+}
+
+func TestHandleActionWithStatus(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_sendStatusDeviceOnAction.json"),
+		Communicator: communicatorMock,
+	}
+	statusMsg := Message{
+		DeviceID: "colorMixer",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "status",
+		Contents: map[string]interface{}{
+			"color": "blue",
+		},
+	}
+
+	instructionMsg, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Type:     "instruction",
+		Contents: []map[string]interface{}{
+			{
+				"component_id": "light",
+				"instruction":  "set color",
+				"value":        "blue",
+			},
+		},
+	})
+
+	communicatorMock.On("Publish", "front-end", mock.AnythingOfType("string"), 3).Times(4)
+	communicatorMock.On("Publish", "tester", string(instructionMsg), 3).Once()
+	handler.msgMapper(statusMsg)
+	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 5)
 	// if this test becomes flaky (only when this test takes longer then 1 second),
 	// (message expected includes time...), replace the messages with 'mock.Anything'
 }
@@ -467,6 +523,23 @@ func TestMsgMapperIllegalType(t *testing.T) {
 	handler.msgMapper(msg)
 	assert.Equal(t, before, handler.Config,
 		"Nothing should have been changed after an incorrect message type")
+}
+
+func TestInvalidInstructionMessage(t *testing.T) {
+	handler := getTestHandler()
+	msg := Message{
+		DeviceID: "front-end",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "instruction",
+		Contents: map[string]interface{}{
+			"instruction": "send setup",
+		},
+	}
+
+	before := handler.Config
+	handler.msgMapper(msg)
+	assert.Equal(t, before, handler.Config,
+		"Nothing should have been changed after an incorrectly structured instruction message")
 }
 
 func TestLimitRule(t *testing.T) {
@@ -553,15 +626,15 @@ func TestGetMapSliceInvalidConfirmation(t *testing.T) {
 		DeviceID: "back-end",
 		TimeSent: "05-12-2019 09:42:10",
 		Type:     "confirmation",
-		Contents: []map[string]interface{}{
-			{"completed": true,
-				"instructed": map[string]interface{}{
-					"device_id": "front-end",
-					"contents":  "test",
-				}},
+		Contents: map[string]interface{}{
+			"completed": true,
+			"instructed": map[string]interface{}{
+				"device_id": "front-end",
+				"contents":  "test",
+			},
 		},
 	}
-	assert.Panics(t, func() { handler.onConfirmationMsg(msg) }, "Should throw error with invalid contents")
+	assert.NotPanics(t, func() { handler.onConfirmationMsg(msg) }, "Should log error with invalid contents")
 }
 
 func TestGetMapSliceInvalidInstruction(t *testing.T) {

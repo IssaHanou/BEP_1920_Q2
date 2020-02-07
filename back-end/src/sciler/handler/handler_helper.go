@@ -6,6 +6,7 @@ import (
 	logger "github.com/sirupsen/logrus"
 	"reflect"
 	"sciler/config"
+	"strings"
 	"time"
 )
 
@@ -22,9 +23,10 @@ func (handler *Handler) SendSetup() {
 		Contents: map[string]interface{}{
 			"name":    handler.Config.General.Name,
 			"hints":   handler.getHints(),
-			"events":  handler.getEventDescriptions(),
+			"events":  handler.getSetUpEvents(),
 			"cameras": handler.getCameras(),
 			"buttons": handler.getButtons(),
+			"devices": handler.getDeviceInformation(),
 		},
 	}
 	jsonMessage, _ := json.Marshal(&message)
@@ -74,6 +76,25 @@ func (handler *Handler) SendComponentInstruction(clientID string, instructions [
 		logger.Infof("sending instructions to %s: %s", clientID, fmt.Sprint(message.Contents))
 		handler.Communicator.Publish(clientID, string(jsonMessage), 3)
 	}
+}
+
+// PrepareMessage scans a message and if the instruction is of type status, if so the value of the message is replaced by the status of a device
+func (handler *Handler) PrepareMessage(typeID string, messages []config.ComponentInstruction) []config.ComponentInstruction {
+	res := make([]config.ComponentInstruction, len(messages))
+	device := handler.Config.Devices[typeID]
+	for i, message := range messages {
+		msg := message
+		instructionType := device.Output[message.ComponentID].Instructions[message.Instruction]
+		if instructionType == "status" { // when the instruction type is status
+			split := strings.Split(message.Value.(string), ".")
+			deviceID := split[0]
+			componentID := split[1]
+			status := handler.Config.Devices[deviceID].Status[componentID]
+			msg.Value = status // set status of message to retrieved status
+		}
+		res[i] = msg
+	}
+	return res
 }
 
 // SendLabelInstruction provides the action with a componentID from de LabelMap and a device to send it to
@@ -181,6 +202,7 @@ func (handler *Handler) sendStatusTimer(timer *config.Timer) {
 	jsonMessage, _ := json.Marshal(&message)
 	logger.Infof("sending status data to front-end: %v", message.Contents)
 	handler.Communicator.Publish("front-end", string(jsonMessage), 3)
+	handler.Communicator.Publish("time", string(jsonMessage), 3)
 }
 
 // HandleEvent is a function that checks and possible executes all rules according to the given device/rule/timer
@@ -195,6 +217,7 @@ func (handler *Handler) HandleEvent(id string) {
 			}
 		}
 	}
+	handler.sendEventStatus()
 }
 
 // sendEventStatus sends the status of events to the front-end
@@ -253,6 +276,12 @@ func (handler *Handler) getEventStatus() []map[string]interface{} {
 		status["status"] = rule.Finished()
 		list = append(list, status)
 	}
+	for _, rule := range handler.Config.PuzzleRuleMap {
+		var status = make(map[string]interface{})
+		status["id"] = rule.ID
+		status["status"] = rule.Finished()
+		list = append(list, status)
+	}
 	return list
 }
 
@@ -265,13 +294,61 @@ func (handler *Handler) getHints() map[string][]string {
 	return hints
 }
 
-// getEventDescriptions returns a map of hints with puzzle name as key and list of hints for that puzzle as value
-func (handler *Handler) getEventDescriptions() map[string]string {
-	events := make(map[string]string)
+// getSetUpEvents returns a map of rules with the rule id, description and status,
+// an additional parameter whether or not the rule belongs to a puzzle,
+// and the name of the puzzle/general event that the rule belongs to
+func (handler *Handler) getSetUpEvents() []map[string]interface{} {
+	events := make([]map[string]interface{}, 0)
 	for _, rule := range handler.Config.EventRuleMap {
-		events[rule.ID] = rule.Description
+		status := getMapWithStatusInfo(rule)
+		status["puzzle"] = false
+		status["eventName"] = findEventName(rule.ID, handler.Config.GeneralEvents)
+		events = append(events, status)
+	}
+	for _, rule := range handler.Config.PuzzleRuleMap {
+		status := getMapWithStatusInfo(rule)
+		status["puzzle"] = true
+		status["eventName"] = findPuzzleName(rule.ID, handler.Config.Puzzles)
+		events = append(events, status)
 	}
 	return events
+}
+
+// findEventName finds the name of the general event that idToFind belongs to
+func findEventName(idToFind string, eventsToSearch []*config.GeneralEvent) string {
+	nameFound := ""
+	for _, event := range eventsToSearch {
+		for _, rule := range event.GetRules() {
+			if rule.ID == idToFind {
+				nameFound = event.GetName()
+				break
+			}
+		}
+	}
+	return nameFound
+}
+
+// findPuzzleName finds the name of the puzzle that idToFind belongs to
+func findPuzzleName(idToFind string, eventsToSearch []*config.Puzzle) string {
+	nameFound := ""
+	for _, event := range eventsToSearch {
+		for _, rule := range event.GetRules() {
+			if rule.ID == idToFind {
+				nameFound = event.GetName()
+				break
+			}
+		}
+	}
+	return nameFound
+}
+
+// Create a map and set the rule's id, description and status properties.
+func getMapWithStatusInfo(rule *config.Rule) map[string]interface{} {
+	var status = make(map[string]interface{})
+	status["id"] = rule.ID
+	status["description"] = rule.Description
+	status["status"] = rule.Finished()
+	return status
 }
 
 // getCameras returns a map with camera name and camera link
@@ -297,6 +374,24 @@ func (handler *Handler) getButtons() []map[string]interface{} {
 		buttons = append(buttons, button)
 	}
 	return buttons
+}
+
+// getDeviceLabels return a list of maps
+// Each map has the id, description and a list of labels it from that device
+func (handler *Handler) getDeviceInformation() []map[string]interface{} {
+	var list []map[string]interface{}
+	for _, device := range handler.Config.Devices {
+		deviceMap := make(map[string]interface{})
+		labels := make([]string, 0)
+		for _, output := range device.Output {
+			labels = append(labels, output.Label...)
+		}
+		deviceMap["id"] = device.ID
+		deviceMap["description"] = device.Description
+		deviceMap["labels"] = labels
+		list = append(list, deviceMap)
+	}
+	return list
 }
 
 // GetStatus asks devices to send status
@@ -382,6 +477,9 @@ func compareType(valueType reflect.Kind, inputType string) error {
 // param status the incoming status needed to be type-checked
 // param component the component that should get that status
 func (handler *Handler) checkStatusType(device config.Device, status interface{}, component string) error {
+	if status == nil {
+		return fmt.Errorf("nil found as status for component %s", component)
+	}
 	valueType := reflect.TypeOf(status).Kind()
 	if inputType, ok := device.Input[component]; ok {
 		if err := compareType(valueType, inputType); err != nil {

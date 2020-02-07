@@ -4,18 +4,19 @@ import { MqttModule, MqttService } from "ngx-mqtt";
 import { MQTT_SERVICE_OPTIONS } from "../../app.module";
 import { FormsModule } from "@angular/forms";
 import { AppComponent } from "../../app.component";
-import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { Overlay } from "@angular/cdk/overlay";
 import {
   MatFormFieldModule,
   MatInputModule,
   MatPaginatorModule,
+  MatTooltipModule,
+  MatIconModule,
   MatSortModule,
-  MatTableDataSource,
+  MatExpansionModule,
   MatTableModule
 } from "@angular/material";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { Device } from "./device";
 
 describe("DeviceComponent", () => {
   let component: DeviceComponent;
@@ -31,7 +32,9 @@ describe("DeviceComponent", () => {
         MatPaginatorModule,
         MatFormFieldModule,
         MatInputModule,
-        MatSnackBarModule,
+        MatTooltipModule,
+        MatIconModule,
+        MatExpansionModule,
         BrowserAnimationsModule
       ],
       declarations: [DeviceComponent],
@@ -59,8 +62,7 @@ describe("DeviceComponent", () => {
     const tableHeaders = compiled.querySelectorAll("th");
     expect(tableHeaders.item(0).textContent).toContain("Apparaat");
     expect(tableHeaders.item(1).textContent).toContain("Connectie");
-    expect(tableHeaders.item(2).textContent).toContain("Onderdeel");
-    expect(tableHeaders.item(3).textContent).toContain("Status");
-    expect(tableHeaders.item(4).textContent).toContain("Test");
+    expect(tableHeaders.item(2).textContent).toContain("Laat status zien");
+    expect(tableHeaders.item(3).textContent).toContain("Test");
   });
 });

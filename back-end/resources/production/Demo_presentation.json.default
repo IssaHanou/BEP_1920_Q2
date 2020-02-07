@@ -1,0 +1,1919 @@
+{
+  "button_events": [
+    {
+      "actions": [
+        {
+          "message": [
+            {
+              "instruction": "start"
+            }
+          ],
+          "type": "timer",
+          "type_id": "general"
+        },
+        {
+          "message": [
+            {
+              "component_id": "gameState",
+              "instruction": "set state",
+              "value": "in spel"
+            }
+          ],
+          "type": "device",
+          "type_id": "front-end"
+        },
+        {
+          "message": [
+            {
+              "component_id": "hint",
+              "instruction": "hint",
+              "value": "Before you get started, set the lights on a nice bright white light"
+            }
+          ],
+          "type": "device",
+          "type_id": "display"
+        },
+        {
+          "message": [
+            {
+              "component_id": "all",
+              "instruction": "manual",
+              "value": [
+                true,
+                0,
+                [
+                  0,
+                  0
+                ]
+              ]
+            }
+          ],
+          "type": "device",
+          "type_id": "hue_lights"
+        }
+      ],
+      "conditions": {},
+      "description": "start het spel",
+      "id": "start",
+      "limit": 0
+    },
+    {
+      "actions": [
+        {
+          "message": [
+            {
+              "component_id": "gameState",
+              "instruction": "set state",
+              "value": "spel gestopt"
+            }
+          ],
+          "type": "device",
+          "type_id": "front-end"
+        },
+        {
+          "message": [
+            {
+              "instruction": "stop"
+            }
+          ],
+          "type": "timer",
+          "type_id": "general"
+        }
+      ],
+      "conditions": {},
+      "description": "stop het spel",
+      "id": "stop",
+      "limit": 1
+    },
+    {
+      "actions": [
+        {
+          "message": [
+            {
+              "instruction": "add",
+              "value": "1m"
+            }
+          ],
+          "type": "timer",
+          "type_id": "general"
+        }
+      ],
+      "conditions": {
+      },
+      "description": "add 1 min to general",
+      "id": "+ 1 min",
+      "limit": 0
+    }
+  ],
+  "cameras": [
+    {
+      "link": "http://192.168.1.102/live_view.html",
+      "name": "LETTERLIJK een camera"
+    }
+  ],
+  "devices": [
+    {
+      "description": "Control board with three switches, three slides with lights and one main switch.",
+      "id": "controlBoard",
+      "input": {
+        "greenSwitch": "boolean",
+        "mainSwitch": "boolean",
+        "orangeSwitch": "boolean",
+        "redSwitch": "boolean",
+        "slider1": "numeric",
+        "slider2": "numeric",
+        "slider3": "numeric"
+      },
+      "output": {
+        "greenLight1": {
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          },
+          "type": "string"
+        },
+        "greenLight2": {
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          },
+          "type": "string"
+        },
+        "greenLight3": {
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          },
+          "type": "string"
+        },
+        "redLight1": {
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          },
+          "type": "string"
+        },
+        "redLight2": {
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          },
+          "type": "string"
+        },
+        "redLight3": {
+          "instructions": {
+            "blink": "array",
+            "turnOnOff": "boolean"
+          },
+          "type": "string"
+        }
+      }
+    },
+    {
+      "description": "displays messages",
+      "id": "display",
+      "input": {},
+      "output": {
+        "hint": {
+          "instructions": {
+            "hint": "string"
+          },
+          "type": "string",
+          "label": ["hint"]
+        }
+      }
+    },
+    {
+      "description": "Whatsapp1 van de spelers",
+      "id": "Whatsapp1",
+      "input": {
+        "currentPerson": "string",
+        "messages": "array",
+        "speler-bericht": "string",
+        "submit": "boolean",
+        "typing": "string"
+      },
+      "output": {
+        "hint": {
+          "instructions": {
+            "hint": "string"
+          },
+          "label": [
+            "hint",
+            "whatsapp",
+            "hint1"
+          ],
+          "type": "string"
+        },
+        "person": {
+          "instructions": {
+            "tekst": "string"
+          },
+          "label": [
+            "whatsapp",
+            "person"
+          ],
+          "type": "string"
+        }
+      }
+    },
+    {
+      "description": "Whatsapp2 van de spelers",
+      "id": "Whatsapp2",
+      "input": {
+        "currentPerson": "string",
+        "messages": "array",
+        "speler-bericht": "string",
+        "submit": "boolean",
+        "typing": "string"
+      },
+      "output": {
+        "hint": {
+          "instructions": {
+            "hint": "string"
+          },
+          "label": [
+            "hint",
+            "whatsapp",
+            "hint2"
+          ],
+          "type": "string"
+        },
+        "person": {
+          "instructions": {
+            "tekst": "string"
+          },
+          "label": [
+            "whatsapp",
+            "person"
+          ],
+          "type": "string"
+        }
+      }
+    },
+    {
+      "description": "Whatsapp3 van de spelers",
+      "id": "Whatsapp3",
+      "input": {
+        "currentPerson": "string",
+        "messages": "array",
+        "speler-bericht": "string",
+        "submit": "boolean",
+        "typing": "string"
+      },
+      "output": {
+        "hint": {
+          "instructions": {
+            "hint": "string"
+          },
+          "label": [
+            "hint",
+            "whatsapp",
+            "hint3"
+          ],
+          "type": "string"
+        },
+        "person": {
+          "instructions": {
+            "tekst": "string"
+          },
+          "label": [
+            "whatsapp",
+            "person"
+          ],
+          "type": "string"
+        }
+      }
+    },
+    {
+      "description": "Whatsapp4 van de spelers",
+      "id": "Whatsapp4",
+      "input": {
+        "currentPerson": "string",
+        "messages": "array",
+        "speler-bericht": "string",
+        "submit": "boolean",
+        "typing": "string"
+      },
+      "output": {
+        "hint": {
+          "instructions": {
+            "hint": "string"
+          },
+          "label": [
+            "hint",
+            "whatsapp",
+            "hint3"
+          ],
+          "type": "string"
+        },
+        "person": {
+          "instructions": {
+            "tekst": "string"
+          },
+          "label": [
+            "whatsapp",
+            "person"
+          ],
+          "type": "string"
+        }
+      }
+    },
+    {
+      "description": "Keypad with input 8 numbers",
+      "id": "keypad",
+      "input": {
+        "code": "numeric",
+        "scanned": "array"
+      },
+      "output": {}
+    },
+    {
+      "description": "barcode scanner with input 8 numbers",
+      "id": "barcode scanner",
+      "input": {
+        "code": "numeric",
+        "scanned": "array"
+      },
+      "output": {}
+    },
+    {
+      "description": "nfc with input 8 numbers",
+      "id": "epische_bep_nfc_scanner_1",
+      "input": {
+        "tag": "string"
+      },
+      "output": {}
+    },
+    {
+      "description": "nfc with input 8 numbers",
+      "id": "epische_bep_nfc_scanner_2",
+      "input": {
+        "tag": "string"
+      },
+      "output": {}
+    },
+    {
+      "description": "4 spotlights",
+      "id": "hue_lights",
+      "input": {},
+      "output": {
+        "all": {
+          "instructions": {
+            "bri": "status",
+            "manual": "array",
+            "scene": "string",
+            "up bri": "numeric",
+            "x": "status",
+            "y": "status"
+          },
+          "type": "string"
+        },
+        "spot1": {
+          "instructions": {
+            "bri": "status",
+            "manual": "array",
+            "x": "status",
+            "y": "status"
+          },
+          "type": "string"
+        },
+        "spot2": {
+          "instructions": {
+            "bri": "status",
+            "manual": "array",
+            "x": "status",
+            "y": "status"
+          },
+          "type": "string"
+        },
+        "spot3": {
+          "instructions": {
+            "bri": "status",
+            "manual": "array",
+            "x": "status",
+            "y": "status"
+          },
+          "type": "string"
+        },
+        "spot4": {
+          "instructions": {
+            "bri": "status",
+            "manual": "array",
+            "x": "status",
+            "y": "status"
+          },
+          "type": "string"
+        }
+      }
+    }
+  ],
+  "general": {
+    "duration": "5m",
+    "host": "192.168.1.103",
+    "name": "Demo Presentatie",
+    "port": 1883
+  },
+  "general_events": [
+    {
+      "name": "Stop Time up",
+      "rules": [
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "instruction": "hint",
+                  "value": "Je tijd is voorbij!"
+                }
+              ],
+              "type": "label",
+              "type_id": "hint"
+            }
+          ],
+          "conditions": {
+            "constraints": {
+              "comparison": "eq",
+              "value": true
+            },
+            "type": "timer",
+            "type_id": "general"
+          },
+          "description": "Na de duration van het spel faalt de groep",
+          "id": "time up",
+          "limit": 1
+        }
+      ]
+    },
+    {
+      "name": "Stop Done",
+      "rules": [
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "instruction": "hint",
+                  "value": "Puzzle opgelost!"
+                }
+              ],
+              "type": "label",
+              "type_id": "hint"
+            },
+            {
+              "message": [
+                {
+                  "instruction": "pause"
+                }
+              ],
+              "type": "timer",
+              "type_id": "general"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                },
+                "type": "rule",
+                "type_id": "hue-nice"
+              },
+              {
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                },
+                "type": "rule",
+                "type_id": "Alles goed"
+              },
+              {
+                "constraints": {
+                  "comparison": "gte",
+                  "value": 1
+                },
+                "type": "rule",
+                "type_id": "Logica goed"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "Puzzles zijn opgelost dus time stop",
+          "id": "Puzzles done",
+          "limit": 1
+        }
+      ]
+    }
+  ],
+  "puzzles": [
+    {
+      "hints": [
+        "Zet de schuiven nauwkeurig"
+      ],
+      "name": "puzzel licht",
+      "rules": [
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "instruction": "hint",
+                  "value": "Licht staat mooi!"
+                }
+              ],
+              "type": "label",
+              "type_id": "hint"
+            },
+            {
+              "message": [
+                {
+                  "component_id": "person",
+                  "instruction": "tekst",
+                  "value": "Which netwerk protocol is used in this system?"
+                }
+              ],
+              "type": "device",
+              "type_id": "Whatsapp1"
+            },
+            {
+              "message": [
+                {
+                  "component_id": "person",
+                  "instruction": "tekst",
+                  "value": "What type of information does the back-end need to check rule’s conditions?"
+                }
+              ],
+              "type": "device",
+              "type_id": "Whatsapp2"
+            },
+            {
+              "message": [
+                {
+                  "component_id": "person",
+                  "instruction": "tekst",
+                  "value": "On what device does our back-end run?"
+                }
+              ],
+              "type": "device",
+              "type_id": "Whatsapp3"
+            },
+            {
+              "message": [
+                {
+                  "component_id": "person",
+                  "instruction": "tekst",
+                  "value": "What does the S in SCILER mean?"
+                }
+              ],
+              "type": "device",
+              "type_id": "Whatsapp4"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "lte",
+                      "component_id": "slider1",
+                      "value": 100
+                    },
+                    {
+                      "comparison": "gte",
+                      "component_id": "slider1",
+                      "value": 80
+                    },
+                    {
+                      "comparison": "lte",
+                      "component_id": "slider2",
+                      "value": 25
+                    },
+                    {
+                      "comparison": "gte",
+                      "component_id": "slider2",
+                      "value": 15
+                    },
+                    {
+                      "comparison": "lte",
+                      "component_id": "slider3",
+                      "value": 25
+                    },
+                    {
+                      "comparison": "gte",
+                      "component_id": "slider3",
+                      "value": 15
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "controlBoard"
+              },
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "component_id": "gameState",
+                      "value": "in spel"
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "front-end"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "Wanneer de hue lights mooi staan, is de puzzle opgelost",
+          "id": "hue-nice",
+          "limit": 1
+        },
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "all",
+                  "instruction": "bri",
+                  "value": "controlBoard.slider1"
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "lte",
+                      "component_id": "slider1",
+                      "value": 100
+                    },
+                    {
+                      "comparison": "gte",
+                      "component_id": "slider1",
+                      "value": 0
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "controlBoard"
+              },
+              {
+                "constraints": {
+                  "comparison": "eq",
+                  "component_id": "gameState",
+                  "value": "in spel"
+                },
+                "type": "device",
+                "type_id": "front-end"
+              },
+              {
+                "constraints": {
+                  "comparison": "eq",
+                  "value": 0
+                },
+                "type": "rule",
+                "type_id": "hue-nice"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "Wanneer slider1 beweegt, pas brightness aan",
+          "id": "hue-bri",
+          "limit": 0
+        },
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "all",
+                  "instruction": "x",
+                  "value": "controlBoard.slider2"
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "lte",
+                      "component_id": "slider2",
+                      "value": 100
+                    },
+                    {
+                      "comparison": "gte",
+                      "component_id": "slider2",
+                      "value": 0
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "controlBoard"
+              },
+              {
+                "constraints": {
+                  "comparison": "eq",
+                  "component_id": "gameState",
+                  "value": "in spel"
+                },
+                "type": "device",
+                "type_id": "front-end"
+              },
+              {
+                "constraints": {
+                  "comparison": "eq",
+                  "value": 0
+                },
+                "type": "rule",
+                "type_id": "hue-nice"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "Wanneer slider2 beweegt, pas x aan",
+          "id": "hue-x",
+          "limit": 0
+        },
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "all",
+                  "instruction": "y",
+                  "value": "controlBoard.slider3"
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "lte",
+                      "component_id": "slider3",
+                      "value": 100
+                    },
+                    {
+                      "comparison": "gte",
+                      "component_id": "slider3",
+                      "value": 0
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "controlBoard"
+              },
+              {
+                "constraints": {
+                  "comparison": "eq",
+                  "component_id": "gameState",
+                  "value": "in spel"
+                },
+                "type": "device",
+                "type_id": "front-end"
+              },
+              {
+                "constraints": {
+                  "comparison": "eq",
+                  "value": 0
+                },
+                "type": "rule",
+                "type_id": "hue-nice"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "Wanneer slider3 beweegt, pas y aan",
+          "id": "hue-y",
+          "limit": 0
+        }
+      ]
+    },
+    {
+      "hints": [
+        "doe beter je best"
+      ],
+      "name": "puzzel whatsapp",
+      "rules": [
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "spot1",
+                  "instruction": "manual",
+                  "value": [
+                    true,
+                    100,
+                    [
+                      0,
+                      0.7
+                    ]
+                  ]
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
+            },
+            {
+              "message": [
+                {
+                  "component_id": "person",
+                  "instruction": "tekst",
+                  "value": "Goed antwoord!"
+                }
+              ],
+              "type": "device",
+              "type_id": "Whatsapp1"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "component_id": "speler-bericht",
+                      "value": "mqtt"
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "speler-bericht",
+                      "value": "MQTT"
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "speler-bericht",
+                      "value": "M.Q.T.T."
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "speler-bericht",
+                      "value": "mqtt."
+                    }
+                  ],
+                  "operator": "OR"
+                },
+                "type": "device",
+                "type_id": "Whatsapp1"
+              },
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "gte",
+                      "value": 1
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "rule",
+                "type_id": "hue-nice"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "vraag 1 is beantwoord",
+          "id": "Vraag 1",
+          "limit": 1
+        },
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "spot2",
+                  "instruction": "manual",
+                  "value": [
+                    true,
+                    100,
+                    [
+                      0,
+                      0.7
+                    ]
+                  ]
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
+            },
+            {
+              "message": [
+                {
+                  "component_id": "person",
+                  "instruction": "tekst",
+                  "value": "Goed antwoord!"
+                }
+              ],
+              "type": "device",
+              "type_id": "Whatsapp2"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "component_id": "speler-bericht",
+                      "value": "status"
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "speler-bericht",
+                      "value": "status message"
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "speler-bericht",
+                      "value": "status device"
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "speler-bericht",
+                      "value": "a status"
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "speler-bericht",
+                      "value": "status of a device"
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "speler-bericht",
+                      "value": "the status"
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "speler-bericht",
+                      "value": "a status message"
+                    }
+                  ],
+                  "operator": "OR"
+                },
+                "type": "device",
+                "type_id": "Whatsapp2"
+              },
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "gte",
+                      "value": 1
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "rule",
+                "type_id": "hue-nice"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "vraag 2 is beantwoord",
+          "id": "Vraag 2",
+          "limit": 1
+        },
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "spot3",
+                  "instruction": "manual",
+                  "value": [
+                    true,
+                    100,
+                    [
+                      0,
+                      0.7
+                    ]
+                  ]
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
+            },
+            {
+              "message": [
+                {
+                  "component_id": "person",
+                  "instruction": "tekst",
+                  "value": "Goed antwoord!"
+                }
+              ],
+              "type": "device",
+              "type_id": "Whatsapp3"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "component_id": "speler-bericht",
+                      "value": "raspberry pi 4"
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "speler-bericht",
+                      "value": "Raspberry Pi 4"
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "speler-bericht",
+                      "value": "pi 4"
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "speler-bericht",
+                      "value": "Pi 4"
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "speler-bericht",
+                      "value": "raspberry pi"
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "speler-bericht",
+                      "value": "Raspberry Pi"
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "speler-bericht",
+                      "value": "pi"
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "speler-bericht",
+                      "value": "Pi"
+                    }
+                  ],
+                  "operator": "OR"
+                },
+                "type": "device",
+                "type_id": "Whatsapp3"
+              },
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "gte",
+                      "value": 1
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "rule",
+                "type_id": "hue-nice"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "vraag 3 is beantwoord",
+          "id": "Vraag 3",
+          "limit": 1
+        },
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "spot4",
+                  "instruction": "manual",
+                  "value": [
+                    true,
+                    100,
+                    [
+                      0,
+                      0.7
+                    ]
+                  ]
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
+            },
+            {
+              "message": [
+                {
+                  "component_id": "person",
+                  "instruction": "tekst",
+                  "value": "Goed antwoord!"
+                }
+              ],
+              "type": "device",
+              "type_id": "Whatsapp4"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "component_id": "speler-bericht",
+                      "value": "Sensory"
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "speler-bericht",
+                      "value": "sensory"
+                    }
+                  ],
+                  "operator": "OR"
+                },
+                "type": "device",
+                "type_id": "Whatsapp4"
+              },
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "gte",
+                      "value": 1
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "rule",
+                "type_id": "hue-nice"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "vraag 4 is beantwoord",
+          "id": "Vraag 4",
+          "limit": 1
+        },
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "spot1",
+                  "instruction": "manual",
+                  "value": [
+                    true,
+                    100,
+                    [
+                      1,
+                      0
+                    ]
+                  ]
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "not",
+                      "component_id": "speler-bericht",
+                      "value": "mqtt"
+                    },
+                    {
+                      "comparison": "not",
+                      "component_id": "speler-bericht",
+                      "value": "MQTT"
+                    },
+                    {
+                      "comparison": "not",
+                      "component_id": "speler-bericht",
+                      "value": "M.Q.T.T."
+                    },
+                    {
+                      "comparison": "not",
+                      "component_id": "speler-bericht",
+                      "value": "mqtt."
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "Whatsapp1"
+              },
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "gte",
+                      "value": 1
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "rule",
+                "type_id": "hue-nice"
+              },
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "value": 0
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "rule",
+                "type_id": "Vraag 1"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "vraag 1 is fout beantwoord",
+          "id": "Vraag 1 fout",
+          "limit": 0
+        },
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "spot2",
+                  "instruction": "manual",
+                  "value": [
+                    true,
+                    100,
+                    [
+                      1,
+                      0
+                    ]
+                  ]
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "not",
+                      "component_id": "speler-bericht",
+                      "value": "status"
+                    },
+                    {
+                      "comparison": "not",
+                      "component_id": "speler-bericht",
+                      "value": "status message"
+                    },
+                    {
+                      "comparison": "not",
+                      "component_id": "speler-bericht",
+                      "value": "status device"
+                    },
+                    {
+                      "comparison": "not",
+                      "component_id": "speler-bericht",
+                      "value": "a status"
+                    },
+                    {
+                      "comparison": "not",
+                      "component_id": "speler-bericht",
+                      "value": "status of a device"
+                    },
+                    {
+                      "comparison": "not",
+                      "component_id": "speler-bericht",
+                      "value": "the status"
+                    },
+                    {
+                      "comparison": "not",
+                      "component_id": "speler-bericht",
+                      "value": "a status message"
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "Whatsapp2"
+              },
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "gte",
+                      "value": 1
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "rule",
+                "type_id": "hue-nice"
+              },
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "value": 0
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "rule",
+                "type_id": "Vraag 2"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "vraag 2 is fout beantwoord",
+          "id": "Vraag 2 fout",
+          "limit": 0
+        },
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "spot3",
+                  "instruction": "manual",
+                  "value": [
+                    true,
+                    100,
+                    [
+                      1,
+                      0
+                    ]
+                  ]
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "not",
+                      "component_id": "speler-bericht",
+                      "value": "raspberry pi 4"
+                    },
+                    {
+                      "comparison": "not",
+                      "component_id": "speler-bericht",
+                      "value": "Raspberry Pi 4"
+                    },
+                    {
+                      "comparison": "not",
+                      "component_id": "speler-bericht",
+                      "value": "pi 4"
+                    },
+                    {
+                      "comparison": "not",
+                      "component_id": "speler-bericht",
+                      "value": "Pi 4"
+                    },
+                    {
+                      "comparison": "not",
+                      "component_id": "speler-bericht",
+                      "value": "raspberry pi"
+                    },
+                    {
+                      "comparison": "not",
+                      "component_id": "speler-bericht",
+                      "value": "Raspberry Pi"
+                    },
+                    {
+                      "comparison": "not",
+                      "component_id": "speler-bericht",
+                      "value": "pi"
+                    },
+                    {
+                      "comparison": "not",
+                      "component_id": "speler-bericht",
+                      "value": "Pi"
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "Whatsapp3"
+              },
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "gte",
+                      "value": 1
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "rule",
+                "type_id": "hue-nice"
+              },
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "value": 0
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "rule",
+                "type_id": "Vraag 3"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "vraag 3 is fout beantwoord",
+          "id": "Vraag 3 fout",
+          "limit": 0
+        },
+        {
+          "actions":[
+            {
+              "message": [
+                {
+                  "component_id": "spot4",
+                  "instruction": "manual",
+                  "value": [
+                    true,
+                    100,
+                    [
+                      1,
+                      0
+                    ]
+                  ]
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "not",
+                      "component_id": "speler-bericht",
+                      "value": "Sensory"
+                    },
+                    {
+                      "comparison": "not",
+                      "component_id": "speler-bericht",
+                      "value": "sensory"
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "Whatsapp4"
+              },
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "gte",
+                      "value": 1
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "rule",
+                "type_id": "hue-nice"
+              },
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "value": 0
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "rule",
+                "type_id": "Vraag 4"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "vraag 4 is fout beantwoord",
+          "id": "Vraag 4 fout",
+          "limit": 0
+        },
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "all",
+                  "instruction": "scene",
+                  "value": "xAgrIMeKpZD8Gla"
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
+            },
+            {
+              "message": [
+                {
+                  "delay": "1s",
+                  "instruction": "tekst",
+                  "value": "Alle vragen zijn goed beantwoord!"
+                }
+              ],
+              "type": "label",
+              "type_id": "person"
+            },
+            {
+              "delay": "2s",
+              "message": [
+                {
+                  "component_id": "person",
+                  "instruction": "tekst",
+                  "value": "The team member who plays an instrument did not like Computational Intelligence"
+                }
+              ],
+              "type": "device",
+              "type_id": "Whatsapp1"
+            },
+            {
+              "delay": "2s",
+              "message": [
+                {
+                  "component_id": "person",
+                  "instruction": "tekst",
+                  "value": "The team members who play sports did not like Complexity Theory."
+                }
+              ],
+              "type": "device",
+              "type_id": "Whatsapp2"
+            },
+            {
+              "delay": "2s",
+              "message": [
+                {
+                  "component_id": "person",
+                  "instruction": "tekst",
+                  "value": "The guy on the team plays korfbal, but did not like Multimedia."
+                }
+              ],
+              "type": "device",
+              "type_id": "Whatsapp3"
+            },
+            {
+              "delay": "2s",
+              "message": [
+                {
+                  "component_id": "person",
+                  "instruction": "tekst",
+                  "value": "Issa plays the accordion, but no sports."
+                }
+              ],
+              "type": "device",
+              "type_id": "Whatsapp4"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "gte",
+                      "value": 1
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "rule",
+                "type_id": "Vraag 1"
+              },
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "gte",
+                      "value": 1
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "rule",
+                "type_id": "Vraag 2"
+              },
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "gte",
+                      "value": 1
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "rule",
+                "type_id": "Vraag 3"
+              },
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "gte",
+                      "value": 1
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "rule",
+                "type_id": "Vraag 4"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "vragen zijn beantwoord",
+          "id": "Alles goed",
+          "limit": 1
+        }
+      ]
+    },
+    {
+      "hints": [
+        "marijn is een keypad en werkt met 4 cijferige codes",
+        "issa is een scanner"
+      ],
+      "name": "puzzel logica",
+      "rules": [
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "spot1",
+                  "instruction": "manual",
+                  "value": [
+                    true,
+                    100,
+                    [
+                      0,
+                      0.7
+                    ]
+                  ]
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "component_id": "scanned",
+                      "value": [
+                        90311055,
+                        90311017
+                      ]
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "scanned",
+                      "value": [
+                        90311017,
+                        90311055
+                      ]
+                    }
+                  ],
+                  "operator": "OR"
+                },
+                "type": "device",
+                "type_id": "barcode scanner"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "alle issa vragen zijn goed",
+          "id": "Issa goed",
+          "limit": 1
+        },
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "spot2",
+                  "instruction": "manual",
+                  "value": [
+                    true,
+                    100,
+                    [
+                      0,
+                      0.7
+                    ]
+                  ]
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "component_id": "tag",
+                      "value": "79BCA0B8000"
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "epische_bep_nfc_scanner_1"
+              },
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "component_id": "tag",
+                      "value": "2931A2B8000"
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "device",
+                "type_id": "epische_bep_nfc_scanner_2"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "alle gwennan vragen zijn goed",
+          "id": "gwennan goed",
+          "limit": 1
+        },
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "spot3",
+                  "instruction": "manual",
+                  "value": [
+                    true,
+                    100,
+                    [
+                      0,
+                      0.7
+                    ]
+                  ]
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "eq",
+                      "component_id": "scanned",
+                      "value": [
+                        3810,
+                        2759
+                      ]
+                    },
+                    {
+                      "comparison": "eq",
+                      "component_id": "scanned",
+                      "value": [
+                        2759,
+                        3810
+                      ]
+                    }
+                  ],
+                  "operator": "OR"
+                },
+                "type": "device",
+                "type_id": "keypad"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "alle marijn vragen zijn goed",
+          "id": "marijn goed",
+          "limit": 1
+        },
+        {
+          "actions": [
+            {
+              "message": [
+                {
+                  "component_id": "all",
+                  "instruction": "manual",
+                  "value": [true, 200, [0.3,0.3] ]
+                }
+              ],
+              "type": "device",
+              "type_id": "hue_lights"
+            }
+          ],
+          "conditions": {
+            "list": [
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "gte",
+                      "value": 1
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "rule",
+                "type_id": "marijn goed"
+              },
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "gte",
+                      "value": 1
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "rule",
+                "type_id": "gwennan goed"
+              },
+              {
+                "constraints": {
+                  "list": [
+                    {
+                      "comparison": "gte",
+                      "value": 1
+                    }
+                  ],
+                  "operator": "AND"
+                },
+                "type": "rule",
+                "type_id": "Issa goed"
+              }
+            ],
+            "operator": "AND"
+          },
+          "description": "alle vragen zijn goed",
+          "id": "Logica goed",
+          "limit": 1
+        }
+      ]
+    }
+  ],
+  "timers": []
+}

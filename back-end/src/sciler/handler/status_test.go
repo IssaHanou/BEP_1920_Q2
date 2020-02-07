@@ -112,6 +112,25 @@ func TestOnStatusMsgOtherDevice(t *testing.T) {
 		"Device should not exist in devices because it was not in config")
 }
 
+func TestOnStatusMsgNoMapContents(t *testing.T) {
+	handler := getTestHandler()
+	msg := Message{
+		DeviceID: "TestDevice",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "status",
+		Contents: []map[string]interface{}{
+			{
+				"testComponent0": true,
+			},
+		},
+	}
+	handler.msgMapper(msg)
+
+	_, ok := handler.Config.Devices["TestDevice"].Status["wrongComponent"]
+	assert.Equal(t, false, ok,
+		"status should not be updated because the status message did not have a map as contents")
+}
+
 func TestOnStatusMsgWrongComponent(t *testing.T) {
 	handler := getTestHandler()
 	msg := Message{
@@ -141,6 +160,12 @@ func TestOnStatusMsgFrontEnd(t *testing.T) {
 		Contents: map[string]interface{}{
 			"stop": true},
 	}
+	eventStatusMessage, _ := json.Marshal(Message{
+		DeviceID: "back-end",
+		Type:     "event status",
+		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
+		Contents: nil,
+	})
 	timerGeneralMessage, _ := json.Marshal(Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
@@ -151,10 +176,12 @@ func TestOnStatusMsgFrontEnd(t *testing.T) {
 			"id":       "general",
 		},
 	})
+	communicatorMock.On("Publish", "front-end", string(eventStatusMessage), 3)
 	communicatorMock.On("Publish", "front-end", string(timerGeneralMessage), 3)
+	communicatorMock.On("Publish", "time", string(timerGeneralMessage), 3)
 	go handler.updateStatus(msg)
 	time.Sleep(100 * time.Millisecond)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
 }
 
 func TestOnStatusMsgWrongType(t *testing.T) {
@@ -217,6 +244,41 @@ func TestOnStatusMsgWrongType(t *testing.T) {
 			_, ok := handler.Config.Devices["TestDevice"].Status[tt.component]
 			assert.Equal(t, false, ok,
 				"component should not been updated in device because it was not the right type")
+		})
+	}
+}
+
+func TestOnStatusMsgNilType(t *testing.T) {
+	handler := getTestHandler()
+	msg := Message{
+		DeviceID: "TestDevice",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "status",
+		Contents: map[string]interface{}{
+			"testComponent1": nil,
+		},
+	}
+	handler.updateStatus(msg)
+
+	tests := []struct {
+		name      string
+		component string
+	}{
+		{
+			name:      "component1 test",
+			component: "testComponent1",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, ok := handler.Config.Devices["TestDevice"].Status[tt.component]
+			assert.Equal(t, false, ok,
+				"component should not been updated in device because it was nil")
+			assert.NotPanics(t, func() {
+				handler.updateStatus(msg)
+			},
+				"component should not been updated in device because it was nil")
 		})
 	}
 }

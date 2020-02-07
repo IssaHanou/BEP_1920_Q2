@@ -59,64 +59,6 @@ func TestInstructionSetup(t *testing.T) {
 			"status":     map[string]interface{}{},
 		},
 	})
-	returnMessage1, _ := json.Marshal(Message{
-		DeviceID: "back-end",
-		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "setup",
-		Contents: map[string]interface{}{
-			"name": "Escape X",
-			"hints": map[string][]string{
-				"Telefoon puzzels": {"De knop verzend jouw volgorde", "Heb je al even gewacht?"},
-				"Control puzzel":   {"Zet de schuiven nauwkeurig"},
-			},
-			"events": map[string]string{
-				"correctSequence": "De juiste volgorde van cijfers moet gedraaid worden.",
-			},
-			"cameras": []map[string]string{
-				{"link": "https://raccoon.games", "name": "camera1"},
-				{"link": "https://debrouwerij.io", "name": "camera2"},
-			},
-			"buttons": []map[string]interface{}{
-				{
-					"id":       "start",
-					"disabled": false,
-				},
-				{
-					"id":       "stop",
-					"disabled": true,
-				},
-			},
-		},
-	})
-	returnMessage2, _ := json.Marshal(Message{
-		DeviceID: "back-end",
-		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
-		Type:     "setup",
-		Contents: map[string]interface{}{
-			"name": "Escape X",
-			"hints": map[string][]string{
-				"Telefoon puzzels": {"De knop verzend jouw volgorde", "Heb je al even gewacht?"},
-				"Control puzzel":   {"Zet de schuiven nauwkeurig"},
-			},
-			"events": map[string]string{
-				"correctSequence": "De juiste volgorde van cijfers moet gedraaid worden.",
-			},
-			"cameras": []map[string]string{
-				{"link": "https://raccoon.games", "name": "camera1"},
-				{"link": "https://debrouwerij.io", "name": "camera2"},
-			},
-			"buttons": []map[string]interface{}{
-				{
-					"id":       "stop",
-					"disabled": true,
-				},
-				{
-					"id":       "start",
-					"disabled": false,
-				},
-			},
-		},
-	})
 	statusMessageFrontEnd, _ := json.Marshal(Message{
 		DeviceID: "back-end",
 		TimeSent: time.Now().Format("02-01-2006 15:04:05"),
@@ -126,8 +68,9 @@ func TestInstructionSetup(t *testing.T) {
 			"connection": false,
 			"status": map[string]interface{}{
 				"start":     false,
-				"stop":      false,
-				"gameState": "gereed"},
+				"gameState": "gereed",
+				"hintLog":   []string{},
+			},
 		},
 	})
 	messageEventStatus, _ := json.Marshal(Message{
@@ -142,8 +85,7 @@ func TestInstructionSetup(t *testing.T) {
 		},
 	})
 
-	communicatorMock.On("Publish", "front-end", string(returnMessage1), 3) // only one of these should be called (button order is random)
-	communicatorMock.On("Publish", "front-end", string(returnMessage2), 3) // only one of these should be called (button order is random)
+	communicatorMock.On("Publish", "front-end", mock.AnythingOfType("string"), 3).Once()
 	communicatorMock.On("Publish", "front-end", string(timerGeneralMessage), 3).Once()
 	communicatorMock.On("Publish", "front-end", string(statusMessage), 3).Once()
 	communicatorMock.On("Publish", "telephone", string(statusInstructionMsg), 3).Once()
@@ -151,8 +93,9 @@ func TestInstructionSetup(t *testing.T) {
 	communicatorMock.On("Publish", "front-end", string(statusMessageFrontEnd), 3).Once()
 	communicatorMock.On("Publish", "front-end", string(statusInstructionMsg), 3).Once()
 	communicatorMock.On("Publish", "front-end", string(messageEventStatus), 3).Once()
+	communicatorMock.On("Publish", "time", string(timerGeneralMessage), 3).Once()
 	handler.msgMapper(instructionMsg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 7)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 8)
 }
 
 func TestOnInstructionMsgResetAll(t *testing.T) {
@@ -199,7 +142,7 @@ func TestOnInstructionMsgResetAll(t *testing.T) {
 	communicatorMock.On("Publish", "front-end", string(jsonStatusMsg), 3).Once()
 	communicatorMock.On("Publish", mock.AnythingOfType("string"), mock.AnythingOfType("string"), 3) // all calls from sendStatus update (tested in another test)
 	handler.msgMapper(instructionMsg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 13)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 14)
 }
 
 func TestOnInstructionMsgTestAll(t *testing.T) {
@@ -305,11 +248,12 @@ func TestOnInstructionMsgFinishRule(t *testing.T) {
 		},
 	})
 	communicatorMock.On("Publish", "front-end", string(instTimerMessage), 3)
+	communicatorMock.On("Publish", "time", string(instTimerMessage), 3)
 	communicatorMock.On("Publish", "front-end", string(returnMessage), 3)
 	communicatorMock.On("Publish", "display", string(instHintMessage), 3)
 	handler.onInstructionMsg(msg)
 	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 5)
 }
 
 func TestOnInstructionMsgFinishRuleLabel(t *testing.T) {
@@ -339,10 +283,10 @@ func TestOnInstructionMsgFinishRuleLabel(t *testing.T) {
 	},
 	)
 	communicatorMock.On("Publish", "display2", string(instMessage), 3).Once()
-	communicatorMock.On("Publish", "front-end", mock.Anything, 3).Once()
+	communicatorMock.On("Publish", "front-end", mock.Anything, 3).Times(2)
 	handler.onInstructionMsg(msg)
 	time.Sleep(10 * time.Millisecond) // Give the goroutine(s) time to finish before asserting number of calls
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 2)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 3)
 }
 
 func TestOnInstructionMsgHint(t *testing.T) {
@@ -350,9 +294,12 @@ func TestOnInstructionMsgHint(t *testing.T) {
 		DeviceID: "front-end",
 		TimeSent: "05-12-2019 09:42:10",
 		Type:     "instruction",
-		Contents: []map[string]interface{}{{
-			"instruction": "hint",
-			"value":       "This is my hint"},
+		Contents: []map[string]interface{}{
+			{
+				"instruction": "hint",
+				"value":       "This is my hint",
+				"topic":       "hint",
+			},
 		},
 	}
 	communicatorMock := new(CommunicatorMock)
@@ -373,6 +320,60 @@ func TestOnInstructionMsgHint(t *testing.T) {
 	communicatorMock.On("Publish", "hint", string(returnMessage), 3)
 	handler.onInstructionMsg(msg)
 	communicatorMock.AssertNumberOfCalls(t, "Publish", 1)
+}
+
+func TestOnInstructionMsgHintNoTopic(t *testing.T) {
+	handler := getTestHandler()
+	msg := map[string]interface{}{
+		"instruction": "hint",
+		"value":       "hint",
+	}
+
+	before := handler.Config
+	handler.onHint(msg, "front-end")
+	assert.Equal(t, before, handler.Config,
+		"Nothing should have been changed after an invalid hint instruction message was sent, with no topic")
+}
+
+func TestOnInstructionMsgHintNoValue(t *testing.T) {
+	handler := getTestHandler()
+	msg := map[string]interface{}{
+		"instruction": "hint",
+		"topic":       "hint",
+	}
+
+	before := handler.Config
+	handler.onHint(msg, "front-end")
+	assert.Equal(t, before, handler.Config,
+		"Nothing should have been changed after an invalid hint instruction message was sent, with no value")
+}
+
+func TestOnInstructionMsgHintNilValue(t *testing.T) {
+	handler := getTestHandler()
+	msg := map[string]interface{}{
+		"instruction": "hint",
+		"value":       nil,
+		"topic":       "hint",
+	}
+
+	before := handler.Config
+	handler.onHint(msg, "front-end")
+	assert.Equal(t, before, handler.Config,
+		"Nothing should have been changed after an invalid hint instruction message was sent, with nil value")
+}
+
+func TestOnInstructionMsgHintNilTopic(t *testing.T) {
+	handler := getTestHandler()
+	msg := map[string]interface{}{
+		"instruction": "hint",
+		"value":       "hint",
+		"topic":       nil,
+	}
+
+	before := handler.Config
+	handler.onHint(msg, "front-end")
+	assert.Equal(t, before, handler.Config,
+		"Nothing should have been changed after an invalid hint instruction message was sent, with nil topic")
 }
 
 func TestOnInstructionMsgMapper(t *testing.T) {
@@ -512,7 +513,7 @@ func TestInstructionUseConfig(t *testing.T) {
 	communicatorMock.On("Publish", "front-end", string(jsonMessage), 3).Once()
 	communicatorMock.On("Publish", mock.AnythingOfType("string"), mock.AnythingOfType("string"), 3) // sendSetup tested in another test
 	handler.msgMapper(instructionMsg)
-	communicatorMock.AssertNumberOfCalls(t, "Publish", 12)
+	communicatorMock.AssertNumberOfCalls(t, "Publish", 13)
 }
 
 func TestSendInstruction(t *testing.T) {

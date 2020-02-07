@@ -23,6 +23,7 @@ import {
   MatFormFieldModule,
   MatInputModule,
   MatIconModule,
+  MatTooltipModule,
   MatCheckboxModule,
   MatSortModule,
   MatTableModule,
@@ -39,6 +40,7 @@ import { RouterModule, Routes } from "@angular/router";
 import { HomeComponent } from "./home/home.component";
 import { CameraComponent } from "./camera/camera.component";
 import { ConfigComponent } from "./config/config.component";
+import { EventComponent } from "./components/event/event.component";
 
 /**
  * These are the parameters used for the MQTT messaging.
@@ -87,7 +89,8 @@ export const APP_ROUTES: Routes = [
     PuzzleComponent,
     HomeComponent,
     CameraComponent,
-    ConfigComponent
+    ConfigComponent,
+    EventComponent
   ],
   exports: [
     AppComponent,
@@ -114,6 +117,7 @@ export const APP_ROUTES: Routes = [
     MatFormFieldModule,
     MatInputModule,
     MatSortModule,
+    MatTooltipModule,
     MatSidenavModule,
     MatToolbarModule,
     MatIconModule,

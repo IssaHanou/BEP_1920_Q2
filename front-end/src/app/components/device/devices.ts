@@ -4,10 +4,44 @@ import { Device } from "./device";
  * Class keeping track of the devices, through use of map with device id's.
  */
 export class Devices {
+  /**
+   * Maps device id to device object.
+   */
   all: Map<string, Device>;
+  /**
+   * Maps label to all devices that listen to that label.
+   */
+  labels: Map<string, string[]>;
 
   constructor() {
     this.all = new Map<string, Device>();
+    this.labels = new Map<string, string[]>();
+  }
+
+  /**
+   * Create devices initially from json data with id, description and labels.
+   */
+  createDevices(jsonData) {
+    for (const device of jsonData) {
+      this.all.set(device.id, new Device(device));
+    }
+  }
+
+  /**
+   * Create the label map with for each label a list of devices that listen to it.
+   */
+  createLabelMap() {
+    for (const deviceId of this.all.keys()) {
+      const device = this.all.get(deviceId);
+      for (const index of Object.keys(device.labels)) {
+        const label = device.labels[index];
+        if (this.labels.has(label)) {
+          this.labels.get(label).push(deviceId);
+        } else {
+          this.labels.set(label, [deviceId]);
+        }
+      }
+    }
   }
 
   /**
@@ -44,5 +78,17 @@ export class Devices {
     } else {
       return null;
     }
+  }
+
+  /**
+   * Get list of devices which belong to label, and add the option to send the hint to `all devices`.
+   */
+  getDevicesWithLabel(label: string): string[] {
+    let hintDevices: string[] = ["alle hint apparaten"];
+    if (this.labels.has(label)) {
+      hintDevices = hintDevices.concat(this.labels.get(label));
+    }
+    hintDevices.sort();
+    return hintDevices;
   }
 }

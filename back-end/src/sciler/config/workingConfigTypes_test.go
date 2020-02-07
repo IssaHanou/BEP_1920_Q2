@@ -34,6 +34,10 @@ type HandlerMock struct {
 	mock.Mock
 }
 
+func (handlerMock *HandlerMock) PrepareMessage(typeID string, message []ComponentInstruction) []ComponentInstruction {
+	panic("implement me")
+}
+
 func (handlerMock *HandlerMock) SendLabelInstruction(string, []ComponentInstruction, string) {
 	// do nothing
 }

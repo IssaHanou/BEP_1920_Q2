@@ -20,6 +20,7 @@ type WorkingConfig struct {
 	StatusMap     map[string][]*Rule
 	RuleMap       map[string]*Rule
 	EventRuleMap  map[string]*Rule
+	PuzzleRuleMap map[string]*Rule
 	LabelMap      map[string][]*Component
 }
 
@@ -134,7 +135,7 @@ func (t *Timer) Stop() error {
 }
 
 // Done finishes the timer as if it ran out of time
-// can not finish a timer that is already Expired
+// cannot finish a timer that is already Expired
 func (t *Timer) Done(handler InstructionSender) error {
 	if t.State == "stateExpired" {
 		return fmt.Errorf("timer %v is already Expired and can not be finished again", t.ID)
@@ -164,6 +165,7 @@ type InstructionSender interface {
 	SetTimer(string, ComponentInstruction)
 	HandleEvent(string)
 	SendLabelInstruction(string, []ComponentInstruction, string)
+	PrepareMessage(typeID string, message []ComponentInstruction) []ComponentInstruction
 }
 
 // Finished is a method that checks is the a rule have been finished, meaning if it reached its maximum number of executions

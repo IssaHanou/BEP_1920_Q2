@@ -38,7 +38,7 @@ matrix:
       go: 1.13.4
       go_import_path: github.com/IssaHanou/BEP_1920_Q2/back-end
       before_install:
-        - go get -u golang.org/x/lint/golint
+        - go get -v -u golang.org/x/lint/golint
         - export GOPATH=$TRAVIS_BUILD_DIR/back-end
         - cd back-end/src/sciler
         - go get github.com/stretchr/testify/assert

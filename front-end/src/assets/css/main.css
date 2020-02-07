@@ -45,16 +45,35 @@ body { /*body of the index.html*/
 }
 .boolean-column {
   text-align: center;
+  width: 65px;
 }
 
 
 /*Other components throughout the application*/
-.custom-md-button, button {
+.custom-md-button {
   margin: 5px;
   font-size: 16px;
   border-radius: 4px;
+  white-space: pre-wrap;
 }
-
+.custom-icon-button {
+  margin: 0;
+  padding: 0;
+  border-width: 0;
+}
+.custom-icon {
+  font-size: 16px;
+  vertical-align: top;
+}
+.custom-tool-tip {
+  font-size: 14px;
+}
+.check-mark {
+  color: green !important;
+}
+.cross {
+  color: red !important;
+}
 
 
 /*Boxes on home page, which contain a header and contents box,
@@ -82,8 +101,8 @@ body { /*body of the index.html*/
 
 
 /*Small screens should have little 'white space'*/
-@media only screen and (max-width: 800px) {
-  @media only screen and (min-width: 650px) {
+@media only screen and (max-width: 1100px) {
+  @media only screen and (min-width: 700px) {
     .left {
       margin: 0 5px 0 0;
     }
@@ -100,7 +119,7 @@ body { /*body of the index.html*/
 }
 
 /*Define grid home page for large screens*/
-@media only screen and (min-width: 650px) {
+@media only screen and (min-width: 700px) {
   .timer-box {grid-area: timer}
   .manage-box {grid-area: manage}
   .hint-box {grid-area: hint}
@@ -109,6 +128,6 @@ body { /*body of the index.html*/
 
   .home-content {
     display: grid;
-    grid-template-columns: 40% 60%;
+    grid-template-columns: 50% 50%;
   }
 }

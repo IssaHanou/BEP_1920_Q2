@@ -1,6 +1,5 @@
 import { Component } from "@angular/core";
 import { AppComponent } from "../../app.component";
-import { Hint } from "./hint";
 
 /**
  * The hint component controls the sending of hints in the "Hint" box on the home pgae.
@@ -14,22 +13,32 @@ export class HintComponent {
   /**
    * The contents of the hint text field.
    */
-  customHint: string;
+  hint: string;
 
   /**
-   * The contents of the hint selection box.
+   * Topic to send hint to.
    */
-  predefinedHint: string;
+  topic: string;
 
   constructor(private app: AppComponent) {}
 
   /**
-   * List of puzzle names to use as dividers in the selection box for predefined hints.
+   * List of hints that have been sent.
+   * When front-end device has not yet been initialized, return empty list.
    */
-  getPuzzleList(): Hint[] {
+  getHintLog(): string[] {
+    if (this.app.deviceList.getDevice("front-end") == null) {
+      return [];
+    } else if (
+      !this.app.deviceList.getDevice("front-end").statusMap.has("hintLog")
+    ) {
+      return [];
+    }
     const list = [];
-    for (const hint of this.app.hintList) {
-      list.push(hint);
+    for (const hint of this.app.deviceList.all
+      .get("front-end")
+      .statusMap.get("hintLog").componentStatus) {
+      list.push(hint + "\n");
     }
     return list;
   }
@@ -51,35 +60,15 @@ export class HintComponent {
   }
 
   /**
-   * When predefined hint has been chosen and the accompanying "Stuur" button is clicked,
+   * When a hint has been entered, a device (topic) has been chosen to send to
+   * and the accompanying send button is clicked,
    * the selected hint is sent as instruction to hint devices.
    */
-  onPredefinedHint() {
-    if (
-      this.predefinedHint !== undefined &&
-      this.predefinedHint !== "" &&
-      this.predefinedHint !== "---"
-    ) {
-      this.app.sendInstruction([
-        { instruction: "hint", value: this.predefinedHint }
-      ]);
-      this.predefinedHint = "---";
-    }
-  }
-
-  /**
-   * When custom hint has been typed and the accompanying "Stuur" button is clicked,
-   * the typed hint is sent as instruction to hint devices.
-   */
   onCustomHint() {
-    if (this.customHint !== undefined && this.customHint !== "") {
-      this.app.sendInstruction([
-        {
-          instruction: "hint",
-          value: this.customHint
-        }
-      ]);
-      this.customHint = "";
+    if (this.hint !== undefined && this.hint !== "") {
+      this.app.sendHint(this.hint, this.topic, "");
     }
+    this.hint = "";
+    this.topic = "";
   }
 }

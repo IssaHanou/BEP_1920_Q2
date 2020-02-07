@@ -65,12 +65,14 @@ func generateDataStructures(readConfig ReadConfig) (WorkingConfig, []string) {
 		// if there are errors in config format,
 		// wait with creating maps (which use condition type ids)
 		// and with checking constraint
-		config.StatusMap = generateStatusMap(&config)
-		config.EventRuleMap = generateEventRuleMap(&config)
 		ruleMap, ruleErrors := generateRuleMap(&config)
 		config.RuleMap = ruleMap
+		uniqueErrors := checkUniqueIDs(&config)
+		config.StatusMap = generateStatusMap(&config)
+		config.EventRuleMap = generateEventRuleMap(&config)
+		config.PuzzleRuleMap = generatePuzzleRuleMap(&config)
 		config.LabelMap = generateLabelMap(&config)
-		errorList = append(errorList, append(ruleErrors, checkConfig(config)...)...)
+		errorList = append(errorList, append(ruleErrors, append(uniqueErrors, checkConfig(config)...)...)...)
 	}
 	return config, errorList
 }
@@ -118,6 +120,8 @@ func generateFrontendDevice(config *WorkingConfig) *Device {
 		status[btn.ID] = false
 	}
 	status["gameState"] = "gereed"
+	status["hintLog"] = []string{}
+	input["hintLog"] = "array"
 	return &(Device{
 		ID:          "front-end",
 		Description: "The operator webapp for managing a escape room",
@@ -210,15 +214,31 @@ func generateRuleMap(config *WorkingConfig) (map[string]*Rule, []string) {
 	return ruleMap, errorList
 }
 
-// generatePuzzle RuleMap creates rule map with rule id
-// pointing to rule object pointers for rules of all puzzles and general events
+// generateEventRuleMap creates rule map with rule id
+// pointing to rule object pointers for rules of all general events
 func generateEventRuleMap(config *WorkingConfig) map[string]*Rule {
 	ruleMap := make(map[string]*Rule)
-	rules := getAllRules(config)
 
-	for _, rule := range rules {
-		ruleMap[rule.ID] = rule
+	for _, event := range config.GeneralEvents {
+		for _, rule := range event.GetRules() {
+			ruleMap[rule.ID] = rule
+		}
 	}
+
+	return ruleMap
+}
+
+// generatePuzzleRuleMap creates rule map with rule id
+// pointing to rule object pointers for rules of all puzzles
+func generatePuzzleRuleMap(config *WorkingConfig) map[string]*Rule {
+	ruleMap := make(map[string]*Rule)
+
+	for _, puzzle := range config.Puzzles {
+		for _, rule := range puzzle.GetRules() {
+			ruleMap[rule.ID] = rule
+		}
+	}
+
 	return ruleMap
 }
 
@@ -247,6 +267,7 @@ func generateStatusMap(config *WorkingConfig) map[string][]*Rule {
 
 	for _, rule := range rules {
 		for _, id := range rule.Conditions.GetConditionIDs() {
+
 			statusMap[id] = appendWhenUniqueRule(statusMap[id], rule)
 		}
 	}
@@ -277,9 +298,11 @@ func appendWhenUniqueComp(comps []*Component, comp *Component) []*Component {
 // generatePuzzles transforms readPuzzles to puzzles
 // it generates events and copies the rest
 // if the config does not abide by the manual, a non-empty list of mistakes is returned
+// the puzzles must have unique names between them
 func generatePuzzles(readPuzzles []ReadPuzzle, config *WorkingConfig) ([]*Puzzle, []string) {
 	var result []*Puzzle
 	errorList := make([]string, 0)
+	nameList := make([]string, 0)
 	for _, readPuzzle := range readPuzzles {
 		event, newErrors := generateGeneralEvent(readPuzzle, config)
 		puzzle := Puzzle{
@@ -287,23 +310,44 @@ func generatePuzzles(readPuzzles []ReadPuzzle, config *WorkingConfig) ([]*Puzzle
 			Hints: readPuzzle.Hints,
 		}
 		result = append(result, &puzzle)
+		nameList = append(nameList, event.Name)
 		errorList = append(errorList, newErrors...)
 	}
+	errorList = append(errorList, checkEventNamesUnique(nameList, "puzzle")...)
 	return result, errorList
 }
 
 // generateGeneralEvents transforms readGeneralEvents to generalEvents
 // it loops through all readGeneralEvents and generates generalEvents for them
 // if the config does not abide by the manual, a non-empty list of mistakes is returned
+// the general events must have unique names between them
 func generateGeneralEvents(readGeneralEvents []ReadGeneralEvent, config *WorkingConfig) ([]*GeneralEvent, []string) {
 	var result []*GeneralEvent
 	errorList := make([]string, 0)
+	nameList := make([]string, 0)
 	for _, readGeneralEvent := range readGeneralEvents {
 		newResult, newErrors := generateGeneralEvent(readGeneralEvent, config)
 		result = append(result, newResult)
+		nameList = append(nameList, newResult.Name)
 		errorList = append(errorList, newErrors...)
 	}
+	errorList = append(errorList, checkEventNamesUnique(nameList, "general event")...)
 	return result, errorList
+}
+
+// checkEventNames checks whether all puzzles or general events have unique names between their own types.
+// typeOfEvent carries the name of the type to put in the error message.
+func checkEventNamesUnique(nameList []string, typeOfEvent string) []string {
+	errorList := make([]string, 0)
+	seen := make(map[string]string, 0)
+	for _, name := range nameList {
+		if _, ok := seen[name]; ok {
+			errorList = append(errorList, fmt.Sprintf("level II - format error: a %s already exists with name %s", typeOfEvent, name))
+		} else {
+			seen[name] = name
+		}
+	}
+	return errorList
 }
 
 // generateGeneralEvent transforms readGeneralEvent to generalEvent
@@ -357,9 +401,11 @@ func generateRules(readRules []ReadRule, config *WorkingConfig) ([]*Rule, []stri
 func generateLogicalCondition(conditions interface{}, ruleID string) (LogicalCondition, []string) {
 	if conditions == nil {
 		return AndCondition{}, make([]string, 0)
+	} else if reflect.TypeOf(conditions) != reflect.TypeOf(make(map[string]interface{})) {
+		return AndCondition{}, []string{fmt.Sprintf("level II - format error: conditions of rule with id %s are not in the form of a map[string]interface but in the form of a %v", ruleID, reflect.TypeOf(conditions))}
 	}
 	logic := conditions.(map[string]interface{})
-	if logic["operator"] != nil && logic["list"] != nil {
+	if logic["operator"] != nil && logic["list"] != nil && reflect.TypeOf(logic["list"]).Kind() == reflect.Slice {
 		return generateLogicalConditionOperator(logic, ruleID)
 	} else if logic["type"] != nil && reflect.TypeOf(logic["type"]).Kind() == reflect.String &&
 		logic["type_id"] != nil && reflect.TypeOf(logic["type_id"]).Kind() == reflect.String {
@@ -403,7 +449,7 @@ func generateLogicalConditionOperator(logic map[string]interface{}, ruleID strin
 		}
 		return or, errorList
 	}
-	return nil, append(errorList, fmt.Sprintf("level II - for mat error: on rule with id %s: JSON config in wrong format, operator: %v, could not be processed", ruleID, logic["operator"]))
+	return nil, append(errorList, fmt.Sprintf("level II - format error: on rule with id %s: JSON config in wrong format, operator: %v, could not be processed", ruleID, logic["operator"]))
 }
 
 // generateLogicalConstraint traverses the constraints tree
@@ -413,9 +459,11 @@ func generateLogicalConditionOperator(logic map[string]interface{}, ruleID strin
 func generateLogicalConstraint(constraints interface{}, ruleID string) (LogicalConstraint, []string) {
 	if constraints == nil {
 		return AndConstraint{}, []string{fmt.Sprintf("level II - format error: on rule with id %s: condition contains no constraints", ruleID)}
+	} else if reflect.TypeOf(constraints) != reflect.TypeOf(make(map[string]interface{})) {
+		return AndConstraint{}, []string{fmt.Sprintf("level II - format error: constraints of rule with id %s are not in the form of a map[string]interface but in the form of a %v", ruleID, reflect.TypeOf(constraints))}
 	}
 	logic := constraints.(map[string]interface{})
-	if logic["operator"] != nil && logic["list"] != nil {
+	if logic["operator"] != nil && logic["list"] != nil && reflect.TypeOf(logic["list"]).Kind() == reflect.Slice {
 		return generateLogicalConstraintOperator(logic, ruleID)
 	} else if logic["comparison"] != nil && reflect.TypeOf(logic["comparison"]).Kind() == reflect.String &&
 		logic["value"] != nil {

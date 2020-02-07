@@ -5,7 +5,13 @@
            class="mat-elevation-z8 custom-md-table">
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header">Apparaat</th>
-        <td mat-cell *matCellDef="let element"> {{ element.id }} </td>
+        <td mat-cell *matCellDef="let element">
+          {{ getName(element.id) }}
+          <button class="custom-icon-button" matTooltip="{{ getDeviceDescription(element.id) }}"
+                  matTooltipPosition="right" matTooltipClass="custom-tool-tip">
+            <mat-icon class="custom-icon">info_outline</mat-icon>
+          </button>
+        </td>
       </ng-container>
       <ng-container matColumnDef="connection">
         <th mat-header-cell *matHeaderCellDef mat-sort-header class="custom-md-table-header">Connectie</th>
@@ -14,27 +20,36 @@
           <ng-container *ngIf="!element.connection"><span class="cross">&#10006;</span></ng-container>
         </td>
       </ng-container>
-      <ng-container matColumnDef="component">
-        <th mat-header-cell *matHeaderCellDef class="custom-md-table-header onderdeel-header">Onderdeel</th>
-        <td mat-cell id="{{element.id}}-component" *matCellDef="let element" class="component-cell comp-pad-right">
-          {{ getComponents(element.status, element.id) }}
-        </td>
-      </ng-container>
-      <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef class="custom-md-table-header">Status</th>
-        <td mat-cell id="{{element.id}}-status" *matCellDef="let element" class="component-cell">
-          {{ formatStatus(element.status, element.id) }}
+      <ng-container matColumnDef="unfold">
+        <th mat-header-cell *matHeaderCellDef class="custom-md-table-header">Laat status zien</th>
+        <td mat-cell *matCellDef="let element" class="panel-cell">
+          <mat-expansion-panel class="status-panel" [expanded]="false">
+            <mat-expansion-panel-header collapsedHeight="*" expandedHeight="*">
+              status van onderdelen
+            </mat-expansion-panel-header>
+            <table mat-table [dataSource]="getComponentList(element.id)"
+                   class="mat-elevation-z8 custom-md-table component-table">
+                <ng-container matColumnDef="component">
+                  <td mat-cell *matCellDef="let comp" class="component-cell">{{ comp.id }}</td>
+                </ng-container>
+                <ng-container matColumnDef="status">
+                  <td mat-cell *matCellDef="let comp" class="status-cell">{{ comp.status }}</td>
+                </ng-container>
+              <tr mat-row *matRowDef="let compRow; columns: componentColumns;"></tr>
+            </table>
+          </mat-expansion-panel>
         </td>
       </ng-container>
       <ng-container matColumnDef="test">
         <th mat-header-cell *matHeaderCellDef mat-sort-header class="test-column custom-md-table-header">Test</th>
         <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
-          <button mat-button class="mat-raised-button test-column" color=primary (click)="testDevice(element.id)">Test</button>
+          <button mat-button class="mat-raised-button test-column" color=primary
+                  disabled="{{ !app.getGameStateInGame() }}" (click)="testDevice(element.id)">test</button>
         </td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="deviceColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: deviceColumns;" (click)="collapseComponents(row)"></tr>
+      <tr mat-row *matRowDef="let row; columns: deviceColumns;"></tr>
     </table>
   </div>
 </div>
