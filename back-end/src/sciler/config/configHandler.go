@@ -401,9 +401,11 @@ func generateRules(readRules []ReadRule, config *WorkingConfig) ([]*Rule, []stri
 func generateLogicalCondition(conditions interface{}, ruleID string) (LogicalCondition, []string) {
 	if conditions == nil {
 		return AndCondition{}, make([]string, 0)
+	} else if reflect.TypeOf(conditions) != reflect.TypeOf(make(map[string]interface{})) {
+		return AndCondition{}, []string{fmt.Sprintf("level II - format error: conditions of rule with id %s are not in the form of a map[string]interface but in the form of a %v", ruleID, reflect.TypeOf(conditions))}
 	}
 	logic := conditions.(map[string]interface{})
-	if logic["operator"] != nil && logic["list"] != nil {
+	if logic["operator"] != nil && logic["list"] != nil && reflect.TypeOf(logic["list"]).Kind() == reflect.Slice {
 		return generateLogicalConditionOperator(logic, ruleID)
 	} else if logic["type"] != nil && reflect.TypeOf(logic["type"]).Kind() == reflect.String &&
 		logic["type_id"] != nil && reflect.TypeOf(logic["type_id"]).Kind() == reflect.String {
@@ -447,7 +449,7 @@ func generateLogicalConditionOperator(logic map[string]interface{}, ruleID strin
 		}
 		return or, errorList
 	}
-	return nil, append(errorList, fmt.Sprintf("level II - for mat error: on rule with id %s: JSON config in wrong format, operator: %v, could not be processed", ruleID, logic["operator"]))
+	return nil, append(errorList, fmt.Sprintf("level II - format error: on rule with id %s: JSON config in wrong format, operator: %v, could not be processed", ruleID, logic["operator"]))
 }
 
 // generateLogicalConstraint traverses the constraints tree
@@ -457,9 +459,11 @@ func generateLogicalConditionOperator(logic map[string]interface{}, ruleID strin
 func generateLogicalConstraint(constraints interface{}, ruleID string) (LogicalConstraint, []string) {
 	if constraints == nil {
 		return AndConstraint{}, []string{fmt.Sprintf("level II - format error: on rule with id %s: condition contains no constraints", ruleID)}
+	} else if reflect.TypeOf(constraints) != reflect.TypeOf(make(map[string]interface{})) {
+		return AndConstraint{}, []string{fmt.Sprintf("level II - format error: constraints of rule with id %s are not in the form of a map[string]interface but in the form of a %v", ruleID, reflect.TypeOf(constraints))}
 	}
 	logic := constraints.(map[string]interface{})
-	if logic["operator"] != nil && logic["list"] != nil {
+	if logic["operator"] != nil && logic["list"] != nil && reflect.TypeOf(logic["list"]).Kind() == reflect.Slice {
 		return generateLogicalConstraintOperator(logic, ruleID)
 	} else if logic["comparison"] != nil && reflect.TypeOf(logic["comparison"]).Kind() == reflect.String &&
 		logic["value"] != nil {

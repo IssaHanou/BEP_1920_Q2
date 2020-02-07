@@ -230,6 +230,53 @@ func TestOnConfirmationMsgIncorrect6(t *testing.T) {
 		"Device should not alter config upon invalid confirmation message with no map of instructed value")
 }
 
+func TestOnConfirmationMsgIncorrect7(t *testing.T) {
+	handler := getTestHandler()
+	msg := Message{
+		DeviceID: "TestDevice",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "confirmation",
+		Contents: []map[string]interface{}{
+			{
+				"completed": true,
+				"instructed": map[string]interface{}{
+					"device_id": "back-end",
+					"time_sent": "05-12-2019 09:42:10",
+					"contents": []map[string]interface{}{{
+						"instruction":   "test",
+						"instructed_by": "front-end"}},
+					"type": "instruction",
+				},
+			},
+		},
+	}
+	before := handler.Config
+	handler.msgMapper(msg)
+	assert.Equal(t, before, handler.Config,
+		"Device should not alter config upon invalid confirmation message with no map contents in the message")
+}
+
+func TestOnConfirmationMsgIncorrect8(t *testing.T) {
+	handler := getTestHandler()
+	msg := Message{
+		DeviceID: "TestDevice",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "confirmation",
+		Contents: map[string]interface{}{
+			"completed": true,
+			"instructed": map[string]interface{}{
+				"device_id": "back-end",
+				"time_sent": "05-12-2019 09:42:10",
+				"type":      "instruction",
+			},
+		},
+	}
+	before := handler.Config
+	handler.onConfirmationMsg(msg)
+	assert.Equal(t, before, handler.Config,
+		"Device should not alter config upon invalid confirmation message with no contents property in instructed")
+}
+
 func TestMsgMapperConfirmation(t *testing.T) {
 	handler := getTestHandler()
 	msg := Message{

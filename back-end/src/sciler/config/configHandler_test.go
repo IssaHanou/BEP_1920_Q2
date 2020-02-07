@@ -358,3 +358,52 @@ func Test_DoubleGeneralEventNames(t *testing.T) {
 		func() { ReadFile(filename) },
 		"two general events with the same name is not allowed")
 }
+
+func Test_ConditionsArrayOfObjects(t *testing.T) {
+	filename := "../../../resources/testing/test_conditions_array_of_objects.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"when the conditions is an array with an condition object, an error should be returned")
+}
+
+func Test_ConstraintsArrayOfObjects(t *testing.T) {
+	filename := "../../../resources/testing/test_constraints_array_of_objects.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"when the constraints is an array with a constraint object, an error should be returned")
+}
+
+func Test_ConstraintsArrayOfOperator(t *testing.T) {
+	filename := "../../../resources/testing/test_constraints_array_of_operator.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"when the constraints is an array with an operator object , an error should be returned")
+}
+
+func Test_ConditionsArrayOfOperator(t *testing.T) {
+	filename := "../../../resources/testing/test_conditions_array_of_operator.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"when the conditions is an array with an operator object, an error should be returned")
+}
+
+func Test_ConstraintsListObject(t *testing.T) {
+	filename := "../../../resources/testing/test_constraints_list_object.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"when the constraints list is an object, an error should be returned")
+}
+
+func Test_ConditionsListObject(t *testing.T) {
+	filename := "../../../resources/testing/test_conditions_list_object.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"when the conditions list is an object, an error should be returned")
+}
+
+func Test_ConstraintsOperatorInt(t *testing.T) {
+	filename := "../../../resources/testing/test_constraints_operator_int.json"
+	assert.Panics(t,
+		func() { ReadFile(filename) },
+		"when the constraints operator is an integer, an error should be returned")
+}

@@ -1,0 +1,109 @@
+{
+  "general": {
+    "name": "Escape X",
+    "duration": "1m",
+    "host": "localhost",
+    "port": 1883
+  },
+  "cameras": [
+    {"name": "camera1", "link": "https://raccoon.games"}
+  ],
+  "devices": [
+    {
+      "id": "telephone",
+      "description": "The telephone can ring and display a message. It will also record the numbers turned, and send these as sequence",
+      "input": {
+        "turningWheel": "array"
+      },
+      "output": {
+        "audio": {
+          "type": "string",
+          "instructions": {
+            "play": "string"
+          },
+          "label": ["sound"]
+        },
+        "ringTone": {
+          "type": "string",
+          "instructions": {
+            "play": "string"
+          }
+        }
+      }
+    }
+  ],
+  "timers": [],
+  "puzzles": [
+    {
+      "name": "Telefoon puzzels",
+      "rules": [
+        {
+          "id": "correctSequence",
+          "description": "De juiste volgorde van cijfers moet gedraaid worden.",
+          "limit": 1,
+          "conditions": {
+            "type": "device",
+            "type_id": "telephone",
+            "constraints": {
+              "comparison": "eq",
+              "component_id": "turningWheel",
+              "value": [
+                0,
+                1,
+                2,
+                7
+              ]
+            }
+          },
+          "actions": [
+          ]
+        }
+      ],
+      "hints": [
+        "De knop verzend jouw volgorde"
+      ]
+    }
+  ],
+  "general_events": [
+  ],
+  "button_events": [
+    {
+      "id": "start",
+      "description": "Als het spel start, moeten alle rode leds aan gaan en de groene uit",
+      "limit": 2,
+      "conditions": [
+        {
+          "type": "device",
+          "type_id": "telephone",
+          "constraints": {
+            "component_id": "turningWheel",
+            "value": [],
+            "comparison": "eq"
+          }
+        }
+      ],
+      "actions": [
+        {
+          "type": "timer",
+          "type_id": "general",
+          "message": [
+            {
+              "instruction": "start"
+            }
+          ]
+        },
+        {
+          "type": "device",
+          "type_id": "front-end",
+          "message": [
+            {
+              "instruction": "set state",
+              "component_id": "gameState",
+              "value": "in spel"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
