@@ -28,6 +28,7 @@
 }
 .status-cell {
   text-align: right;
+  word-break: break-word;
 }
 
 /*Button columns should be button width.*/
