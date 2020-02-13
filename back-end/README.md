@@ -2,9 +2,6 @@
 The back-end server contains and manages all logic in the escape room.
 
 ## Deployment on Raspberry Pi
-#### Make config:
-- in directory `back-end` (copy and) rename [resources/`room_config.json.default`](resources/production/room_config.json.default) to `room_config.json`
-- (optional), change this file as desired following the [room_manual.md](resources/manuals/room_manual.md)
 
 #### If needed install go1.13.4:
 - run  `pi@raspberrypi:~ $ wget https://storage.googleapis.com/golang/go1.13.4.linux-armv6l.tar.gz`
@@ -19,10 +16,17 @@ The back-end server contains and manages all logic in the escape room.
 `export GOPATH=~/go/src/BEP_1920_Q2/back-end`\
 `export PATH=$PATH:$GOPATH/bin`
 - reboot pi
+- make in `/home/pi` the directories `/go`and `/go/src` such that `/home/pi/go/src` exists
 - run `pi@raspberrypi:~/go/src $ git clone https://github.com/IssaHanou/BEP_1920_Q2.git`
 - run `pi@raspberrypi:~/go/src/BEP_1920_Q2/back-end/src/sciler $ go get ./...`
 - run `pi@raspberrypi:~/go/src/BEP_1920_Q2 $ go install sciler`
+- make config if not done already (see below)
 - run `pi@raspberrypi:~/go/src/BEP_1920_Q2 $ sciler`
+
+#### Make config:
+- in directory `back-end` (copy and) rename [resources/production/`room_config.json.default`](resources/production/room_config.json.default) to `room_config.json`
+- (optional), change this file as desired following the [room_manual.md](resources/manuals/room_manual.md)
+
 
 ##### To update to latest version
 - run `pi@raspberrypi:~/go/src/BEP_1920_Q2 $ git pull`
