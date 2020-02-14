@@ -463,7 +463,7 @@ func checkConstraintsDeviceNumericType(errorParameters []string, constraint Cons
 func checkConstraintsDeviceArrayType(errorParameters []string, constraint Constraint) []string {
 	valueType := reflect.TypeOf(constraint.Value).Kind()
 	comparison := constraint.Comparison
-	if valueType != reflect.Slice {
+	if valueType != reflect.Slice && comparison != "contains" {
 		return []string{fmt.Sprintf("level III - implementation error: on rule %s, constraint on device with id %s: type array/slice expected but %s found as type of the value: %v",
 			errorParameters[0], errorParameters[1], valueType.String(), constraint.Value)}
 	}
