@@ -2,8 +2,11 @@ package config
 
 import (
 	"fmt"
+	"github.com/agnivade/levenshtein"
 	logger "github.com/sirupsen/logrus"
+	"math"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -240,6 +243,10 @@ func compare(param1 interface{}, param2 interface{}, comparision string) bool {
 			return numericToFloat64(param1) == numericToFloat64(param2)
 		}
 		return reflect.DeepEqual(param1, param2)
+	case "eqwt":
+		return equalWithTypo(param1.(string), param2.(string))
+	case "not eqwt":
+		return !equalWithTypo(param1.(string), param2.(string))
 	case "lt":
 		return numericToFloat64(param1) < numericToFloat64(param2)
 	case "gt":
@@ -259,6 +266,19 @@ func compare(param1 interface{}, param2 interface{}, comparision string) bool {
 		// This case is already handled to give error in checkConstraint
 		return false
 	}
+}
+
+// equalWithTypo checks if two strings are roughly equal
+// it tries to ignore typos
+func equalWithTypo(expected string, actual string) bool {
+	return checkStringDistanceConstraint(expected, actual, int(math.Max(1, float64(len(expected))/5)))
+}
+
+// checkStringDistanceConstraint checks if the difference (minimal number of replacements/insertions/deletions needed to convert one string in the other)
+// is smaller or equal to the maximum allowed difference
+func checkStringDistanceConstraint(string1 string, string2 string, maxDifference int) bool {
+	distance := levenshtein.ComputeDistance(strings.ToLower(string1), strings.ToLower(string2))
+	return distance <= maxDifference
 }
 
 // numericToFloat64 checks if numeric value is int or float64 and converts it to a float64 (if it wasn't already)

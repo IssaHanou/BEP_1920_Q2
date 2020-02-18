@@ -506,6 +506,76 @@ func TestHandleActionWithStatus(t *testing.T) {
 	// (message expected includes time...), replace the messages with 'mock.Anything'
 }
 
+func TestHandleEventOnEqualWithTypo(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_equals_with_typo.json"),
+		Communicator: communicatorMock,
+	}
+	msgCorrect := Message{
+		DeviceID: "inputdevice",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "status",
+		Contents: map[string]interface{}{
+			"inputWithTypos": "danse hok daNse",
+		},
+	}
+
+	msgInCorrect := Message{
+		DeviceID: "inputdevice",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "status",
+		Contents: map[string]interface{}{
+			"inputWithTypos": "dance dance hok",
+		},
+	}
+
+	communicatorMock.On("Publish", "front-end", mock.AnythingOfType("string"), 3)
+	communicatorMock.On("Publish", "front-end", mock.AnythingOfType("string"), 3)
+	communicatorMock.On("Publish", "front-end", mock.AnythingOfType("string"), 3)
+
+	handler.msgMapper(msgInCorrect)
+	assert.Equal(t, handler.Config.Puzzles[0].Event.Rules[0].Executed, 0)
+
+	handler.msgMapper(msgCorrect)
+	assert.Equal(t, handler.Config.Puzzles[0].Event.Rules[0].Executed, 1)
+}
+
+func TestHandleEventOnNotEqualWithTypo(t *testing.T) {
+	communicatorMock := new(CommunicatorMock)
+	handler := Handler{
+		Config:       config.ReadFile("../../../resources/testing/test_equals_with_typo.json"),
+		Communicator: communicatorMock,
+	}
+	msgCorrect := Message{
+		DeviceID: "inputdevice",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "status",
+		Contents: map[string]interface{}{
+			"inputWithTypos": "danse hok daNse",
+		},
+	}
+
+	msgInCorrect := Message{
+		DeviceID: "inputdevice",
+		TimeSent: "05-12-2019 09:42:10",
+		Type:     "status",
+		Contents: map[string]interface{}{
+			"inputWithTypos": "dance dance hok",
+		},
+	}
+
+	communicatorMock.On("Publish", "front-end", mock.AnythingOfType("string"), 3)
+	communicatorMock.On("Publish", "front-end", mock.AnythingOfType("string"), 3)
+	communicatorMock.On("Publish", "front-end", mock.AnythingOfType("string"), 3)
+
+	handler.msgMapper(msgCorrect)
+	assert.Equal(t, handler.Config.Puzzles[1].Event.Rules[0].Executed, 0)
+
+	handler.msgMapper(msgInCorrect)
+	assert.Equal(t, handler.Config.Puzzles[1].Event.Rules[0].Executed, 1)
+}
+
 ////////////////////////////// Error/irregular behavior tests //////////////////////////////
 func TestMsgMapperIllegalType(t *testing.T) {
 	handler := getTestHandler()
