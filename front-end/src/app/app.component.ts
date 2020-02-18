@@ -236,7 +236,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
       }
       // when a config has be checked and put to use (only possible on no errors), notify the user
       case "new config": {
-        this.openSnackbar("using new config: " + msg.contents.name, 3000,"");
+        this.openSnackbar("using new config: " + msg.contents.name, 3000, "");
         break;
       }
       default:
@@ -280,7 +280,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
           break;
         }
         case "test": {
-          this.openSnackbar("performing instruction test", 5000,"OK");
+          this.openSnackbar("performing instruction test", 5000, "OK");
           break;
         }
         case "set state": {
