@@ -18,11 +18,16 @@ Start a server on your desired server machine and insert a build of the front-en
 In directory `front-end` (copy and) rename [src/assets/`config.json.default`](src/assets/config.json.default) to `config.json`, 
 change this file as desired to match your broker IP address and port
 
-#### Build
+### install lighttpd
+- run `sudo apt-get install lighttpd`
 
+#### Build
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
-Move the the build artifacts to the html directory of the server machine.
+Move the the build artifacts to the html directory of the server machine, by:
+- run `cd /`
+- run `sudo rm -r var/www/html/*`
+- move the contents of `dist/sciler/` to `var/www/html/`
 
 # Development
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.3.19.

@@ -53,7 +53,7 @@ protocol websockets
 - run sudo nano /etc/supervisor/conf.d/broker.conf and save:
 ```
 [program:broker]
-command=/bin/sh -c "sudo service mosquitto stop && -c etc/mosquitto/conf.d/mosquitto.conf"
+command=sh -c "sudo service mosquitto stop && mosquitto -c etc/mosquitto/conf.d/mosquitto.conf"
 user=pi
 group_name=pi
 stdout_logfile=/home/pi/sciler_logs/logs_broker.txt
