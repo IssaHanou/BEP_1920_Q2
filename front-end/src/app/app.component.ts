@@ -236,7 +236,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
       }
       // when a config has be checked and put to use (only possible on no errors), notify the user
       case "new config": {
-        this.openSnackbar("using new config: " + msg.contents.name, "");
+        this.openSnackbar("using new config: " + msg.contents.name, 3000,"");
         break;
       }
       default:
@@ -256,7 +256,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
         jsonData.deviceId +
         " for instruction: " +
         instruction.instruction;
-      this.openSnackbar(display, "");
+      this.openSnackbar(display, 3000, "");
     }
   }
 
@@ -265,7 +265,8 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
    * reset - reset the front-end's device status
    * status update - send front-end's connection status to back-end
    * test - perform a test on the front-end
-   * setState - update the gameState of the front-end and inform the back-end
+   * set state - update the gameState of the front-end and inform the back-end
+   * notify host - notify the host of a message
    */
   private processInstruction(jsonData) {
     for (const action of jsonData) {
@@ -279,12 +280,16 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
           break;
         }
         case "test": {
-          this.openSnackbar("performing instruction test", "");
+          this.openSnackbar("performing instruction test", 5000,"OK");
           break;
         }
         case "set state": {
           this.deviceList.updateDevice(action.component_id, action.value);
           this.sendStatusFrontEnd();
+          break;
+        }
+        case "notify host": {
+          this.openSnackbar(action.value, 8000, "OK");
           break;
         }
         default: {
@@ -460,12 +465,13 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
 
   /**
    * Opens snackbar with duration of 3 seconds.
-   * @param message displays this message
+   * @param message: displays this message
+   * @param duration: duration of message
    * @param action: button to display - optional use
    */
-  public openSnackbar(message: string, action: string) {
+  public openSnackbar(message: string, duration: number, action: string) {
     const snackbar = new MatSnackBarConfig();
-    snackbar.duration = 3000;
+    snackbar.duration = duration;
     snackbar.panelClass = ["custom-snack-bar"];
     this.snackBar.open(message, action, snackbar);
   }

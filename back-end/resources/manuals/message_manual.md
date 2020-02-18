@@ -102,7 +102,7 @@ are specifically defined depending on the sender and receiver.
             - `instruction`
             - `instructed_by`
     - If type is `instruction`, then the then the message contents have
-             - `instruction` with value `reset` or `status update` or `test` or `setState`
+             - `instruction` with value `reset` or `status update` or `test` or `set state` or `notify host`
     - If type is `status`, then the message contents has
         - `id` of device
         - `status` has a map of `component_id` keys and `status` values

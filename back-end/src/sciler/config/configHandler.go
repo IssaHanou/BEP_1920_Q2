@@ -133,6 +133,12 @@ func generateFrontendDevice(config *WorkingConfig) *Device {
 					"set state": "string",
 				},
 			},
+			"notification": {
+				Type: "string",
+				Instructions: map[string]string{
+					"notify host": "string",
+				},
+			},
 		},
 		Status:     status,
 		Connection: false,
