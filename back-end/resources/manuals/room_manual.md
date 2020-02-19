@@ -131,7 +131,7 @@ This can be displayed in the front-end, so should be readable and in Dutch.
                 - `operator`: this can `AND` or `OR`
                 - `list`: this is an array of constraints / logical operators
             2. Constraint
-                - `comparison`: this is the type of comparison and can be `eq`, `lt`, `gt`, `contains` , `lte`, `gte`, `not`, `eqwt` and `not eqwt`. However, only `eq` will work on all types, `lt`, `gt`, `lte`, `gte` only on numeric, and `contains` only on arrays, `not` does not work on booleans. `eqwt` and `not eqwt` will only work on strings, they work like `eq` and `not`, they do however allow for typos, and they ignore capital letters.
+                - `comparison`: this is the type of comparison and can be `eq`, `lt`, `gt`, `contains` , `lte`, `gte`, `not`, `eqwt` and `not eqwt`. However, only `eq` will work on all types, `lt`, `gt`, `lte`, `gte` only on numeric, and `contains` only on arrays, `not` does not work on booleans. `eqwt` and `not eqwt` will only work on strings, they work like `eq` and `not`, they do however allow for typos, and they ignore capital letters. Typos are misplaced characters, examples are additional spaces or typing a `c` instead of a `s`. Suppose a correct answer is 'dancing queen' then using `eqwt` will return true for 'DansingQuen' but false for 'dancing king'
                 - `value`: this is the value on which the comparison is made. In case of `device` type, it should be in the same type as specified in the input of the device. 
                 In the case of `timer` type, it should be boolean
                 In the case of `rule` type, it should be numeric since the comparison will be done against the times the rule is executed
