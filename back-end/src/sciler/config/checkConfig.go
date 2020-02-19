@@ -247,7 +247,7 @@ func (action Action) checkActionLabel(config WorkingConfig, ruleID string) []str
 
 // checkValidComparison checks if the comparison is a valid one (one that can be used in a condition)
 func checkValidComparison(comparison string) bool {
-	comparisonTypesAllowed := []string{"eq", "lt", "gt", "lte", "gte", "contains", "not", "eqwt", "not eqwt"}
+	comparisonTypesAllowed := []string{"eq", "lt", "gt", "lte", "gte", "contains", "not"}
 	for _, comp := range comparisonTypesAllowed {
 		if comp == comparison {
 			return true
@@ -400,10 +400,6 @@ func checkConstraintsDeviceStringType(errorParameters []string, constraint Const
 	if valueType != reflect.String {
 		return []string{fmt.Sprintf("level III - implementation error: on rule %s, constraint on device with id %s: type string expected but %s found as type of the value: %v",
 			errorParameters[0], errorParameters[1], valueType.String(), constraint.Value)}
-	}
-	if !checkValidComparison(comparison) {
-		return []string{fmt.Sprintf("level III - implementation error: on rule %s, constraint on device with id %s: comparison '%s' is not valid",
-			errorParameters[0], errorParameters[1], comparison)}
 	}
 	if comparison != "eq" && comparison != "not" && comparison != "eqwt" && comparison != "not eqwt" {
 		return []string{fmt.Sprintf("level III - implementation error: on rule %s, constraint on device with id %s: comparison %s not allowed on a string constraint",
