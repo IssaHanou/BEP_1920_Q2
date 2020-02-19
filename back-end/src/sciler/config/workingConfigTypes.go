@@ -271,7 +271,8 @@ func compare(param1 interface{}, param2 interface{}, comparision string) bool {
 // equalWithTypo checks if two strings are roughly equal
 // it tries to ignore typos
 func equalWithTypo(expected string, actual string) bool {
-	return checkStringDistanceConstraint(expected, actual, int(math.Max(1, float64(len(expected))/5)))
+	maxDifference := int(math.Max(1, float64(len(expected))/5)) // maximum allowed difference is 20% of the length of the correct answer (with a minimum of 1)
+	return checkStringDistanceConstraint(expected, actual, maxDifference)
 }
 
 // checkStringDistanceConstraint checks if the difference (minimal number of replacements/insertions/deletions needed to convert one string in the other)
