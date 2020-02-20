@@ -63,6 +63,7 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
     this.logger = new Logger();
     this.jsonConvert = new JsonConvert();
     this.initializeVariables();
+    this.initializeTimers();
 
     const topics = ["front-end"];
     for (const topic of topics) {
@@ -73,7 +74,6 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
       this.logger.log("info", "connected to broker on " + config.host);
       this.sendInstruction([{ instruction: "send setup" }]);
       this.sendConnection(true);
-      this.initializeTimers();
     });
 
     this.mqttService.onOffline.subscribe(() => {
