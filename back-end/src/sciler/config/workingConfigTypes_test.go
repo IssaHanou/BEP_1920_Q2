@@ -800,3 +800,113 @@ func TestNumericToFloatNonNumeric(t *testing.T) {
 	assert.Equal(t, float64(0), numericToFloat64("0"),
 		"non input or float value should return 0")
 }
+
+func Test_typoProofEqual(t *testing.T) {
+	type args struct {
+		string1       string
+		string2       string
+		maxDifference int
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "strict equal",
+			args: args{
+				string1:       "kaas",
+				string2:       "kaas",
+				maxDifference: 0,
+			},
+			want: true,
+		},
+		{
+			name: "capital letters don't influence the outcome",
+			args: args{
+				string1:       "Kaas",
+				string2:       "kaas",
+				maxDifference: 0,
+			},
+			want: true,
+		},
+		{
+			name: "not equal",
+			args: args{
+				string1:       "kaas",
+				string2:       "kees",
+				maxDifference: 0,
+			},
+			want: false,
+		},
+		{
+			name: "small typo allowed",
+			args: args{
+				string1:       "abcdefghijklmnopqrstuvwxyz",
+				string2:       "abcdefghijklmnopqrstuvcwyz",
+				maxDifference: 2,
+			},
+			want: true,
+		},
+		{
+			name: "big typo not allowed",
+			args: args{
+				string1:       "abcdefghijklmnopqrstuvwxyz",
+				string2:       "abcdefghikjlnmnopqrstuvcsxyz",
+				maxDifference: 2,
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := checkStringDistanceConstraint(tt.args.string1, tt.args.string2, tt.args.maxDifference); got != tt.want {
+				t.Errorf("checkStringDistanceConstraint() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_equalWithTypo(t *testing.T) {
+	type args struct {
+		param1 string
+		param2 string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "roughly equal variant 1",
+			args: args{
+				param1: "dance hok dance",
+				param2: "danse hok danse",
+			},
+			want: true,
+		},
+		{
+			name: "roughly equal variant 2",
+			args: args{
+				param1: "dance hok dance",
+				param2: "dancehokdance",
+			},
+			want: true,
+		},
+		{
+			name: "not roughly equal",
+			args: args{
+				param1: "dance dance hok",
+				param2: "dance hok dance",
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := equalWithTypo(tt.args.param1, tt.args.param2); got != tt.want {
+				t.Errorf("equalWithTypo() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

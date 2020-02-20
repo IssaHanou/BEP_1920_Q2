@@ -1,0 +1,92 @@
+{
+  "button_events": [],
+  "cameras": [
+  ],
+  "devices": [
+    {
+      "description": "test device",
+      "id": "inputdevice",
+      "input": {
+        "inputWithTypos": "string"
+      },
+      "output": {}
+    }
+  ],
+  "general": {
+    "duration": "20m",
+    "host": "localhost",
+    "name": "test",
+    "port": 1883
+  },
+  "general_events": [
+  ],
+  "puzzles": [
+    {
+      "hints": [
+        "doe beter je best"
+      ],
+      "name": "password",
+      "rules": [
+        {
+          "actions": [],
+          "conditions": {
+            "constraints": {
+              "list": [
+                {
+                  "list": [
+                    {
+                      "comparison": "eqwt",
+                      "component_id": "inputWithTypos",
+                      "value": "dance hok dance"
+                    }
+                  ],
+                  "operator": "OR"
+                }
+              ],
+              "operator": "AND"
+            },
+            "type": "device",
+            "type_id": "inputdevice"
+          },
+          "description": "",
+          "id": "test puzzel",
+          "limit": 1
+        }
+      ]
+    },
+    {
+      "hints": [
+        "doe beter je best"
+      ],
+      "name": "not password",
+      "rules": [
+        {
+          "actions": [],
+          "conditions": {
+            "constraints": {
+              "list": [
+                {
+                  "list": [
+                    {
+                      "comparison": "not eqwt",
+                      "component_id": "inputWithTypos",
+                      "value": "dance hok dance"
+                    }
+                  ],
+                  "operator": "OR"
+                }
+              ],
+              "operator": "AND"
+            },
+            "type": "device",
+            "type_id": "inputdevice"
+          },
+          "description": "",
+          "id": "test puzzel2",
+          "limit": 1
+        }
+      ]
+    }
+  ],
+  "timers": []
+}
