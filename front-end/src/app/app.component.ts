@@ -109,7 +109,6 @@ export class AppComponent extends FullScreen implements OnInit, OnDestroy {
     const generalTimer = { id: "general", duration: 0, state: "stateIdle" };
     this.timerList.setTimer(generalTimer);
     this.resetFrontEndStatus();
-    this.logger.log("debug","RESET RESET RESET \n RESET RESET RESET \n RESET RESET RESET")
   }
 
   /**
