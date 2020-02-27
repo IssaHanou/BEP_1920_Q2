@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import time
 from datetime import datetime
 
 import paho.mqtt.client as mqtt
@@ -129,10 +130,19 @@ class Sciler:
         try:
             self.client.connect(self.host, self.port, keepalive=10)
             logging.info("connected to broker")
+            return
         except ConnectionRefusedError:
             logging.error("connection was refused")
         except TimeoutError:
             logging.error("connecting failed, socket timed out")
+        except OSError:
+            logging.error("connecting failed, OSError, probably not (yet) connected to the router")
+        except BaseException as error:
+            print("Unexpected error: {}".format(error))
+
+        time.sleep(1)
+        logging.warning("trying to reconnect")
+        self.__connect()
 
     def __on_connect(self, client, userdata, flags, rc):
         """
