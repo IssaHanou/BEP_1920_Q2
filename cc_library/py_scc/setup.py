@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="sciler",
-    version="0.2.2",
+    version="0.2.3",
     author="Raccoon Serious Games",
     author_email="BEP@raccoon.games",
     description="Client library for S.C.I.L.E.R.",
