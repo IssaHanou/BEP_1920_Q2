@@ -1,10 +1,11 @@
 <div class="content">
-  <div class="navigation">
-    <button (click)="navigation.sendInstruction('first')">Eerste</button>
-    <button (click)="navigation.sendInstruction('prev')">Vorige</button>
+  <p class="title">Haarlems Accordeonorkest</p>
+  <p class="subtitle">Schilderijententoonstelling</p>
+  <div class="current-box">
+    <p class="current">Huidige slide:</p>
     <p class="current">{{ getCurrent() }}</p>
+    <button (click)="navigation.sendInstruction('prev')">Vorige</button>
     <button (click)="navigation.sendInstruction('next')">Volgende</button>
-    <button (click)="navigation.sendInstruction('last')">Laatste</button>
   </div>
   <div class="all-slides">
     <p>Kies een specifieke slide</p>

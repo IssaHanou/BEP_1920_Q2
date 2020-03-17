@@ -1,0 +1,155 @@
+{
+  "general": {
+    "name": "HAO schilderijententoonstelling",
+    "host": "192.168.0.107",
+    "port": 1883,
+    "duration": "30m"
+  },
+  "devices": [
+    {
+      "id": "slides",
+      "description": "slideshow of the schilderijententoonstelling",
+      "input": {},
+      "output": {
+        "current": {
+          "type": "numeric",
+          "instructions": {
+            "next": "boolean",
+            "prev": "boolean",
+            "specific": "status"
+          }
+        }
+      }
+    },
+    {
+      "id": "navigate",
+      "description": "navigate through the slides using next, prev, specific or last",
+      "input": {
+        "next": "boolean",
+        "prev": "boolean",
+        "specific": "numeric",
+        "specificSubmitted": "boolean"
+      },
+      "output": {
+        "showing": {
+          "type": "numeric",
+          "instructions": {
+            "setShowing": "status"
+          }
+        }
+      }
+    }
+  ],
+  "puzzles": [
+    {
+      "name": "navigation",
+      "rules": [
+        {
+          "id": "next",
+          "conditions": {
+            "type": "device",
+            "type_id": "navigate",
+            "constraints": {
+              "component_id": "next",
+              "value": true,
+              "comparison": "eq"
+            }
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "slides",
+              "message": [
+                {
+                  "instruction": "next",
+                  "component_id": "current",
+                  "value": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "prev",
+          "conditions": {
+            "type": "device",
+            "type_id": "navigate",
+            "constraints": {
+              "component_id": "prev",
+              "value": true,
+              "comparison": "eq"
+            }
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "slides",
+              "message": [
+                {
+                  "instruction": "prev",
+                  "component_id": "current",
+                  "value": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "specific",
+          "conditions": {
+            "type": "device",
+            "type_id": "navigate",
+            "constraints": {
+              "component_id": "specificSubmitted",
+              "value": true,
+              "comparison": "eq"
+            }
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "slides",
+              "message": [
+                {
+                  "instruction": "specific",
+                  "component_id": "current",
+                  "value": "navigate.specific"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "current",
+      "rules": [
+        {
+          "id": "slideStatus",
+          "conditions": {
+            "type": "device",
+            "type_id": "slides",
+            "constraints": {
+              "component_id": "current",
+              "comparison": "gte",
+              "value": 0
+            }
+          },
+          "actions": [
+            {
+              "type": "device",
+              "type_id": "navigate",
+              "message": [
+                {
+                  "component_id": "showing",
+                  "instruction": "setShowing",
+                  "value": "slides.current"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

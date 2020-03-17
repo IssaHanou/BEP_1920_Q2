@@ -6,8 +6,6 @@ export class Navigation extends Device {
 
   private next: boolean;
   private prev: boolean;
-  private first: boolean;
-  private last: boolean;
   private specific: number;
   private specificSubmitted: boolean;
 
@@ -50,8 +48,6 @@ export class Navigation extends Device {
 
     this.prev = false;
     this.next = false;
-    this.last = false;
-    this.first = false;
     this.specific = 0;
     this.specificSubmitted = false;
   }
@@ -61,15 +57,21 @@ export class Navigation extends Device {
       showing: this.current,
       prev: this.prev,
       next: this.next,
-      first: this.first,
-      last: this.last,
       specific: this.specific,
       specificSubmitted: this.specificSubmitted
     };
   }
 
   performInstruction(action) {
-    return false;
+    switch (action.instruction) {
+      case "setShowing": {
+        this.current = action.value;
+        break;
+      }
+      default:
+        return false;
+    }
+    return true;
   }
 
   test() {
@@ -81,20 +83,7 @@ export class Navigation extends Device {
   }
 
   sendInstruction(instruction: string, value: number) {
-    console.log("sending instruction: " + instruction + " " + value);
     switch (instruction) {
-      case "first":
-        this.first = true;
-        this.statusChanged();
-        this.first = false;
-        this.statusChanged();
-        break;
-      case "last":
-        this.last = true;
-        this.statusChanged();
-        this.last = false;
-        this.statusChanged();
-        break;
       case "next":
         this.next = true;
         this.statusChanged();

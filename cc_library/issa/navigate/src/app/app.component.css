@@ -1,0 +1,39 @@
+.content {
+  text-align: center;
+}
+
+button {
+  background-color: #ff4081;
+  color: white;
+  border: 2px solid white;
+  border-radius: 10%;
+  padding: 5px;
+  margin: 5px;
+}
+
+.current {
+  font-size: 24px;
+}
+.current-box {
+  border: 2px solid white;
+  padding: 5px;
+}
+
+p {
+  color: white;
+  font-size: 16px;
+}
+
+.all-slides {
+  border: 2px solid white;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 24px;
+}
+
+.subtitle {
+  font-size: 18px;
+}

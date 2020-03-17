@@ -54,26 +54,21 @@ export class Slides extends Device {
         if (this.current < this.allSlides.length - 1) {
           this.current++;
         }
+        this.statusChanged();
         break;
       }
       case "prev": {
         if (this.current > 0) {
           this.current--;
         }
-        break;
-      }
-      case "last": {
-        this.current = this.allSlides.length - 1;
-        break;
-      }
-      case "first": {
-        this.current = 0;
+        this.statusChanged();
         break;
       }
       case "specific": {
         if (action.value >= 0 && action.value < this.allSlides.length) {
           this.current = action.value;
         }
+        this.statusChanged();
         break;
       }
       default: {
@@ -89,6 +84,5 @@ export class Slides extends Device {
 
   reset() {
     this.current = 0;
-    this.statusChanged();
   }
 }
