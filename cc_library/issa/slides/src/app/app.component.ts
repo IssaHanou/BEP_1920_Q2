@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {Navigation} from "../../../navigate/src/app/navigation";
+import {Slides} from "./slides";
 import * as data from "../assets/slides_config.json";
 
 @Component({
@@ -14,7 +14,7 @@ export class AppComponent {
 
   constructor() {
     this.config = (data as any).default;
-    this.slides = new Navigation(this.config);
+    this.slides = new Slides(this.config);
   }
 
   ngOnInit(): void {
@@ -25,9 +25,9 @@ export class AppComponent {
 
   getSrc() {
     if (this.slides.allSlides === undefined) {
-      return "../assets/images/opening.JPG";
+      return "../assets/images/Opening.jpg";
     } else {
-      return "../assets/images/" + this.slides.allSlides[this.slides.current] + ".JPG";
+      return "../assets/images/" + this.slides.allSlides[this.slides.current] + ".jpg";
     }
   }
 }

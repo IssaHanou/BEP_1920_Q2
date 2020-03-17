@@ -1,15 +1,15 @@
 <div class="content">
-  <div class="current">
-    <p>{{ navigation.slides[navigation.current] }}</p>
-  </div>
   <div class="navigation">
-    <button>Prev</button>
-    <button>Next</button>
+    <button (click)="navigation.sendInstruction('first')">Eerste</button>
+    <button (click)="navigation.sendInstruction('prev')">Vorige</button>
+    <p class="current">{{ getCurrent() }}</p>
+    <button (click)="navigation.sendInstruction('next')">Volgende</button>
+    <button (click)="navigation.sendInstruction('last')">Laatste</button>
   </div>
   <div class="all-slides">
     <p>Kies een specifieke slide</p>
-    <ng-container *ngFor="let slide of navigation.slides">
-      <button>{{ slide }}</button>
+    <ng-container *ngFor="let slide of navigation.slides; let i = index">
+      <button (click)="navigation.sendInstruction('specific', i)">{{ slide }}</button>
     </ng-container>
   </div>
 </div>

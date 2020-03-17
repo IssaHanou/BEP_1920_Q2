@@ -22,4 +22,12 @@ export class AppComponent {
       console.log("CONNECTED");
     });
   }
+
+  getCurrent() {
+    if (this.navigation.slides === undefined) {
+      return "Opening";
+    } else {
+      return this.navigation.slides[this.navigation.current];
+    }
+  }
 }

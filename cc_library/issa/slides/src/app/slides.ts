@@ -26,7 +26,19 @@ export class Slides extends Device {
         "time=" + formatDate(date) + " level=" + level + " msg=" + message
       ); // call own logger
     });
-    this.allSlides = ["Opening", "Promenade 1", "Deel 1", "Promenade 2", "Deel 2", "Promenade 3", "Deel 3", "Einde"];
+    this.allSlides = ["Opening",
+      "Promenade 1",
+      "Gnomus (deel 1)",
+      "Promenade 2",
+      "Het oude kasteel (deel 2)",
+      "Promenade 3",
+      "Tuilerieen (deel 3)",
+      "Bydlo (deel 4)",
+      "Promenade 4",
+      "Ballet van de kuikens (deel 5)",
+      "Samuel en Schmuyle (deel 6)",
+      "Poort van Kiev (deel 10)",
+      "Einde"];
     this.current = 0;
   }
 
@@ -39,19 +51,29 @@ export class Slides extends Device {
   performInstruction(action) {
     switch (action.instruction) {
       case "next": {
-        this.current++;
+        if (this.current < this.allSlides.length - 1) {
+          this.current++;
+        }
         break;
       }
       case "prev": {
-        this.current--;
+        if (this.current > 0) {
+          this.current--;
+        }
         break;
       }
       case "last": {
         this.current = this.allSlides.length - 1;
         break;
       }
+      case "first": {
+        this.current = 0;
+        break;
+      }
       case "specific": {
-        this.current = action.value;
+        if (action.value >= 0 && action.value < this.allSlides.length) {
+          this.current = action.value;
+        }
         break;
       }
       default: {
