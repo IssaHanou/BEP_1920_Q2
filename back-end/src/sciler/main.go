@@ -40,7 +40,7 @@ func main() {
 }
 
 func startApplication(dir string) {
-	filename := filepath.Join(dir, "back-end", "resources", "production", "issa_config.json")
+	filename := filepath.Join(dir, "back-end", "resources", "production", "room_config.json")
 	configurations := config.ReadFile(filename)
 	logger.Infof("configurations read from: %v", filename)
 
