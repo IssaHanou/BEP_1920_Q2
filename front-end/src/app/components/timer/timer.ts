@@ -24,7 +24,7 @@ export class Timer {
    * A tick subtracts 1 second (1000 ms) from its duration.
    */
   tick() {
-    this.duration = this.duration - 1000;
+    this.duration = Math.max(this.duration - 1000, 0);
   }
 
   update(dur, sta) {
