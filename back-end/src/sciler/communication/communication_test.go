@@ -24,6 +24,10 @@ func (t TokenMockSuccess) Error() error {
 	return nil
 }
 
+func (t TokenMockSuccess) Done() <-chan struct {}{
+	return nil
+}
+
 type TokenMockFailure struct {
 	mock.Mock
 }
@@ -38,6 +42,10 @@ func (t TokenMockFailure) WaitTimeout(time.Duration) bool {
 
 func (t TokenMockFailure) Error() error {
 	return errors.New("testing error of TokenMockFailure")
+}
+
+func (t TokenMockFailure) Done() <-chan struct {}{
+	return nil
 }
 
 type ClientMock struct {
