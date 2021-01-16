@@ -5,7 +5,7 @@ import * as moment from "moment";
  * Message class with same variables as message json object that is sent by broker.
  * Object are used to send messages to the back-end.
  */
-@JsonObject
+@JsonObject("Message")
 export class Message {
   @JsonProperty("device_id")
   deviceId: string;

@@ -48,7 +48,7 @@ describe("ManageComponent", () => {
     const testButton = fixture.debugElement.nativeElement
       .getElementsByClassName("test")
       .item(0);
-    testButton.click();
+    testButton.dispatchEvent(new Event("click"));
     fixture.detectChanges();
 
     expect(component.onClickTestButton).toHaveBeenCalled();
@@ -59,7 +59,7 @@ describe("ManageComponent", () => {
     const testButton = fixture.debugElement.nativeElement
       .getElementsByClassName("reset")
       .item(0);
-    testButton.click();
+    testButton.dispatchEvent(new Event("click"));
     fixture.detectChanges();
 
     expect(component.onClickResetButton).toHaveBeenCalled();
