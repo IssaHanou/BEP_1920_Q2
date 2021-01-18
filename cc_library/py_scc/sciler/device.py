@@ -54,13 +54,20 @@ class Device(ABC):
         """
         self.scclib.status_changed()
 
-    def start(self, loop=None, stop=None):
+    def start(self, loop=None, stop=None, blocking=True):
         """
         Passes the request to start the message sender
         :param loop: possible event loop
         :param stop: possible end function
+        :param blocking: set to False to not block when the client thread has started; need to call `stop` manually.
         """
-        self.scclib.start(loop, stop)
+        self.scclib.start(loop=loop, stop=stop, blocking=blocking)
+
+    def stop(self):
+        """
+        Stops the client thread that was started with `start` in non-blocking mode.
+        """
+        self.scclib.stop()
 
     def log(self, msg, level=logging.INFO):
         """
