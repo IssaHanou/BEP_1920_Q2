@@ -33,7 +33,7 @@ class Sciler:
             os.mkdir("logs")
         filename = "logs/log-" + datetime.now().strftime("%d-%m-%YT--%H-%M-%S") + ".txt"
         logging.basicConfig(
-            level=logging.INFO,
+            level=logging.CRITICAL,
             format="%(asctime)s [%(levelname)-5.5s]  %(message)s",
             handlers=[logging.FileHandler(filename=filename), logging.StreamHandler()],
         )
